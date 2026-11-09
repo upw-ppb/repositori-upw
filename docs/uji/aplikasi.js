@@ -197,12 +197,29 @@ function laci() {
 }
 
 /* ---------- aksi ---------- */
-async function jalankan(fn) {
-  if (S.sibuk) return; S.sibuk = true; S.galat = ""; render();
-  try { await fn(); } catch (e) { S.galat = e.message; }
-  S.sibuk = false; render();
+/* Isian dibaca SEBELUM layar digambar ulang (status "Memproses…"), lalu dikembalikan bila terjadi kesalahan. */
+let SNAP = {}, CENTANG = [];
+function potretIsian() {
+  SNAP = {}; CENTANG = [];
+  document.querySelectorAll("#app input, #app textarea, #app select").forEach(el => {
+    if (!el.id) { if (el.type === "checkbox" && el.checked) CENTANG.push(el.dataset); return; }
+    SNAP[el.id] = el.type === "checkbox" ? el.checked : el.value;
+  });
 }
-const nilai = id => ($(id)?.value || "").trim();
+function kembalikanIsian() {
+  Object.keys(SNAP).forEach(id => { const el = $(id); if (el && el.type !== "checkbox" && el.type !== "password") el.value = SNAP[id]; });
+}
+async function jalankan(fn) {
+  if (S.sibuk) return;
+  potretIsian();
+  S.sibuk = true; S.galat = ""; render();
+  let gagal = false;
+  try { await fn(); } catch (e) { S.galat = e.message; gagal = true; }
+  S.sibuk = false; render();
+  if (gagal) kembalikanIsian();
+}
+const nilai = id => String((id in SNAP ? SNAP[id] : $(id)?.value) || "").trim();
+const mentah = id => String((id in SNAP ? SNAP[id] : $(id)?.value) || "");
 function cocok(a, b) { if (!a) throw new Error("Isi kata sandi baru."); if (a !== b) throw new Error("Kedua kata sandi tidak sama."); }
 async function muatPengguna() { try { S.daftar = (await api("admin.pengguna")).pengguna; render(); } catch (e) { toast(e.message); } }
 
@@ -210,15 +227,15 @@ const AKSI = {
   keLupa() { S.layar = "lupa"; S.lupa = { langkah: 1, email: "" }; S.galat = ""; render(); },
   keMasuk() { S.layar = "masuk"; S.galat = ""; render(); },
   async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
-  aktSandi: () => jalankan(async () => { const a = nilai("p1"); cocok(a, nilai("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
+  aktSandi: () => jalankan(async () => { const a = mentah("p1"); cocok(a, mentah("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
   aktKirim: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; const j = await api("aktivasi.kirimKode", { email: em }); S.akt.terkirim = true; S.akt.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
   aktVerif: () => jalankan(async () => { S.pengguna = (await api("aktivasi.verifikasi", { kode: nilai("kode") })).pengguna; S.view = "beranda"; toast("Akun aktif. Selamat datang!"); }),
   lupaKirim: () => jalankan(async () => { S.lupa.email = nilai("le"); if (!S.lupa.email) throw new Error("Isi email terdaftar."); const j = await api("lupa.kirimKode", { email: S.lupa.email }); S.lupa.langkah = 2; S.lupa.kodeUji = j.kodeUji || ""; }),
-  lupaReset: () => jalankan(async () => { const a = nilai("l1"); cocok(a, nilai("l2")); const j = await api("lupa.reset", { email: S.lupa.email, kode: nilai("lk"), sandiBaru: a }); S.layar = "masuk"; toast(j.pesan); }),
-  gantiWajib: () => jalankan(async () => { const a = nilai("g1"); cocok(a, nilai("g2")); S.pengguna = (await api("ganti.sandi", { sandiBaru: a })).pengguna; toast("Kata sandi tersimpan."); }),
-  gantiSandi: () => jalankan(async () => { const a = nilai("a1"); cocok(a, nilai("a2")); S.pengguna = (await api("ganti.sandi", { sandiLama: nilai("a0"), sandiBaru: a })).pengguna; toast("Kata sandi berhasil diganti."); }),
+  lupaReset: () => jalankan(async () => { const a = mentah("l1"); cocok(a, mentah("l2")); const j = await api("lupa.reset", { email: S.lupa.email, kode: nilai("lk"), sandiBaru: a }); S.layar = "masuk"; toast(j.pesan); }),
+  gantiWajib: () => jalankan(async () => { const a = mentah("g1"); cocok(a, mentah("g2")); S.pengguna = (await api("ganti.sandi", { sandiBaru: a })).pengguna; toast("Kata sandi tersimpan."); }),
+  gantiSandi: () => jalankan(async () => { const a = mentah("a1"); cocok(a, mentah("a2")); S.pengguna = (await api("ganti.sandi", { sandiLama: mentah("a0"), sandiBaru: a })).pengguna; toast("Kata sandi berhasil diganti."); }),
   impor: () => jalankan(async () => {
-    S.impor.teks = $("imporTeks").value;
+    S.impor.teks = mentah("imporTeks");
     const baris = S.impor.teks.split(/\r?\n/).map(x => x.trim()).filter(Boolean).map(x => { const c = x.split(/\t|;/).map(y => y.trim()); return { username: c[0], nama: c[1], peran: c[2] || "mahasiswa" }; });
     if (!baris.length) throw new Error("Tempel minimal satu baris data.");
     S.impor.hasil = await api("admin.impor", { baris }); S.impor.teks = ""; S.daftar = null; toast(S.impor.hasil.diimpor + " akun diimpor.");
@@ -227,7 +244,7 @@ const AKSI = {
   muatLog() { S.log = null; render(); },
   laciPeran(d) { S.laci = { jenis: "peran", id: d.id }; S.galat = ""; render(); },
   resetSandi: d => jalankan(async () => { const x = S.daftar.find(y => y.id === d.id); const j = await api("admin.resetSandi", { userId: d.id }); S.laci = { jenis: "sandi", nama: x.nama, sandi: j.sandiSementara }; }),
-  simpanPeran: () => jalankan(async () => { const peran = [...document.querySelectorAll("[data-peran]:checked")].map(x => x.dataset.peran); await api("admin.peran", { userId: S.laci.id, peran }); S.laci = null; S.daftar = null; toast("Peran disimpan."); }),
+  simpanPeran: () => jalankan(async () => { const peran = CENTANG.filter(x => x.peran).map(x => x.peran); await api("admin.peran", { userId: S.laci.id, peran }); S.laci = null; S.daftar = null; toast("Peran disimpan."); }),
   salinSandi() { navigator.clipboard?.writeText(S.laci.sandi).then(() => toast("Disalin."), () => toast("Pilih teksnya lalu salin manual.")); },
   tutup() { S.laci = null; S.galat = ""; render(); },
   tutupLuar(d, e) { if (e.target === e.currentTarget || e.target.classList.contains("overlay")) { S.laci = null; render(); } }
@@ -243,7 +260,7 @@ document.addEventListener("submit", e => {
   if (e.target.id !== "fMasuk") return;
   e.preventDefault();
   jalankan(async () => {
-    const j = await api("masuk", { username: nilai("mu"), sandi: $("ms").value, perangkat: navigator.userAgent });
+    const j = await api("masuk", { username: nilai("mu"), sandi: mentah("ms"), perangkat: navigator.userAgent });
     aturToken(j.token); S.pengguna = j.pengguna; S.view = "beranda"; S.akt = { langkah: j.pengguna.perluAktivasi && !j.pengguna.wajibGanti ? 2 : 1, email: "" };
   });
 });
