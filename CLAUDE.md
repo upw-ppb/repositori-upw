@@ -59,6 +59,24 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 7. Pelihara panduan darurat bergambar (di Drive prodi) agar Super Admin bisa rollback sendiri via GitHub & Apps Script.
 8. Jangan hapus folder proyek di OneDrive maupun akun GitHub prodi; sesi baru di folder ini melanjutkan pekerjaan.
 
+## Infrastruktur (dibuat 9 Nov 2026)
+- Repositori publik: https://github.com/upw-ppb/repositori-upw (git lokal di folder ini; core.fileMode=false karena OneDrive).
+  Cabang kerja Fase 1: fase-1/fondasi. GitHub Pages sementara dari cabang fase-1/fondasi, folder /docs
+  (pindahkan ke main saat cabang digabung).
+- Tampilan Uji Coba: https://upw-ppb.github.io/repositori-upw/uji/ (docs/uji). Alamat Produksi (docs/) masih halaman
+  "belum dibuka". Tanpa build step; versi di docs/uji/konfig.js dan nama cache di docs/uji/sw.js (naikkan tiap rilis).
+- Server Uji Coba (Apps Script): scriptId 1R2S8BM3glkyOYqsqX36XvdHMW24r77mcaKlHEF22pjva-4Gp3G6kvEvf (gas/.clasp.json),
+  deployment AKfycbyILM_1zheYuMXf-zt7GYIhVr7o1z8S3bCfucZkW1VP9Jj6Wa3Zu4UWXQOq8vrVPBMb.
+  Perbarui: `cd gas && clasp push -f && clasp redeploy <deploymentId> --description "..."` (URL tetap).
+- Data Uji Coba: spreadsheet "Repositori UPW — Data (Uji Coba)" 1rZ82bHhMfNK8ik2cuUXfn7cokGOAGrPVuTsXfKzldvk,
+  folder Drive "Repositori UPW (Uji Coba)" 1jVQDYt8rbdCWSLSEI8X6Vt2z0P2-bJhb (Bukti, Surat, Tanda Tangan, Cadangan).
+  Rahasia server (MERICA) di Script Properties, BUKAN di repo.
+- Produksi nanti = proyek Apps Script + spreadsheet TERPISAH (aksi "siapkan" dengan lingkungan "produksi").
+- Kredensial uji: akun-uji-coba.local.md (gitignored). JANGAN tulis kata sandi di chat atau di berkas yang ter-commit.
+- Mode Uji: server mengembalikan kodeUji (kode verifikasi) agar bisa diuji otomatis; dimatikan otomatis di Produksi.
+- Uji otomatis server: skrip node di scratchpad (uji-api.mjs) — 25 skenario lulus 9 Nov 2026.
+- Batasan agen: jangan mengetik kata sandi di browser untuk alamat github.io (bukan host lokal/uji); uji login lewat API/skrip.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
