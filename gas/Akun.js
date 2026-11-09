@@ -6,7 +6,11 @@ var PERAN_SAH = ["superadmin", "admin", "kps", "kalab", "laboran", "dosen", "ten
 
 function peranDari(p) { return String(p.peran || "").split(",").map(function (x) { return x.trim(); }).filter(String); }
 function punyaPeran(p, daftar) { var r = peranDari(p); return daftar.some(function (x) { return r.indexOf(x) >= 0; }); }
-function wajibPeran(p, daftar) { if (!punyaPeran(p, daftar)) throw galat("Anda tidak memiliki izin untuk tindakan ini."); }
+function wajibPeran(p, daftar) {
+  if (p.status === "impor") throw galat("Selesaikan aktivasi akun terlebih dahulu.");
+  if (p.wajibGanti === true || p.wajibGanti === "TRUE") throw galat("Ganti kata sandi Anda terlebih dahulu.");
+  if (!punyaPeran(p, daftar)) throw galat("Anda tidak memiliki izin untuk tindakan ini.");
+}
 
 /** Data pengguna yang aman dikirim ke tampilan. */
 function profilPublik(p) {
