@@ -76,6 +76,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - Mode Uji: server mengembalikan kodeUji (kode verifikasi) agar bisa diuji otomatis; dimatikan otomatis di Produksi.
 - Uji otomatis server: skrip node di scratchpad (uji-api.mjs) — 25 skenario lulus 9 Nov 2026.
 - Batasan agen: jangan mengetik kata sandi di browser untuk alamat github.io (bukan host lokal/uji); uji login lewat API/skrip.
+- PELAJARAN v0.1.1: uji API saja tidak cukup. Setiap rilis tampilan WAJIB diuji lewat UI: salin docs/uji ke scratchpad,
+  sajikan di localhost (preview), ganti window.fetch dengan server tiruan, isi formulir dan tekan tombol, lalu cek isi
+  permintaan yang terkirim. (Bug v0.1.0: render "Memproses…" menghapus isian sebelum dibaca → semua login gagal.)
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
