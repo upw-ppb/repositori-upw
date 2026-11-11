@@ -3,8 +3,8 @@
  * Hanya bisa dijalankan SEKALI per proyek Apps Script (Uji Coba dan Produksi adalah proyek terpisah).
  */
 var AKUN_CONTOH_UJI = [
-  { username: "250103", nama: "Kadek Ayu Lestari (contoh)", peran: "mahasiswa" },
-  { username: "250107", nama: "Putu Wirawan (contoh)", peran: "mahasiswa" },
+  { username: "250103", nama: "Kadek Ayu Lestari (contoh)", peran: "mahasiswa", masuk: 2025, kelas: "A" },
+  { username: "250107", nama: "Putu Wirawan (contoh)", peran: "mahasiswa", masuk: 2025, kelas: "A" },
   { username: "199001152015041001", nama: "Gede Arya Pratama, S.E., M.M. (contoh)", peran: "dosen,kalab", dosenId: "d3" },
   { username: "197911302005012001", nama: "Dr. Komang Sri Widiastuti, M.Par. (contoh)", peran: "dosen,kps", dosenId: "d4" },
   { username: "pppk-2021-0107", nama: "Luh Putu Sari Dewi, S.E. (contoh)", peran: "admin,tendik" },
@@ -22,13 +22,11 @@ function aksiSiapkan(d) {
 
   var ss = SpreadsheetApp.create("Repositori UPW — Data" + label);
   DriveApp.getFileById(ss.getId()).moveTo(induk);
-  Object.keys(SKEMA).forEach(function (nama, i) {
-    var sh = i === 0 ? ss.getSheets()[0].setName(nama) : ss.insertSheet(nama);
-    sh.getRange(1, 1, 1, SKEMA[nama].length).setValues([SKEMA[nama]]).setFontWeight("bold").setBackground("#e6eef6");
-    sh.setFrozenRows(1);
-  });
+  var awal = ss.getSheets()[0];
+  daftarTabel().forEach(function (nama) { bentukSheet(ss, nama); });
+  ss.deleteSheet(awal);
 
-  k.setProperties({ SPREADSHEET_ID: ss.getId(), FOLDER_ID: induk.getId(), LINGKUNGAN: env, MERICA: acak(48) });
+  k.setProperties({ SPREADSHEET_ID: ss.getId(), FOLDER_ID: induk.getId(), LINGKUNGAN: env, MERICA: acak(48), SKEMA_VERSI: String(VERSI_SKEMA) });
 
   tambahBanyak("Pengaturan", [
     { kunci: "unitKerja", nilai: "Prodi Usaha Perjalanan Wisata", keterangan: "Unit kerja pada surat" },
@@ -46,7 +44,8 @@ function aksiSiapkan(d) {
   if (env === "uji") AKUN_CONTOH_UJI.forEach(function (a) {
     akun.push({ id: "u" + acak(10), username: a.username, nama: a.nama, email: "", peran: a.peran, status: "impor", hash: "", garam: "",
       wajibGanti: true, emailTerverifikasi: false, gagal: 0, kunciSampai: "", ref: a.username, dosenId: a.dosenId || "",
-      diimporPada: kini, aktivasiPada: "", masukTerakhir: "", diubahPada: kini });
+      diimporPada: kini, aktivasiPada: "", masukTerakhir: "", diubahPada: kini,
+      masuk: a.masuk || "", kelas: a.kelas || "", statusMhs: a.masuk ? "A" : "" });
   });
   tambahBanyak("Pengguna", akun);
   catat("", "siapkan", { lingkungan: env });

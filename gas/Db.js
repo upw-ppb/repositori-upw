@@ -1,24 +1,41 @@
 /**
  * Lapisan data sederhana di atas Google Sheets.
  * Setiap sheet = satu tabel; baris 1 = nama kolom.
+ * ATURAN: kolom baru selalu ditambahkan di AKHIR daftar, agar data lama tetap terbaca (juga oleh versi sebelumnya).
  */
 var SKEMA = {
   Pengguna: ["id", "username", "nama", "email", "peran", "status", "hash", "garam", "wajibGanti", "emailTerverifikasi",
-             "gagal", "kunciSampai", "ref", "dosenId", "diimporPada", "aktivasiPada", "masukTerakhir", "diubahPada"],
+             "gagal", "kunciSampai", "ref", "dosenId", "diimporPada", "aktivasiPada", "masukTerakhir", "diubahPada",
+             /* v0.2.0 */ "masuk", "kelas", "statusMhs", "biodataLengkap", "biodataSemester", "biodataPada"],
   Sesi: ["tokenHash", "userId", "dibuat", "kedaluwarsa", "perangkat"],
   Kode: ["userId", "tujuan", "kodeHash", "email", "kedaluwarsa", "percobaan", "dipakai"],
   Log: ["waktu", "userId", "aksi", "detail"],
-  Pengaturan: ["kunci", "nilai", "keterangan"]
+  Pengaturan: ["kunci", "nilai", "keterangan"],
+  /* v0.2.0 */
+  RiwayatSemester: ["userId", "semester", "tinggal", "kerja", "inggris", "transport", "waktu"]
 };
+
+/** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
+var VERSI_SKEMA = 2;
+
+/** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
+function kolomDari(nama) {
+  var k = SKEMA[nama] || tabelBiodata()[nama];
+  if (!k) throw new Error("Tabel tidak dikenal: " + nama);
+  return k;
+}
+function daftarTabel() { return Object.keys(SKEMA).concat(Object.keys(tabelBiodata())); }
 
 function konfig() { return PropertiesService.getScriptProperties(); }
 function lingkungan() { return konfig().getProperty("LINGKUNGAN") || "belum-disiapkan"; }
 function modeUji() { return lingkungan() === "uji"; }
 
+var _buku = null;
 function buku() {
+  if (_buku) return _buku;
   var id = konfig().getProperty("SPREADSHEET_ID");
   if (!id) throw galat("Server belum disiapkan.");
-  return SpreadsheetApp.openById(id);
+  return (_buku = SpreadsheetApp.openById(id));
 }
 
 function sheet(nama) {
@@ -31,7 +48,7 @@ function sheet(nama) {
 function semua(nama) {
   var sh = sheet(nama), n = sh.getLastRow();
   if (n < 2) return [];
-  var kolom = SKEMA[nama], nilai = sh.getRange(2, 1, n - 1, kolom.length).getValues();
+  var kolom = kolomDari(nama), nilai = sh.getRange(2, 1, n - 1, kolom.length).getValues();
   return nilai.map(function (r, i) {
     var o = { _baris: i + 2 };
     kolom.forEach(function (k, j) { o[k] = r[j]; });
@@ -41,25 +58,34 @@ function semua(nama) {
 
 function cari(nama, fn) { var l = semua(nama); for (var i = 0; i < l.length; i++) if (fn(l[i])) return l[i]; return null; }
 
-function tambah(nama, obj) {
-  var kolom = SKEMA[nama];
-  sheet(nama).appendRow(kolom.map(function (k) { return obj[k] === undefined ? "" : obj[k]; }));
-}
+/**
+ * Teks yang diawali angka atau = + - @ disimpan sebagai teks murni (awalan '), agar nol di depan nomor HP/NIM tidak hilang,
+ * tanggal tidak berubah format, dan isian tidak pernah dijalankan sebagai rumus.
+ */
+function amankan(v) { return typeof v === "string" && /^[=+\-@0-9]/.test(v) ? "'" + v : v; }
+function barisDari(nama, obj) { return kolomDari(nama).map(function (k) { return obj[k] === undefined || obj[k] === null ? "" : amankan(obj[k]); }); }
+
+function tambah(nama, obj) { sheet(nama).appendRow(barisDari(nama, obj)); }
 
 function tambahBanyak(nama, daftar) {
   if (!daftar.length) return;
-  var kolom = SKEMA[nama], sh = sheet(nama);
-  var nilai = daftar.map(function (o) { return kolom.map(function (k) { return o[k] === undefined ? "" : o[k]; }); });
+  var kolom = kolomDari(nama), sh = sheet(nama);
+  var nilai = daftar.map(function (o) { return barisDari(nama, o); });
   sh.getRange(sh.getLastRow() + 1, 1, nilai.length, kolom.length).setValues(nilai);
 }
 
 /** Perbarui kolom tertentu pada baris objek (hasil semua/cari). */
 function ubah(nama, obj, perubahan) {
-  var kolom = SKEMA[nama], sh = sheet(nama);
-  Object.keys(perubahan).forEach(function (k) {
-    var j = kolom.indexOf(k);
-    if (j < 0) throw new Error("Kolom tidak ada: " + nama + "." + k);
-    sh.getRange(obj._baris, j + 1).setValue(perubahan[k]);
+  var kolom = kolomDari(nama), sh = sheet(nama), ks = Object.keys(perubahan);
+  ks.forEach(function (k) { if (kolom.indexOf(k) < 0) throw new Error("Kolom tidak ada: " + nama + "." + k); });
+  if (ks.length > 3) {
+    // Banyak kolom: tulis satu baris utuh sekaligus (lebih cepat).
+    ks.forEach(function (k) { obj[k] = perubahan[k]; });
+    sh.getRange(obj._baris, 1, 1, kolom.length).setValues([barisDari(nama, obj)]);
+    return;
+  }
+  ks.forEach(function (k) {
+    sh.getRange(obj._baris, kolom.indexOf(k) + 1).setValue(amankan(perubahan[k]));
     obj[k] = perubahan[k];
   });
 }
@@ -80,4 +106,83 @@ function catat(userId, aksi, detail) {
 function pengaturan(kunci, bawaan) {
   var r = cari("Pengaturan", function (x) { return x.kunci === kunci; });
   return r ? r.nilai : bawaan;
+}
+
+/** Buat sheet yang belum ada dan tambahkan kolom baru di akhir. Tidak pernah menghapus atau mengubah urutan kolom. */
+function bentukSheet(ss, nama) {
+  var kolom = kolomDari(nama), sh = ss.getSheetByName(nama);
+  if (!sh) {
+    sh = ss.insertSheet(nama);
+    sh.getRange(1, 1, 1, kolom.length).setValues([kolom]).setFontWeight("bold").setBackground("#e6eef6");
+    sh.setFrozenRows(1);
+    return;
+  }
+  var lebar = Math.max(sh.getLastColumn(), 1), ada = sh.getRange(1, 1, 1, lebar).getValues()[0].filter(String);
+  ada.forEach(function (k, j) {
+    if (kolom[j] !== k) throw new Error("Urutan kolom " + nama + " tidak cocok di kolom " + (j + 1) + ": " + k + " ≠ " + kolom[j]);
+  });
+  if (ada.length < kolom.length) {
+    var baru = kolom.slice(ada.length);
+    if (sh.getMaxColumns() < kolom.length) sh.insertColumnsAfter(sh.getMaxColumns(), kolom.length - sh.getMaxColumns());
+    sh.getRange(1, ada.length + 1, 1, baru.length).setValues([baru]).setFontWeight("bold").setBackground("#e6eef6");
+  }
+}
+
+/**
+ * Dipanggil di awal setiap permintaan. Bila struktur data di server lebih baru daripada spreadsheet,
+ * spreadsheet dicadangkan dulu, lalu sheet/kolom baru ditambahkan.
+ */
+function pastikanSkema() {
+  var k = konfig();
+  if (!k.getProperty("SPREADSHEET_ID")) return;
+  if (Number(k.getProperty("SKEMA_VERSI") || 1) >= VERSI_SKEMA) return;
+  kunciTulis(function () {
+    var dari = Number(k.getProperty("SKEMA_VERSI") || 1);
+    if (dari >= VERSI_SKEMA) return;
+    cadangkan("sebelum v" + VERSI_SERVER + " (struktur data " + dari + " → " + VERSI_SKEMA + ")");
+    var ss = buku();
+    daftarTabel().forEach(function (nama) { bentukSheet(ss, nama); });
+    migrasiData(dari);
+    k.setProperty("SKEMA_VERSI", String(VERSI_SKEMA));
+    catat("", "skema.perbarui", { dari: dari, ke: VERSI_SKEMA, versiServer: VERSI_SERVER });
+  });
+}
+
+/** Pengisian data untuk kolom baru. */
+function migrasiData(dari) {
+  if (dari < 2 && modeUji()) {
+    // Akun contoh Uji Coba: tahun masuk dan kelas dari pola NIM contoh (yy 0 kelas nn), misalnya 250103 = 2025 kelas A.
+    semua("Pengguna").forEach(function (p) {
+      if (peranDari(p).indexOf("mahasiswa") < 0 || p.masuk) return;
+      var m = /^(\d{2})0([12])\d{2}$/.exec(String(p.username));
+      if (m) ubah("Pengguna", p, { masuk: 2000 + Number(m[1]), kelas: m[2] === "1" ? "A" : "B", statusMhs: "A" });
+      else ubah("Pengguna", p, { statusMhs: "A" });
+    });
+  }
+}
+
+/* ---------- Cadangan ---------- */
+
+function folderCadangan() {
+  var induk = DriveApp.getFolderById(konfig().getProperty("FOLDER_ID"));
+  var it = induk.getFoldersByName("Cadangan");
+  return it.hasNext() ? it.next() : induk.createFolder("Cadangan");
+}
+
+/** Salin spreadsheet + daftar semua file Drive aplikasi ke folder Cadangan. */
+function cadangkan(label) {
+  var waktu = Utilities.formatDate(new Date(), "Asia/Makassar", "yyyy-MM-dd HH.mm");
+  var nama = "Cadangan / " + label + " / " + waktu, tujuan = folderCadangan();
+  var salinan = DriveApp.getFileById(konfig().getProperty("SPREADSHEET_ID")).makeCopy(nama, tujuan);
+  var baris = [["Folder", "Nama file", "ID", "Ukuran (byte)", "Diubah"]];
+  (function telusuri(f, jalur) {
+    if (f.getId() === tujuan.getId()) return;
+    var fs = f.getFiles();
+    while (fs.hasNext()) { var x = fs.next(); baris.push([jalur, x.getName(), x.getId(), x.getSize(), x.getLastUpdated().toISOString()]); }
+    var ds = f.getFolders();
+    while (ds.hasNext()) { var d = ds.next(); telusuri(d, jalur + "/" + d.getName()); }
+  })(DriveApp.getFolderById(konfig().getProperty("FOLDER_ID")), "");
+  var csv = baris.map(function (r) { return r.map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(","); }).join("\n");
+  tujuan.createFile(nama + " — daftar file Drive.csv", csv, MimeType.CSV);
+  return { nama: nama, url: salinan.getUrl(), jumlahFile: baris.length - 1 };
 }

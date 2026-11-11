@@ -3,7 +3,7 @@
  * Semua permintaan masuk lewat doPost dengan badan JSON: { aksi, token, data }.
  * Jawaban selalu JSON: { ok: true, ... } atau { ok: false, galat: "pesan untuk pengguna" }.
  */
-var VERSI_SERVER = "0.1.0";
+var VERSI_SERVER = "0.2.0";
 
 function doGet() {
   return jawab({ ok: true, layanan: "Repositori Akreditasi UPW", versi: VERSI_SERVER, lingkungan: lingkungan() });
@@ -16,6 +16,7 @@ function doPost(e) {
     var aksi = String(badan.aksi || "");
     var fn = AKSI[aksi];
     if (!fn) throw galat("Aksi tidak dikenal: " + aksi);
+    if (aksi !== "ping" && aksi !== "siapkan") pastikanSkema();
     hasil = fn(badan.data || {}, badan.token || "");
     if (!hasil || typeof hasil !== "object") hasil = {};
     hasil.ok = true;
@@ -50,8 +51,24 @@ var AKSI = {
   "admin.impor": aksiAdminImpor,
   "admin.resetSandi": aksiAdminResetSandi,
   "admin.peran": aksiAdminPeran,
-  "admin.log": aksiAdminLog
+  "admin.log": aksiAdminLog,
+  "admin.ubahMhs": aksiAdminUbahMhs,
+  "admin.cadangkan": aksiAdminCadangkan,
+  "biodata.saya": aksiBiodataSaya,
+  "biodata.simpan": aksiBiodataSimpan,
+  "biodata.lihat": aksiBiodataLihat,
+  "direktori": aksiDirektori
 };
+
+/** Super Admin: cadangan manual spreadsheet + daftar file Drive. */
+function aksiAdminCadangkan(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["superadmin"]);
+  var label = String(d.label || "manual").replace(/[\\/]/g, "-").slice(0, 60);
+  var h = cadangkan(label);
+  catat(p.id, "admin.cadangkan", { nama: h.nama });
+  return h;
+}
 
 /** Jalankan SEKALI dari editor Apps Script (tombol Run) untuk memberi izin Sheets, Drive, dan email. */
 function izinkanServer() {

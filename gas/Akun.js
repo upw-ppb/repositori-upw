@@ -10,13 +10,27 @@ function wajibPeran(p, daftar) {
   if (p.status === "impor") throw galat("Selesaikan aktivasi akun terlebih dahulu.");
   if (p.wajibGanti === true || p.wajibGanti === "TRUE") throw galat("Ganti kata sandi Anda terlebih dahulu.");
   if (!punyaPeran(p, daftar)) throw galat("Anda tidak memiliki izin untuk tindakan ini.");
+  if (perluBiodata(p)) throw galat("Lengkapi biodata Anda terlebih dahulu.");
 }
 
 /** Data pengguna yang aman dikirim ke tampilan. */
 function profilPublik(p) {
   return { id: p.id, username: String(p.username), nama: p.nama, email: p.email, peran: peranDari(p), status: p.status,
     wajibGanti: p.wajibGanti === true || p.wajibGanti === "TRUE", emailTerverifikasi: p.emailTerverifikasi === true || p.emailTerverifikasi === "TRUE",
-    perluAktivasi: p.status === "impor" };
+    perluAktivasi: p.status === "impor", jenisBiodata: jenisBiodata(p), perluBiodata: perluBiodata(p),
+    masuk: p.masuk ? Number(p.masuk) : null, kelas: String(p.kelas || ""), statusMhs: String(p.statusMhs || ""),
+    semesterMhs: semesterMhs(p.masuk), semesterKini: semesterInfo() };
+}
+
+/** Data akun untuk halaman Pengguna (Admin Prodi tidak melihat peran). */
+function profilAdmin(x, lihatPeran) {
+  var o = profilPublik(x);
+  o.ref = String(x.ref || "");
+  o.masukTerakhir = x.masukTerakhir ? new Date(x.masukTerakhir).toISOString() : "";
+  o.biodataLengkap = x.biodataLengkap === true || x.biodataLengkap === "TRUE";
+  delete o.semesterKini;
+  if (!lihatPeran) delete o.peran;
+  return o;
 }
 
 function normalUser(u) { return String(u || "").trim().toLowerCase(); }
@@ -142,14 +156,12 @@ function aksiAdminPengguna(d, token) {
   wajibPeran(p, ["superadmin", "admin"]);
   var lihatSemua = punyaPeran(p, ["superadmin"]);
   var daftar = semua("Pengguna").filter(function (x) { return lihatSemua || peranDari(x).indexOf("mahasiswa") >= 0; });
-  return { pengguna: daftar.map(function (x) {
-    var o = profilPublik(x); o.ref = String(x.ref || ""); o.masukTerakhir = x.masukTerakhir ? new Date(x.masukTerakhir).toISOString() : "";
-    if (!lihatSemua) delete o.peran; return o; }) };
+  return { pengguna: daftar.map(function (x) { return profilAdmin(x, lihatSemua); }), semester: semesterInfo() };
 }
 
 /**
  * Impor akun. Admin Prodi hanya boleh mengimpor mahasiswa; Super Admin semua peran.
- * data.baris = [{ username, nama, peran: "dosen,kps", ref }]
+ * data.baris = [{ username, nama, peran: "dosen,kps", masuk: 2026, kelas: "A" }] — mahasiswa wajib tahun masuk dan kelas.
  */
 function aksiAdminImpor(d, token) {
   var p = penggunaDariToken(token);
@@ -168,11 +180,15 @@ function aksiAdminImpor(d, token) {
       if (!/^[a-z0-9.\-]{3,30}$/.test(u)) { lewati.push({ baris: i + 1, alasan: "Format NIM/NIP tidak valid" }); return; }
       if (peran.some(function (r) { return PERAN_SAH.indexOf(r) < 0; })) { lewati.push({ baris: i + 1, alasan: "Peran tidak dikenal" }); return; }
       if (!superA && (peran.length !== 1 || peran[0] !== "mahasiswa")) { lewati.push({ baris: i + 1, alasan: "Admin Prodi hanya boleh mengimpor mahasiswa" }); return; }
+      var mhs = peran.indexOf("mahasiswa") >= 0, masuk = Number(b.masuk), kelas = String(b.kelas || "").trim().toUpperCase();
+      if (mhs && !(masuk >= 2000 && masuk <= new Date().getFullYear() + 1)) { lewati.push({ baris: i + 1, alasan: "Tahun masuk kosong atau tidak valid" }); return; }
+      if (mhs && !/^[A-Z0-9]{1,3}$/.test(kelas)) { lewati.push({ baris: i + 1, alasan: "Kelas kosong atau tidak valid" }); return; }
       if (ada[u]) { lewati.push({ baris: i + 1, alasan: "Sudah terdaftar" }); return; }
       ada[u] = true;
       baru.push({ id: "u" + acak(10), username: u, nama: nama, email: "", peran: peran.join(","), status: "impor", hash: "", garam: "",
         wajibGanti: true, emailTerverifikasi: false, gagal: 0, kunciSampai: "", ref: String(b.ref || u), dosenId: String(b.dosenId || ""),
-        diimporPada: kini, aktivasiPada: "", masukTerakhir: "", diubahPada: kini });
+        diimporPada: kini, aktivasiPada: "", masukTerakhir: "", diubahPada: kini,
+        masuk: mhs ? masuk : "", kelas: mhs ? kelas : "", statusMhs: mhs ? "A" : "", biodataLengkap: false, biodataSemester: "", biodataPada: "" });
     });
     tambahBanyak("Pengguna", baru);
     catat(p.id, "admin.impor", { jumlah: baru.length, dilewati: lewati.length });
