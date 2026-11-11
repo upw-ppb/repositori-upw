@@ -90,7 +90,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - clasp login kedaluwarsa berkala (Workspace, galat invalid_rapt). Browser pemilik otomatis memilih Gmail pribadi:
   minta pemilik membuka tautan login di jendela incognito dan masuk sebagai upw@ppb.ac.id; cek dengan
   `clasp show-authorized-user` sebelum push.
-- Kata sandi Admin Prodi uji di akun-uji-coba.local.md sudah tidak berlaku (diganti pemilik). Jangan coba berulang (kunci 5x).
+- Kata sandi Admin Prodi uji di akun-uji-coba.local.md sudah diperbarui (11 Nov 2026). Bila gagal, jangan coba berulang (kunci 5x).
+- MASALAH EMAIL (11 Nov 2026): email dari aplikasi (MailApp) DITOLAK ke semua penerima: 550 5.7.26 DMARC.
+  DNS ppb.ac.id: DMARC p=reject, adkim=s, aspf=s; DKIM google._domainkey berisi "v=DKIM1; p=" (kunci kosong).
+  Perbaikan hanya oleh admin Workspace/DNS kampus (UPT TIK): Admin Console → Gmail → Autentikasi email → buat kunci DKIM,
+  pasang TXT google._domainkey di DNS, lalu "Mulai autentikasi". WAJIB beres sebelum Produksi. Sementara di Uji Coba,
+  kode verifikasi tampil di layar (Mode Uji Coba), jadi pengujian tetap bisa.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
