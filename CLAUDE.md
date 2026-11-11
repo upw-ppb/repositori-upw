@@ -80,6 +80,18 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   sajikan di localhost (preview), ganti window.fetch dengan server tiruan, isi formulir dan tekan tombol, lalu cek isi
   permintaan yang terkirim. (Bug v0.1.0: render "Memproses…" menghapus isian sebelum dibaca → semua login gagal.)
 
+- v0.2.0 (11 Nov 2026, Uji Coba, tag v0.2.0-uji): biodata (skema HANYA di gas/Biodata.js, dikirim ke tampilan),
+  Cari orang, impor mahasiswa "NIM; Nama; tahun masuk; kelas", struktur data v2 (VERSI_SKEMA di gas/Db.js; kolom baru
+  SELALU di akhir; server mencadangkan + memigrasi otomatis saat permintaan pertama). Teks diawali angka/=+-@ disimpan
+  dengan awalan ' (amankan). Riwayat rilis di CHANGELOG.md.
+- Uji lokal penuh: scratchpad gas-tiruan.mjs (tiruan Apps Script menjalankan gas/*.js asli sebagai satu skrip),
+  uji-bio.mjs (44 skenario), server-uji.mjs (menyajikan salinan docs/uji + /api tiruan; konfigurasi "uji-lokal" di
+  .claude/launch.json). Scratchpad berganti per sesi: buat ulang bila hilang.
+- clasp login kedaluwarsa berkala (Workspace, galat invalid_rapt). Browser pemilik otomatis memilih Gmail pribadi:
+  minta pemilik membuka tautan login di jendela incognito dan masuk sebagai upw@ppb.ac.id; cek dengan
+  `clasp show-authorized-user` sebelum push.
+- Kata sandi Admin Prodi uji di akun-uji-coba.local.md sudah tidak berlaku (diganti pemilik). Jangan coba berulang (kunci 5x).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
