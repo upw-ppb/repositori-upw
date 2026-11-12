@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.5.0 — 12 Nov 2026 — Uji Coba
+- Kode QR pada surat pengantar yang terbit, berisi tautan cek keaslian (?cek=KODE). Pembuat QR ditulis sendiri (docs/uji/qr.js,
+  tanpa pustaka luar); diuji terbaca oleh pemindai QR Chrome untuk teks 1–213 karakter (versi QR 1–10).
+- Menu "Tanda Tangan Saya" (akun berperan KPS): buat langsung di kotak gambar atau unggah foto/pindaian; latar putih
+  dibuat transparan dan dirapikan; wajib centang persetujuan. Bisa diganti atau dihapus.
+- Tanda tangan disimpan tersandi di Drive (folder Tanda Tangan; kunci di Script Properties KUNCI_TTD). Tidak ada aksi bagi
+  Admin/Super Admin untuk melihat atau mengganti tanda tangan KPS di aplikasi.
+- Saat KPS menyetujui surat, tanda tangan aktifnya ditempel bersama pernyataan elektronik, kode verifikasi, dan QR.
+  Mengganti/menghapus tanda tangan tidak mengubah surat yang sudah terbit. Log pemakaian di halaman Tanda Tangan Saya.
+  Antrean KPS mengingatkan bila KPS belum menyimpan tanda tangan.
+- Struktur data versi 5: tabel baru TandaTangan. Cadangan otomatis sebelum perubahan. Versi lama (v0.4.0) tetap bisa membaca
+  data ini (tabel baru diabaikan; surat tampil tanpa QR dan tanda tangan); rollback tidak memerlukan pemulihan data.
+- Belum ada: Portofolio Saya, ekspor iLKPS.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.4.0 — 12 Nov 2026 — Uji Coba
 - Unggah bukti bersama di detail kegiatan: tiap dokumen cukup diunggah sekali oleh pengaju/peserta mana pun, lalu terkunci;
   hanya pengunggah yang bisa membatalkan (file dipindah ke sampah Drive). Bisa berupa file (PDF, gambar, Word, Excel, PowerPoint,

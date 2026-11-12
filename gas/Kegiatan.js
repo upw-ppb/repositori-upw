@@ -372,6 +372,8 @@ function aksiKpsPutuskan(d, token) {
       k.kodeSurat = buatKodeSurat(); k.tglSurat = new Date().toISOString(); k.kpsId = p.id;
       k.lampiran = lampiranSurat(k, idx, set);
       k.lampiran.tglSurat = hariIni();
+      var ttd = ttdAktif(p.id);
+      if (ttd) k.lampiran.ttd = ttd.id; // tanda tangan KPS yang menyetujui (versi saat ini; surat lama tidak berubah)
     }
     simpanKegiatan(k);
     catat(p.id, "kps.putuskan", { id: k.id, keputusan: kep });

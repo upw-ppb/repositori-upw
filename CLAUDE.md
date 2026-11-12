@@ -111,6 +111,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   (dihitung saat diminta, tanpa email/trigger). VERSI_SKEMA 4. Uji: uji-keg.mjs + uji-bukti-bagian.mjs (113 skenario).
   Catatan UI: jangan panggil nilai() di luar jalankan() (bisa membaca potret isian lama).
 
+- v0.5.0 (12 Nov 2026, Uji Coba): docs/uji/qr.js = pembuat QR buatan sendiri (mode byte, tingkat M, versi 1–10; JANGAN ganti dengan
+  pustaka luar tanpa izin pemilik). gas/TandaTangan.js: tabel TandaTangan (VERSI_SKEMA 5), PNG tersandi (sandiTtd, HMAC-SHA256 aliran)
+  di folder Drive "Tanda Tangan"; surat terbit menyimpan lampiran.ttd = id versi tanda tangan; gambar diambil lewat surat.ttd.
+  Uji: uji-ttd-bagian.mjs (dipanggil dari uji-keg.mjs; total 134 skenario). Menjalankan kode unduhan (npm) di Mac ini diblokir.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
