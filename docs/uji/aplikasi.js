@@ -16,7 +16,7 @@ const S = { token: ls.get("token"), pengguna: null, peran: ls.get("peran"), view
   daftar: null, cari: "", impor: { teks: "", hasil: null }, log: null, laci: null, galat: "",
   bio: null, wil: null, dir: null, dirTab: "pegawai", dirQ: "", dirAngk: "", dirKelas: "",
   ref: null, keg: null, kegLingkup: "saya", kegQ: "", antrean: null, form: null, formSt: "", cek: { kode: "", hasil: null },
-  tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {} };
+  tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {}, porto: null, dokForm: null };
 const STATUS_MHS = { A: "Aktif", C: "Cuti", N: "Non-aktif", L: "Lulus", D: "Drop out / dikeluarkan", K: "Mengundurkan diri / keluar", M: "Mutasi / pindah", W: "Wafat" };
 
 /* ---------- server ---------- */
@@ -53,10 +53,11 @@ const I = {
   kps: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/>',
   keluar: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>',
   verif: '<path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/>',
-  ttd: '<path d="M3 17c3-1 4-7 6-7s1 6 3 6 2-4 4-4 2 3 5 3"/><path d="M3 21h18"/>'
+  ttd: '<path d="M3 17c3-1 4-7 6-7s1 6 3 6 2-4 4-4 2 3 5 3"/><path d="M3 21h18"/>',
+  porto: '<path d="M4 7h16v13H4z"/><path d="M9 7V4h6v3"/><path d="M4 12h16"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -68,6 +69,7 @@ function menu() {
   if (u.perluBiodata) return ["biodata", "akun"];
   const m = ["beranda"];
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
+  if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
   if (u.peran.includes("kps")) m.push("kps"); // antrean KPS selalu terlihat, apa pun peran aktifnya, agar pengajuan tidak terlewat
   if (u.peran.some(r => ["admin", "superadmin", "kps", "dosen"].includes(r))) m.push("verif"); // dosen: sebagai pendamping lomba
   if (u.peran.includes("kps")) m.push("ttd");
@@ -122,6 +124,7 @@ function halaman() {
   if (S.view === "kps") return hKps();
   if (S.view === "verif") return hVerif();
   if (S.view === "ttd") return hTtd();
+  if (S.view === "porto") return hPorto();
   return hBeranda();
 }
 const tombol = (act, label, kelas = "primary", attr = "") => `<button class="btn ${kelas}" data-act="${act}" ${attr} ${S.sibuk ? "disabled" : ""}>${S.sibuk ? "Memproses…" : label}</button>`;
@@ -182,9 +185,9 @@ function hBeranda() {
   const u = S.pengguna;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelTugas()}
-   <div class="callout"><b>Uji Coba v${K.versi} · Tanda tangan KPS dan QR.</b> Baru: surat pengantar yang terbit memuat kode QR untuk cek keaslian${u.peran.includes("kps") ? ", dan menu <b>Tanda Tangan Saya</b> untuk membuat atau mengunggah tanda tangan yang ditempel otomatis pada surat yang Anda setujui" : " dan tanda tangan KPS (bila KPS sudah menyimpannya)"}.
-   Sudah ada: kegiatan dan surat tugas, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.
-   Bagian berikutnya: Portofolio Saya.</div>
+   <div class="callout"><b>Uji Coba v${K.versi} · Portofolio Saya.</b> Baru: menu <b>Portofolio</b> berisi semua kegiatan Anda (sebagai pengaju, peserta, atau dosen pendamping) per semester,
+   dokumen pribadi (sertifikat, pelatihan, SK), dan ekspor ke PDF, Excel, serta ZIP berisi semua bukti.
+   Sudah ada: kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
     <tr><td>NIM/NIP</td><td class="mono">${esc(u.username)}</td></tr><tr><td>Email</td><td>${esc(u.email || "–")}</td></tr>
@@ -406,7 +409,7 @@ async function muatPengguna() { try { S.daftar = (await api("admin.pengguna")).p
 const AKSI = {
   keLupa() { S.layar = "lupa"; S.lupa = { langkah: 1, email: "" }; S.galat = ""; render(); },
   keMasuk() { S.layar = "masuk"; S.galat = ""; render(); },
-  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
+  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
   aktSandi: () => jalankan(async () => { const a = mentah("p1"); cocok(a, mentah("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
   aktKirim: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; const j = await api("aktivasi.kirimKode", { email: em }); S.akt.terkirim = true; S.akt.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
   aktVerif: () => jalankan(async () => { S.pengguna = (await api("aktivasi.verifikasi", { kode: nilai("kode") })).pengguna; S.view = S.pengguna.perluBiodata ? "biodata" : "beranda"; toast("Akun aktif. Selamat datang!"); }),
@@ -539,7 +542,7 @@ async function muatVerif() {
   return sekali("verif", async () => { S.verif = (await api("verifikasi.antrean")).kegiatan; render(); });
 }
 /** Setelah ada perubahan data: muat ulang daftar, antrean, dan pengingat saat dibutuhkan. */
-function segarkan() { S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; }
+function segarkan() { S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; }
 async function muatAntrean() {
   return sekali("antrean", async () => { S.antrean = (await api("kps.antrean")).kegiatan; render(); });
 }
@@ -1011,6 +1014,134 @@ document.addEventListener("change", e => {
   if (f.size > 10 * 1024 * 1024) { toast("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai Tautan."); return; }
   bacaBase64(f).then(isi => unggahBk(slot, { nama: f.name, isi }), err => toast(err.message));
 });
+/* --- portofolio saya (v0.6.0) --- */
+function statusTeks(k) {
+  if (k.st !== "tanpa" && k.st !== "terbit") return (ST_L[k.st] || [k.st])[0];
+  if (k.status === "draf") return k.st === "terbit" ? `${k.terlambat ? "Bukti terlambat" : "Lengkapi bukti"} ${k.buktiAda}/${k.buktiPerlu}` : "Draf";
+  return (STATUS_L[k.status] || [k.status])[0];
+}
+function perSemester(l) { const g = {}; l.forEach(k => { const s = k.semester || "Tanpa tanggal"; (g[s] = g[s] || []).push(k); }); return Object.entries(g); }
+function hPorto() {
+  if (!S.porto) { sekali("porto", async () => { S.porto = await api("portofolio.saya"); render(); }); return `<div class="memuat">Memuat portofolio…</div>`; }
+  const P = S.porto, l = P.kegiatan, dis = S.sibuk ? "disabled" : "";
+  const setuju = l.filter(k => k.status === "disetujui").length, adaBukti = l.filter(k => k.buktiPerlu > 0), lengkap = adaBukti.filter(k => k.buktiLengkap).length;
+  const F = S.dokForm;
+  return `<div class="head"><div><h1>Portofolio Saya</h1><p>Semua kegiatan yang melibatkan Anda, sebagai pengaju, peserta yang ditandai, atau dosen pendamping, ditambah dokumen pribadi Anda.</p></div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="portoPdf" ${dis}>PDF portofolio</button><button class="btn" data-act="portoXlsx" ${dis}>Excel</button><button class="btn" data-act="portoZip" ${dis}>Unduh bukti (ZIP)</button></div></div>
+   <div class="grid g3">
+    <div class="panel stat"><span class="v num">${l.length}</span><span class="l">Kegiatan</span></div>
+    <div class="panel stat"><span class="v num">${setuju}</span><span class="l">Data disetujui (masuk akreditasi)</span></div>
+    <div class="panel stat"><span class="v num">${lengkap}/${adaBukti.length}</span><span class="l">Kegiatan dengan bukti lengkap</span><div class="bar" style="margin-top:6px"><i style="width:${adaBukti.length ? Math.round(lengkap / adaBukti.length * 100) : 0}%"></i></div></div>
+   </div>
+   <div class="grid g2">
+    <section class="panel"><h2>Kegiatan per semester</h2>${perSemester(l).map(([s, ks]) => `<h3 style="margin:12px 0 4px;color:var(--brand)">${esc(s)}</h3><div class="list">${ks.map(k => `<div class="item" style="cursor:pointer" data-act="bukaKeg" data-id="${k.id}"><div class="body">
+       <div class="row" style="justify-content:space-between;gap:8px"><div class="title">${esc(k.judul)}</div>${chipKeg(k)}</div>
+       <div class="meta"><span>${esc(k.jenisLabel)}</span><span class="num">${esc(rentangPendek(k.tgl, k.sampai))}</span><span class="tag">${esc(k.peranSaya)}</span></div></div></div>`).join("")}</div>`).join("") || `<div class="empty">Belum ada kegiatan.</div>`}</section>
+    <section class="panel"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>Dokumen pribadi (${P.dokumen.length})</h2>${F ? "" : `<button class="btn sm" data-act="dokBaru">+ Tambah</button>`}</div>
+     ${F ? `<div class="picker" style="margin-bottom:10px">
+       <div class="field"><label for="dokNama">Nama dokumen${wajib}</label><input id="dokNama" type="text" placeholder="Contoh: Sertifikat Kompetensi Pemandu Wisata Muda"></div>
+       <div class="grid g2" style="gap:10px"><div class="field"><label for="dokJenis">Jenis${wajib}</label><select id="dokJenis"><option value="">Pilih…</option>${P.jenisDok.map(j => `<option>${esc(j)}</option>`).join("")}</select></div>
+        <div class="field"><label for="dokTahun">Tahun${wajib}</label><input id="dokTahun" type="text" inputmode="numeric" maxlength="4" value="${new Date().getFullYear()}"></div></div>
+       <div class="seg" role="group" aria-label="Bentuk"><button data-act="dokMode" data-m="file" aria-pressed="${F.t === "file"}">File</button><button data-act="dokMode" data-m="tautan" aria-pressed="${F.t === "tautan"}">Tautan</button></div>
+       ${F.t === "file" ? `<input id="dokFile" type="file" accept="${TERIMA}" aria-label="Pilih file dokumen"><span class="hint">PDF, gambar, Word, Excel, atau PowerPoint; maks. 10 MB.</span>`
+         : `<input id="dokUrl" type="url" placeholder="https://drive.google.com/…" aria-label="Tautan dokumen">`}
+       ${galatHtml()}<div class="row" style="justify-content:flex-end">${tombol("dokBatal", "Batal", "")}${tombol("dokSimpan", "Simpan")}</div></div>` : ""}
+     <div class="list">${P.dokumen.map(d => `<div class="item bk"><div class="body"><div class="title">${esc(d.nama)}</div><div class="meta"><span>${esc(d.jenis)}</span><span class="num">${esc(d.tahun)}</span><span>${d.t === "file" ? esc(d.namaFile) + " · " + ukuranT(d.ukuran) : "Tautan"}</span></div></div>
+       <div class="row bk-aksi"><button class="btn sm" data-act="dokLihat" data-id="${d.id}" ${dis}>${d.t === "tautan" ? "Buka" : "Lihat"}</button><button class="btn sm bad" data-act="dokHapus" data-id="${d.id}" ${dis}>Hapus</button></div></div>`).join("")
+       || (F ? "" : `<div class="empty">Belum ada dokumen. Tambahkan sertifikat kompetensi, sertifikat bahasa, pelatihan, atau SK Anda.</div>`)}</div>
+    </section></div>`;
+}
+const tglCetak = () => new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+function identitasPorto(P) {
+  const o = P.orang;
+  return [["Nama", o.nama], [o.jenis === "mahasiswa" ? "NIM" : "NIP / ID", o.jenis === "mahasiswa" ? o.username : nipTampil(o.username)],
+    ...(o.jenis === "mahasiswa" ? [["Kelas", (o.semesterMhs ? "Semester " + o.semesterMhs + " – " : "") + "Kelas " + (o.kelas || "–") + " (masuk " + (o.masuk || "–") + ")"]] : []),
+    ["Program studi", "Usaha Perjalanan Wisata, Politeknik Pariwisata Bali"]];
+}
+function htmlPortoCetak(P) {
+  const id = identitasPorto(P), k = P.kegiatan;
+  return `<div class="kertas"><p style="text-align:center;font-weight:700;font-size:13pt;margin-bottom:10px">PORTOFOLIO KEGIATAN</p>
+    ${tabelBaris(id.map(([a, b]) => [esc(a), esc(b)]))}
+    <p style="margin-top:10px">Jumlah kegiatan: <b>${k.length}</b>, data disetujui: <b>${k.filter(x => x.status === "disetujui").length}</b>. Dokumen pribadi: <b>${P.dokumen.length}</b>.</p>
+    ${perSemester(k).map(([s, ks]) => `<p style="font-weight:700;margin:14px 0 4px">${esc(s)}</p>
+     <table class="lamp"><thead><tr><th>No</th><th>Kegiatan</th><th>Jenis</th><th>Tanggal</th><th>Tingkat</th><th>Peran</th><th>Status</th></tr></thead><tbody>
+     ${ks.map((x, n) => `<tr><td class="c">${n + 1}</td><td>${esc(x.judul)}${x.kodeSurat ? `<br><span style="font-size:8.5pt;color:#555">Surat: ${esc(x.kodeSurat)}</span>` : ""}</td><td>${esc(x.jenisLabel)}</td><td>${esc(rentangPendek(x.tgl, x.sampai))}</td><td>${esc(x.tingkat || "–")}</td><td>${esc(x.peranSaya)}</td><td>${esc(statusTeks(x))}</td></tr>`).join("")}</tbody></table>`).join("")}
+    ${P.dokumen.length ? `<p style="font-weight:700;margin:14px 0 4px">Dokumen pribadi</p><table class="lamp"><thead><tr><th>No</th><th>Dokumen</th><th>Jenis</th><th>Tahun</th></tr></thead><tbody>
+     ${P.dokumen.map((d, n) => `<tr><td class="c">${n + 1}</td><td>${esc(d.nama)}</td><td>${esc(d.jenis)}</td><td class="c">${esc(d.tahun)}</td></tr>`).join("")}</tbody></table>` : ""}
+    <p style="margin-top:14px;font-size:9pt;color:#555">Dicetak dari Repositori UPW pada ${esc(tglCetak())}. Status "Data disetujui" berarti data dan buktinya sudah diverifikasi prodi. Surat dapat dicek keasliannya dengan kode surat di ${esc(location.origin + location.pathname)}.</p></div>`;
+}
+function lembarPorto(P) {
+  const kg = [["No", "Semester", "Judul / nama kegiatan", "Jenis", "Tabel", "Tanggal mulai", "Tanggal selesai", "Tingkat", "Peran saya", "Status", "Kode surat", "Bukti wajib terunggah", "Bukti wajib diperlukan"]]
+    .concat(P.kegiatan.map((k, n) => [n + 1, k.semester || "", k.judul, k.jenisLabel + (k.jenisLain ? " · " + k.jenisLain : ""), k.tabel || "", k.tgl || "", k.sampai || "", k.tingkat || "", k.peranSaya, statusTeks(k), k.kodeSurat || "", k.buktiAda, k.buktiPerlu]));
+  const bk = [["Kegiatan", "Dokumen", "Bentuk", "Nama file / tautan / keterangan"]];
+  P.kegiatan.forEach(k => k.daftarBukti.forEach(b => bk.push([k.judul, b.l, b.t === "file" ? "File" : b.t === "tautan" ? "Tautan" : "Tidak tersedia", b.t === "file" ? b.nama : b.t === "tautan" ? b.url : b.ket])));
+  const dk = [["No", "Nama dokumen", "Jenis", "Tahun", "Bentuk", "Nama file / tautan"]].concat(P.dokumen.map((d, n) => [n + 1, d.nama, d.jenis, d.tahun, d.t === "file" ? "File" : "Tautan", d.t === "file" ? d.namaFile : d.url]));
+  return [{ nama: "Identitas", baris: [["Keterangan", "Isi"], ...identitasPorto(P), ["Dicetak", tglCetak()]] }, { nama: "Kegiatan", baris: kg }, { nama: "Bukti", baris: bk }, { nama: "Dokumen pribadi", baris: dk }];
+}
+function unduh(blob, nama) {
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = nama; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 120000);
+}
+const namaBerkas = s => String(s || "").replace(/[\\/:*?"<>| -]/g, "_").replace(/\s+/g, " ").trim().slice(0, 80) || "berkas";
+const dariBase64 = b => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
+const judulPorto = P => "Portofolio " + P.orang.username + " " + namaBerkas(namaPendek(P.orang.nama));
+Object.assign(AKSI, {
+  dokBaru() { S.dokForm = { t: "file" }; S.galat = ""; render(); fokus("dokNama"); },
+  dokBatal() { S.dokForm = null; S.galat = ""; render(); },
+  dokMode(d) { const simpan = { nama: $("dokNama")?.value, jenis: $("dokJenis")?.value, tahun: $("dokTahun")?.value }; S.dokForm.t = d.m; render();
+    if (simpan.nama != null) { $("dokNama").value = simpan.nama; $("dokJenis").value = simpan.jenis; $("dokTahun").value = simpan.tahun; } },
+  async dokSimpan() {
+    const data = { nama: $("dokNama").value, jenis: $("dokJenis").value, tahun: $("dokTahun").value };
+    if (S.dokForm.t === "tautan") data.tautan = $("dokUrl").value;
+    else {
+      const f = $("dokFile").files[0];
+      if (!f) { S.galat = "Pilih file dokumen, atau pilih Tautan."; render(); return; }
+      if (f.size > 10 * 1024 * 1024) { S.galat = "Ukuran file maksimal 10 MB. Untuk file lebih besar, pakai Tautan."; render(); return; }
+      data.namaFile = f.name; data.isi = await bacaBase64(f);
+    }
+    jalankan(async () => { const j = await api("dok.simpan", data); S.porto.dokumen = j.dokumen; S.dokForm = null; toast("Dokumen tersimpan."); });
+  },
+  dokHapus(d) {
+    if (!confirm("Hapus dokumen ini dari portofolio? File dipindahkan ke sampah Drive.")) return;
+    jalankan(async () => { const j = await api("dok.hapus", { id: d.id }).catch(e => { toast(e.message); throw e; }); S.porto.dokumen = j.dokumen; toast("Dokumen dihapus."); });
+  },
+  async dokLihat(d) {
+    const x = S.porto.dokumen.find(y => y.id === d.id); if (!x) return;
+    if (x.t === "tautan") { window.open(x.url, "_blank", "noopener,noreferrer"); return; }
+    const w = window.open("", "_blank");
+    try {
+      const j = await api("dok.lihat", { id: d.id }), blob = new Blob([dariBase64(j.isi)], { type: j.mime });
+      if (w && /pdf|image/.test(j.mime)) { w.location.href = URL.createObjectURL(blob); } else { if (w) w.close(); unduh(blob, j.nama); }
+    } catch (e) { if (w) w.close(); toast(e.message); }
+  },
+  portoPdf() { cetakSurat(htmlPortoCetak(S.porto)); },
+  portoXlsx() { const P = S.porto; unduh(UPW_ZIP.xlsx(lembarPorto(P)), judulPorto(P) + ".xlsx"); },
+  portoZip() {
+    const P = S.porto, tugas = [];
+    P.kegiatan.forEach(k => k.daftarBukti.filter(b => b.t === "file").forEach(b => tugas.push({ jenis: "bukti", id: k.id, slot: b.slot,
+      jalur: `Kegiatan/${namaBerkas(k.semester || "Tanpa tanggal")}/${namaBerkas((k.tgl || "") + " " + k.judul)}/${namaBerkas(b.l)} - ${namaBerkas(b.nama)}` })));
+    P.dokumen.filter(d => d.t === "file").forEach(d => tugas.push({ jenis: "dok", id: d.id, jalur: `Dokumen pribadi/${namaBerkas(d.tahun + " " + d.nama)} - ${namaBerkas(d.namaFile)}` }));
+    if (!tugas.length) { toast("Belum ada file bukti atau dokumen untuk diunduh. Tautan dan keterangan tercantum di file Excel."); return; }
+    jalankan(async () => {
+      const berkas = [], ada = new Set(), gagal = [];
+      for (let i = 0; i < tugas.length; i++) {
+        const t = tugas[i]; toast(`Mengambil file ${i + 1} dari ${tugas.length}…`);
+        try {
+          const j = t.jenis === "bukti" ? await api("bukti.lihat", { id: t.id, slot: t.slot }) : await api("dok.lihat", { id: t.id });
+          let jalur = t.jalur, n = 2; while (ada.has(jalur)) jalur = t.jalur.replace(/(\.[^.\/]+)?$/, ` (${n++})$1`); ada.add(jalur);
+          berkas.push({ nama: jalur, data: dariBase64(j.isi) });
+        } catch (e) { gagal.push(t.jalur + ": " + e.message); }
+      }
+      const daftar = await UPW_ZIP.xlsx(lembarPorto(P)).arrayBuffer();
+      berkas.unshift({ nama: "Daftar isi portofolio.xlsx", data: new Uint8Array(daftar) });
+      if (gagal.length) berkas.push({ nama: "GAGAL DIAMBIL.txt", data: gagal.join("\r\n") });
+      unduh(UPW_ZIP.zip(berkas), judulPorto(P) + " - bukti.zip");
+      toast(gagal.length ? `ZIP dibuat; ${gagal.length} file gagal diambil (lihat GAGAL DIAMBIL.txt).` : `ZIP dibuat berisi ${berkas.length - 1} file.`);
+    });
+  }
+});
+
 /* --- tanda tangan saya (KPS) --- */
 function hTtd() {
   if (!S.ttd) { sekali("ttd", async () => { S.ttd = await api("ttd.saya"); render(); }); return `<div class="memuat">Memuat…</div>`; }

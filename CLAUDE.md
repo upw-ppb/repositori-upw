@@ -116,6 +116,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   di folder Drive "Tanda Tangan"; surat terbit menyimpan lampiran.ttd = id versi tanda tangan; gambar diambil lewat surat.ttd.
   Uji: uji-ttd-bagian.mjs (dipanggil dari uji-keg.mjs; total 134 skenario). Menjalankan kode unduhan (npm) di Mac ini diblokir.
 
+- v0.6.0 (12 Nov 2026, Uji Coba): gas/Portofolio.js (portofolio.saya, dok.simpan/hapus/lihat; tabel DokumenPribadi, VERSI_SKEMA 6).
+  docs/uji/zip.js = penulis ZIP (tanpa kompresi) + .xlsx buatan sendiri. Uji: uji-porto-bagian.mjs (total 152 skenario).
+  Saat menguji unduhan di browser pratinjau: tahan unduhan (ganti HTMLAnchorElement.click) agar tidak masuk ke Downloads pemilik.
+  grep di Mac ini kadang tidak membaca aplikasi.js (OneDrive); periksa isi dengan Python.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

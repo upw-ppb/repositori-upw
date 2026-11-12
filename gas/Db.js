@@ -19,11 +19,13 @@ var SKEMA = {
              "kodeSurat", "tglSurat", "kpsId", "lampiran", "dibuat", "diubah", "dihapus",
              /* v0.4.0 */ "bukti", "verifId", "tglVerif"],
   /* v0.5.0 */
-  TandaTangan: ["id", "userId", "fileId", "nonce", "cara", "dibuat", "dihapus"]
+  TandaTangan: ["id", "userId", "fileId", "nonce", "cara", "dibuat", "dihapus"],
+  /* v0.6.0 */
+  DokumenPribadi: ["id", "userId", "nama", "jenis", "tahun", "t", "fileId", "namaFile", "mime", "ukuran", "url", "dibuat", "dihapus"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 5;
+var VERSI_SKEMA = 6;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {

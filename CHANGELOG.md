@@ -3,6 +3,19 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.6.0 — 12 Nov 2026 — Uji Coba
+- Menu "Portofolio" untuk semua pengguna yang mencatat kegiatan: semua kegiatan yang melibatkan pengguna (pengaju, peserta yang
+  ditandai, atau dosen pendamping) per semester, dengan ringkasan (jumlah kegiatan, data disetujui, kelengkapan bukti).
+  Draf milik orang lain tidak ditampilkan.
+- Dokumen pribadi: tambah sertifikat, sertifikat bahasa, pelatihan, SK, dll. (nama, jenis, tahun; file maks. 10 MB atau tautan),
+  lihat, dan hapus. File disimpan di Drive: Portofolio / <NIM/NIP> <nama>. Hanya pemilik yang bisa melihat dan menghapus.
+- Ekspor: PDF portofolio (lewat jendela cetak), Excel .xlsx (lembar Identitas, Kegiatan, Bukti, Dokumen pribadi), dan ZIP berisi
+  semua file bukti kegiatan dan dokumen pribadi beserta daftar isinya. Penulis ZIP/Excel ditulis sendiri (docs/uji/zip.js),
+  tanpa pustaka luar; hasil diuji dengan unzip, Python zipfile, dan Quick Look macOS.
+- Struktur data versi 6: tabel baru DokumenPribadi. Cadangan otomatis sebelum perubahan. Versi lama (v0.5.0) tetap bisa membaca
+  data ini (tabel baru diabaikan); rollback tidak memerlukan pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.5.0 — 12 Nov 2026 — Uji Coba
 - Kode QR pada surat pengantar yang terbit, berisi tautan cek keaslian (?cek=KODE). Pembuat QR ditulis sendiri (docs/uji/qr.js,
   tanpa pustaka luar); diuji terbaca oleh pemindai QR Chrome untuk teks 1–213 karakter (versi QR 1–10).
