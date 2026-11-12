@@ -17,6 +17,7 @@ Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CL
 - Struktur data versi 3: tabel Kegiatan baru; pengaturan tujuanDosen/tujuanMhs. Cadangan otomatis sebelum perubahan.
   Versi lama (v0.2.0) tetap berjalan dengan data ini (tabel baru diabaikan); rollback tidak memerlukan pemulihan data.
 - Belum ada: unggah bukti, batas 5 hari kerja, verifikasi data Admin, tanda tangan dan QR (rilis berikutnya).
+- Apps Script deployment @4; tag v0.3.0-uji.
 - Penyetuju: tidak diperlukan (Uji Coba).
 
 ## v0.2.0 — 11 Nov 2026 — Uji Coba
