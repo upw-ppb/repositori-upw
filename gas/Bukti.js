@@ -333,6 +333,9 @@ function aksiTugasSaya(d, token) {
     if (k.st === "menunggu_kps" && punyaPeran(p, ["kps"])) hasil.kps++;
   });
   if (punyaPeran(p, ["kps"])) hasil.ttd = !!ttdAktif(p.id);
+  // Butir DED yang menjadi tanggung jawab akun ini (v0.13.0)
+  var nar = narasiSemua(), ded = Object.keys(nar).filter(function (k) { return nar[k].pj === p.id; });
+  hasil.dedPj = ded.length; hasil.dedBelum = ded.filter(function (k) { return nar[k].status !== "selesai"; }).length;
   var urut = { bukti: 0, revisiData: 1, revisiAju: 2, drafData: 3 };
   hasil.tugas.sort(function (a, b) { return (b.terlambat ? 1 : 0) - (a.terlambat ? 1 : 0) || urut[a.jenis] - urut[b.jenis] || String(a.batas || "").localeCompare(String(b.batas || "")); });
   return hasil;

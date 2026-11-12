@@ -3,6 +3,22 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.13.0 — 13 Nov 2026 — Uji Coba
+- Menu "DED" (Admin Prodi, KPS, Super Admin; dosen yang ditunjuk sebagai penanggung jawab melihat butirnya sendiri):
+  - Editor narasi 64 butir DED LAMWisata dengan petunjuk resmi tiap butir, daftar butir Matriks terkait (bobot, syarat skor 4),
+    jumlah kata, status (belum / draf / selesai), dan penanggung jawab (PJ) per butir.
+  - Pengingat di Beranda untuk dosen PJ yang butirnya belum selesai.
+  - Perlindungan tulisan: bila butir sudah diubah orang lain sejak dibuka, simpan ditolak agar tidak saling menimpa;
+    editor juga bertanya sebelum ditutup bila ada teks yang belum disimpan.
+  - Identitas pengusul, daftar program studi di UPPS, dan tim penyusun (nama, NIDN, jabatan, tanggal).
+  - Kemajuan (butir selesai) dan perkiraan jumlah halaman dari batas 120 halaman isi.
+  - Unduh Word (.docx) per TS: halaman muka dengan logo, identitas, tim penyusun, 64 butir narasi (petunjuk boleh disertakan),
+    dan Tabel 1–23 iLKPS di posisi sesuai petunjuk DED. Format Calibri 12, spasi 1, A4, margin atas 3, kiri 4, bawah 3, kanan 3 cm,
+    nomor halaman di kaki. Pembuat Word buatan sendiri (docs/uji/docx.js), tanpa pustaka luar.
+- Struktur data versi 12: tabel baru DedNarasi; identitas, daftar PS, dan tim disimpan di Pengaturan. Cadangan otomatis sebelum perubahan.
+  Versi lama (v0.12.0) tetap bisa membaca data ini; rollback tidak memerlukan pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.12.0 — 13 Nov 2026 — Uji Coba
 - Menu "Penilaian" (Admin Prodi, KPS, Super Admin): simulasi penilaian mandiri 84 butir Matriks LAMWisata IAPS 1.0 Unggul Sarjana Terapan
   (bobot total 100, skor 0–4, maks. 400) per TS.

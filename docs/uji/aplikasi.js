@@ -18,7 +18,7 @@ const S = { token: ls.get("token"), pengguna: null, peran: ls.get("peran"), view
   ref: null, keg: null, kegLingkup: "saya", kegQ: "", antrean: null, form: null, formSt: "", cek: { kode: "", hasil: null },
   tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {}, porto: null, dokForm: null, ilkps: null, ilkpsTab: "1", ilkpsTs: null, bukaSetelahMasuk: null,
   dp: null, dpTab: "kurikulum", dpSmt: null, dpTa: null, dpImpor: false, asesor: null, setuju: null, setujuQ: "", lul: null, lulTa: null, lulImpor: false,
-  sv: null, svForm: null, svSaya: null, svPub: null, nilai: null, nilaiTs: null, nilaiF: "" };
+  sv: null, svForm: null, svSaya: null, svPub: null, nilai: null, nilaiTs: null, nilaiF: "", ded: null, dedTab: "narasi", dedF: "" };
 const STATUS_MHS = { A: "Aktif", C: "Cuti", N: "Non-aktif", L: "Lulus", D: "Drop out / dikeluarkan", K: "Mengundurkan diri / keluar", M: "Mutasi / pindah", W: "Wafat" };
 
 /* ---------- server ---------- */
@@ -61,10 +61,11 @@ const I = {
   dprodi: '<path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/>',
   setuju: '<path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/>',
   survei: '<path d="M9 5h10M9 12h10M9 19h10"/><path d="M4 5l1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2"/>',
-  penilaian: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'
+  penilaian: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  ded: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -78,7 +79,8 @@ function menu() {
   const m = ["beranda"];
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
   if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
-  if (u.peran.some(r => ["admin", "superadmin", "kps"].includes(r))) m.push("penilaian", "ilkps", "dprodi", "survei");
+  if (u.peran.some(r => ["admin", "superadmin", "kps"].includes(r))) m.push("penilaian", "ded", "ilkps", "dprodi", "survei");
+  else if (S.tugas && S.tugas.dedPj) m.push("ded");
   if (u.peran.includes("kps")) m.push("kps"); // antrean KPS selalu terlihat, apa pun peran aktifnya, agar pengajuan tidak terlewat
   if (u.peran.some(r => ["admin", "superadmin", "kps", "dosen"].includes(r))) m.push("verif"); // dosen: sebagai pendamping lomba
   if (u.peran.includes("kps")) m.push("ttd");
@@ -142,6 +144,7 @@ function halaman() {
   if (S.view === "setuju") return hSetuju();
   if (S.view === "survei") return hSurvei();
   if (S.view === "penilaian") return hPenilaian();
+  if (S.view === "ded") return hDed();
   return hBeranda();
 }
 const tombol = (act, label, kelas = "primary", attr = "") => `<button class="btn ${kelas}" data-act="${act}" ${attr} ${S.sibuk ? "disabled" : ""}>${S.sibuk ? "Memproses…" : label}</button>`;
@@ -209,7 +212,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}
-   <div class="callout"><b>Uji Coba v${K.versi} · Penilaian.</b>${menu().includes("penilaian") ? " Baru: menu <b>Penilaian</b>, simulasi nilai 84 butir Matriks LAMWisata (maks. 400) dari data aplikasi ditambah skor GPM, dengan prioritas perbaikan dan target." : ""} Sebelumnya, <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   <div class="callout"><b>Uji Coba v${K.versi} · DED.</b>${menu().includes("ded") ? " Baru: menu <b>DED</b> untuk menulis narasi 64 butir (dengan petunjuk resmi dan penanggung jawab), identitas dan tim penyusun, serta unduh Word sesuai format LAMWisata dengan Tabel 1–23 otomatis." : ""} Sebelumnya: menu <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -228,6 +231,7 @@ function panelTugas() {
     return `<div class="item" style="cursor:pointer" data-act="bukaKeg" data-id="${x.id}"><div class="body"><div class="title">${esc(x.judul)}</div><div class="meta"><span>${esc(isi)}</span></div></div><span class="chip ${kelas}">${judul}</span></div>`;
   });
   if (t.verifikasi) baris.push(`<div class="item" style="cursor:pointer" data-go="verif"><div class="body"><div class="title">${t.verifikasi} data kegiatan menunggu verifikasi Anda</div></div><span class="chip s-diajukan">Verifikasi</span></div>`);
+  if (t.dedBelum) baris.push(`<div class="item" style="cursor:pointer" data-go="ded"><div class="body"><div class="title">${t.dedBelum} butir DED tanggung jawab Anda belum selesai</div><div class="meta"><span>Dari ${t.dedPj} butir yang ditugaskan kepada Anda</span></div></div><span class="chip s-revisi">DED</span></div>`);
   if (t.kps) baris.push(`<div class="item" style="cursor:pointer" data-go="kps"><div class="body"><div class="title">${t.kps} pengajuan surat tugas menunggu keputusan Anda</div></div><span class="chip s-diajukan">Antrean KPS</span></div>`);
   return `<section class="panel"><h2>Perlu tindakan (${baris.length})</h2><div class="list">${baris.join("") || `<div class="empty">Tidak ada yang perlu ditindaklanjuti. Bagus!</div>`}</div></section>`;
 }
@@ -339,6 +343,7 @@ function laci() {
   if (L.jenis === "svTautan") return laciSvTautan();
   if (L.jenis === "svIsi") return laciSvIsi();
   if (L.jenis === "gpm") return laciGpm();
+  if (L.jenis === "ded") return laciDed();
   if (L.jenis === "sandi") return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Kata sandi sementara">
    <div class="dh"><h2>Kata sandi sementara</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
    <p>Berikan ${L.username ? "nama pengguna dan " : ""}kata sandi ini kepada <b>${esc(L.nama)}</b> secara langsung (bukan lewat grup percakapan). Kata sandi hanya ditampilkan sekali dan wajib diganti saat masuk pertama.</p>
@@ -499,7 +504,7 @@ async function muatPengguna() { try { S.daftar = (await api("admin.pengguna")).p
 const AKSI = {
   keLupa() { S.layar = "lupa"; S.lupa = { langkah: 1, email: "" }; S.galat = ""; render(); },
   keMasuk() { S.layar = "masuk"; S.galat = ""; render(); },
-  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.dp = null; S.asesor = null; S.setuju = null; S.lul = null; S.sv = null; S.svSaya = null; S.nilai = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
+  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.dp = null; S.asesor = null; S.setuju = null; S.lul = null; S.sv = null; S.svSaya = null; S.nilai = null; S.ded = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
   aktSandi: () => jalankan(async () => { const a = mentah("p1"); cocok(a, mentah("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
   aktKirim: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; const j = await api("aktivasi.kirimKode", { email: em }); S.akt.terkirim = true; S.akt.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
   aktVerif: () => jalankan(async () => { S.pengguna = (await api("aktivasi.verifikasi", { kode: nilai("kode") })).pengguna; S.view = S.pengguna.perluBiodata ? "biodata" : "beranda"; toast("Akun aktif. Selamat datang!"); }),
@@ -538,8 +543,8 @@ const AKSI = {
     S.laci = null; S.daftar = null; S.dir = null; toast("Data mahasiswa disimpan.");
   }),
   salinSandi() { navigator.clipboard?.writeText(S.laci.sandi).then(() => toast("Disalin."), () => toast("Pilih teksnya lalu salin manual.")); },
-  tutup() { S.laci = null; S.galat = ""; render(); },
-  tutupLuar(d, e) { if (e.target === e.currentTarget || e.target.classList.contains("overlay")) { S.laci = null; render(); } }
+  tutup() { if (!bolehTutup()) return; S.laci = null; S.galat = ""; render(); },
+  tutupLuar(d, e) { if (e.target === e.currentTarget || e.target.classList.contains("overlay")) { if (!bolehTutup()) return; S.laci = null; render(); } }
 };
 
 document.addEventListener("click", e => {
@@ -1328,6 +1333,154 @@ Object.assign(AKSI, {
   }
 });
 document.addEventListener("change", e => { if (e.target.id === "lulTa") { S.lulTa = Number(e.target.value); S.lul = null; render(); } });
+
+/* --- DED (v0.13.0) --- */
+/** Cegah kehilangan narasi yang belum disimpan saat menutup editor. */
+function bolehTutup() {
+  if (!S.laci || S.laci.jenis !== "ded") return true;
+  const t = $("dedTeks");
+  return !t || t.value === S.laci.awal || confirm("Narasi belum disimpan. Tutup dan buang perubahan?");
+}
+const ST_DED = { belum: ["Belum", "s-draf"], draf: ["Draf", "s-revisi"], selesai: ["Selesai", "s-disetujui"] };
+const KODE_TABEL_L = k => ({ ref11a: "Ref 11a" }[k] || "Tabel " + k);
+function perkiraanHalaman(D) { const kata = D.butir.reduce((s, b) => s + b.kata, 0); return Math.round(kata / 380 + D.butir.reduce((s, b) => s + b.tabel.length, 0) * 0.8 + 6); }
+function hDed() {
+  if (!S.ded) { sekali("ded", async () => { S.ded = await api("ded.data"); render(); }); return `<div class="memuat">Memuat DED…</div>`; }
+  const D = S.ded, dis = S.sibuk ? "disabled" : "", hit = k => D.butir.filter(b => b.status === k).length, f = S.dedF;
+  const l = D.butir.filter(b => !f || (f === "saya" ? b.pj === S.pengguna.id : b.status === f));
+  const kata = D.butir.reduce((s, b) => s + b.kata, 0), hal = perkiraanHalaman(D);
+  const th = new Date().getFullYear(), pil = []; for (let a = th; a >= 2018; a--) pil.push(a);
+  const tabNarasi = `<section class="panel"><div class="row" style="justify-content:space-between;flex-wrap:wrap;margin-bottom:8px"><h2>Narasi ${D.kelola ? "64 butir" : "butir tanggung jawab Anda"}</h2>
+      <select id="dedF" style="width:auto" aria-label="Saring butir"><option value="">Semua</option><option value="belum" ${f === "belum" ? "selected" : ""}>Belum</option><option value="draf" ${f === "draf" ? "selected" : ""}>Draf</option><option value="selesai" ${f === "selesai" ? "selected" : ""}>Selesai</option><option value="saya" ${f === "saya" ? "selected" : ""}>Tanggung jawab saya</option></select></div>
+     <div class="tbl-wrap"><table><thead><tr><th>Butir</th><th>Judul</th><th>Penanggung jawab</th><th>Status</th><th>Kata</th><th>Diubah</th></tr></thead><tbody>
+     ${l.map(b => `<tr style="cursor:pointer" data-act="dedBuka" data-n="${b.n}"><td class="num">${b.n}</td><td>${esc(b.judul)}${b.tabel.length ? `<div class="small muted">${b.tabel.map(KODE_TABEL_L).join(", ")} otomatis</div>` : ""}</td>
+       <td class="small">${esc(b.pjNama ? namaPendek(b.pjNama) : "–")}</td><td><span class="chip ${ST_DED[b.status][1]}">${ST_DED[b.status][0]}</span></td><td class="num">${b.kata.toLocaleString("id-ID")}</td><td class="small num">${b.diubah ? tgl(b.diubah) : "–"}</td></tr>`).join("") || `<tr><td colspan="6"><div class="empty">Tidak ada butir.</div></td></tr>`}</tbody></table></div></section>`;
+  const tabId = !D.kelola ? "" : (() => {
+    const isian = D.identitas.map(x => `<div class="field"><label for="di-${x.k}">${esc(x.l)}</label><input id="di-${x.k}" data-did="${x.k}" type="text" value="${esc(x.v)}"></div>`).join("");
+    const ps = D.daftarPs.length ? D.daftarPs : [{ nama: "Usaha Perjalanan Wisata", jenis: "Sarjana Terapan", peringkat: "", sk: "", kedaluwarsa: "", mhs: "" }];
+    const tim = D.tim.length ? D.tim : [{ userId: "", nama: "", nidn: "", jabatan: "", tanggal: "" }];
+    return `<section class="panel"><h2>Identitas pengusul</h2><div class="grid g2" style="gap:10px">${isian}</div></section>
+     <section class="panel"><h2>Daftar program studi di UPPS</h2><div class="tbl-wrap"><table><thead><tr><th>Nama PS</th><th>Jenis program</th><th>Status/peringkat</th><th>No. dan tgl. SK</th><th>Tgl. kedaluwarsa</th><th>Mahasiswa saat TS</th><th></th></tr></thead><tbody id="dedPs">
+      ${ps.map((r, i) => `<tr data-psi="${i}">${["nama", "jenis", "peringkat", "sk", "kedaluwarsa", "mhs"].map(k => `<td><input data-psk="${k}" type="text" value="${esc(r[k] ?? "")}" aria-label="${k} ${i + 1}" style="min-width:${k === "mhs" ? 70 : 120}px"></td>`).join("")}<td><button class="btn sm bad" data-act="dedPsHapus" data-i="${i}" aria-label="Hapus baris">×</button></td></tr>`).join("")}</tbody></table></div>
+      <div class="row"><button class="btn sm" data-act="dedPsTambah">+ Baris</button></div></section>
+     <section class="panel"><h2>Tim penyusun</h2><p class="small muted">Nama dan NIDN diambil dari akun dosen bila dipilih. Tanda tangan dibubuhkan pada dokumen cetak.</p><div class="tbl-wrap"><table><thead><tr><th>Dosen / nama</th><th>NIDN</th><th>Jabatan</th><th>Tanggal pengisian</th><th></th></tr></thead><tbody>
+      ${tim.map((r, i) => `<tr data-timi="${i}"><td><select data-timk="userId" style="min-width:180px" aria-label="Dosen ${i + 1}"><option value="">– nama lain –</option>${D.dosen.map(o => `<option value="${o.id}" ${r.userId === o.id ? "selected" : ""}>${esc(namaPendek(o.nama))}</option>`).join("")}</select>
+        <input data-timk="nama" type="text" value="${esc(r.userId ? "" : r.nama)}" placeholder="Nama (bila bukan akun dosen)" aria-label="Nama ${i + 1}" style="margin-top:4px;${r.userId ? "display:none" : ""}"></td>
+        <td><input data-timk="nidn" type="text" value="${esc(r.nidn || (r.userId ? D.nidn[r.userId] || "" : ""))}" style="width:120px" aria-label="NIDN ${i + 1}"></td><td><input data-timk="jabatan" type="text" value="${esc(r.jabatan)}" placeholder="Contoh: Ketua Tim / GPM" aria-label="Jabatan ${i + 1}"></td>
+        <td><input data-timk="tanggal" type="date" value="${esc(r.tanggal)}" aria-label="Tanggal ${i + 1}"></td><td><button class="btn sm bad" data-act="dedTimHapus" data-i="${i}" aria-label="Hapus anggota">×</button></td></tr>`).join("")}</tbody></table></div>
+      <div class="row" style="justify-content:space-between;flex-wrap:wrap"><button class="btn sm" data-act="dedTimTambah">+ Anggota</button>${tombol("dedIdSimpan", "Simpan identitas dan tim")}</div></section>`;
+  })();
+  return `<div class="head"><div><h1>Dokumen Evaluasi Diri (DED)</h1><p>Tulis narasi 64 butir DED LAMWisata. Ekspor Word menyusun halaman muka, identitas pengusul, tim penyusun, narasi, dan Tabel 1–23 dari Tabel iLKPS di posisinya, dengan format Calibri 12, spasi 1, A4, margin 3–4–3–3 cm.</p></div></div>
+   <div class="grid g3">
+    <div class="panel stat"><span class="l">Kemajuan</span><span class="v num">${hit("selesai")}<span class="muted" style="font-size:1rem"> / ${D.butir.length} selesai</span></span><div class="bar" style="margin-top:6px"><i style="width:${D.butir.length ? hit("selesai") / D.butir.length * 100 : 0}%"></i></div><span class="l">${hit("draf")} draf · ${hit("belum")} belum</span></div>
+    <div class="panel stat"><span class="l">Panjang naskah</span><span class="v num">${kata.toLocaleString("id-ID")}</span><span class="l">kata · perkiraan <b>${hal}</b> halaman dari maksimal 120 halaman isi${hal > 120 ? ` <b style="color:var(--bad)">(melebihi)</b>` : ""}</span></div>
+    <div class="panel stat"><span class="l">Unduh Word (.docx)</span>
+     <div class="row small" style="gap:6px;flex-wrap:wrap;margin-top:4px"><label class="row" style="gap:4px">TS <select id="dedTs" style="width:auto">${pil.map(a => `<option value="${a}" ${a === D.ts.awal ? "selected" : ""}>${a}/${a + 1}</option>`).join("")}</select></label>
+      <label class="row" style="gap:4px;flex-wrap:nowrap"><input type="checkbox" id="dedPetunjuk" checked style="flex:none"> Sertakan petunjuk butir</label></div>
+     <button class="btn primary" data-act="dedUnduh" ${dis} style="margin-top:8px">${S.sibuk ? "Menyusun…" : "Unduh DED (.docx)"}</button></div></div>
+   ${D.kelola ? `<div class="seg" role="group" aria-label="Bagian" style="margin-bottom:12px"><button data-act="dedTab" data-t="narasi" aria-pressed="${S.dedTab === "narasi"}">Narasi 64 butir</button><button data-act="dedTab" data-t="identitas" aria-pressed="${S.dedTab === "identitas"}">Identitas &amp; tim</button></div>` : ""}
+   ${S.laci ? "" : galatHtml()}${S.dedTab === "identitas" && D.kelola ? tabId : tabNarasi}`;
+}
+function laciDed() {
+  const D = S.ded, b = D.butir.find(x => x.n === S.laci.n);
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Butir DED" style="width:min(820px,100%)">
+   <div class="dh"><h2>Butir ${b.n}. ${esc(b.judul)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <details class="picker" open><summary class="small" style="cursor:pointer"><b>Petunjuk DED</b></summary><div class="small" style="white-space:pre-wrap;margin-top:6px">${esc(b.petunjuk)}</div>
+    ${b.tabel.length ? `<div class="auto" style="margin-top:6px">${b.tabel.map(KODE_TABEL_L).join(", ")} disisipkan otomatis dari Tabel iLKPS setelah narasi ini saat ekspor Word. Narasi cukup menganalisis isinya.</div>` : ""}</details>
+   ${b.matriks.length ? `<details class="picker"><summary class="small" style="cursor:pointer"><b>Butir matriks terkait (${b.matriks.length})</b> · syarat skor 4</summary>${b.matriks.map(m => `<div class="small" style="margin-top:6px"><b>${m.n}. ${esc(m.nm)}</b> (bobot ${String(m.w).replace(".", ",")}): ${esc(m.s4)} <span class="muted">Sumber: ${esc(m.src)}</span></div>`).join("")}</details>` : ""}
+   <div class="field"><label for="dedTeks">Narasi</label><textarea id="dedTeks" rows="16" ${b.bolehUbah ? "" : "readonly"} placeholder="Pola yang disarankan: (1) kondisi saat ini dengan data dan bukti, (2) analisis keberhasilan dan kendala, (3) tindak lanjut. Pisahkan paragraf dengan baris kosong; awali baris dengan '- ' untuk butir daftar.">${esc(b.teks)}</textarea>
+    <span class="hint"><span id="dedKata">${b.kata.toLocaleString("id-ID")}</span> kata. Gunakan angka dari halaman Penilaian dan Tabel iLKPS agar narasi konsisten dengan data.</span></div>
+   <div class="grid g2" style="gap:10px"><div class="field"><label for="dedStatus">Status</label><select id="dedStatus" ${b.bolehUbah ? "" : "disabled"}>${Object.entries(ST_DED).map(([k, v]) => `<option value="${k}" ${b.status === k ? "selected" : ""}>${v[0]}</option>`).join("")}</select></div>
+    ${D.kelola ? `<div class="field"><label for="dedPj">Penanggung jawab</label><select id="dedPj"><option value="">– belum ditunjuk –</option>${D.dosen.map(o => `<option value="${o.id}" ${b.pj === o.id ? "selected" : ""}>${esc(namaPendek(o.nama))}</option>`).join("")}</select><span class="hint">Dosen yang ditunjuk bisa menulis butir ini dari menu DED miliknya.</span></div>` : `<div class="field"><span class="small muted">Penanggung jawab: ${esc(b.pjNama || "–")}</span></div>`}</div>
+   ${b.oleh ? `<p class="small muted">Terakhir diubah ${esc(namaPendek(b.oleh))}, ${tgl(b.diubah)}.</p>` : ""}
+   ${galatHtml()}${b.bolehUbah ? `<div class="row" style="justify-content:flex-end;margin-top:auto">${tombol("dedSimpan", "Simpan")}</div>` : ""}</div></div>`;
+}
+function kumpulIdentitas() {
+  const identitas = {}; document.querySelectorAll("[data-did]").forEach(el => { identitas[el.dataset.did] = el.value; });
+  const daftarPs = [...document.querySelectorAll("[data-psi]")].map(tr => { const o = {}; tr.querySelectorAll("[data-psk]").forEach(el => { o[el.dataset.psk] = el.value; }); return o; });
+  const tim = [...document.querySelectorAll("[data-timi]")].map(tr => { const o = {}; tr.querySelectorAll("[data-timk]").forEach(el => { o[el.dataset.timk] = el.value; }); return o; });
+  return { identitas, daftarPs, tim };
+}
+function terapkanIdentitas(x) { // simpan sementara isian di S.ded agar menambah/menghapus baris tidak menghapus ketikan
+  S.ded.identitas.forEach(f => { if (x.identitas[f.k] !== undefined) f.v = x.identitas[f.k]; });
+  S.ded.daftarPs = x.daftarPs; S.ded.tim = x.tim.map(t => Object.assign(t, { nama: t.userId ? (S.ded.dosen.find(o => o.id === t.userId) || {}).nama || "" : t.nama }));
+}
+async function eksporDed(ts, petunjuk) {
+  const D = S.ded, I = await api("ilkps.data", { ts }), T = {}; I.tabel.forEach(t => { T[t.kode] = t; });
+  const v = k => (D.identitas.find(x => x.k === k) || {}).v || "", d = UPW_DOCX.baru();
+  // logo (perbandingan sisi asli)
+  let logo = null, rasio = 1;
+  try {
+    const r = await fetch("logo.png"); logo = new Uint8Array(await r.arrayBuffer());
+    // Ukuran asli dibaca dari kepala PNG (lebar/tinggi di bait 16–23), tanpa menunggu gambar digambar browser.
+    const dv = new DataView(logo.buffer); const w = dv.getUint32(16), h = dv.getUint32(20); if (w && h) rasio = h / w;
+  } catch (_) { logo = null; }
+  d.p("", { sesudah: 60 });
+  if (logo) d.gambar(logo, 4.5, 4.5 * rasio, { rata: "center", sesudah: 24 });
+  [["DOKUMEN AKREDITASI PROGRAM STUDI", 16], ["AKREDITASI PROGRAM STUDI", 14], ["PROGRAM " + v("jenis").toUpperCase() + " " + v("ps").toUpperCase(), 14]].forEach(([t, u]) => d.p(t, { b: 1, ukuran: u, rata: "center", sesudah: 6 }));
+  d.p("", { sesudah: 80 });
+  [v("pt").toUpperCase(), v("kota").toUpperCase(), "TAHUN " + (v("tahun") || new Date().getFullYear())].forEach(t => d.p(t, { b: 1, ukuran: 14, rata: "center", sesudah: 6 }));
+  d.p("IDENTITAS PENGUSUL", { b: 1, ukuran: 14, rata: "center", halamanBaru: 1, sesudah: 12 });
+  d.tabel(D.identitas.filter(x => !["kota", "tahun"].includes(x.k)).map(x => [x.l, ": " + (x.v || "…")]), { judul: false, ukuran: 11, lebar: [6.5, 7.5] });
+  d.p("Daftar Program Studi di Unit Pengelola Program Studi (UPPS)", { b: 1, sebelum: 6 });
+  const ps = D.daftarPs;
+  d.tabel([["No.", "Jenis Program", "Nama Program Studi", "Status/Peringkat", "No. dan Tgl. SK", "Tgl. Kedaluwarsa", "Jumlah mahasiswa saat TS"]].concat(ps.map((r, i) => [i + 1, r.jenis, r.nama, r.peringkat, r.sk, r.kedaluwarsa, Number(r.mhs) || ""]),
+    [["Jumlah", "", "", "", "", "", ps.reduce((s, r) => s + (Number(r.mhs) || 0), 0)]]), { ukuran: 9 });
+  d.p("IDENTITAS TIM PENYUSUN DOKUMEN AKREDITASI PROGRAM STUDI", { b: 1, ukuran: 14, rata: "center", halamanBaru: 1, sesudah: 12 });
+  (D.tim.length ? D.tim : [{ nama: "", nidn: "", jabatan: "", tanggal: "" }]).forEach(t => {
+    const tg = t.tanggal ? t.tanggal.split("-").reverse().join(" – ") : "DD – MM – YYYY";
+    d.tabel([["Nama", ": " + (t.nama || "")], ["NIDN", ": " + (t.nidn || "")], ["Jabatan", ": " + (t.jabatan || "")], ["Tanggal Pengisian", ": " + tg], ["Tanda Tangan", ":\n\n"]], { judul: false, ukuran: 11, lebar: [4.5, 9.5] });
+  });
+  d.p("INDIKATOR KINERJA UTAMA", { b: 1, ukuran: 14, rata: "center", halamanBaru: 1, sesudah: 12 });
+  D.butir.forEach(b => {
+    d.p(b.n + ". " + b.judul, { b: 1, sebelum: 12, sesudah: 4, tetap: 1 });
+    if (petunjuk) d.p(b.petunjuk.replace(/\n/g, " "), { i: 1, ukuran: 10, warna: "555555", sesudah: 6 });
+    const par = String(b.teks || "").split(/\n\s*\n|\n/).map(s => s.trim()).filter(Boolean);
+    if (!par.length) d.p("[Narasi butir ini belum diisi]", { i: 1, warna: "C00000" });
+    par.forEach(s => /^[-•]\s+/.test(s) ? d.p("•	" + s.replace(/^[-•]\s+/, ""), { rata: "justify", inden: 1, gantung: 0.5, sesudah: 3 }) : d.p(s, { rata: "justify" }));
+    b.tabel.forEach(k => { const t = T[k]; if (!t) return;
+      d.p(t.judul + " — TS " + I.ts.label, { b: 1, ukuran: 10, sebelum: 6, sesudah: 3, tetap: 1 });
+      d.tabel([t.kolom].concat(t.baris), { ukuran: t.kolom.length > 9 ? 7 : t.kolom.length > 6 ? 8 : 9 });
+      if (t.catatan) d.p("Catatan: " + t.catatan, { i: 1, ukuran: 8, warna: "555555" }); });
+  });
+  unduh(d.blob({ judul: "DED Prodi " + v("ps"), kaki: "DED " + v("ps") + " – TS " + I.ts.label }), "DED " + namaBerkas(v("ps")) + " - TS " + I.ts.label.replace("/", "-") + ".docx");
+}
+Object.assign(AKSI, {
+  dedTab(d) { if (S.dedTab === "identitas" && S.ded) terapkanIdentitas(kumpulIdentitas()); S.dedTab = d.t; S.galat = ""; render(); },
+  dedBuka(d) { const b = S.ded.butir.find(x => x.n === Number(d.n)); S.laci = { jenis: "ded", n: b.n, awal: b.teks, versi: b.diubah }; S.galat = ""; render(); },
+  dedSimpan() {
+    const L = S.laci, teks = $("dedTeks").value, status = $("dedStatus").value, pj = $("dedPj") ? $("dedPj").value : undefined;
+    const b = S.ded.butir.find(x => x.n === L.n), data = { butir: L.n, teks, status: status === "belum" && teks.trim() ? "draf" : status, versi: L.versi || "" };
+    if (pj !== undefined && pj !== b.pj) data.pj = pj;
+    jalankan(async () => {
+      const j = await api("ded.simpan", data).catch(e => { toast(e.message); throw e; });
+      Object.assign(b, { teks, status: data.status, kata: (teks.trim().match(/\S+/g) || []).length, diubah: j.diubah, oleh: S.pengguna.nama });
+      if (data.pj !== undefined) { b.pj = data.pj; b.pjNama = (S.ded.dosen.find(o => o.id === data.pj) || {}).nama || ""; }
+      L.awal = teks; L.versi = j.diubah; S.laci = null; S.tugas = null; toast("Butir " + L.n + " tersimpan.");
+    });
+  },
+  dedPsTambah() { const x = kumpulIdentitas(); x.daftarPs.push({ nama: "", jenis: "", peringkat: "", sk: "", kedaluwarsa: "", mhs: "" }); terapkanIdentitas(x); render(); },
+  dedPsHapus(d) { const x = kumpulIdentitas(); x.daftarPs.splice(Number(d.i), 1); terapkanIdentitas(x); render(); },
+  dedTimTambah() { const x = kumpulIdentitas(); x.tim.push({ userId: "", nama: "", nidn: "", jabatan: "", tanggal: "" }); terapkanIdentitas(x); render(); },
+  dedTimHapus(d) { const x = kumpulIdentitas(); x.tim.splice(Number(d.i), 1); terapkanIdentitas(x); render(); },
+  dedIdSimpan() {
+    const x = kumpulIdentitas(); terapkanIdentitas(x);
+    jalankan(async () => { await api("ded.identitas", x); S.ded = null; toast("Identitas dan tim penyusun tersimpan."); });
+  },
+  dedUnduh() {
+    const ts = Number($("dedTs").value), pet = $("dedPetunjuk").checked;
+    if (S.dedTab === "identitas" && S.ded.kelola) terapkanIdentitas(kumpulIdentitas());
+    jalankan(async () => { toast("Menyusun dokumen Word…"); await eksporDed(ts, pet); toast("DED (.docx) dibuat."); });
+  }
+});
+document.addEventListener("input", e => { if (e.target.id === "dedTeks") { const n = (e.target.value.trim().match(/\S+/g) || []).length; const el = $("dedKata"); if (el) el.textContent = n.toLocaleString("id-ID"); } });
+document.addEventListener("change", e => {
+  if (e.target.id === "dedF") { S.dedF = e.target.value; render(); }
+  if (e.target.dataset && e.target.dataset.timk === "userId") {
+    const tr = e.target.closest("[data-timi]"), nama = tr.querySelector('[data-timk="nama"]'), nidn = tr.querySelector('[data-timk="nidn"]');
+    nama.style.display = e.target.value ? "none" : ""; if (e.target.value && !nidn.value) nidn.value = S.ded.nidn[e.target.value] || "";
+  }
+});
 
 /* --- Penilaian (v0.12.0) --- */
 const CARA_L = { a: "Otomatis dari data", m: "Penilaian GPM (rubrik)", c: "Data + penilaian GPM" };

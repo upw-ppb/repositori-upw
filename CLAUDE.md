@@ -146,6 +146,14 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Akreditasi_Unggul_Word.docx, diekstrak scratchpad baca-docx.py); gabung() untuk butir c (26, 42, 64, 71). SkorGpm per TS. VERSI_SKEMA 11.
   Uji: uji-nilai-bagian.mjs (302). Tafsiran tercatat di keterangan butir dan CHANGELOG.
 
+- v0.13.0 (13 Nov 2026, Uji Coba): gas/Ded.js — tabel DedNarasi (butir, teks, status, pj; VERSI_SKEMA 12), cek versi saat simpan
+  (d.versi = diubah), dosen hanya butir PJ-nya; identitas/daftar PS/tim di Pengaturan (dedIdentitas, dedDaftarPs, dedTim).
+  gas/DedPetunjuk.js DIBUAT OTOMATIS dari Downloads/DED_Vokasi_Unggul_Word.docx (petunjuk + penempatan Tabel iLKPS per butir).
+  docs/uji/docx.js = penulis .docx buatan sendiri (UPW_DOCX; dipaketkan UPW_ZIP). Ekspor DED di tampilan (eksporDed); ukuran logo dibaca
+  dari kepala PNG (jangan pakai Image.decode — macet saat panel tersembunyi). Uji: uji-ded-bagian.mjs (total 319 + 44 skenario);
+  uji dijalankan `node uji-keg.mjs gas` dari scratchpad (salin gas/ dulu). Docx divalidasi unzip + XML + textutil + Quick Look,
+  belum dibuka di Microsoft Word asli.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
