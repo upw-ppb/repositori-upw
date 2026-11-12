@@ -173,12 +173,13 @@ function gabung(n, auto, gpm) {
 function hitungPenilaian(ts) {
   var X = konteksNilai(ts), gpm = {};
   semua("SkorGpm").filter(function (r) { return Number(r.ts) === ts; }).forEach(function (r) { gpm[Number(r.butir)] = { skor: r.skor === "" ? null : Number(r.skor), catatan: teks(r.catatan), oleh: teks(r.oleh), waktu: r.waktu ? new Date(r.waktu).toISOString() : "" }; });
-  var idx = indeksOrang();
+  var idx = indeksOrang(), mkp = infoMkpTs(ts);
   var rows = MATRIKS.map(function (m) {
     var g = gpm[m.n] || { skor: null, catatan: "" }, r = m.f ? rumusOtomatis(m.f, X) : null, s, info, auto = null;
     if (m.t === "a") { s = r.s; info = r.info; }
     else if (m.t === "c" && r) { auto = r.s; s = gabung(m.n, r.s, g.skor); info = r.info + "; skor GPM " + (g.skor === null ? "belum diisi" : g.skor); }
     else { s = g.skor === null ? 0 : g.skor; info = g.skor === null ? "Belum dinilai GPM" : "Dinilai GPM"; }
+    if (mkp[m.n]) info += "; " + mkp[m.n];
     s = Math.round(cap4(s) * 100) / 100;
     var o = idx.byId[g.oleh];
     return { n: m.n, k: m.k, nm: m.nm, w: m.w, t: m.t, ded: m.ded, src: m.src, s4: m.s4, sr: m.sr, skor: s, nilai: Math.round(m.w * s * 1000) / 1000, info: info,

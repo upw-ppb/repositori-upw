@@ -250,3 +250,7 @@ label.btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
 .survei-publik header{display:flex;gap:12px;align-items:center}
 .survei-publik header img{width:52px;height:52px}
 .jebakan{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* v0.14.0: tombol bergaya tautan (mis. nama MK di tabel rekap) */
+.lnk { background: none; border: 0; padding: 0; color: var(--brand); font: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.lnk:hover { color: var(--brand-ink); }

@@ -62,10 +62,11 @@ const I = {
   setuju: '<path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/>',
   survei: '<path d="M9 5h10M9 12h10M9 19h10"/><path d="M4 5l1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2"/>',
   penilaian: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
-  ded: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'
+  ded: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
+  mk: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7M8 11h7"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -79,6 +80,7 @@ function menu() {
   const m = ["beranda"];
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
   if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
+  if (u.peran.includes("dosen")) m.push("mk");
   if (u.peran.some(r => ["admin", "superadmin", "kps"].includes(r))) m.push("penilaian", "ded", "ilkps", "dprodi", "survei");
   else if (S.tugas && S.tugas.dedPj) m.push("ded");
   if (u.peran.includes("kps")) m.push("kps"); // antrean KPS selalu terlihat, apa pun peran aktifnya, agar pengajuan tidak terlewat
@@ -145,6 +147,7 @@ function halaman() {
   if (S.view === "survei") return hSurvei();
   if (S.view === "penilaian") return hPenilaian();
   if (S.view === "ded") return hDed();
+  if (S.view === "mk") return hMk();
   return hBeranda();
 }
 const tombol = (act, label, kelas = "primary", attr = "") => `<button class="btn ${kelas}" data-act="${act}" ${attr} ${S.sibuk ? "disabled" : ""}>${S.sibuk ? "Memproses…" : label}</button>`;
@@ -212,7 +215,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}
-   <div class="callout"><b>Uji Coba v${K.versi} · DED.</b>${menu().includes("ded") ? " Baru: menu <b>DED</b> untuk menulis narasi 64 butir (dengan petunjuk resmi dan penanggung jawab), identitas dan tim penyusun, serta unduh Word sesuai format LAMWisata dengan Tabel 1–23 otomatis." : ""} Sebelumnya: menu <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   <div class="callout"><b>Uji Coba v${K.versi} · Portofolio Mata Kuliah.</b>${menu().includes("mk") ? " Baru: menu <b>Mata Kuliah Saya</b> untuk mengunggah RPS, kontrak kuliah, rubrik, metode, integrasi penelitian/PkM, dan bukti pembelajaran per semester." : ""}${menu().includes("dprodi") ? " Rekap kelengkapannya ada di Data Prodi › Portofolio MK dan ikut tampil di Penilaian butir 8, 22, 25." : ""} Sebelumnya: menu <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -231,6 +234,7 @@ function panelTugas() {
     return `<div class="item" style="cursor:pointer" data-act="bukaKeg" data-id="${x.id}"><div class="body"><div class="title">${esc(x.judul)}</div><div class="meta"><span>${esc(isi)}</span></div></div><span class="chip ${kelas}">${judul}</span></div>`;
   });
   if (t.verifikasi) baris.push(`<div class="item" style="cursor:pointer" data-go="verif"><div class="body"><div class="title">${t.verifikasi} data kegiatan menunggu verifikasi Anda</div></div><span class="chip s-diajukan">Verifikasi</span></div>`);
+  (t.mkpBelumRps || []).forEach(m => baris.push(`<div class="item" style="cursor:pointer" data-act="mkpBuka" data-s="${m.semester}" data-kode="${esc(m.kode)}"><div class="body"><div class="title">${esc(m.kode)} · ${esc(m.nama)}</div><div class="meta"><span>Unggah RPS semester ini (Anda pengampu utama)</span></div></div><span class="chip s-revisi">RPS</span></div>`));
   if (t.dedBelum) baris.push(`<div class="item" style="cursor:pointer" data-go="ded"><div class="body"><div class="title">${t.dedBelum} butir DED tanggung jawab Anda belum selesai</div><div class="meta"><span>Dari ${t.dedPj} butir yang ditugaskan kepada Anda</span></div></div><span class="chip s-revisi">DED</span></div>`);
   if (t.kps) baris.push(`<div class="item" style="cursor:pointer" data-go="kps"><div class="body"><div class="title">${t.kps} pengajuan surat tugas menunggu keputusan Anda</div></div><span class="chip s-diajukan">Antrean KPS</span></div>`);
   return `<section class="panel"><h2>Perlu tindakan (${baris.length})</h2><div class="list">${baris.join("") || `<div class="empty">Tidak ada yang perlu ditindaklanjuti. Bagus!</div>`}</div></section>`;
@@ -344,6 +348,7 @@ function laci() {
   if (L.jenis === "svIsi") return laciSvIsi();
   if (L.jenis === "gpm") return laciGpm();
   if (L.jenis === "ded") return laciDed();
+  if (L.jenis === "mkp") return laciMkp();
   if (L.jenis === "sandi") return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Kata sandi sementara">
    <div class="dh"><h2>Kata sandi sementara</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
    <p>Berikan ${L.username ? "nama pengguna dan " : ""}kata sandi ini kepada <b>${esc(L.nama)}</b> secara langsung (bukan lewat grup percakapan). Kata sandi hanya ditampilkan sekali dan wajib diganti saat masuk pertama.</p>
@@ -637,7 +642,7 @@ async function muatVerif() {
   return sekali("verif", async () => { S.verif = (await api("verifikasi.antrean")).kegiatan; render(); });
 }
 /** Setelah ada perubahan data: muat ulang daftar, antrean, dan pengingat saat dibutuhkan. */
-function segarkan() { S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
+function segarkan() { S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
 async function muatAntrean() {
   return sekali("antrean", async () => { S.antrean = (await api("kps.antrean")).kegiatan; render(); });
 }
@@ -1116,9 +1121,10 @@ function muatDp() { sekali("dp", async () => { S.dp = await api("dp.data", { sem
 const namaAnggota = a => { const D = S.dp; if (a.t === "p") { const x = D.praktisi.find(y => y.id === a.id); return x ? x.nama + " (praktisi)" : "(praktisi dihapus)"; } const x = D.dosen.find(y => y.id === a.id); return x ? namaPendek(x.nama) + (x.inisial ? " (" + x.inisial + ")" : "") : "(akun nonaktif)"; };
 function hDprodi() {
   if (!S.dp) { muatDp(); return `<div class="memuat">Memuat data prodi…</div>`; }
-  const D = S.dp, ub = D.bolehUbah, tabs = [["kurikulum", "Kurikulum"], ["tim", "Tim pengajar"], ["praktisi", "Praktisi"], ["dosents", "Data dosen TS"], ["lulusan", "Lulusan"], ["pmb", "PMB"], ["keuangan", "Keuangan"]];
+  const D = S.dp, ub = D.bolehUbah, tabs = [["kurikulum", "Kurikulum"], ["tim", "Tim pengajar"], ["mkp", "Portofolio MK"], ["praktisi", "Praktisi"], ["dosents", "Data dosen TS"], ["lulusan", "Lulusan"], ["pmb", "PMB"], ["keuangan", "Keuangan"]];
   let isi = "";
   if (["lulusan", "pmb", "keuangan"].includes(S.dpTab)) isi = isiLulusan();
+  if (S.dpTab === "mkp") isi = isiMkpRekap();
   if (S.dpTab === "kurikulum") {
     const tot = D.mk.reduce((s, m) => s + m.sks, 0), prak = D.mk.reduce((s, m) => s + m.sksPraktik, 0);
     isi = `<div class="grid g3"><div class="panel stat"><span class="v num">${D.mk.length}</span><span class="l">Mata kuliah</span></div><div class="panel stat"><span class="v num">${tot.toLocaleString("id-ID")}</span><span class="l">Total sks</span></div>
@@ -1480,6 +1486,145 @@ document.addEventListener("change", e => {
     const tr = e.target.closest("[data-timi]"), nama = tr.querySelector('[data-timk="nama"]'), nidn = tr.querySelector('[data-timk="nidn"]');
     nama.style.display = e.target.value ? "none" : ""; if (e.target.value && !nidn.value) nidn.value = S.ded.nidn[e.target.value] || "";
   }
+});
+
+/* --- Portofolio Mata Kuliah (v0.14.0) --- */
+const KOMP_SING = { rps: "RPS", kontrak: "Kontrak", rubrik: "Rubrik", metode: "Metode", integ: "Integrasi", interaksi: "Interaksi" };
+function muatMkp() { sekali("mkp", async () => { S.mkp = await api("mkp.saya", { semester: S.mkpSmt || undefined }); render(); }); }
+function pilihSmtMkp(id, D) {
+  return `<label class="row small" style="gap:6px"><b>Semester</b><select id="${id}" style="width:auto">${D.pilihanSemester.map(s => `<option value="${s.kode}" ${s.kode === D.semester ? "selected" : ""}>${esc(s.label)}${s.kode === D.semesterKini ? " (berjalan)" : ""}</option>`).join("")}</select></label>`;
+}
+const tandaKomp = (x, k) => x.lengkap.includes(k) ? '<span style="color:var(--ok)" aria-label="ada">✓</span>' : '<span style="color:var(--warn)" aria-label="belum">–</span>';
+function hMk() {
+  if (!S.mkp) { muatMkp(); return `<div class="memuat">Memuat mata kuliah…</div>`; }
+  const D = S.mkp, n = D.komp.length;
+  return `<div class="head"><div><h1>Mata Kuliah Saya</h1><p>Mata kuliah yang Anda ampu sesuai tim pengajar yang ditetapkan Admin Prodi. Kelengkapannya dipakai untuk butir 8 (RPS), 22 (proses pembelajaran), dan 25 (penilaian).</p></div>${pilihSmtMkp("mkpSmt", D)}</div>
+   ${D.semester < D.semesterKini ? `<div class="callout">Anda melihat <b>${esc(D.labelSemester)}</b>. Semester yang sudah lewat hanya bisa dilihat.</div>` : ""}
+   <div class="callout"><b>Siapa mengisi apa?</b> <b>Pengampu utama</b> mengunggah RPS, kontrak kuliah, rubrik, dan memilih metode pembelajaran. <b>Semua dosen dalam tim</b> bisa menambahkan catatan integrasi penelitian/PkM dan bukti pembelajaran dari sesi yang diampu.</div>
+   <div class="grid g2">${D.mk.map(x => {
+     const a = x.lengkap.length, utama = x.peran === "utama";
+     return `<article class="panel" style="display:flex;flex-direction:column;gap:8px"><div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:nowrap"><b>${esc(x.kode)} · ${esc(x.nama)}</b>${utama ? '<span class="chip s-diajukan">Pengampu utama</span>' : '<span class="chip s-draf">Anggota tim</span>'}</div>
+      <div class="small muted">${x.sks} sks · tim: ${x.tim.map((t, i) => esc(namaPendek(t.nama)) + (i === 0 ? " (utama)" : "") + (t.t === "p" ? " (praktisi)" : "")).join(", ")}</div>
+      <div class="bar ${a < n ? "gold" : ""}"><i style="width:${a / n * 100}%"></i></div>
+      <div class="small">${D.komp.map(c => `<div>${x.lengkap.includes(c.k) ? '<span style="color:var(--ok)">✓</span>' : '<span style="color:var(--warn)">○</span>'} ${esc(c.l)} <span class="muted">${c.u ? (utama ? "· tugas Anda" : "· oleh pengampu utama") : "· semua anggota"}</span></div>`).join("")}</div>
+      <button class="btn sm ${x.bolehAnggota ? "primary" : ""}" data-act="mkpBuka" data-s="${x.semester}" data-kode="${esc(x.kode)}" style="align-self:flex-start">${!x.buka ? "Lihat" : utama ? "Lengkapi" : "Tambah bagian saya"}</button></article>`;
+   }).join("") || `<div class="empty panel">Anda tidak tercatat mengampu mata kuliah pada ${esc(D.labelSemester)}. Tim pengajar ditetapkan Admin Prodi di Data Prodi.</div>`}</div>`;
+}
+function isiMkpRekap() {
+  const R = S.mkpRekap;
+  if (!R) { sekali("mkpRekap", async () => { S.mkpRekap = await api("mkp.rekap", { semester: S.mkpRekapSmt || (S.dp && S.dp.semester) || undefined }); render(); }); return `<div class="memuat">Memuat portofolio mata kuliah…</div>`; }
+  return `<div class="row" style="justify-content:space-between;flex-wrap:wrap">${pilihSmtMkp("mkpRekapSmt", R)}<span class="small muted">Diisi dosen di menu Mata Kuliah Saya; data pendukung butir 8, 22, dan 25.</span></div>
+   ${R.tanpaTim ? `<div class="callout">${R.tanpaTim} mata kuliah ${/-1$/.test(R.semester) ? "ganjil" : "genap"} belum punya tim pengajar sehingga belum dihitung. Tetapkan di tab <b>Tim pengajar</b>.</div>` : ""}
+   <div class="grid g3">${R.komp.map(c => `<div class="panel stat"><span class="v num">${R.persen.n ? dpPersen(R.persen[c.k]) : "–"}</span><span class="l">${esc(c.l)}</span><div class="bar ${R.persen[c.k] < 0.75 ? "gold" : ""}" style="margin-top:6px"><i style="width:${R.persen[c.k] * 100}%"></i></div></div>`).join("")}</div>
+   <div class="tbl-wrap"><table><thead><tr><th>Mata kuliah</th><th>Tim</th>${R.komp.map(c => `<th>${KOMP_SING[c.k]}</th>`).join("")}</tr></thead><tbody>
+   ${R.mk.map(x => `<tr><td><button class="lnk" data-act="mkpBuka" data-s="${x.semester}" data-kode="${esc(x.kode)}">${esc(x.kode)} · ${esc(x.nama)}</button></td><td class="small">${x.tim.map((t, i) => esc(namaPendek(t.nama)) + (i === 0 ? " (utama)" : "")).join(", ")}</td>${R.komp.map(c => `<td>${tandaKomp(x, c.k)}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="8"><div class="empty">Belum ada tim pengajar untuk ${esc(R.labelSemester)}.</div></td></tr>`}</tbody></table></div>`;
+}
+function entriMkp(e, komp, hapus) {
+  const dis = S.sibuk ? "disabled" : "";
+  const ket = e.t === "file" ? `${esc(e.nama)} · ${ukuranT(e.ukuran)}` : `Tautan: <a href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">${esc(e.url.length > 60 ? e.url.slice(0, 57) + "…" : e.url)}</a>`;
+  return `<div class="item bk"><div class="body"><div class="meta"><span>${ket}${e.ket ? " · " + esc(e.ket) : ""} · ${esc(namaPendek(e.oleh))}, ${tglJam(e.w)}</span></div></div>
+   <div class="row bk-aksi"><button class="btn sm" data-act="mkpLihat" data-komp="${komp}" data-id="${e.id || ""}" ${dis}>${e.t === "tautan" ? "Buka" : "Lihat"}</button>${hapus ? `<button class="btn sm bad" data-act="mkpHapus" data-komp="${komp}" data-id="${e.id || ""}" ${dis}>Hapus</button>` : ""}</div></div>`;
+}
+function formTautanMkp(komp, ket) {
+  const m = S.laci.tm;
+  if (!m || m !== komp) return "";
+  return `<div class="grid" style="gap:6px;margin-top:6px"><input id="mkpUrl" type="url" inputmode="url" placeholder="https://drive.google.com/…" aria-label="Tautan">
+   ${ket ? `<input id="mkpKetT" type="text" maxlength="200" placeholder="Keterangan, misalnya: kelas LMS pertemuan 1–7" aria-label="Keterangan">` : ""}
+   <div class="row">${tombol("mkpSimpanTautan", "Simpan tautan", "primary sm")}<button class="btn sm" data-act="mkpTautan" data-komp="">Batal</button></div>
+   <span class="hint">Pastikan tautan bisa dibuka oleh akun prodi (upw@ppb.ac.id) atau siapa saja dengan tautan.</span></div>`;
+}
+function laciMkp() {
+  const x = S.laci.x, saya = S.pengguna.id, dis = S.sibuk ? "disabled" : "";
+  const blok = c => {
+    const kepala = `<div class="row" style="justify-content:space-between;flex-wrap:wrap"><h3 style="margin:0">${esc(c.l)}</h3><span class="small muted">${c.u ? "Pengampu utama" : "Semua dosen dalam tim"}</span></div><span class="hint">${esc(c.h)}</span>`;
+    const boleh = c.u ? x.bolehUtama : x.bolehAnggota;
+    if (c.jenis === "dok") {
+      const e = x[c.k];
+      return `<div class="picker">${kepala}${e ? entriMkp(e, c.k, boleh) : `<div class="row" style="justify-content:space-between"><span class="chip s-revisi">Belum</span></div>`}
+        ${boleh ? `<div class="row small" style="flex-wrap:wrap"><label class="btn sm" ${S.sibuk ? 'aria-disabled="true"' : ""}>${e ? "Ganti dengan file" : "Unggah file"}<input type="file" data-mfile="${c.k}" accept="${TERIMA}" hidden ${dis}></label><button class="btn sm" data-act="mkpTautan" data-komp="${c.k}" ${dis}>${e ? "Ganti dengan tautan" : "Tempel tautan"}</button></div>${formTautanMkp(c.k, false)}` : ""}</div>`;
+    }
+    if (c.jenis === "metode") {
+      const m = x.metode;
+      if (!boleh) return `<div class="picker">${kepala}<div class="small">${m.v.length || m.lain ? esc(m.v.concat(m.lain ? [m.lain] : []).join(", ")) + (m.oleh ? ` <span class="muted">· ${esc(namaPendek(m.oleh))}, ${tglJam(m.w)}</span>` : "") : '<span class="chip s-revisi">Belum</span>'}</div></div>`;
+      return `<div class="picker">${kepala}<div class="classgrid">${x.daftarMetode.map(v => `<label><input type="checkbox" data-mmet="${esc(v)}" ${m.v.includes(v) ? "checked" : ""}><span>${esc(v)}</span></label>`).join("")}</div>
+        <div class="field"><label for="mkpLain">Metode lain (opsional)</label><input id="mkpLain" type="text" maxlength="200" value="${esc(m.lain)}" placeholder="Contoh: simulasi reservasi GDS"></div>
+        <div class="row">${tombol("mkpMetode", "Simpan metode", "sm")}</div></div>`;
+    }
+    if (c.jenis === "catatan") {
+      return `<div class="picker">${kepala}${x.integ.map(e => `<div class="item bk"><div class="body"><div class="small" style="border-left:3px solid var(--brand);padding-left:8px">${esc(e.teks)}</div><div class="meta"><span>${esc(namaPendek(e.oleh))}, ${tglJam(e.w)}</span></div></div>${boleh && e.o === saya ? `<div class="row bk-aksi"><button class="btn sm bad" data-act="mkpHapus" data-komp="integ" data-id="${e.id}" ${dis}>Hapus</button></div>` : ""}</div>`).join("") || '<span class="small muted">Belum ada catatan integrasi.</span>'}
+        ${boleh ? `<div class="field"><label for="mkpInteg">Tambahkan catatan Anda</label><textarea id="mkpInteg" rows="3" maxlength="1000" placeholder="Contoh: mahasiswa menganalisis data penelitian saya tentang preferensi wisatawan sebagai studi kasus tugas akhir MK."></textarea></div><div class="row">${tombol("mkpInteg", "Tambahkan", "sm")}</div>` : ""}</div>`;
+    }
+    return `<div class="picker">${kepala}${x.interaksi.map(e => entriMkp(e, "interaksi", boleh && e.o === saya)).join("") || '<span class="small muted">Belum ada bukti.</span>'}
+      ${boleh ? `<div class="field"><label for="mkpKet">Keterangan untuk file (opsional)</label><input id="mkpKet" type="text" maxlength="200" placeholder="Contoh: dokumentasi praktik pemanduan, pertemuan 5"></div>
+      <div class="row small" style="flex-wrap:wrap"><label class="btn sm" ${S.sibuk ? 'aria-disabled="true"' : ""}>Unggah file<input type="file" data-mfile="interaksi" accept="${TERIMA}" hidden ${dis}></label><button class="btn sm" data-act="mkpTautan" data-komp="interaksi" ${dis}>Tempel tautan</button></div>${formTautanMkp("interaksi", true)}` : ""}</div>`;
+  };
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Portofolio mata kuliah" style="width:min(680px,100%)">
+   <div class="dh"><h2>${esc(x.kode)} · ${esc(x.nama)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <p class="small muted">${esc(x.labelSemester)} · ${x.sks} sks (${x.sksPraktik} sks praktik) · tim: ${x.tim.map((t, i) => (i === 0 ? "<b>" : "") + esc(t.nama) + (i === 0 ? "</b> (utama)" : "") + (t.t === "p" ? " (praktisi)" : "")).join(", ")}</p>
+   ${!x.buka ? `<div class="callout">Semester sudah lewat: hanya bisa dilihat.</div>` : !x.peran ? `<div class="callout">Tampilan pemantauan: hanya melihat. Dokumen diisi oleh tim pengajar.</div>` : ""}
+   ${x.peran ? `<p class="small muted" style="margin:0">File maks. 10 MB (PDF, gambar, Word, Excel, PowerPoint); video atau album: pakai tautan. Mengganti file memindahkan file lama ke sampah Drive.</p>` : ""}
+   ${galatHtml()}
+   ${x.komp.map(blok).join("")}
+   ${x.kuliahTamu && x.kuliahTamu.length ? `<div class="picker"><h3 style="margin:0">Kuliah tamu tercatat</h3>${x.kuliahTamu.map(k => `<div class="item" style="cursor:pointer" data-act="bukaKeg" data-id="${k.id}"><div class="body"><div class="title">${esc(k.judul)}</div><div class="meta"><span>${esc(tglPendek(k.tgl))}</span></div></div></div>`).join("")}</div>` : ""}
+  </div></div>`;
+}
+function gantiMkp(j) { if (S.laci && S.laci.jenis === "mkp") { S.laci.x = j; S.laci.tm = null; } S.mkp = null; S.mkpRekap = null; S.tugas = null; S.nilai = null; }
+function unggahMkp(komp, isi) {
+  const x = S.laci.x;
+  if (isi.isi) toast("Mengunggah…");
+  jalankan(async () => { gantiMkp(await api("mkp.unggah", Object.assign({ semester: x.semester, kode: x.kode, komp }, isi))); toast("Tersimpan."); });
+}
+Object.assign(AKSI, {
+  mkpBuka(d) {
+    sekali("mkpBuka", async () => { const j = await api("mkp.detail", { semester: d.s, kode: d.kode }); S.laci = { jenis: "mkp", x: j, tm: null }; S.galat = ""; render(); });
+  },
+  mkpTautan(d) { S.laci.tm = d.komp || null; S.galat = ""; render(); if (d.komp) fokus("mkpUrl"); },
+  mkpSimpanTautan() {
+    const komp = S.laci.tm; if (!komp) return;
+    const isi = { tautan: String($("mkpUrl")?.value || "").trim() };
+    if ($("mkpKetT")) isi.ket = String($("mkpKetT").value || "").trim();
+    unggahMkp(komp, isi);
+  },
+  mkpMetode() {
+    const x = S.laci.x, metode = [...document.querySelectorAll("[data-mmet]:checked")].map(el => el.dataset.mmet), lain = String($("mkpLain")?.value || "").trim();
+    jalankan(async () => { gantiMkp(await api("mkp.metode", { semester: x.semester, kode: x.kode, metode, lain })); toast("Metode pembelajaran tersimpan."); });
+  },
+  mkpInteg() {
+    const x = S.laci.x, teks = String($("mkpInteg")?.value || "").trim();
+    jalankan(async () => { gantiMkp(await api("mkp.integ", { semester: x.semester, kode: x.kode, teks })); toast("Catatan integrasi ditambahkan."); });
+  },
+  mkpHapus(d) {
+    if (!confirm("Hapus isian ini? File dipindahkan ke sampah Drive.")) return;
+    const x = S.laci.x;
+    jalankan(async () => { gantiMkp(await api("mkp.hapus", { semester: x.semester, kode: x.kode, komp: d.komp, id: d.id || undefined })); toast("Dihapus."); });
+  },
+  async mkpLihat(d) {
+    const x = S.laci.x, c = x.komp.find(y => y.k === d.komp), e = c.jenis === "dok" ? x[d.komp] : x[d.komp].find(y => y.id === d.id);
+    if (!e) return;
+    if (e.t === "tautan") { window.open(e.url, "_blank", "noopener,noreferrer"); return; }
+    const w = window.open("", "_blank");
+    if (w) w.document.write('<p style="font-family:sans-serif;padding:16px">Membuka berkas…</p>');
+    try {
+      const j = await api("mkp.lihat", { semester: x.semester, kode: x.kode, komp: d.komp, id: d.id || undefined });
+      const bin = atob(j.isi), arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([arr], { type: j.mime }));
+      if (w && /pdf|image/.test(j.mime)) w.location.href = url;
+      else { if (w) w.close(); const a = document.createElement("a"); a.href = url; a.download = j.nama; document.body.appendChild(a); a.click(); a.remove(); }
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
+    } catch (err) { if (w) w.close(); toast(err.message); }
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.id === "mkpSmt") { S.mkpSmt = t.value; S.mkp = null; render(); return; }
+  if (t.id === "mkpRekapSmt") { S.mkpRekapSmt = t.value; S.mkpRekap = null; render(); return; }
+  if (!t.dataset || !t.dataset.mfile || !S.laci || S.laci.jenis !== "mkp") return;
+  const f = t.files && t.files[0], komp = t.dataset.mfile; t.value = "";
+  if (!f) return;
+  if (f.size > 10 * 1024 * 1024) { toast("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai tautan."); return; }
+  const ket = komp === "interaksi" ? String($("mkpKet")?.value || "").trim() : undefined;
+  bacaBase64(f).then(isi => unggahMkp(komp, ket !== undefined ? { nama: f.name, isi, ket } : { nama: f.name, isi }), err => toast(err.message));
 });
 
 /* --- Penilaian (v0.12.0) --- */

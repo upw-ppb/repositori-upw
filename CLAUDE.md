@@ -154,6 +154,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   uji dijalankan `node uji-keg.mjs gas` dari scratchpad (salin gas/ dulu). Docx divalidasi unzip + XML + textutil + Quick Look,
   belum dibuka di Microsoft Word asli.
 
+- v0.14.0 (13 Nov 2026, Uji Coba): gas/PortofolioMk.js — tabel PortofolioMk (semester, kodeMk, isi JSON; VERSI_SKEMA 13). Komponen KOMP_MKP
+  (rps/kontrak/rubrik/metode = pengampu utama anggota[0]; integ/interaksi = semua dosen tim). Bisa diisi semester berjalan + sesudahnya.
+  infoMkpTs(ts) menambah keterangan butir 8/22/25 di Penilaian. Uji: uji-mkp-bagian.mjs (total 349 + 44).
+  PELAJARAN: saat menyalin docs/uji ke scratchpad/web untuk uji UI, WAJIB ganti api di web/konfig.js menjadi "/api",
+  kalau tidak permintaan pergi ke server Uji Coba sungguhan.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

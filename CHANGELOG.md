@@ -3,6 +3,22 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.14.0 — 13 Nov 2026 — Uji Coba
+- Menu "Mata Kuliah Saya" (dosen): mata kuliah yang diampu per semester sesuai tim pengajar dari Data Prodi.
+  - Pengampu utama mengunggah RPS, kontrak kuliah, rubrik/portofolio penilaian (file atau tautan; bisa diganti, file lama ke sampah Drive)
+    dan memilih metode pembelajaran (7 pilihan + metode lain).
+  - Semua dosen dalam tim menambahkan catatan integrasi penelitian/PkM dan bukti pembelajaran daring/luring (file/tautan + keterangan);
+    hanya penulis/pengunggahnya yang bisa menghapus.
+  - Semester berjalan dan berikutnya bisa diisi; semester lampau hanya dilihat. Kuliah tamu yang menyebut kode MK ikut ditampilkan.
+  - Pengingat di Beranda bagi pengampu utama yang belum mengunggah RPS semester berjalan.
+- Data Prodi › Portofolio MK (Admin Prodi, KPS, Super Admin): persentase kelengkapan per komponen dan tabel per mata kuliah; detail hanya dilihat.
+- Penilaian butir 8, 22, 25: keterangan otomatis dari Portofolio MK pada TS (persentase RPS, metode, integrasi, interaksi, rubrik, kontrak).
+  Skor butir tetap dinilai GPM.
+- File disimpan di Drive: Bukti / Portofolio MK / <semester> / <kode dan nama MK>; dibuka lewat aplikasi.
+- Struktur data versi 13: tabel baru PortofolioMk. Cadangan otomatis sebelum perubahan.
+  Versi lama (v0.13.0) tetap bisa membaca data ini; rollback tidak memerlukan pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.13.0 — 13 Nov 2026 — Uji Coba
 - Menu "DED" (Admin Prodi, KPS, Super Admin; dosen yang ditunjuk sebagai penanggung jawab melihat butirnya sendiri):
   - Editor narasi 64 butir DED LAMWisata dengan petunjuk resmi tiap butir, daftar butir Matriks terkait (bobot, syarat skor 4),

@@ -39,11 +39,13 @@ var SKEMA = {
   /* v0.12.0 */
   SkorGpm: ["ts", "butir", "skor", "catatan", "oleh", "waktu"],
   /* v0.13.0 */
-  DedNarasi: ["butir", "teks", "status", "pj", "oleh", "diubah"]
+  DedNarasi: ["butir", "teks", "status", "pj", "oleh", "diubah"],
+  /* v0.14.0 */
+  PortofolioMk: ["semester", "kodeMk", "isi", "oleh", "diubah"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 12;
+var VERSI_SKEMA = 13;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
