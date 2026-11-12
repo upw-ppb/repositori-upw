@@ -121,6 +121,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Saat menguji unduhan di browser pratinjau: tahan unduhan (ganti HTMLAnchorElement.click) agar tidak masuk ke Downloads pemilik.
   grep di Mac ini kadang tidak membaca aplikasi.js (OneDrive); periksa isi dengan Python.
 
+- v0.7.0 (12 Nov 2026, Uji Coba): gas/Ilkps.js — susunIlkps(ts) membangun tabel (bentuk "daftar" atau "hitung" TS-2..TS) dari
+  kegiatan status "disetujui"; peta jenis → tabel ada di sana. TS = Pengaturan tsAwal (bawaan TA lalu). Tautan ?keg=ID.
+  Format resmi dibaca dengan scratchpad baca-xlsx.py (Python, tanpa pustaka). Uji: uji-ilkps-bagian.mjs (total 170 skenario).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

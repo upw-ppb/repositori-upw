@@ -3,6 +3,19 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.7.0 — 12 Nov 2026 — Uji Coba
+- Menu "Tabel iLKPS" (Admin Prodi, KPS, Super Admin): 18 lembar tabel LAMWisata tersusun otomatis dari kegiatan yang datanya
+  disetujui — 7a, 7b, 12, 13, 14 (Vokasi), 15 Bagian 1–4, 15a, 16, 17, 18, 19 (Vokasi), 20 Bagian 1–3, 23 — mengikuti kolom
+  berkas resmi "Tabel iLKPS_Lamwisata.xlsx". Klik baris membuka kegiatan dan buktinya.
+- TS (tahun akademik penilaian) ditetapkan Admin Prodi/Super Admin (bawaan 2025/2026); rentang TS-2..TS. Pengguna lain bisa
+  melihat pratinjau TS lain tanpa mengubah ketetapan. Jumlah kegiatan yang masih dalam proses ditampilkan per tabel.
+- Ekspor Excel: lembar Ringkasan, satu lembar per tabel (dengan kolom "Tautan bukti" per baris), dan Rincian tabel hitung.
+- Tautan ?keg=<kode> membuka detail kegiatan setelah masuk (dipakai di Excel; nanti untuk asesor).
+- Belum otomatis (sumber data lain): Tabel 1–6, 8–11, 21, 22. Kolom yang belum ada di formulir (manfaat kerja sama, tema
+  roadmap PkM, bidang keahlian dosen) dikosongkan dengan catatan.
+- Struktur data tetap versi 6 (TS disimpan di Pengaturan "tsAwal"); rollback ke v0.6.0 tidak memerlukan pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.6.0 — 12 Nov 2026 — Uji Coba
 - Menu "Portofolio" untuk semua pengguna yang mencatat kegiatan: semua kegiatan yang melibatkan pengguna (pengaju, peserta yang
   ditandai, atau dosen pendamping) per semester, dengan ringkasan (jumlah kegiatan, data disetujui, kelengkapan bukti).
