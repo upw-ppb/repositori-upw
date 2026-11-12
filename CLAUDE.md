@@ -97,6 +97,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   pasang TXT google._domainkey di DNS, lalu "Mulai autentikasi". WAJIB beres sebelum Produksi. Sementara di Uji Coba,
   kode verifikasi tampil di layar (Mode Uji Coba), jadi pengujian tetap bisa.
 
+- v0.3.0 (12 Nov 2026, Uji Coba): kegiatan + surat tugas. Jenis kegiatan di gas/Jenis.js (dibuat dari prototipe dengan
+  scratchpad buat-jenis.mjs; satu sumber, dikirim lewat kegiatan.ref). Tabel Kegiatan (VERSI_SKEMA 3): peserta disimpan
+  sebagai JSON (pegawai, kelas "masuk-kelas", mhs, excl = userId); kolom st (alur surat) terpisah dari status (verifikasi data).
+  Lampiran surat dibekukan saat KPS setuju. PDF = jendela cetak browser (#cetak, @media print). Cek surat: ?cek=KODE.
+  Uji: scratchpad uji-keg.mjs (56 skenario); server-uji.mjs menyiapkan akun uji lengkap biodata (sandi uji di skrip).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

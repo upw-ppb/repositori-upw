@@ -195,3 +195,31 @@ textarea{min-height:70px;resize:vertical}
 .brand-m{display:none;align-items:center;gap:8px}
 .brand-m img{width:28px;height:28px}
 @media (prefers-reduced-motion:no-preference){.overlay.anim .drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px)}}}
+
+/* ---------- surat (v0.3.0): kertas selalu putih, juga di mode gelap ---------- */
+.kertas{background:#fff;color:#111;font-family:Calibri,Carlito,"Segoe UI",sans-serif;font-size:12pt;line-height:1.5;padding:36px 34px 36px 44px;border:1px solid var(--line);border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.12);min-width:520px}
+.kertas p{margin:0 0 8px}
+.kertas table{font-size:inherit}
+.kertas th,.kertas td{color:#111;background:none;text-transform:none;letter-spacing:0;white-space:normal}
+.kertas .lamp{width:100%;border-collapse:collapse}
+.kertas .lamp th,.kertas .lamp td{border:1px solid #111;padding:3px 6px;font-size:11pt}
+.kertas .lamp th{background:#eee;font-weight:700}
+.kertas .lamp .c{text-align:center}
+.surat-baris{margin:8px 0 8px 18px;border-collapse:collapse;width:auto}
+.surat-baris td{border:0!important;padding:1px 8px 1px 0;vertical-align:top;background:none}
+.surat-baris td:first-child{white-space:nowrap}
+.ttd{margin-top:22px;margin-left:auto;width:62%}
+.ttd .sah{font-size:9.5pt;color:#333;margin:10px 0;border:1px solid #999;padding:6px 8px;border-radius:4px;overflow-wrap:anywhere}
+.ttd .draf-ttd{border:1px dashed #999;padding:10px;font-size:10pt;color:#555;margin:10px 0;display:inline-block}
+.draf-tanda{color:#b91c1c;font-weight:700;text-align:center;letter-spacing:.3em;margin-bottom:8px}
+mark.isi-kosong{background:#fde68a;color:#111;padding:0 3px;border-radius:3px}
+.pratinjau{background:#fff;color:#111;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-family:Calibri,Carlito,"Segoe UI",sans-serif;font-size:12.5px;line-height:1.5}
+#cetak{display:none}
+@media print{
+  @page{size:A4;margin:2.5cm 2.5cm 2.5cm 3cm}
+  body>*:not(#cetak){display:none!important}
+  body{background:#fff}
+  #cetak{display:block}
+  #cetak .kertas{border:0;box-shadow:none;padding:0;margin:0;min-width:0;border-radius:0}
+  #cetak .kertas+.kertas{break-before:page}
+}

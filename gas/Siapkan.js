@@ -32,7 +32,9 @@ function aksiSiapkan(d) {
     { kunci: "unitKerja", nilai: "Prodi Usaha Perjalanan Wisata", keterangan: "Unit kerja pada surat" },
     { kunci: "tempatSurat", nilai: "Nusa Dua", keterangan: "Tempat pada tanggal surat" },
     { kunci: "sapaanDosen", nilai: "Bapak", keterangan: "Sapaan pejabat tujuan surat dosen/tendik" },
-    { kunci: "batasHariKerja", nilai: 5, keterangan: "Batas pelengkapan bukti setelah kegiatan selesai" }
+    { kunci: "batasHariKerja", nilai: 5, keterangan: "Batas pelengkapan bukti setelah kegiatan selesai" },
+    { kunci: "tujuanDosen", nilai: "Kepala Bagian Administrasi Umum", keterangan: "Tujuan surat penugasan dosen/tendik" },
+    { kunci: "tujuanMhs", nilai: "Kabag. Administrasi Akademik, Kemahasiswaan dan Kerjasama", keterangan: "Tujuan surat tugas mahasiswa" }
   ]);
 
   // Akun Super Admin awal: kata sandi sementara ditampilkan sekali, wajib diganti saat masuk pertama.

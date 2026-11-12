@@ -12,11 +12,15 @@ var SKEMA = {
   Log: ["waktu", "userId", "aksi", "detail"],
   Pengaturan: ["kunci", "nilai", "keterangan"],
   /* v0.2.0 */
-  RiwayatSemester: ["userId", "semester", "tinggal", "kerja", "inggris", "transport", "waktu"]
+  RiwayatSemester: ["userId", "semester", "tinggal", "kerja", "inggris", "transport", "waktu"],
+  /* v0.3.0 */
+  Kegiatan: ["id", "jenis", "jenisLain", "judul", "tgl", "sampai", "tingkat", "olehId", "kelompok", "pegawai", "kelas", "mhs", "excl",
+             "pendampingId", "isian", "gcet", "perluST", "tempat", "aktivitas", "ket", "bentuk", "kegDosen", "st", "status", "riwayat",
+             "kodeSurat", "tglSurat", "kpsId", "lampiran", "dibuat", "diubah", "dihapus"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 2;
+var VERSI_SKEMA = 3;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
@@ -150,6 +154,13 @@ function pastikanSkema() {
 
 /** Pengisian data untuk kolom baru. */
 function migrasiData(dari) {
+  if (dari < 3) {
+    // Pengaturan tujuan surat (bisa diubah di sheet Pengaturan).
+    var ada = semua("Pengaturan").map(function (x) { return x.kunci; });
+    [{ kunci: "tujuanDosen", nilai: "Kepala Bagian Administrasi Umum", keterangan: "Tujuan surat penugasan dosen/tendik" },
+     { kunci: "tujuanMhs", nilai: "Kabag. Administrasi Akademik, Kemahasiswaan dan Kerjasama", keterangan: "Tujuan surat tugas mahasiswa" }]
+      .forEach(function (x) { if (ada.indexOf(x.kunci) < 0) tambah("Pengaturan", x); });
+  }
   if (dari < 2 && modeUji()) {
     // Akun contoh Uji Coba: tahun masuk dan kelas dari pola NIM contoh (yy 0 kelas nn), misalnya 250103 = 2025 kelas A.
     semua("Pengguna").forEach(function (p) {
