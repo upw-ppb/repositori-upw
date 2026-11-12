@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.11.0 — 12 Nov 2026 — Uji Coba
+- Menu "Survei" (Admin Prodi/Super Admin membuat; KPS melihat hasil):
+  - Templat sesuai instrumen: Tabel 22 kepuasan mahasiswa (5 aspek), Tabel 11 pengguna lulusan (7 aspek + tahun lulus alumni),
+    kepuasan mitra, dosen, dan tendik. Jenis pertanyaan: skala 4 (Kurang–Sangat baik), pilihan ganda, kotak centang, isian singkat, paragraf.
+  - Sasaran: mahasiswa, mahasiswa baru, dosen, tendik (kartu di Beranda), dan/atau publik (tautan ?survei=KODE tanpa login,
+    dengan pesan siap dibagikan lewat WhatsApp/email). Anonim atau dengan identitas; satu akun hanya bisa mengisi sekali.
+  - Draf → Dibuka → Ditutup (otomatis tertutup setelah tanggal tutup; bisa dibuka lagi). Setelah dibuka, pertanyaan terkunci.
+  - Hasil: rekap per pertanyaan (persentase dan rata-rata), jawaban teks, ekspor Excel (rekap + jawaban), rencana tindak lanjut per aspek.
+- Tabel iLKPS kini lengkap 33 lembar: Tabel 11 dan 22 dari survei yang dibuka pada TA tersebut (persentase per tingkat + tindak lanjut),
+  Ref 11a menghitung tanggapan pengguna menurut tahun lulus alumni.
+- Formulir survei tidak menghapus jawaban saat ada pertanyaan wajib yang terlewat; pertanyaan itu ditandai dan digulir ke layar.
+- Struktur data versi 10: tabel baru Survei dan Jawaban. Cadangan otomatis sebelum perubahan. Versi lama (v0.10.0) tetap bisa membaca
+  data ini; rollback tidak memerlukan pemulihan data (survei dan jawaban tetap tersimpan, menu Survei tidak tampil).
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.10.0 — 12 Nov 2026 — Uji Coba
 - Data Prodi › Lulusan: impor/perbarui dengan menempel dari Excel (NIM, nama, tahun masuk, tanggal lulus, IPK, waktu tunggu,
   kesesuaian bidang kerja, tempat kerja); tanggal DD/MM/YYYY dan koma desimal diterima; satu baris salah membatalkan impor.

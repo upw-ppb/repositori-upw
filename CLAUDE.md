@@ -137,6 +137,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - v0.10.0 (12 Nov 2026, Uji Coba): gas/Lulusan.js — tabel Lulusan (kunci NIM), Penerimaan (per tahun), Dana (per TA × jenis);
   tabelLulusan(ts) = Tabel 8, 9, 10a–c, ref11a, 21; susunIlkps mengurutkan dengan URUTAN_TABEL. VERSI_SKEMA 9. Uji: uji-lul-bagian.mjs (247).
 
+- v0.11.0 (12 Nov 2026, Uji Coba): gas/Survei.js — tabel Survei (pertanyaan JSON, kode publik) dan Jawaban (kunci = HMAC userId:survei
+  untuk anonim). TEMPLAT_SURVEI di server. tabelKepuasan(ts) = Tabel 11/22; tanggapanPengguna() untuk Ref 11a. VERSI_SKEMA 10.
+  Tabel iLKPS lengkap 33 lembar. Uji: uji-survei-bagian.mjs (282). Formulir jawaban: kirimJawaban() tidak menggambar ulang saat galat.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

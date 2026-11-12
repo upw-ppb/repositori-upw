@@ -238,3 +238,15 @@ label.btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
 .item.bk .meta span{overflow-wrap:anywhere}
 .bk-aksi{flex-wrap:wrap;justify-content:flex-end;flex:none}
 @media (max-width:640px){.item.bk{flex-direction:column;gap:8px}.bk-aksi{justify-content:flex-start}}
+/* v0.11.0: survei */
+.likert{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.likert label{border:1px solid var(--line);border-radius:8px;padding:6px 4px;text-align:center;font-size:.78rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.likert label:has(input:checked){border-color:var(--brand);background:var(--brand-soft);color:var(--brand);font-weight:700}
+.soal{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.soal:first-child{border-top:0;padding-top:0}
+.batang{display:flex;align-items:center;gap:8px;font-size:.8rem}
+.batang .bar{flex:1}
+.survei-publik{max-width:720px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.survei-publik header{display:flex;gap:12px;align-items:center}
+.survei-publik header img{width:52px;height:52px}
+.jebakan{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}

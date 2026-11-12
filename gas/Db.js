@@ -32,11 +32,14 @@ var SKEMA = {
   /* v0.10.0 */
   Lulusan: ["nim", "nama", "masuk", "tglLulus", "ipk", "dipesan", "wtBulan", "kesesuaian", "tempatKerja", "diubah", "dihapus"],
   Penerimaan: ["tahun", "dayaTampung", "pendaftar", "lulusSeleksi", "diterima", "diubah"],
-  Dana: ["ta", "jenis", "upps", "ps", "diubah"]
+  Dana: ["ta", "jenis", "upps", "ps", "diubah"],
+  /* v0.11.0 */
+  Survei: ["id", "judul", "tujuan", "sasaran", "buka", "tutup", "anonim", "status", "pertanyaan", "kode", "tindakLanjut", "dibuat", "oleh", "diubah", "dihapus"],
+  Jawaban: ["id", "survei", "userId", "kunci", "jawaban", "waktu"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 9;
+var VERSI_SKEMA = 10;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
