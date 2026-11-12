@@ -17,7 +17,7 @@ const S = { token: ls.get("token"), pengguna: null, peran: ls.get("peran"), view
   bio: null, wil: null, dir: null, dirTab: "pegawai", dirQ: "", dirAngk: "", dirKelas: "",
   ref: null, keg: null, kegLingkup: "saya", kegQ: "", antrean: null, form: null, formSt: "", cek: { kode: "", hasil: null },
   tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {}, porto: null, dokForm: null, ilkps: null, ilkpsTab: "1", ilkpsTs: null, bukaSetelahMasuk: null,
-  dp: null, dpTab: "kurikulum", dpSmt: null, dpTa: null, dpImpor: false };
+  dp: null, dpTab: "kurikulum", dpSmt: null, dpTa: null, dpImpor: false, asesor: null, setuju: null, setujuQ: "" };
 const STATUS_MHS = { A: "Aktif", C: "Cuti", N: "Non-aktif", L: "Lulus", D: "Drop out / dikeluarkan", K: "Mengundurkan diri / keluar", M: "Mutasi / pindah", W: "Wafat" };
 
 /* ---------- server ---------- */
@@ -57,10 +57,11 @@ const I = {
   ttd: '<path d="M3 17c3-1 4-7 6-7s1 6 3 6 2-4 4-4 2 3 5 3"/><path d="M3 21h18"/>',
   porto: '<path d="M4 7h16v13H4z"/><path d="M9 7V4h6v3"/><path d="M4 12h16"/>',
   ilkps: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/>',
-  dprodi: '<path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/>'
+  dprodi: '<path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/>',
+  setuju: '<path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -70,6 +71,7 @@ function peranAktif() {
 function menu() {
   const p = peranAktif(), u = S.pengguna;
   if (u.perluBiodata) return ["biodata", "akun"];
+  if (p === "asesor") return ["beranda", "ilkps", "setuju", "cari", "akun"];
   const m = ["beranda"];
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
   if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
@@ -132,6 +134,7 @@ function halaman() {
   if (S.view === "porto") return hPorto();
   if (S.view === "ilkps") return hIlkps();
   if (S.view === "dprodi") return hDprodi();
+  if (S.view === "setuju") return hSetuju();
   return hBeranda();
 }
 const tombol = (act, label, kelas = "primary", attr = "") => `<button class="btn ${kelas}" data-act="${act}" ${attr} ${S.sibuk ? "disabled" : ""}>${S.sibuk ? "Memproses…" : label}</button>`;
@@ -190,6 +193,13 @@ function layarLupa() {
 /* ---------- halaman setelah masuk ---------- */
 function hBeranda() {
   const u = S.pengguna;
+  if (peranAktif() === "asesor") return `<div class="head"><div><h1>Selamat datang, ${esc(namaPendek(u.nama))}</h1><p>Akun asesor${u.instansi ? " · " + esc(u.instansi) : ""} untuk akreditasi Prodi Usaha Perjalanan Wisata, Politeknik Pariwisata Bali.</p></div></div>
+   <div class="callout"><b>Akses baca saja, berlaku sampai ${esc(tglPanjang(u.berlakuSampai))}.</b> Anda dapat melihat <b>Tabel iLKPS</b> dan <b>kegiatan yang datanya sudah diverifikasi</b> beserta bukti, surat tugas, dan kode verifikasinya. Draf, biodata, dan data pribadi lain tidak ditampilkan. Setiap akses tercatat oleh prodi.</div>
+   <div class="row"><button class="btn primary" data-go="ilkps">Buka Tabel iLKPS</button><button class="btn" data-go="setuju">Kegiatan disetujui</button></div>
+   <section class="panel"><h2>Cara memakai</h2><ol class="small" style="margin:6px 0 0 18px;padding:0;display:grid;gap:4px">
+    <li>Di <b>Tabel iLKPS</b>, pilih tabel; klik baris kegiatan untuk membuka detail dan buktinya.</li>
+    <li>Tautan bukti di Excel ekspor prodi (kolom "Tautan bukti") juga membuka kegiatan yang sama setelah Anda masuk.</li>
+    <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelTugas()}
    <div class="callout"><b>Uji Coba v${K.versi} · Data dosen (Tabel 1–6).</b> Baru${menu().includes("dprodi") ? ": menu <b>Data Prodi</b> (kurikulum, tim pengajar per semester, dosen industri/praktisi, data dosen per TS/EWMP), dan Tabel iLKPS kini memuat Tabel 1–6 (24 lembar)" : ": isian <b>Mata kuliah yang diampu di prodi lain</b> di biodata dosen, dan kegiatan Bimbingan tugas akhir kini masuk Tabel 5"}.
@@ -231,6 +241,7 @@ function hPengguna() {
   const bio = x => !x.jenisBiodata ? '<span class="muted small">–</span>' : x.biodataLengkap ? '<span class="chip s-disetujui">Lengkap</span>' : '<span class="chip s-draf">Belum</span>';
   const st = s => s === "aktif" ? '<span class="chip s-disetujui">Aktif</span>' : s === "impor" ? '<span class="chip s-draf">Belum aktivasi</span>' : '<span class="chip s-ditolak">Nonaktif</span>';
   return `<div class="head"><div><h1>Pengguna</h1><p>${sa ? "Semua akun. Super Admin dapat mengimpor semua peran, mereset kata sandi, dan mengatur peran." : "Akun mahasiswa. Admin Prodi dapat mengimpor mahasiswa."}</p></div></div>
+   ${sa ? panelAsesor() : ""}
    <section class="panel"><h2>Impor akun</h2>
     <p class="small muted">Satu baris per orang. Mahasiswa: <b>NIM; Nama lengkap; tahun masuk; kelas</b>.${sa ? " Dosen/tendik: <b>NIP; Nama lengkap; peran</b>, peran dipisah koma, misalnya <span class=\"mono\">dosen,kps</span>." : ""} Bisa ditempel langsung dari Excel (kolom dipisah tab juga diterima).</p>
     <textarea id="imporTeks" style="min-height:110px;margin-top:8px" placeholder="${sa ? "260101; Made Contoh; 2026; A\n198501012010121001; Ni Luh Contoh, M.Par.; dosen" : "260101; Made Contoh; 2026; A\n260102; Ketut Contoh; 2026; B"}">${esc(S.impor.teks)}</textarea>
@@ -243,6 +254,63 @@ function hPengguna() {
      <td><div class="row">${x.jenisBiodata ? `<button class="btn sm" data-act="lihatBio" data-id="${x.id}">Biodata</button>` : ""}${x.jenisBiodata === "mahasiswa" ? `<button class="btn sm" data-act="laciMhs" data-id="${x.id}">Data mhs</button>` : ""}${sa ? `<button class="btn sm" data-act="laciPeran" data-id="${x.id}">Peran</button><button class="btn sm" data-act="resetSandi" data-id="${x.id}">Reset sandi</button>` : ""}</div></td></tr>`).join("")}
     </tbody></table></div></section>`;
 }
+/* --- akun asesor (v0.9.0, Super Admin) --- */
+function panelAsesor() {
+  if (!S.asesor) { sekali("asesor", async () => { S.asesor = await api("asesor.daftar"); render(); }); return `<section class="panel"><h2>Akun asesor</h2><div class="memuat" style="min-height:80px">Memuat…</div></section>`; }
+  const A = S.asesor, dis = S.sibuk ? "disabled" : "";
+  const st = x => x.status === "nonaktif" ? '<span class="chip s-ditolak">Nonaktif</span>' : x.kedaluwarsa ? '<span class="chip s-ditolak">Kedaluwarsa</span>' : x.wajibGanti ? '<span class="chip s-draf">Belum masuk</span>' : '<span class="chip s-disetujui">Aktif</span>';
+  return `<section class="panel"><h2>Akun asesor</h2>
+   <p class="small muted">Akses <b>baca saja</b> untuk asesor: Tabel iLKPS dan kegiatan yang datanya sudah disetujui beserta bukti dan suratnya. Langsung aktif tanpa email, kata sandi sementara wajib diganti saat masuk pertama, dan berakhir otomatis (maks. ${A.maksHari} hari). Setiap akses tercatat.</p>
+   <div class="grid g3" style="gap:10px;margin-top:8px"><div class="field"><label for="asNama">Nama asesor${wajib}</label><input id="asNama" type="text" placeholder="Contoh: Prof. Dr. Ni Made Ayu, M.Par."></div>
+    <div class="field"><label for="asInst">Instansi</label><input id="asInst" type="text" placeholder="Contoh: LAMWisata / Universitas …"></div>
+    <div class="field"><label for="asSampai">Berlaku sampai${wajib}</label><input id="asSampai" type="date" value="${esc(A.bawaanSampai)}"></div></div>
+   ${galatHtml()}<div class="row">${tombol("asBuat", "Buat akun asesor")}</div>
+   ${A.asesor.length ? `<div class="tbl-wrap" style="margin-top:10px"><table><thead><tr><th>Asesor</th><th>Nama pengguna</th><th>Berlaku sampai</th><th>Status</th><th>Akses</th><th>Masuk terakhir</th><th></th></tr></thead><tbody>
+    ${A.asesor.map(x => `<tr><td>${esc(x.nama)}${x.instansi ? `<br><span class="small muted">${esc(x.instansi)}</span>` : ""}</td><td class="mono small">${esc(x.username)}</td>
+     <td><input id="asTgl-${x.id}" type="date" value="${esc(x.berlakuSampai)}" style="width:auto" aria-label="Berlaku sampai ${esc(x.nama)}"></td><td>${st(x)}</td><td class="num">${x.akses}</td><td class="small num">${tgl(x.masukTerakhir)}</td>
+     <td><div class="row" style="flex-wrap:wrap"><button class="btn sm" data-act="asPerpanjang" data-id="${x.id}" ${dis}>Simpan tanggal</button>
+      <button class="btn sm ${x.status === "nonaktif" ? "" : "bad"}" data-act="asAktif" data-id="${x.id}" data-a="${x.status === "nonaktif" ? 1 : 0}" ${dis}>${x.status === "nonaktif" ? "Aktifkan" : "Nonaktifkan"}</button>
+      <button class="btn sm" data-act="asReset" data-id="${x.id}" ${dis}>Reset sandi</button></div></td></tr>`).join("")}</tbody></table></div>` : ""}
+   ${A.log.length ? `<details style="margin-top:10px"><summary class="small" style="cursor:pointer"><b>Log akses asesor</b> (${A.log.length} terakhir)</summary><div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>Waktu</th><th>Asesor</th><th>Aksi</th><th>Rincian</th></tr></thead><tbody>
+    ${A.log.map(l => `<tr><td class="small num">${tgl(l.waktu)}</td><td class="small">${esc(namaPendek(l.nama))}</td><td class="small">${esc(LOG_ASESOR[l.aksi] || l.aksi)}</td><td class="small mono">${esc(l.detail)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}
+  </section>`;
+}
+const LOG_ASESOR = { masuk: "Masuk", "asesor.ilkps": "Membuka Tabel iLKPS", "asesor.lihatKegiatan": "Membuka kegiatan", "asesor.lihatBukti": "Membuka bukti",
+  "asesor.daftarKegiatan": "Membuka daftar kegiatan", "asesor.direktori": "Membuka Cari orang", "asesor.masukDitolak": "Masuk ditolak (kedaluwarsa)" };
+const AKSI_ASESOR = {
+  asBuat() {
+    const data = { nama: $("asNama").value, instansi: $("asInst").value, berlakuSampai: $("asSampai").value };
+    jalankan(async () => {
+      const j = await api("asesor.buat", data);
+      S.laci = { jenis: "sandi", nama: data.nama, username: j.username, sandi: j.sandiSementara, sampai: j.berlakuSampai }; S.asesor = null; S.daftar = null;
+    });
+  },
+  asPerpanjang(d) { const v = $("asTgl-" + d.id).value; jalankan(async () => { await api("asesor.ubah", { userId: d.id, berlakuSampai: v }).catch(e => { toast(e.message); throw e; }); S.asesor = null; toast("Masa akses diperbarui."); }); },
+  asAktif(d) {
+    if (d.a !== "1" && !confirm("Nonaktifkan akun asesor ini? Sesi yang sedang berjalan langsung berakhir.")) return;
+    jalankan(async () => { await api("asesor.ubah", { userId: d.id, aktif: d.a === "1" }).catch(e => { toast(e.message); throw e; }); S.asesor = null; S.daftar = null; toast(d.a === "1" ? "Akun diaktifkan." : "Akun dinonaktifkan."); });
+  },
+  asReset(d) {
+    if (!confirm("Buat kata sandi sementara baru untuk asesor ini?")) return;
+    const x = S.asesor.asesor.find(y => y.id === d.id);
+    jalankan(async () => { const j = await api("admin.resetSandi", { userId: d.id }); S.laci = { jenis: "sandi", nama: x.nama, username: x.username, sandi: j.sandiSementara, sampai: x.berlakuSampai }; });
+  }
+};
+
+/* --- kegiatan disetujui (asesor) --- */
+function hSetuju() {
+  if (!S.setuju) { sekali("setuju", async () => { S.setuju = (await api("kegiatan.disetujui")).kegiatan; render(); }); return `<div class="memuat">Memuat kegiatan…</div>`; }
+  const q = S.setujuQ.trim().toLowerCase(), l = S.setuju.filter(k => !q || [k.judul, k.jenisLabel, k.tabel, k.olehNama, k.tempat, k.kodeSurat, k.semester].join(" ").toLowerCase().includes(q));
+  return `<div class="head"><div><h1>Kegiatan disetujui</h1><p>Kegiatan yang data dan buktinya sudah diverifikasi prodi. Klik untuk melihat detail, bukti, dan surat tugas.</p></div></div>
+   <section class="panel"><div class="row" style="justify-content:space-between;flex-wrap:wrap;margin-bottom:10px"><span class="small muted">${l.length} dari ${S.setuju.length} kegiatan</span>
+    <input id="cariSetuju" type="search" placeholder="Cari judul, jenis, tabel, semester, kode surat" value="${esc(S.setujuQ)}" style="width:300px"></div>
+    <div class="list">${l.map(k => `<div class="item" style="cursor:pointer" data-act="bukaKeg" data-id="${k.id}"><div class="body">
+      <div class="row" style="justify-content:space-between;gap:8px"><div class="title">${esc(k.judul)}</div>${k.tabel ? `<span class="tag t">${esc(k.tabel)}</span>` : ""}</div>
+      <div class="meta"><span>${esc(k.jenisLabel)}</span><span class="num">${esc(rentangPendek(k.tgl, k.sampai))}</span>${k.tingkat ? `<span>${esc(k.tingkat)}</span>` : ""}${k.semester ? `<span>${esc(k.semester)}</span>` : ""}<span>Bukti ${k.buktiAda}/${k.buktiPerlu}</span></div></div></div>`).join("")
+      || `<div class="empty">${q ? "Tidak ada yang cocok." : "Belum ada kegiatan yang disetujui."}</div>`}</div></section>`;
+}
+document.addEventListener("input", ketikUlang("cariSetuju", v => { S.setujuQ = v; }));
+
 function hLog() {
   if (!S.log) { api("admin.log").then(j => { S.log = j.log; render(); }).catch(e => toast(e.message)); return `<div class="memuat">Memuat log…</div>`; }
   const nama = id => (S.daftar || []).find(x => x.id === id)?.nama || id || "sistem";
@@ -261,7 +329,8 @@ function laci() {
   if (L.jenis === "praktisi") return laciPraktisi();
   if (L.jenis === "sandi") return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Kata sandi sementara">
    <div class="dh"><h2>Kata sandi sementara</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
-   <p>Berikan kata sandi ini kepada <b>${esc(L.nama)}</b> secara langsung. Kata sandi hanya ditampilkan sekali dan wajib diganti saat ia masuk.</p>
+   <p>Berikan ${L.username ? "nama pengguna dan " : ""}kata sandi ini kepada <b>${esc(L.nama)}</b> secara langsung (bukan lewat grup percakapan). Kata sandi hanya ditampilkan sekali dan wajib diganti saat masuk pertama.</p>
+   ${L.username ? `<p class="small">Nama pengguna: <b class="mono">${esc(L.username)}</b>${L.sampai ? ` · berlaku sampai <b>${esc(tglPanjang(L.sampai))}</b>` : ""}<br>Alamat: <span class="mono">${esc(location.origin + location.pathname)}</span></p>` : ""}
    <div class="sandi-baru">${esc(L.sandi)}</div><button class="btn" data-act="salinSandi">Salin</button></div></div>`;
   const x = S.daftar.find(y => y.id === L.id);
   if (L.jenis === "bio" || L.jenis === "mhs") return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="${L.jenis === "bio" ? "Biodata" : "Data mahasiswa"}">
@@ -418,7 +487,7 @@ async function muatPengguna() { try { S.daftar = (await api("admin.pengguna")).p
 const AKSI = {
   keLupa() { S.layar = "lupa"; S.lupa = { langkah: 1, email: "" }; S.galat = ""; render(); },
   keMasuk() { S.layar = "masuk"; S.galat = ""; render(); },
-  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.dp = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
+  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.dp = null; S.asesor = null; S.setuju = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
   aktSandi: () => jalankan(async () => { const a = mentah("p1"); cocok(a, mentah("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
   aktKirim: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; const j = await api("aktivasi.kirimKode", { email: em }); S.akt.terkirim = true; S.akt.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
   aktVerif: () => jalankan(async () => { S.pengguna = (await api("aktivasi.verifikasi", { kode: nilai("kode") })).pengguna; S.view = S.pengguna.perluBiodata ? "biodata" : "beranda"; toast("Akun aktif. Selamat datang!"); }),
@@ -1428,6 +1497,7 @@ document.addEventListener("change", e => {
   fr.readAsDataURL(f);
 });
 function fokus(id) { const el = $(id); if (el) el.focus(); }
+Object.assign(AKSI, AKSI_ASESOR); // didefinisikan lebih awal (dekat halaman Pengguna), didaftarkan setelah AKSI ada
 function gantiJenis(j) {
   const f = S.form, lama = f.jenis; f.jenis = j;
   if (lama !== j) { f.isian = {}; f.lainIsian = {}; f.perluST = !S.ref.tanpaSt.includes(j); }

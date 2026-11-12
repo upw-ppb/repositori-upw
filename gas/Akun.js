@@ -19,7 +19,8 @@ function profilPublik(p) {
     wajibGanti: p.wajibGanti === true || p.wajibGanti === "TRUE", emailTerverifikasi: p.emailTerverifikasi === true || p.emailTerverifikasi === "TRUE",
     perluAktivasi: p.status === "impor", jenisBiodata: jenisBiodata(p), perluBiodata: perluBiodata(p),
     masuk: p.masuk ? Number(p.masuk) : null, kelas: String(p.kelas || ""), statusMhs: String(p.statusMhs || ""),
-    semesterMhs: semesterMhs(p.masuk), semesterKini: semesterInfo() };
+    semesterMhs: semesterMhs(p.masuk), semesterKini: semesterInfo(),
+    berlakuSampai: peranDari(p).indexOf("asesor") >= 0 ? teksTgl(p.berlakuSampai) : "", instansi: peranDari(p).indexOf("asesor") >= 0 ? teks(p.instansi) : "" };
 }
 
 /** Data akun untuk halaman Pengguna (Admin Prodi tidak melihat peran). */
@@ -60,6 +61,7 @@ function aksiMasuk(d) {
       catat(p.id, "masuk.gagal", { percobaan: g });
       throw salah;
     }
+    if (asesorKedaluwarsa(p)) { catat(p.id, "asesor.masukDitolak", { sampai: teksTgl(p.berlakuSampai) }); throw pesanAsesorBerakhir(p); }
     ubah("Pengguna", p, { gagal: 0, kunciSampai: "", masukTerakhir: new Date() });
     var token = buatSesi(p, d.perangkat);
     catat(p.id, "masuk", {});

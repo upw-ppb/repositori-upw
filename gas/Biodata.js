@@ -301,6 +301,7 @@ function aksiDirektori(d, token) {
   wajibPeran(p, PERAN_SAH);
   if (perluBiodata(p)) throw galat("Lengkapi biodata Anda terlebih dahulu.");
   var staf = punyaPeran(p, ["superadmin", "admin", "kps", "kalab", "laboran", "dosen", "tendik", "asesor"]);
+  catatAsesor(p, "direktori", {});
   var peg = {}; semua("BiodataPegawai").forEach(function (b) { peg[b.userId] = b; });
   var s = semesterInfo(), l = [];
   semua("Pengguna").forEach(function (x) {

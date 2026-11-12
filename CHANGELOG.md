@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.9.0 — 12 Nov 2026 — Uji Coba
+- Akun asesor (baca saja, berkedaluwarsa), dikelola Super Admin di halaman Pengguna:
+  - Buat akun (nama, instansi, berlaku sampai; maks. 90 hari): nama pengguna otomatis (asesor-<nama>-NN), langsung aktif tanpa
+    email, kata sandi sementara ditampilkan sekali dan wajib diganti saat masuk pertama.
+  - Ubah tanggal berlaku, nonaktifkan/aktifkan (sesi langsung berakhir), reset kata sandi; jumlah akses dan log akses asesor.
+  - Setelah tanggal berlaku lewat, masuk dan sesi lama ditolak dengan pesan jelas (dicatat).
+- Menu asesor: Beranda (petunjuk + masa berlaku), Tabel iLKPS (tanpa mengatur TS), Kegiatan disetujui (cari), Cari orang, Akun saya.
+  Asesor hanya dapat membuka kegiatan berstatus data disetujui beserta bukti dan surat tugasnya; tautan ?keg= di Excel berfungsi.
+  Draf, kegiatan yang belum disetujui, biodata, portofolio, Data Prodi, dan tanda tangan tidak dapat diakses.
+- Setiap akses asesor dicatat di Log (asesor.ilkps, asesor.lihatKegiatan, asesor.lihatBukti, asesor.daftarKegiatan, asesor.direktori).
+- Struktur data versi 8: kolom baru di akhir tabel Pengguna (berlakuSampai, instansi). Cadangan otomatis sebelum perubahan.
+  Versi lama (v0.8.0) tetap bisa membaca data ini; rollback tidak memerlukan pemulihan data, tetapi di versi lama akun asesor
+  tidak berkedaluwarsa otomatis (nonaktifkan manual bila perlu).
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.8.0 — 12 Nov 2026 — Uji Coba
 - Menu "Data Prodi" (Admin Prodi/Super Admin mengubah; KPS melihat):
   - Kurikulum: tambah/ubah/hapus mata kuliah (kode, semester, kompetensi, sks kuliah/seminar/praktik, CPL, RPS, unit) dan impor

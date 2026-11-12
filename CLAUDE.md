@@ -29,7 +29,7 @@ sebelum menayangkan ke Produksi, dan jangan pernah mengetik kata sandi atas nama
 - Portofolio Saya per pengguna, bisa diekspor (PDF, Excel, ZIP bukti).
 - Notifikasi default di aplikasi; email hanya untuk kode dan pengumuman pilihan Admin.
 - Dwibahasa (ID/EN) untuk tampilan. Warna aksen #0A5188, emas dari logo sebagai aksen kedua.
-- Tautan bukti untuk asesor lewat halaman aplikasi (login asesor), sampai UPT TIK menjawab.
+- Tautan bukti untuk asesor lewat halaman aplikasi (login asesor; tersedia sejak v0.9.0), sampai UPT TIK menjawab.
 - Dua lingkungan: Uji Coba dan Produksi. Perubahan selalu dicoba di Uji Coba dulu.
 - Biodata mahasiswa = Kuesioner Mahasiswa Baru Bagian I (skema PM_SCHEMA di prototipe):
   wajib kecuali penghasilan, transportasi, skor tes, bahasa lain, disabilitas; setiap pilihan ganda punya "Lainnya".
@@ -128,6 +128,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - v0.8.0 (12 Nov 2026, Uji Coba): gas/DataProdi.js — MataKuliah, Praktisi, TimPengajar (semester "2025-1"/"2025-2", anggota JSON
   {t:"u"|"p", id}, [0] = utama), DosenTs (per TA). tabelDosen(ts) = Tabel 1–6, dipanggil susunIlkps. VERSI_SKEMA 7.
   Isian biodata baru: beri tanda `baru: 1` di skema → kolomnya otomatis di akhir sheet (tabelBiodata). Uji: uji-dp-bagian.mjs (200 skenario).
+
+- v0.9.0 (12 Nov 2026, Uji Coba): gas/Asesor.js — akun asesor-saja (peran tepat "asesor"), kolom Pengguna.berlakuSampai/instansi
+  (VERSI_SKEMA 8); kedaluwarsa diperiksa di penggunaDariToken dan aksiMasuk. Akses baca lewat asesorBolehLihat (status data disetujui);
+  catatAsesor mencatat ke Log. Uji: uji-asesor-bagian.mjs (223 skenario). PELAJARAN: node --check tidak menangkap pemakaian
+  const sebelum dideklarasikan (AKSI); uji UI wajib memuat halaman dari awal.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

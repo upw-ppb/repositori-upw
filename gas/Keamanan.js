@@ -71,6 +71,7 @@ function penggunaDariToken(token, wajib) {
   }
   var p = cari("Pengguna", function (x) { return x.id === uid; });
   if (!p || p.status === "nonaktif") { if (wajib === false) return null; throw galat("Akun tidak aktif."); }
+  if (asesorKedaluwarsa(p)) { if (wajib === false) return null; throw pesanAsesorBerakhir(p); }
   return p;
 }
 

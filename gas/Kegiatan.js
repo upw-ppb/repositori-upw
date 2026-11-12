@@ -287,9 +287,10 @@ function aksiKegiatanDaftar(d, token) {
 
 function aksiKegiatanDetail(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, PERAN_KEGIATAN);
+  wajibPeran(p, PERAN_KEGIATAN.concat(["asesor"]));
   var k = ambilKegiatan(String(d.id || "")), idx = indeksOrang();
-  if (!terlibat(k, p, idx) && !boleLihatSemua(p)) throw galat("Anda tidak memiliki izin untuk melihat kegiatan ini.");
+  if (!terlibat(k, p, idx) && !boleLihatSemua(p) && !asesorBolehLihat(p, k)) throw galat("Anda tidak memiliki izin untuk melihat kegiatan ini.");
+  catatAsesor(p, "lihatKegiatan", { id: k.id });
   return { kegiatan: kegiatanKeKlien(k, p, idx, true) };
 }
 

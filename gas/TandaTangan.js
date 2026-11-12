@@ -83,9 +83,9 @@ function aksiTtdHapus(d, token) {
 /** Gambar tanda tangan pada surat terbit, untuk orang yang boleh melihat surat itu. */
 function aksiSuratTtd(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, PERAN_KEGIATAN);
+  wajibPeran(p, PERAN_KEGIATAN.concat(["asesor"]));
   var k = ambilKegiatan(String(d.id || "")), idx = indeksOrang();
-  if (!terlibat(k, p, idx) && !boleLihatSemua(p)) throw galat("Anda tidak memiliki izin untuk melihat surat ini.");
+  if (!terlibat(k, p, idx) && !boleLihatSemua(p) && !asesorBolehLihat(p, k)) throw galat("Anda tidak memiliki izin untuk melihat surat ini.");
   if (k.st !== "terbit" || !k.lampiran || !k.lampiran.ttd) return { gambar: "" };
   var r = cari("TandaTangan", function (x) { return x.id === k.lampiran.ttd; });
   return { gambar: r ? bacaTtd(r) : "" };

@@ -4,7 +4,7 @@
  * Rentang: TS-2, TS-1, TS (tahun akademik). TS diatur Admin di Pengaturan "tsAwal" (tahun awal TA, mis. 2025 = 2025/2026).
  * Tabel 1–6 (dosen, kurikulum, EWMP) disusun di DataProdi.js; tabel lulusan, keuangan, dan kepuasan belum diisi otomatis.
  */
-var PERAN_ILKPS = ["admin", "superadmin", "kps"];
+var PERAN_ILKPS = ["admin", "superadmin", "kps", "asesor"];
 var BARIS_DANA = ["a) Perguruan tinggi b) Mandiri", "Lembaga dalam negeri (diluar PT)", "Lembaga luar negeri"];
 var BARIS_PUB14 = ["Jurnal penelitian tidak terakreditasi", "Jurnal penelitian nasional terakreditasi", "Jurnal penelitian internasional",
   "Jurnal penelitian internasional bereputasi", "Seminar wilayah/lokal/perguruan tinggi", "Seminar nasional", "Seminar internasional",
@@ -118,6 +118,7 @@ function aksiIlkpsData(d, token) {
   var ts = d.ts ? Number(d.ts) : tsAwal();
   if (!(ts >= 2000 && ts < 2100)) throw galat("TS tidak valid.");
   var h = susunIlkps(ts);
+  catatAsesor(p, "ilkps", { ts: ts });
   h.tsTersimpan = tsAwal();
   h.bolehAtur = punyaPeran(p, ["admin", "superadmin"]);
   return h;

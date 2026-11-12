@@ -6,7 +6,8 @@
 var SKEMA = {
   Pengguna: ["id", "username", "nama", "email", "peran", "status", "hash", "garam", "wajibGanti", "emailTerverifikasi",
              "gagal", "kunciSampai", "ref", "dosenId", "diimporPada", "aktivasiPada", "masukTerakhir", "diubahPada",
-             /* v0.2.0 */ "masuk", "kelas", "statusMhs", "biodataLengkap", "biodataSemester", "biodataPada"],
+             /* v0.2.0 */ "masuk", "kelas", "statusMhs", "biodataLengkap", "biodataSemester", "biodataPada",
+             /* v0.9.0 */ "berlakuSampai", "instansi"],
   Sesi: ["tokenHash", "userId", "dibuat", "kedaluwarsa", "perangkat"],
   Kode: ["userId", "tujuan", "kodeHash", "email", "kedaluwarsa", "percobaan", "dipakai"],
   Log: ["waktu", "userId", "aksi", "detail"],
@@ -31,7 +32,7 @@ var SKEMA = {
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 7;
+var VERSI_SKEMA = 8;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {

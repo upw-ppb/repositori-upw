@@ -227,9 +227,10 @@ function aksiBuktiBatal(d, token) {
 
 function aksiBuktiLihat(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, PERAN_KEGIATAN);
+  wajibPeran(p, PERAN_KEGIATAN.concat(["asesor"]));
   var k = ambilKegiatan(String(d.id || "")), idx = indeksOrang(), e = k.bukti[String(d.slot || "")];
-  if (!terlibat(k, p, idx) && !boleLihatSemua(p)) throw galat("Anda tidak memiliki izin untuk melihat bukti ini.");
+  if (!terlibat(k, p, idx) && !boleLihatSemua(p) && !asesorBolehLihat(p, k)) throw galat("Anda tidak memiliki izin untuk melihat bukti ini.");
+  catatAsesor(p, "lihatBukti", { id: k.id, slot: String(d.slot || "") });
   if (!e) throw galat("Dokumen ini belum diunggah.");
   if (e.t !== "file") return { t: e.t, url: e.url || "", ket: e.ket || "" };
   var b = DriveApp.getFileById(e.fileId).getBlob();
