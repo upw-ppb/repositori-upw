@@ -141,6 +141,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   untuk anonim). TEMPLAT_SURVEI di server. tabelKepuasan(ts) = Tabel 11/22; tanggapanPengguna() untuk Ref 11a. VERSI_SKEMA 10.
   Tabel iLKPS lengkap 33 lembar. Uji: uji-survei-bagian.mjs (282). Formulir jawaban: kirimJawaban() tidak menggambar ulang saat galat.
 
+- v0.12.0 (13 Nov 2026, Uji Coba): gas/Matriks.js DIBUAT OTOMATIS dari prototipe/data-akreditasi.js (MATRIKS, KRITERIA, DED_BUTIR).
+  gas/Penilaian.js: konteksNilai(ts) memakai susunIlkps + data mentah; rumusOtomatis(f) sesuai teks Matriks (Downloads/Vokasi_Matriks_D4_
+  Akreditasi_Unggul_Word.docx, diekstrak scratchpad baca-docx.py); gabung() untuk butir c (26, 42, 64, 71). SkorGpm per TS. VERSI_SKEMA 11.
+  Uji: uji-nilai-bagian.mjs (302). Tafsiran tercatat di keterangan butir dan CHANGELOG.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

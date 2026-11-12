@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.12.0 — 13 Nov 2026 — Uji Coba
+- Menu "Penilaian" (Admin Prodi, KPS, Super Admin): simulasi penilaian mandiri 84 butir Matriks LAMWisata IAPS 1.0 Unggul Sarjana Terapan
+  (bobot total 100, skor 0–4, maks. 400) per TS.
+  - 36 butir otomatis dihitung dari data aplikasi (biodata dosen, Data Prodi, kegiatan disetujui, lulusan, PMB, dana, survei) dengan rumus
+    Matriks resmi, termasuk penyesuaian persentase responden tracer/pengguna (Prmin). Butir tanpa data dihitung 0 dan ditandai.
+  - 39 butir dinilai GPM (skor 0–4 + catatan bukti, tercatat siapa dan kapan); 9 butir gabungan memakai rumus butirnya.
+  - Capaian per kriteria, prioritas perbaikan (bobot × kekurangan skor), syarat skor 4 dan saran tiap butir, target (diatur Admin),
+    saringan, dan ekspor Excel (ringkasan + 84 butir). Halaman selalu menghitung ulang saat dibuka.
+  - Tafsiran yang tidak dirinci Matriks ditulis di keterangan butir: PTW (lulus ≤ 4 tahun 3 bulan, angkatan TS-6..TS-3), PPS, PBS (sedang+tinggi),
+    TKM (rata-rata 5 aspek ÷ 4), komposisi publikasi butir 48, sumber dana penelitian/PkM.
+- Data Prodi › Data dosen TS: isian baru "pendidikan dasar sesuai kompetensi inti" (butir 12) dan "pendidikan tertinggi linier" (butir 13).
+- Struktur data versi 11: tabel baru SkorGpm; kolom baru di akhir DosenTs (dasarSesuai, linier). Cadangan otomatis sebelum perubahan.
+  Versi lama (v0.11.0) tetap bisa membaca data ini; rollback tidak memerlukan pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.11.0 — 12 Nov 2026 — Uji Coba
 - Menu "Survei" (Admin Prodi/Super Admin membuat; KPS melihat hasil):
   - Templat sesuai instrumen: Tabel 22 kepuasan mahasiswa (5 aspek), Tabel 11 pengguna lulusan (7 aspek + tahun lulus alumni),

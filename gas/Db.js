@@ -28,18 +28,20 @@ var SKEMA = {
                "rps", "unit", "diubah", "dihapus"],
   Praktisi: ["id", "nama", "nidk", "perusahaan", "pendidikan", "bidang", "sertifikat", "diubah", "dihapus"],
   TimPengajar: ["semester", "kodeMk", "anggota", "diubah", "oleh"],
-  DosenTs: ["userId", "ta", "ps", "psLain", "luarPt", "penelitian", "pkm", "tambahan", "sesuai", "diubah"],
+  DosenTs: ["userId", "ta", "ps", "psLain", "luarPt", "penelitian", "pkm", "tambahan", "sesuai", "diubah", /* v0.12.0 */ "dasarSesuai", "linier"],
   /* v0.10.0 */
   Lulusan: ["nim", "nama", "masuk", "tglLulus", "ipk", "dipesan", "wtBulan", "kesesuaian", "tempatKerja", "diubah", "dihapus"],
   Penerimaan: ["tahun", "dayaTampung", "pendaftar", "lulusSeleksi", "diterima", "diubah"],
   Dana: ["ta", "jenis", "upps", "ps", "diubah"],
   /* v0.11.0 */
   Survei: ["id", "judul", "tujuan", "sasaran", "buka", "tutup", "anonim", "status", "pertanyaan", "kode", "tindakLanjut", "dibuat", "oleh", "diubah", "dihapus"],
-  Jawaban: ["id", "survei", "userId", "kunci", "jawaban", "waktu"]
+  Jawaban: ["id", "survei", "userId", "kunci", "jawaban", "waktu"],
+  /* v0.12.0 */
+  SkorGpm: ["ts", "butir", "skor", "catatan", "oleh", "waktu"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 10;
+var VERSI_SKEMA = 11;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {

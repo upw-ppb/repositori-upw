@@ -97,7 +97,7 @@ function aksiDpData(d, token) {
       var r = dts[x.id] || {}, a2 = ampu[x.id] || { sks: 0, mk: [] };
       return { id: x.id, nama: x.nama, status: x.status, sksPsHitung: Math.round(a2.sks * 100) / 100, mk: a2.mk,
         ps: r.ps === "" || r.ps === undefined ? "" : angka(r.ps), psLain: angka(r.psLain), luarPt: angka(r.luarPt), penelitian: angka(r.penelitian),
-        pkm: angka(r.pkm), tambahan: angka(r.tambahan), sesuai: teks(r.sesuai) };
+        pkm: angka(r.pkm), tambahan: angka(r.tambahan), sesuai: teks(r.sesuai), dasarSesuai: teks(r.dasarSesuai), linier: teks(r.linier) };
     })
   };
 }
@@ -226,7 +226,8 @@ function aksiDpDosenTsSimpan(d, token) {
   if (!daftarDosen().some(function (y) { return y.id === x.userId; })) throw galat("Dosen tidak ditemukan.");
   var o = { userId: x.userId, ta: ta, ps: x.ps === "" || x.ps === null || x.ps === undefined ? "" : angka(x.ps, 60), psLain: angka(x.psLain, 60), luarPt: angka(x.luarPt, 60),
     penelitian: angka(x.penelitian, 60), pkm: angka(x.pkm, 60), tambahan: angka(x.tambahan, 60),
-    sesuai: ["Ya", "Tidak"].indexOf(x.sesuai) >= 0 ? x.sesuai : "", diubah: new Date() };
+    sesuai: ["Ya", "Tidak"].indexOf(x.sesuai) >= 0 ? x.sesuai : "", diubah: new Date(),
+    dasarSesuai: ["Ya", "Tidak"].indexOf(x.dasarSesuai) >= 0 ? x.dasarSesuai : "", linier: ["Ya", "Tidak"].indexOf(x.linier) >= 0 ? x.linier : "" };
   return kunciTulis(function () {
     var r = cari("DosenTs", function (y) { return y.userId === x.userId && Number(y.ta) === ta; });
     if (r) ubah("DosenTs", r, o); else tambah("DosenTs", o);
