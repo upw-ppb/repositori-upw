@@ -73,7 +73,8 @@ var BIO_PEG = [
   { g: "Kepakaran dan sertifikat", untuk: "dosen", f: [
     { k: "bidang", l: "Bidang keahlian", t: "text", untuk: "dosen", req: 1, hint: "Pisahkan dengan titik koma, contoh: Perencanaan perjalanan; MICE" },
     { k: "serdos", l: "Nomor sertifikat pendidik (Serdos)", t: "text", untuk: "dosen", hint: "Kosongkan bila belum" },
-    { k: "sertKomp", l: "Sertifikat kompetensi / profesi / industri", t: "text", untuk: "dosen", hint: "Format: skema – lembaga, tahun. Contoh: Tour Leader – LSP Pariwisata Indonesia (BNSP), 2023" }] },
+    { k: "sertKomp", l: "Sertifikat kompetensi / profesi / industri", t: "text", untuk: "dosen", hint: "Format: skema – lembaga, tahun. Contoh: Tour Leader – LSP Pariwisata Indonesia (BNSP), 2023" },
+    { k: "mkLain", l: "Mata kuliah yang diampu di prodi lain", t: "text", untuk: "dosen", baru: 1, hint: "Kosongkan bila tidak ada. Contoh: Bahasa Inggris Pariwisata (Prodi Perhotelan)" }] },
   { g: "Profil ilmiah", untuk: "dosen", f: [
     { k: "scholar", l: "Google Scholar", t: "text", untuk: "dosen", hint: "Alamat profil Google Scholar Anda" },
     { k: "sinta", l: "SINTA ID", t: "text", untuk: "dosen", hint: "Angka ID di sinta.kemdiktisaintek.go.id" },
@@ -87,15 +88,16 @@ var BIO_PEG = [
 ];
 
 /** Kunci yang disimpan di sheet biodata (tanpa kolom dari akun). */
-function kunciSimpan(skema) {
+function kunciSimpan(skema, baru) {
   var l = [];
-  skema.forEach(function (g) { g.f.forEach(function (f) { if (f.t !== "ro" && !f.akun) l.push(f.k); }); });
+  skema.forEach(function (g) { g.f.forEach(function (f) { if (f.t !== "ro" && !f.akun && !!f.baru === !!baru) l.push(f.k); }); });
   return l;
 }
+/** Kolom sheet biodata. Isian bertanda "baru" (ditambahkan setelah v0.7.0) selalu diletakkan di AKHIR, agar urutan kolom lama tetap. */
 function tabelBiodata() {
   return {
-    BiodataMahasiswa: ["userId"].concat(kunciSimpan(BIO_MHS), ["lama", "diubahPada"]),
-    BiodataPegawai: ["userId"].concat(kunciSimpan(BIO_PEG), ["lama", "diubahPada"])
+    BiodataMahasiswa: ["userId"].concat(kunciSimpan(BIO_MHS), ["lama", "diubahPada"], kunciSimpan(BIO_MHS, true)),
+    BiodataPegawai: ["userId"].concat(kunciSimpan(BIO_PEG), ["lama", "diubahPada"], kunciSimpan(BIO_PEG, true))
   };
 }
 
@@ -243,7 +245,8 @@ function aksiBiodataSimpan(d, token) {
     skema.forEach(function (g) { g.f.forEach(function (f) { if (f.t !== "ro") bersih[f.k] = bersihkan(f, masukan[f.k], masukan); }); });
     if (!bersih.nama) throw galat("Nama tidak boleh kosong.");
     var tabel = tabelUntuk(j), b = ambilBaris(j, p.id), rekam = { userId: p.id, lama: "", diubahPada: kini };
-    kunciSimpan(j === "mahasiswa" ? BIO_MHS : BIO_PEG).forEach(function (k) { rekam[k] = bersih[k] !== undefined ? bersih[k] : (b ? b[k] : ""); });
+    var skm = j === "mahasiswa" ? BIO_MHS : BIO_PEG;
+    kunciSimpan(skm).concat(kunciSimpan(skm, true)).forEach(function (k) { rekam[k] = bersih[k] !== undefined ? bersih[k] : (b ? b[k] : ""); });
     if (b) ubah(tabel, b, rekam); else tambah(tabel, rekam);
 
     var nilai = nilaiBiodata(Object.assign({}, p, { nama: bersih.nama }), rekam), kurang = kurangDari(p, nilai);

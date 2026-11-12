@@ -2,7 +2,7 @@
  * Tabel iLKPS LAMWisata (v0.7.0), disusun otomatis dari kegiatan berstatus data "disetujui".
  * Format mengikuti berkas resmi "Tabel iLKPS_Lamwisata.xlsx" (varian Vokasi untuk Tabel 14 dan 19, karena UPW Sarjana Terapan).
  * Rentang: TS-2, TS-1, TS (tahun akademik). TS diatur Admin di Pengaturan "tsAwal" (tahun awal TA, mis. 2025 = 2025/2026).
- * Tabel yang sumbernya bukan kegiatan (dosen, kurikulum, lulusan, keuangan, kepuasan) belum diisi otomatis.
+ * Tabel 1–6 (dosen, kurikulum, EWMP) disusun di DataProdi.js; tabel lulusan, keuangan, dan kepuasan belum diisi otomatis.
  */
 var PERAN_ILKPS = ["admin", "superadmin", "kps"];
 var BARIS_DANA = ["a) Perguruan tinggi b) Mandiri", "Lembaga dalam negeri (diluar PT)", "Lembaga luar negeri"];
@@ -18,9 +18,6 @@ var BAGIAN15 = [
   { kode: "15-3", judul: "Tabel 15) Bagian-3 Teknologi Tepat Guna, Produk, Karya Seni, Rekayasa Sosial", jenis: ["Teknologi tepat guna", "Produk terstandar/tersertifikasi", "Rekayasa sosial"] },
   { kode: "15-4", judul: "Tabel 15) Bagian-4 Buku Ber-ISBN, Book Chapter", jenis: ["Buku ber-ISBN", "Book chapter"] }];
 var BELUM_OTOMATIS = [
-  ["Tabel 1–3, 6", "Dosen tetap, dosen industri/praktisi, dosen tidak tetap, EWMP", "biodata dosen dan data mengajar"],
-  ["Tabel 4", "Kurikulum, capaian pembelajaran, dan rencana pembelajaran", "Data Prodi: kurikulum"],
-  ["Tabel 5", "Dosen pembimbing utama tugas akhir", "impor data bimbingan per dosen"],
   ["Tabel 8–11", "IPK, masa studi, waktu tunggu, kesesuaian dan tempat kerja lulusan, kepuasan pengguna", "data lulusan dan survei"],
   ["Tabel 21", "Penggunaan dana", "data keuangan prodi"],
   ["Tabel 22", "Kepuasan mahasiswa", "survei mahasiswa"]];
@@ -111,7 +108,7 @@ function susunIlkps(ts) {
   daftar("23", "Tabel 23) Pengakuan/Rekognisi DTPS", ["No.", "Nama Dosen", "Bidang Keahlian", "Rekognisi dan Bukti Pendukung", "Tingkat: Wilayah", "Tingkat: Nasional", "Tingkat: Internasional", "Tahun (YYYY)"],
     dari(["rekognisi"]), function (k) { return [dosenKegiatan(k, idx).join("; "), "", [teks(k.isian["Bentuk rekognisi"]), k.judul].filter(String).join(": ")].concat(centangTingkat(k.tingkat, TK), [tahunKegiatan(k)]); },
     "Bidang keahlian diambil dari biodata dosen pada rilis berikutnya.", ["rekognisi"]);
-  return { ts: { awal: ts, label: labelTa(ts), rentang: tsList.map(labelTa) }, tabel: T, belum: BELUM_OTOMATIS,
+  return { ts: { awal: ts, label: labelTa(ts), rentang: tsList.map(labelTa) }, tabel: tabelDosen(ts).concat(T), belum: BELUM_OTOMATIS,
     jumlahDisetujui: ok.length, jumlahProses: semuaK.filter(function (k) { return k.status !== "disetujui" && k.status !== "ditolak" && k.st !== "ditolak_aju"; }).length };
 }
 

@@ -125,6 +125,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   kegiatan status "disetujui"; peta jenis → tabel ada di sana. TS = Pengaturan tsAwal (bawaan TA lalu). Tautan ?keg=ID.
   Format resmi dibaca dengan scratchpad baca-xlsx.py (Python, tanpa pustaka). Uji: uji-ilkps-bagian.mjs (total 170 skenario).
 
+- v0.8.0 (12 Nov 2026, Uji Coba): gas/DataProdi.js — MataKuliah, Praktisi, TimPengajar (semester "2025-1"/"2025-2", anggota JSON
+  {t:"u"|"p", id}, [0] = utama), DosenTs (per TA). tabelDosen(ts) = Tabel 1–6, dipanggil susunIlkps. VERSI_SKEMA 7.
+  Isian biodata baru: beri tanda `baru: 1` di skema → kolomnya otomatis di akhir sheet (tabelBiodata). Uji: uji-dp-bagian.mjs (200 skenario).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

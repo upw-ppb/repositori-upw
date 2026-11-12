@@ -559,6 +559,11 @@ var JENIS_KEG = [
      "Pembimbing utama",
      "Pembimbing pendamping"
     ]
+   },
+   {
+    "l": "Jumlah mahasiswa (prodi lain)",
+    "t": "text",
+    "ph": "Isi angka bila mahasiswa dari prodi lain (tidak ditandai), contoh: 3"
    }
   ]
  },

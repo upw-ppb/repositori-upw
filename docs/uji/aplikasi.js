@@ -16,7 +16,8 @@ const S = { token: ls.get("token"), pengguna: null, peran: ls.get("peran"), view
   daftar: null, cari: "", impor: { teks: "", hasil: null }, log: null, laci: null, galat: "",
   bio: null, wil: null, dir: null, dirTab: "pegawai", dirQ: "", dirAngk: "", dirKelas: "",
   ref: null, keg: null, kegLingkup: "saya", kegQ: "", antrean: null, form: null, formSt: "", cek: { kode: "", hasil: null },
-  tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {}, porto: null, dokForm: null, ilkps: null, ilkpsTab: "7a", ilkpsTs: null, bukaSetelahMasuk: null };
+  tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {}, porto: null, dokForm: null, ilkps: null, ilkpsTab: "1", ilkpsTs: null, bukaSetelahMasuk: null,
+  dp: null, dpTab: "kurikulum", dpSmt: null, dpTa: null, dpImpor: false };
 const STATUS_MHS = { A: "Aktif", C: "Cuti", N: "Non-aktif", L: "Lulus", D: "Drop out / dikeluarkan", K: "Mengundurkan diri / keluar", M: "Mutasi / pindah", W: "Wafat" };
 
 /* ---------- server ---------- */
@@ -55,10 +56,11 @@ const I = {
   verif: '<path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/>',
   ttd: '<path d="M3 17c3-1 4-7 6-7s1 6 3 6 2-4 4-4 2 3 5 3"/><path d="M3 21h18"/>',
   porto: '<path d="M4 7h16v13H4z"/><path d="M9 7V4h6v3"/><path d="M4 12h16"/>',
-  ilkps: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/>'
+  ilkps: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/>',
+  dprodi: '<path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -71,7 +73,7 @@ function menu() {
   const m = ["beranda"];
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
   if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
-  if (u.peran.some(r => ["admin", "superadmin", "kps"].includes(r))) m.push("ilkps");
+  if (u.peran.some(r => ["admin", "superadmin", "kps"].includes(r))) m.push("ilkps", "dprodi");
   if (u.peran.includes("kps")) m.push("kps"); // antrean KPS selalu terlihat, apa pun peran aktifnya, agar pengajuan tidak terlewat
   if (u.peran.some(r => ["admin", "superadmin", "kps", "dosen"].includes(r))) m.push("verif"); // dosen: sebagai pendamping lomba
   if (u.peran.includes("kps")) m.push("ttd");
@@ -129,6 +131,7 @@ function halaman() {
   if (S.view === "ttd") return hTtd();
   if (S.view === "porto") return hPorto();
   if (S.view === "ilkps") return hIlkps();
+  if (S.view === "dprodi") return hDprodi();
   return hBeranda();
 }
 const tombol = (act, label, kelas = "primary", attr = "") => `<button class="btn ${kelas}" data-act="${act}" ${attr} ${S.sibuk ? "disabled" : ""}>${S.sibuk ? "Memproses…" : label}</button>`;
@@ -189,7 +192,7 @@ function hBeranda() {
   const u = S.pengguna;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelTugas()}
-   <div class="callout"><b>Uji Coba v${K.versi} · Tabel iLKPS.</b> Baru${menu().includes("ilkps") ? ": menu <b>Tabel iLKPS</b> menyusun otomatis 18 lembar tabel LAMWisata (prestasi mahasiswa, penelitian, publikasi, luaran, PkM, kerja sama, rekognisi) dari kegiatan yang datanya sudah disetujui, dengan pengaturan TS dan ekspor Excel" : ": data kegiatan yang Anda catat dan disetujui verifikator kini otomatis masuk Tabel iLKPS akreditasi"}.
+   <div class="callout"><b>Uji Coba v${K.versi} · Data dosen (Tabel 1–6).</b> Baru${menu().includes("dprodi") ? ": menu <b>Data Prodi</b> (kurikulum, tim pengajar per semester, dosen industri/praktisi, data dosen per TS/EWMP), dan Tabel iLKPS kini memuat Tabel 1–6 (24 lembar)" : ": isian <b>Mata kuliah yang diampu di prodi lain</b> di biodata dosen, dan kegiatan Bimbingan tugas akhir kini masuk Tabel 5"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -253,6 +256,9 @@ function laci() {
   if (L.jenis === "kegDetail") return laciDetail();
   if (L.jenis === "surat") return laciSurat();
   if (L.jenis === "akred") return laciAkred();
+  if (L.jenis === "mk") return laciMk();
+  if (L.jenis === "tim") return laciTim();
+  if (L.jenis === "praktisi") return laciPraktisi();
   if (L.jenis === "sandi") return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Kata sandi sementara">
    <div class="dh"><h2>Kata sandi sementara</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
    <p>Berikan kata sandi ini kepada <b>${esc(L.nama)}</b> secara langsung. Kata sandi hanya ditampilkan sekali dan wajib diganti saat ia masuk.</p>
@@ -412,7 +418,7 @@ async function muatPengguna() { try { S.daftar = (await api("admin.pengguna")).p
 const AKSI = {
   keLupa() { S.layar = "lupa"; S.lupa = { langkah: 1, email: "" }; S.galat = ""; render(); },
   keMasuk() { S.layar = "masuk"; S.galat = ""; render(); },
-  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
+  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.dp = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
   aktSandi: () => jalankan(async () => { const a = mentah("p1"); cocok(a, mentah("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
   aktKirim: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; const j = await api("aktivasi.kirimKode", { email: em }); S.akt.terkirim = true; S.akt.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
   aktVerif: () => jalankan(async () => { S.pengguna = (await api("aktivasi.verifikasi", { kode: nilai("kode") })).pengguna; S.view = S.pengguna.perluBiodata ? "biodata" : "beranda"; toast("Akun aktif. Selamat datang!"); }),
@@ -1017,6 +1023,162 @@ document.addEventListener("change", e => {
   if (f.size > 10 * 1024 * 1024) { toast("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai Tautan."); return; }
   bacaBase64(f).then(isi => unggahBk(slot, { nama: f.name, isi }), err => toast(err.message));
 });
+/* --- Data Prodi (v0.8.0) --- */
+const smtL = k => { const m = /^(\d{4})-([12])$/.exec(k || ""); return m ? (m[2] === "1" ? "Ganjil " : "Genap ") + m[1] + "/" + (+m[1] + 1) : k; };
+const dpPersen = x => (Math.round(x * 1000) / 10).toLocaleString("id-ID") + "%";
+function muatDp() { sekali("dp", async () => { S.dp = await api("dp.data", { semester: S.dpSmt || undefined, ta: S.dpTa || undefined }); render(); }); }
+const namaAnggota = a => { const D = S.dp; if (a.t === "p") { const x = D.praktisi.find(y => y.id === a.id); return x ? x.nama + " (praktisi)" : "(praktisi dihapus)"; } const x = D.dosen.find(y => y.id === a.id); return x ? namaPendek(x.nama) + (x.inisial ? " (" + x.inisial + ")" : "") : "(akun nonaktif)"; };
+function hDprodi() {
+  if (!S.dp) { muatDp(); return `<div class="memuat">Memuat data prodi…</div>`; }
+  const D = S.dp, ub = D.bolehUbah, tabs = [["kurikulum", "Kurikulum"], ["tim", "Tim pengajar"], ["praktisi", "Praktisi"], ["dosents", "Data dosen TS"]];
+  let isi = "";
+  if (S.dpTab === "kurikulum") {
+    const tot = D.mk.reduce((s, m) => s + m.sks, 0), prak = D.mk.reduce((s, m) => s + m.sksPraktik, 0);
+    isi = `<div class="grid g3"><div class="panel stat"><span class="v num">${D.mk.length}</span><span class="l">Mata kuliah</span></div><div class="panel stat"><span class="v num">${tot.toLocaleString("id-ID")}</span><span class="l">Total sks</span></div>
+      <div class="panel stat"><span class="v num">${tot ? dpPersen(prak / tot) : "–"}</span><span class="l">PJP: sks praktik/praktikum ÷ total sks (${prak.toLocaleString("id-ID")} sks praktik)</span></div></div>
+     ${ub ? `<div class="row" style="flex-wrap:wrap">${tombol("dpMkBaru", "+ Tambah mata kuliah", "primary")}<button class="btn" data-act="dpImporBuka">${S.dpImpor ? "Tutup impor" : "Impor dari Excel (tempel)"}</button></div>` : ""}
+     ${S.dpImpor ? `<section class="panel"><h2>Impor kurikulum</h2><p class="small">Salin baris dari Excel lalu tempel di sini. Urutan kolom: <b>Kode; Nama mata kuliah; Semester (1–8); sks kuliah; sks seminar; sks praktik/praktikum; Kompetensi (Ya/Tidak)</b>. Pemisah boleh tab (hasil salin Excel) atau titik koma. Kode yang sudah ada akan diperbarui.</p>
+       <textarea id="dpImporTeks" rows="6" placeholder="UPW201&#9;Travel Agency Operation&#9;2&#9;1&#9;0&#9;2&#9;Ya"></textarea>${galatHtml()}<div class="row" style="justify-content:flex-end">${tombol("dpImporSimpan", "Impor")}</div></section>` : ""}
+     <div class="tbl-wrap"><table><thead><tr><th>Smt</th><th>Kode</th><th>Mata kuliah</th><th>Kompetensi</th><th>Kuliah</th><th>Seminar</th><th>Praktik</th><th>CPL</th><th>RPS</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
+     ${D.mk.map(m => `<tr><td class="num">${m.semester}</td><td class="mono">${esc(m.kode)}</td><td>${esc(m.nama)}</td><td>${m.kompetensi ? '<span class="tag t">Ya</span>' : "–"}</td><td class="num">${m.sksKuliah}</td><td class="num">${m.sksSeminar}</td><td class="num">${m.sksPraktik}</td>
+       <td class="small">${[["S", m.cplSikap], ["P", m.cplPengetahuan], ["KU", m.cplKu], ["KK", m.cplKk]].filter(x => x[1]).map(x => x[0]).join(", ") || "–"}</td><td class="small">${m.rps ? (m.rps === "Ada" ? "Ada" : `<a href="${esc(m.rps)}" target="_blank" rel="noopener noreferrer">Tautan</a>`) : '<span class="chip s-revisi">Belum</span>'}</td>
+       ${ub ? `<td><button class="btn sm" data-act="dpMkUbah" data-kode="${esc(m.kode)}">Ubah</button></td>` : ""}</tr>`).join("") || `<tr><td colspan="10"><div class="empty">Belum ada mata kuliah. ${ub ? "Tambahkan satu per satu atau impor dari Excel." : ""}</div></td></tr>`}</tbody></table></div>`;
+  }
+  if (S.dpTab === "tim") {
+    const isiN = D.tim.filter(t => t.anggota.length).length;
+    isi = `<div class="row" style="justify-content:space-between;flex-wrap:wrap"><label class="row small" style="gap:6px"><b>Semester</b><select id="dpSmt" style="width:auto">${D.pilihanSemester.map(s => `<option value="${s.kode}" ${s.kode === D.semester ? "selected" : ""}>${esc(s.label)}</option>`).join("")}</select></label>
+      <span class="small num">${isiN} dari ${D.tim.length} mata kuliah ${/-1$/.test(D.semester) ? "ganjil" : "genap"} sudah punya tim</span></div>
+     <div class="callout">Tim pengajar berlaku <b>satu semester</b>: satu <b>pengampu utama</b> (dosen) dan maksimal 3 orang per tim, termasuk praktisi. Data ini mengisi kolom mata kuliah yang diampu (Tabel 1–3) dan EWMP (Tabel 6).</div>
+     <div class="tbl-wrap"><table><thead><tr><th>Kode</th><th>Mata kuliah</th><th>Sks</th><th>Tim pengajar ${esc(D.labelSemester)}</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
+     ${D.tim.map(t => `<tr><td class="mono">${esc(t.kode)}</td><td>${esc(t.nama)}</td><td class="num">${t.sks}</td><td class="small">${t.anggota.length ? t.anggota.map((a, i) => i === 0 ? `<b>${esc(namaAnggota(a))}</b> <span class="muted">(utama)</span>` : esc(namaAnggota(a))).join(", ") : '<span class="chip s-revisi">Belum ditetapkan</span>'}</td>
+       ${ub ? `<td><button class="btn sm" data-act="dpTimAtur" data-kode="${esc(t.kode)}">${t.anggota.length ? "Ubah tim" : "Tetapkan tim"}</button></td>` : ""}</tr>`).join("") || `<tr><td colspan="5"><div class="empty">Belum ada mata kuliah ${/-1$/.test(D.semester) ? "semester ganjil" : "semester genap"} di kurikulum.</div></td></tr>`}</tbody></table></div>
+     ${ub ? `<div class="row">${tombol("dpTimSalin", "Salin dari " + D.salinDari, "")}</div>` : ""}`;
+  }
+  if (S.dpTab === "praktisi") {
+    isi = `<p class="small muted">Dosen industri/praktisi yang mengajar dalam tim pengajar (Tabel 2). Praktisi tidak perlu akun aplikasi.</p>
+     ${ub ? `<div class="row">${tombol("dpPrakBaru", "+ Tambah praktisi", "primary")}</div>` : ""}
+     <div class="tbl-wrap"><table><thead><tr><th>Nama</th><th>Perusahaan/industri</th><th>Pendidikan</th><th>Bidang keahlian</th><th>Sertifikat</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
+     ${D.praktisi.map(x => `<tr><td>${esc(x.nama)}${x.nidk ? `<br><span class="mono small muted">NIDK ${esc(x.nidk)}</span>` : ""}</td><td class="small">${esc(x.perusahaan)}</td><td class="small">${esc(x.pendidikan || "–")}</td><td class="small">${esc(x.bidang || "–")}</td><td class="small">${esc(x.sertifikat || "–")}</td>
+       ${ub ? `<td><button class="btn sm" data-act="dpPrakUbah" data-id="${x.id}">Ubah</button></td>` : ""}</tr>`).join("") || `<tr><td colspan="6"><div class="empty">Belum ada praktisi.</div></td></tr>`}</tbody></table></div>`;
+  }
+  if (S.dpTab === "dosents") {
+    const th = new Date().getFullYear(), pil = []; for (let a = th; a >= 2018; a--) pil.push(a);
+    const f = (x, k, ph) => `<input id="dt-${x.id}-${k}" type="text" inputmode="decimal" value="${x[k] === "" || x[k] == null ? "" : String(x[k]).replace(".", ",")}" placeholder="${ph || "0"}" style="width:64px" ${ub ? "" : "disabled"} aria-label="${k} ${esc(x.nama)}">`;
+    isi = `<div class="row" style="justify-content:space-between;flex-wrap:wrap"><label class="row small" style="gap:6px"><b>Tahun akademik</b><select id="dpTa" style="width:auto">${pil.map(a => `<option value="${a}" ${a === D.ta ? "selected" : ""}>${a}/${a + 1}</option>`).join("")}</select></label></div>
+     <div class="callout">Satuan sks per tahun akademik (Ganjil + Genap), untuk Tabel 6 (EWMP). Kolom <b>PS</b> otomatis dari tim pengajar (sks MK dibagi rata ke dosen dalam tim); isi angka untuk menimpanya, misalnya dari BKD. <b>Sesuai</b> = kesesuaian bidang keahlian dengan MK yang diampu (Tabel 1 dan 3).</div>
+     <div class="tbl-wrap"><table><thead><tr><th>Dosen</th><th>PS</th><th>PS lain (PT)</th><th>Luar PT</th><th>Penelitian</th><th>PkM</th><th>Tugas tambahan</th><th>Sesuai</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
+     ${D.dosenTs.map(x => `<tr><td class="small"><b>${esc(namaPendek(x.nama))}</b><br><span class="muted">${esc(x.status || "Status dosen belum diisi di biodata")}</span>${x.mk.length ? `<br><span class="muted">${esc(x.mk.join("; "))}</span>` : ""}</td>
+       <td>${f(x, "ps", String(x.sksPsHitung).replace(".", ","))}</td><td>${f(x, "psLain")}</td><td>${f(x, "luarPt")}</td><td>${f(x, "penelitian")}</td><td>${f(x, "pkm")}</td><td>${f(x, "tambahan")}</td>
+       <td><select id="dt-${x.id}-sesuai" style="width:auto" ${ub ? "" : "disabled"} aria-label="Kesesuaian ${esc(x.nama)}"><option value="">–</option><option ${x.sesuai === "Ya" ? "selected" : ""}>Ya</option><option ${x.sesuai === "Tidak" ? "selected" : ""}>Tidak</option></select></td>
+       ${ub ? `<td><button class="btn sm" data-act="dpDtSimpan" data-id="${x.id}" ${S.sibuk ? "disabled" : ""}>Simpan</button></td>` : ""}</tr>`).join("") || `<tr><td colspan="9"><div class="empty">Belum ada akun dosen.</div></td></tr>`}</tbody></table></div>`;
+  }
+  return `<div class="head"><div><h1>Data Prodi</h1><p>Sumber Tabel iLKPS 1–6: kurikulum, tim pengajar per semester, dosen industri/praktisi, dan data dosen per tahun akademik. ${ub ? "" : "Anda dapat melihat; perubahan oleh Admin Prodi."}</p></div><button class="btn" data-go="ilkps">Lihat Tabel iLKPS</button></div>
+   <div class="seg" role="group" aria-label="Bagian" style="margin-bottom:12px;flex-wrap:wrap">${tabs.map(([k, l]) => `<button data-act="dpTab" data-t="${k}" aria-pressed="${S.dpTab === k}">${l}</button>`).join("")}</div>
+   ${S.laci ? "" : galatHtml()}${isi}`;
+}
+function laciMk() {
+  const m = S.laci.m || { kode: "", nama: "", semester: 1, kompetensi: false, sksKuliah: "", sksSeminar: "", sksPraktik: "", cplSikap: false, cplPengetahuan: false, cplKu: false, cplKk: false, rps: "", unit: "Prodi UPW" };
+  const cek = (id, l, v) => `<label><input type="checkbox" id="${id}" ${v ? "checked" : ""}><span>${l}</span></label>`;
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Mata kuliah" style="width:min(620px,100%)">
+   <div class="dh"><h2>${S.laci.m ? "Ubah mata kuliah" : "Tambah mata kuliah"}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <div class="grid g3" style="gap:10px"><div class="field"><label for="mkKode">Kode${wajib}</label><input id="mkKode" type="text" value="${esc(m.kode)}" placeholder="UPW201"></div>
+    <div class="field" style="grid-column:span 2"><label for="mkNama">Nama mata kuliah${wajib}</label><input id="mkNama" type="text" value="${esc(m.nama)}" placeholder="Travel Agency Operation"></div></div>
+   <div class="grid g3" style="gap:10px"><div class="field"><label for="mkSmt">Semester${wajib}</label><select id="mkSmt">${[1, 2, 3, 4, 5, 6, 7, 8].map(n => `<option ${m.semester === n ? "selected" : ""}>${n}</option>`).join("")}</select></div>
+    <div class="field"><label for="mkUnit">Unit penyelenggara</label><input id="mkUnit" type="text" value="${esc(m.unit)}"></div>
+    <div class="field"><span style="font-weight:600;font-size:.82rem">Mata kuliah kompetensi</span><div class="classgrid">${cek("mkKomp", "Ya", m.kompetensi)}</div></div></div>
+   <div class="grid g3" style="gap:10px"><div class="field"><label for="mkK">Sks kuliah/responsi/tutorial</label><input id="mkK" type="text" inputmode="decimal" value="${m.sksKuliah}"></div>
+    <div class="field"><label for="mkS">Sks seminar</label><input id="mkS" type="text" inputmode="decimal" value="${m.sksSeminar}"></div>
+    <div class="field"><label for="mkP">Sks praktikum/praktik/PKL</label><input id="mkP" type="text" inputmode="decimal" value="${m.sksPraktik}"></div></div>
+   <div class="field"><span style="font-weight:600;font-size:.82rem">Capaian pembelajaran yang didukung</span><div class="classgrid">${cek("mkCs", "Sikap", m.cplSikap)}${cek("mkCp", "Pengetahuan", m.cplPengetahuan)}${cek("mkCku", "Keterampilan umum", m.cplKu)}${cek("mkCkk", "Keterampilan khusus", m.cplKk)}</div></div>
+   <div class="field"><label for="mkRps">Dokumen rencana pembelajaran (RPS)</label><input id="mkRps" type="text" value="${esc(m.rps)}" placeholder="https://drive.google.com/… atau tulis Ada"><span class="hint">Tautan RPS di Drive prodi, atau tulis <b>Ada</b> bila tersimpan di tempat lain.</span></div>
+   ${galatHtml()}<div class="row" style="justify-content:space-between;margin-top:auto">${S.laci.m ? tombol("dpMkHapus", "Hapus", "bad") : "<span></span>"}${tombol("dpMkSimpan", "Simpan")}</div></div></div>`;
+}
+function laciTim() {
+  const D = S.dp, t = D.tim.find(x => x.kode === S.laci.kode), a = t.anggota;
+  const opsi = (sel, prak) => `<option value="">${prak ? "– tidak ada –" : "Pilih dosen"}</option><optgroup label="Dosen">${D.dosen.map(x => `<option value="u:${x.id}" ${sel === "u:" + x.id ? "selected" : ""}>${esc(namaPendek(x.nama))}${x.inisial ? " (" + esc(x.inisial) + ")" : ""}</option>`).join("")}</optgroup>
+    ${prak ? `<optgroup label="Praktisi">${D.praktisi.map(x => `<option value="p:${x.id}" ${sel === "p:" + x.id ? "selected" : ""}>${esc(x.nama)} · ${esc(x.perusahaan)}</option>`).join("")}</optgroup>` : ""}`;
+  const v = i => a[i] ? a[i].t + ":" + a[i].id : "";
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Tim pengajar" style="width:min(560px,100%)">
+   <div class="dh"><h2>Tim pengajar ${esc(t.kode)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <p class="small">${esc(t.nama)} · ${t.sks} sks · <b>${esc(D.labelSemester)}</b></p>
+   <div class="field"><label for="tim0">Pengampu utama${wajib}</label><select id="tim0">${opsi(v(0), false)}</select></div>
+   <div class="field"><label for="tim1">Anggota tim 2</label><select id="tim1">${opsi(v(1), true)}</select></div>
+   <div class="field"><label for="tim2">Anggota tim 3</label><select id="tim2">${opsi(v(2), true)}</select></div>
+   <span class="hint">Praktisi belum ada di daftar? Tambahkan dulu di tab Praktisi. Kosongkan pengampu utama untuk menghapus tim semester ini.</span>
+   ${galatHtml()}<div class="row" style="justify-content:flex-end;margin-top:auto">${tombol("dpTimSimpan", "Simpan tim")}</div></div></div>`;
+}
+function laciPraktisi() {
+  const x = S.laci.x || {};
+  const f = (id, k, l, ph, req) => `<div class="field"><label for="${id}">${l}${req ? wajib : ""}</label><input id="${id}" type="text" value="${esc(x[k] || "")}" placeholder="${esc(ph)}"></div>`;
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Praktisi" style="width:min(560px,100%)">
+   <div class="dh"><h2>${x.id ? "Ubah praktisi" : "Tambah praktisi"}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   ${f("prNama", "nama", "Nama lengkap dengan gelar", "Contoh: Made Wirawan, S.Par.", 1)}${f("prPer", "perusahaan", "Perusahaan / industri", "Contoh: PT Bali Tour Nusantara", 1)}
+   <div class="grid g2" style="gap:10px">${f("prNidk", "nidk", "NIDK (bila ada)", "")}${f("prPend", "pendidikan", "Pendidikan tertinggi", "Contoh: S1 Pariwisata")}</div>
+   ${f("prBid", "bidang", "Bidang keahlian", "Contoh: Tour operation; Ticketing")}${f("prSert", "sertifikat", "Sertifikat profesi/kompetensi/industri", "Contoh: Tour Leader – LSP Pariwisata (BNSP), 2022")}
+   ${galatHtml()}<div class="row" style="justify-content:space-between;margin-top:auto">${x.id ? tombol("dpPrakHapus", "Hapus", "bad") : "<span></span>"}${tombol("dpPrakSimpan", "Simpan")}</div></div></div>`;
+}
+const angkaId = v => String(v || "").trim().replace(",", ".");
+function pecahImpor(teks) {
+  return teks.split(/\r?\n/).map(b => b.trim()).filter(Boolean).map((b, i) => {
+    const c = b.split(/\t|;/).map(x => x.trim());
+    if (c.length < 4) throw new Error("Baris " + (i + 1) + " kurang kolom: " + b);
+    return { kode: c[0], nama: c[1], semester: Number(c[2]), sksKuliah: angkaId(c[3]), sksSeminar: angkaId(c[4]), sksPraktik: angkaId(c[5]), kompetensi: /^(ya|y|v|1)$/i.test(c[6] || "") };
+  }).filter(r => !/^kode$/i.test(r.kode));
+}
+Object.assign(AKSI, {
+  dpTab(d) { S.dpTab = d.t; S.galat = ""; render(); },
+  dpImporBuka() { S.dpImpor = !S.dpImpor; S.galat = ""; render(); },
+  dpImporSimpan() {
+    let daftar; try { daftar = pecahImpor($("dpImporTeks").value); } catch (e) { S.galat = e.message; render(); return; }
+    if (!daftar.length) { S.galat = "Tempel minimal satu baris."; render(); return; }
+    jalankan(async () => { const j = await api("dp.mkSimpan", { daftar }); S.dp = null; S.ilkps = null; S.dpImpor = false; toast(`Impor selesai: ${j.baru} baru, ${j.diubah} diperbarui.`); });
+  },
+  dpMkBaru() { S.laci = { jenis: "mk" }; S.galat = ""; render(); fokus("mkKode"); },
+  dpMkUbah(d) { S.laci = { jenis: "mk", m: S.dp.mk.find(m => m.kode === d.kode) }; S.galat = ""; render(); },
+  dpMkSimpan() {
+    const data = { kode: $("mkKode").value, nama: $("mkNama").value, semester: Number($("mkSmt").value), unit: $("mkUnit").value, kompetensi: $("mkKomp").checked,
+      sksKuliah: angkaId($("mkK").value), sksSeminar: angkaId($("mkS").value), sksPraktik: angkaId($("mkP").value), cplSikap: $("mkCs").checked, cplPengetahuan: $("mkCp").checked,
+      cplKu: $("mkCku").checked, cplKk: $("mkCkk").checked, rps: $("mkRps").value.trim() };
+    const lama = S.laci.m ? S.laci.m.kode : undefined;
+    S.laci.m = Object.assign({}, S.laci.m || {}, data);
+    jalankan(async () => { await api("dp.mkSimpan", { kodeLama: lama, data }); S.laci = null; S.dp = null; S.ilkps = null; toast("Mata kuliah tersimpan."); });
+  },
+  dpMkHapus() {
+    if (!confirm("Hapus mata kuliah ini dari kurikulum?")) return;
+    jalankan(async () => { await api("dp.mkHapus", { kode: S.laci.m.kode }); S.laci = null; S.dp = null; S.ilkps = null; toast("Mata kuliah dihapus."); });
+  },
+  dpTimAtur(d) { S.laci = { jenis: "tim", kode: d.kode }; S.galat = ""; render(); },
+  dpTimSimpan() {
+    const anggota = ["tim0", "tim1", "tim2"].map(id => $(id).value).filter(Boolean).map(v => ({ t: v[0], id: v.slice(2) }));
+    if (!anggota.length && !confirm("Hapus tim pengajar mata kuliah ini untuk semester ini?")) return;
+    if (anggota.length && $("tim0").value === "") { S.galat = "Pilih pengampu utama dulu."; render(); return; }
+    jalankan(async () => { await api("dp.timSimpan", { semester: S.dp.semester, kodeMk: S.laci.kode, anggota }); S.laci = null; S.dpSmt = S.dp.semester; S.dp = null; S.ilkps = null; toast("Tim pengajar tersimpan."); });
+  },
+  dpTimSalin() {
+    jalankan(async () => { const j = await api("dp.timSalin", { semester: S.dp.semester }); S.dpSmt = S.dp.semester; S.dp = null; S.ilkps = null; toast(j.disalin ? `${j.disalin} tim disalin dari ${j.dari}.` : `Tidak ada tim yang perlu disalin dari ${j.dari}.`); });
+  },
+  dpPrakBaru() { S.laci = { jenis: "praktisi" }; S.galat = ""; render(); fokus("prNama"); },
+  dpPrakUbah(d) { S.laci = { jenis: "praktisi", x: S.dp.praktisi.find(x => x.id === d.id) }; S.galat = ""; render(); },
+  dpPrakSimpan() {
+    const data = { id: S.laci.x ? S.laci.x.id : undefined, nama: $("prNama").value, perusahaan: $("prPer").value, nidk: $("prNidk").value, pendidikan: $("prPend").value, bidang: $("prBid").value, sertifikat: $("prSert").value };
+    S.laci.x = Object.assign({}, S.laci.x || {}, data);
+    jalankan(async () => { await api("dp.praktisiSimpan", { data }); S.laci = null; S.dp = null; S.ilkps = null; toast("Praktisi tersimpan."); });
+  },
+  dpPrakHapus() {
+    if (!confirm("Hapus praktisi ini? Tim pengajar yang memuatnya akan menampilkan '(praktisi dihapus)'.")) return;
+    jalankan(async () => { await api("dp.praktisiHapus", { id: S.laci.x.id }); S.laci = null; S.dp = null; S.ilkps = null; toast("Praktisi dihapus."); });
+  },
+  dpDtSimpan(d) {
+    const v = k => angkaId($(`dt-${d.id}-${k}`).value), data = { userId: d.id, ps: v("ps"), psLain: v("psLain"), luarPt: v("luarPt"), penelitian: v("penelitian"), pkm: v("pkm"), tambahan: v("tambahan"), sesuai: $(`dt-${d.id}-sesuai`).value };
+    for (const k of ["ps", "psLain", "luarPt", "penelitian", "pkm", "tambahan"]) if (data[k] !== "" && !(Number(data[k]) >= 0)) { toast("Isi angka (sks) yang valid."); return; }
+    jalankan(async () => { await api("dp.dosenTsSimpan", { ta: S.dp.ta, data }).catch(e => { toast(e.message); throw e; }); S.dpTa = S.dp.ta; S.dp = null; S.ilkps = null; toast("Data dosen tersimpan."); });
+  }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "dpSmt") { S.dpSmt = e.target.value; S.dp = null; render(); }
+  if (e.target.id === "dpTa") { S.dpTa = Number(e.target.value); S.dp = null; render(); }
+});
+
 /* --- Tabel iLKPS (v0.7.0) --- */
 const tautanKeg = id => location.origin + location.pathname + "?keg=" + encodeURIComponent(id);
 function hIlkps() {
@@ -1027,11 +1189,11 @@ function hIlkps() {
   const D = S.ilkps, t = D.tabel.find(x => x.kode === S.ilkpsTab) || D.tabel[0], dis = S.sibuk ? "disabled" : "";
   const thnKini = new Date().getFullYear(), pilihan = []; for (let a = thnKini; a >= 2018; a--) pilihan.push(a);
   const isiTabel = t.bentuk === "daftar"
-    ? (t.baris.length ? `<div class="tbl-wrap"><table><thead><tr>${t.kolom.map(k => `<th>${esc(k)}</th>`).join("")}</tr></thead><tbody>${t.baris.map((r, i) => `<tr style="cursor:pointer" data-act="bukaKeg" data-id="${t.id[i]}">${r.map(v => `<td class="small">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`
-      : `<div class="empty">Belum ada kegiatan disetujui untuk tabel ini pada rentang TS.</div>`)
-    : `<div class="tbl-wrap"><table><thead><tr>${t.kolom.map(k => `<th>${esc(k)}</th>`).join("")}</tr></thead><tbody>${t.baris.map(r => `<tr>${r.map((v, j) => `<td class="small ${j > 1 ? "num" : ""}" ${r[0] === "Jumlah" ? 'style="font-weight:700"' : ""}>${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    ? (t.baris.length ? `<div class="tbl-wrap"><table><thead><tr>${t.kolom.map(k => `<th>${esc(k)}</th>`).join("")}</tr></thead><tbody>${t.baris.map((r, i) => `<tr ${t.id ? `style="cursor:pointer" data-act="bukaKeg" data-id="${t.id[i]}"` : ""}>${r.map(v => `<td class="small">${esc(typeof v === "number" ? v.toLocaleString("id-ID") : v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`
+      : `<div class="empty">${t.id ? "Belum ada kegiatan disetujui untuk tabel ini pada rentang TS." : "Belum ada data. Lengkapi di menu Data Prodi atau biodata dosen."}</div>`)
+    : `<div class="tbl-wrap"><table><thead><tr>${t.kolom.map(k => `<th>${esc(k)}</th>`).join("")}</tr></thead><tbody>${t.baris.map(r => `<tr>${r.map((v, j) => `<td class="small ${j > 1 ? "num" : ""}" ${r[0] === "Jumlah" ? 'style="font-weight:700"' : ""}>${esc(typeof v === "number" ? v.toLocaleString("id-ID") : v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
       ${t.idBaris.some(x => x.length) ? `<details style="margin-top:8px"><summary class="small" style="cursor:pointer">Kegiatan yang dihitung</summary><div class="list" style="margin-top:6px">${t.idBaris.map((ids, i) => ids.map(id => `<div class="item" style="cursor:pointer" data-act="bukaKeg" data-id="${id}"><div class="body small">${esc(t.baris[i][1])}: <span class="mono">${esc(id)}</span> (buka detail)</div></div>`).join("")).join("")}</div></details>` : ""}`;
-  return `<div class="head"><div><h1>Tabel iLKPS</h1><p>Tersusun otomatis dari kegiatan yang datanya sudah <b>disetujui</b> verifikator, mengikuti format Tabel iLKPS LAMWisata (varian Vokasi untuk Tabel 14 dan 19). Klik baris untuk membuka kegiatan dan buktinya.</p></div>
+  return `<div class="head"><div><h1>Tabel iLKPS</h1><p>Tabel 1–6 tersusun dari biodata dosen dan <b>Data Prodi</b>; tabel lain dari kegiatan yang datanya sudah <b>disetujui</b> verifikator. Format mengikuti Tabel iLKPS LAMWisata (varian Vokasi untuk Tabel 14 dan 19). Klik baris kegiatan untuk membuka buktinya.</p></div>
      <button class="btn primary" data-act="ilkpsXlsx" ${dis}>Ekspor Excel</button></div>
    <section class="panel"><div class="row" style="flex-wrap:wrap;gap:10px;justify-content:space-between">
      <div><b>TS = ${esc(D.ts.label)}</b> <span class="small muted">· rentang ${D.ts.rentang.map(esc).join(", ")}${D.ts.awal !== D.tsTersimpan ? " · pratinjau (TS tersimpan " + D.tsTersimpan + "/" + (D.tsTersimpan + 1) + ")" : ""}</span></div>
@@ -1052,7 +1214,8 @@ function lembarIlkps(D) {
   const L = [{ nama: "Ringkasan", baris: ringkas }];
   D.tabel.forEach(t => {
     const b = [[t.judul], ["TS = " + D.ts.label + " (" + D.ts.rentang.join(", ") + ")"], []];
-    if (t.bentuk === "daftar") { b.push([...t.kolom, "Tautan bukti"]); t.baris.forEach((r, i) => b.push([...r, tautanKeg(t.id[i])])); }
+    if (t.bentuk === "daftar" && t.id) { b.push([...t.kolom, "Tautan bukti"]); t.baris.forEach((r, i) => b.push([...r, tautanKeg(t.id[i])])); }
+    else if (t.bentuk === "daftar") { b.push(t.kolom); t.baris.forEach(r => b.push(r)); }
     else { b.push(t.kolom); t.baris.forEach(r => b.push(r)); }
     if (t.catatan) b.push([], ["Catatan: " + t.catatan]);
     L.push({ nama: "Tabel " + t.kode, baris: b });

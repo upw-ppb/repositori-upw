@@ -3,6 +3,22 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.8.0 — 12 Nov 2026 — Uji Coba
+- Menu "Data Prodi" (Admin Prodi/Super Admin mengubah; KPS melihat):
+  - Kurikulum: tambah/ubah/hapus mata kuliah (kode, semester, kompetensi, sks kuliah/seminar/praktik, CPL, RPS, unit) dan impor
+    dengan menempel baris dari Excel; ringkasan total sks dan PJP.
+  - Tim pengajar per semester: pengampu utama (dosen) + maks. 3 orang termasuk praktisi; salin dari semester yang sama tahun lalu.
+  - Praktisi (dosen industri) tanpa akun aplikasi.
+  - Data dosen per tahun akademik untuk EWMP (PS lain, luar PT, penelitian, PkM, tugas tambahan; sks PS otomatis dari tim pengajar,
+    bisa ditimpa) dan kesesuaian bidang keahlian dengan MK.
+- Tabel iLKPS kini 24 lembar: tambah Tabel 1 (dosen tetap), 2 (dosen industri/praktisi), 3 (dosen tidak tetap), 4 (kurikulum,
+  konversi jam = sks × 45), 5 (pembimbing utama TA dari kegiatan bimbingan yang disetujui), 6 (EWMP pada TS).
+- Biodata dosen: isian baru "Mata kuliah yang diampu di prodi lain" (kolom baru di akhir sheet BiodataPegawai).
+- Jenis kegiatan Bimbingan tugas akhir: isian baru "Jumlah mahasiswa (prodi lain)".
+- Struktur data versi 7: tabel baru MataKuliah, Praktisi, TimPengajar, DosenTs; kolom baru mkLain. Cadangan otomatis sebelum perubahan.
+  Versi lama (v0.7.0) tetap bisa membaca data ini (tabel/kolom baru diabaikan); rollback tidak memerlukan pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.7.0 — 12 Nov 2026 — Uji Coba
 - Menu "Tabel iLKPS" (Admin Prodi, KPS, Super Admin): 18 lembar tabel LAMWisata tersusun otomatis dari kegiatan yang datanya
   disetujui — 7a, 7b, 12, 13, 14 (Vokasi), 15 Bagian 1–4, 15a, 16, 17, 18, 19 (Vokasi), 20 Bagian 1–3, 23 — mengikuti kolom
