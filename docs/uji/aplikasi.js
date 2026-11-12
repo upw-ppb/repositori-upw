@@ -17,7 +17,7 @@ const S = { token: ls.get("token"), pengguna: null, peran: ls.get("peran"), view
   bio: null, wil: null, dir: null, dirTab: "pegawai", dirQ: "", dirAngk: "", dirKelas: "",
   ref: null, keg: null, kegLingkup: "saya", kegQ: "", antrean: null, form: null, formSt: "", cek: { kode: "", hasil: null },
   tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {}, porto: null, dokForm: null, ilkps: null, ilkpsTab: "1", ilkpsTs: null, bukaSetelahMasuk: null,
-  dp: null, dpTab: "kurikulum", dpSmt: null, dpTa: null, dpImpor: false, asesor: null, setuju: null, setujuQ: "" };
+  dp: null, dpTab: "kurikulum", dpSmt: null, dpTa: null, dpImpor: false, asesor: null, setuju: null, setujuQ: "", lul: null, lulTa: null, lulImpor: false };
 const STATUS_MHS = { A: "Aktif", C: "Cuti", N: "Non-aktif", L: "Lulus", D: "Drop out / dikeluarkan", K: "Mengundurkan diri / keluar", M: "Mutasi / pindah", W: "Wafat" };
 
 /* ---------- server ---------- */
@@ -202,7 +202,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelTugas()}
-   <div class="callout"><b>Uji Coba v${K.versi} · Data dosen (Tabel 1–6).</b> Baru${menu().includes("dprodi") ? ": menu <b>Data Prodi</b> (kurikulum, tim pengajar per semester, dosen industri/praktisi, data dosen per TS/EWMP), dan Tabel iLKPS kini memuat Tabel 1–6 (24 lembar)" : ": isian <b>Mata kuliah yang diampu di prodi lain</b> di biodata dosen, dan kegiatan Bimbingan tugas akhir kini masuk Tabel 5"}.
+   <div class="callout"><b>Uji Coba v${K.versi} · Lulusan, PMB, dan keuangan.</b> Baru${menu().includes("dprodi") ? ": tab <b>Lulusan</b> (impor IPK, tanggal lulus, tracer study), <b>PMB</b>, dan <b>Keuangan</b> di Data Prodi; Tabel iLKPS kini 31 lembar termasuk Tabel 8, 9, 10a–c, Ref 11a, dan 21" : ": Tabel iLKPS prodi kini memuat data lulusan dan keuangan"}. Berikutnya: menu Survei (Tabel 11 dan 22).
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -487,7 +487,7 @@ async function muatPengguna() { try { S.daftar = (await api("admin.pengguna")).p
 const AKSI = {
   keLupa() { S.layar = "lupa"; S.lupa = { langkah: 1, email: "" }; S.galat = ""; render(); },
   keMasuk() { S.layar = "masuk"; S.galat = ""; render(); },
-  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.dp = null; S.asesor = null; S.setuju = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
+  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.dp = null; S.asesor = null; S.setuju = null; S.lul = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
   aktSandi: () => jalankan(async () => { const a = mentah("p1"); cocok(a, mentah("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
   aktKirim: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; const j = await api("aktivasi.kirimKode", { email: em }); S.akt.terkirim = true; S.akt.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
   aktVerif: () => jalankan(async () => { S.pengguna = (await api("aktivasi.verifikasi", { kode: nilai("kode") })).pengguna; S.view = S.pengguna.perluBiodata ? "biodata" : "beranda"; toast("Akun aktif. Selamat datang!"); }),
@@ -1099,8 +1099,9 @@ function muatDp() { sekali("dp", async () => { S.dp = await api("dp.data", { sem
 const namaAnggota = a => { const D = S.dp; if (a.t === "p") { const x = D.praktisi.find(y => y.id === a.id); return x ? x.nama + " (praktisi)" : "(praktisi dihapus)"; } const x = D.dosen.find(y => y.id === a.id); return x ? namaPendek(x.nama) + (x.inisial ? " (" + x.inisial + ")" : "") : "(akun nonaktif)"; };
 function hDprodi() {
   if (!S.dp) { muatDp(); return `<div class="memuat">Memuat data prodi…</div>`; }
-  const D = S.dp, ub = D.bolehUbah, tabs = [["kurikulum", "Kurikulum"], ["tim", "Tim pengajar"], ["praktisi", "Praktisi"], ["dosents", "Data dosen TS"]];
+  const D = S.dp, ub = D.bolehUbah, tabs = [["kurikulum", "Kurikulum"], ["tim", "Tim pengajar"], ["praktisi", "Praktisi"], ["dosents", "Data dosen TS"], ["lulusan", "Lulusan"], ["pmb", "PMB"], ["keuangan", "Keuangan"]];
   let isi = "";
+  if (["lulusan", "pmb", "keuangan"].includes(S.dpTab)) isi = isiLulusan();
   if (S.dpTab === "kurikulum") {
     const tot = D.mk.reduce((s, m) => s + m.sks, 0), prak = D.mk.reduce((s, m) => s + m.sksPraktik, 0);
     isi = `<div class="grid g3"><div class="panel stat"><span class="v num">${D.mk.length}</span><span class="l">Mata kuliah</span></div><div class="panel stat"><span class="v num">${tot.toLocaleString("id-ID")}</span><span class="l">Total sks</span></div>
@@ -1247,6 +1248,73 @@ document.addEventListener("change", e => {
   if (e.target.id === "dpSmt") { S.dpSmt = e.target.value; S.dp = null; render(); }
   if (e.target.id === "dpTa") { S.dpTa = Number(e.target.value); S.dp = null; render(); }
 });
+
+/* --- Lulusan, PMB, keuangan (v0.10.0) --- */
+const rp = n => n ? "Rp" + Number(n).toLocaleString("id-ID") : "–";
+function isiLulusan() {
+  if (!S.lul) { sekali("lul", async () => { S.lul = await api("lul.data", { ta: S.lulTa || undefined }); render(); }); return `<div class="memuat" style="min-height:120px">Memuat…</div>`; }
+  const L = S.lul, ub = L.bolehUbah, dis = S.sibuk ? "disabled" : "";
+  if (S.dpTab === "lulusan") {
+    const ip = L.lulusan.filter(x => x.ipk != null), rata = ip.length ? ip.reduce((s, x) => s + x.ipk, 0) / ip.length : 0;
+    return `<div class="grid g3"><div class="panel stat"><span class="v num">${L.lulusan.length}</span><span class="l">Lulusan tercatat</span></div>
+      <div class="panel stat"><span class="v num">${L.lulusan.filter(x => x.terlacak).length}</span><span class="l">Terlacak (tracer study terisi)</span></div>
+      <div class="panel stat"><span class="v num">${ip.length ? rata.toLocaleString("id-ID", { maximumFractionDigits: 2 }) : "–"}</span><span class="l">Rata-rata IPK</span></div></div>
+     ${ub ? `<div class="row"><button class="btn primary" data-act="lulImporBuka">${S.lulImpor ? "Tutup impor" : "Impor / perbarui dari Excel (tempel)"}</button></div>` : ""}
+     ${S.lulImpor ? `<section class="panel"><h2>Impor lulusan</h2><p class="small">Salin baris dari Excel lalu tempel. Urutan kolom: <b>NIM; Nama; Tahun masuk; Tanggal lulus; IPK; Waktu tunggu kerja (bulan); Kesesuaian bidang kerja (Rendah/Sedang/Tinggi); Tempat kerja (Lokal/Nasional/Internasional)</b>.
+       Tanggal boleh 2025-08-20 atau 20/08/2025; koma desimal boleh. Kolom tracer (3 terakhir) boleh kosong bila lulusan belum terlacak. NIM yang sudah ada akan diperbarui, dan akun mahasiswa dengan NIM itu otomatis berstatus <b>Lulus</b>.</p>
+       <textarea id="lulTeks" rows="7" placeholder="210101&#9;Kadek Contoh&#9;2021&#9;20/08/2025&#9;3,52&#9;2&#9;Tinggi&#9;Nasional"></textarea>${galatHtml()}<div class="row" style="justify-content:flex-end">${tombol("lulImporSimpan", "Impor")}</div></section>` : ""}
+     <div class="tbl-wrap"><table><thead><tr><th>NIM</th><th>Nama</th><th>Masuk</th><th>Lulus</th><th>IPK</th><th>Waktu tunggu</th><th>Kesesuaian</th><th>Tempat kerja</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
+     ${L.lulusan.map(x => `<tr><td class="mono small">${esc(x.nim)}</td><td class="small">${esc(x.nama)}</td><td class="num">${x.masuk}</td><td class="small num">${esc(tglPendek(x.tglLulus))}<br><span class="muted">TA ${x.taLulus}/${x.taLulus + 1}</span></td>
+       <td class="num">${x.ipk != null ? x.ipk.toLocaleString("id-ID") : "–"}</td><td class="num">${x.wtBulan != null ? x.wtBulan.toLocaleString("id-ID") + " bln" : "–"}</td><td class="small">${esc(x.kesesuaian || "–")}</td><td class="small">${esc(x.tempatKerja || "–")}</td>
+       ${ub ? `<td><button class="btn sm bad" data-act="lulHapus" data-nim="${esc(x.nim)}" ${dis}>Hapus</button></td>` : ""}</tr>`).join("") || `<tr><td colspan="9"><div class="empty">Belum ada data lulusan.</div></td></tr>`}</tbody></table></div>`;
+  }
+  if (S.dpTab === "pmb") {
+    const th = new Date().getFullYear(), baris = L.penerimaan.slice();
+    if (ub && !baris.some(x => x.tahun === th)) baris.unshift({ tahun: th, dayaTampung: "", pendaftar: "", lulusSeleksi: "", diterima: "", baru: true });
+    const f = (x, k) => `<input id="pmb-${x.tahun}-${k}" type="text" inputmode="numeric" value="${x[k] === "" ? "" : x[k]}" style="width:90px" ${ub ? "" : "disabled"} aria-label="${k} ${x.tahun}">`;
+    return `<div class="callout">Penerimaan mahasiswa baru per tahun. <b>Diterima</b> = mahasiswa yang daftar ulang; dipakai sebagai "Jumlah Mahasiswa Diterima" di Tabel 9. Isi juga tahun-tahun lama (sampai TS-6) agar Tabel 9 lengkap.</div>
+     <div class="tbl-wrap"><table><thead><tr><th>Tahun</th><th>Daya tampung</th><th>Pendaftar</th><th>Lulus seleksi</th><th>Diterima (daftar ulang)</th><th>Rasio pendaftar</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
+     ${baris.map(x => `<tr><td>${x.baru ? `<input id="pmbTahunBaru" type="text" inputmode="numeric" value="${x.tahun}" style="width:70px" aria-label="Tahun">` : `<b class="num">${x.tahun}</b>`}</td><td>${f(x, "dayaTampung")}</td><td>${f(x, "pendaftar")}</td><td>${f(x, "lulusSeleksi")}</td><td>${f(x, "diterima")}</td>
+       <td class="num small">${x.dayaTampung && x.pendaftar ? (x.pendaftar / x.dayaTampung).toLocaleString("id-ID", { maximumFractionDigits: 1 }) + "×" : "–"}</td>${ub ? `<td><button class="btn sm" data-act="pmbSimpan" data-th="${x.tahun}" data-baru="${x.baru ? 1 : ""}" ${dis}>Simpan</button></td>` : ""}</tr>`).join("")}</tbody></table></div>
+     ${ub ? `<p class="small muted">Untuk tahun lain, ganti angka tahun di baris pertama lalu Simpan.</p>` : ""}`;
+  }
+  const th = new Date().getFullYear(), pil = []; for (let a = th; a >= 2015; a--) pil.push(a);
+  const f = (j, k) => `<input id="dana-${j.k}-${k}" type="text" inputmode="numeric" value="${(L.dana[j.k] || {})[k] || ""}" placeholder="0" style="width:140px" ${ub ? "" : "disabled"} aria-label="${k === "upps" ? "UPPS" : "Prodi"} ${esc(j.l)}">`;
+  return `<div class="row" style="justify-content:space-between;flex-wrap:wrap"><label class="row small" style="gap:6px"><b>Tahun akademik</b><select id="lulTa" style="width:auto">${pil.map(a => `<option value="${a}" ${a === L.ta ? "selected" : ""}>${a}/${a + 1}</option>`).join("")}</select></label></div>
+   <div class="callout">Penggunaan dana dalam rupiah per tahun akademik, untuk Tabel 21: kolom <b>UPPS</b> (Unit Pengelola Program Studi, mis. jurusan/politeknik) dan <b>Prodi</b>. Isi angka tanpa titik, mis. 250000000.</div>
+   <div class="tbl-wrap"><table><thead><tr><th>Jenis penggunaan</th><th>UPPS (Rp)</th><th>Prodi (Rp)</th></tr></thead><tbody>
+   ${L.jenisDana.map(j => `<tr><td class="small">${esc(j.l)}</td><td>${f(j, "upps")}</td><td>${f(j, "ps")}</td></tr>`).join("")}</tbody></table></div>
+   ${ub ? `<div class="row" style="justify-content:flex-end">${tombol("danaSimpan", "Simpan " + L.labelTa)}</div>` : ""}`;
+}
+function pecahLulusan(teks) {
+  return teks.split(/\r?\n/).map(b => b.trim()).filter(Boolean).map(b => b.split(/\t|;/).map(x => x.trim()))
+    .filter(c => !/^nim$/i.test(c[0])).map(c => ({ nim: c[0], nama: c[1], masuk: c[2], tglLulus: c[3], ipk: c[4] || "", wtBulan: c[5] || "", kesesuaian: c[6] || "", tempatKerja: c[7] || "" }));
+}
+const angkaBulat = v => String(v || "").replace(/[^\d]/g, "");
+Object.assign(AKSI, {
+  lulImporBuka() { S.lulImpor = !S.lulImpor; S.galat = ""; render(); },
+  lulImporSimpan() {
+    const daftar = pecahLulusan($("lulTeks").value);
+    if (!daftar.length) { S.galat = "Tempel minimal satu baris."; render(); return; }
+    jalankan(async () => { const j = await api("lul.impor", { daftar }); S.lul = null; S.ilkps = null; S.daftar = null; S.lulImpor = false;
+      toast(`Impor selesai: ${j.baru} baru, ${j.diubah} diperbarui${j.akunLulus ? `; ${j.akunLulus} akun mahasiswa ditandai Lulus` : ""}.`); });
+  },
+  lulHapus(d) {
+    if (!confirm("Hapus data lulusan " + d.nim + "?")) return;
+    jalankan(async () => { await api("lul.hapus", { nim: d.nim }).catch(e => { toast(e.message); throw e; }); S.lul = null; S.ilkps = null; toast("Data lulusan dihapus."); });
+  },
+  pmbSimpan(d) {
+    const th = d.baru ? $("pmbTahunBaru").value : d.th, v = k => angkaBulat($(`pmb-${d.th}-${k}`).value);
+    const data = { tahun: Number(th), dayaTampung: v("dayaTampung"), pendaftar: v("pendaftar"), lulusSeleksi: v("lulusSeleksi"), diterima: v("diterima") };
+    jalankan(async () => { await api("lul.pmbSimpan", { data }).catch(e => { toast(e.message); throw e; }); S.lul = null; S.ilkps = null; toast("Data PMB " + th + " tersimpan."); });
+  },
+  danaSimpan() {
+    const data = {}; S.lul.jenisDana.forEach(j => { data[j.k] = { upps: angkaBulat($(`dana-${j.k}-upps`).value), ps: angkaBulat($(`dana-${j.k}-ps`).value) }; });
+    const ta = S.lul.ta;
+    jalankan(async () => { await api("lul.danaSimpan", { ta, data }); S.lulTa = ta; S.lul = null; S.ilkps = null; toast("Penggunaan dana " + ta + "/" + (ta + 1) + " tersimpan."); });
+  }
+});
+document.addEventListener("change", e => { if (e.target.id === "lulTa") { S.lulTa = Number(e.target.value); S.lul = null; render(); } });
 
 /* --- Tabel iLKPS (v0.7.0) --- */
 const tautanKeg = id => location.origin + location.pathname + "?keg=" + encodeURIComponent(id);

@@ -3,6 +3,18 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.10.0 — 12 Nov 2026 — Uji Coba
+- Data Prodi › Lulusan: impor/perbarui dengan menempel dari Excel (NIM, nama, tahun masuk, tanggal lulus, IPK, waktu tunggu,
+  kesesuaian bidang kerja, tempat kerja); tanggal DD/MM/YYYY dan koma desimal diterima; satu baris salah membatalkan impor.
+  Akun mahasiswa dengan NIM yang sama otomatis berstatus L (lulus).
+- Data Prodi › PMB: daya tampung, pendaftar, lulus seleksi, diterima (daftar ulang) per tahun.
+- Data Prodi › Keuangan: penggunaan dana UPPS dan prodi per tahun akademik (10 jenis sesuai Tabel 21).
+- Tabel iLKPS kini 31 lembar, berurutan seperti berkas resmi: tambah Tabel 8 (IPK), 9 (masa studi, blok Sarjana Terapan
+  TS-6..TS-3), 10a–c (tracer, tahun lulus TS-4..TS-2), Referensi 11a (jumlah lulusan; tanggapan dari survei di rilis berikutnya), 21 (dana).
+- Struktur data versi 9: tabel baru Lulusan, Penerimaan, Dana. Cadangan otomatis sebelum perubahan. Versi lama (v0.9.0) tetap bisa
+  membaca data ini; rollback tidak memerlukan pemulihan data (status L pada akun mahasiswa tetap).
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.9.0 — 12 Nov 2026 — Uji Coba
 - Akun asesor (baca saja, berkedaluwarsa), dikelola Super Admin di halaman Pengguna:
   - Buat akun (nama, instansi, berlaku sampai; maks. 90 hari): nama pengguna otomatis (asesor-<nama>-NN), langsung aktif tanpa

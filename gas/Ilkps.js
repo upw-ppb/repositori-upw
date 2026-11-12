@@ -18,9 +18,11 @@ var BAGIAN15 = [
   { kode: "15-3", judul: "Tabel 15) Bagian-3 Teknologi Tepat Guna, Produk, Karya Seni, Rekayasa Sosial", jenis: ["Teknologi tepat guna", "Produk terstandar/tersertifikasi", "Rekayasa sosial"] },
   { kode: "15-4", judul: "Tabel 15) Bagian-4 Buku Ber-ISBN, Book Chapter", jenis: ["Buku ber-ISBN", "Book chapter"] }];
 var BELUM_OTOMATIS = [
-  ["Tabel 8–11", "IPK, masa studi, waktu tunggu, kesesuaian dan tempat kerja lulusan, kepuasan pengguna", "data lulusan dan survei"],
-  ["Tabel 21", "Penggunaan dana", "data keuangan prodi"],
-  ["Tabel 22", "Kepuasan mahasiswa", "survei mahasiswa"]];
+  ["Tabel 11", "Kepuasan pengguna lulusan (7 aspek)", "survei pengguna lulusan (menu Survei, rilis berikutnya)"],
+  ["Tabel 22", "Kepuasan mahasiswa (5 aspek)", "survei mahasiswa (menu Survei, rilis berikutnya)"]];
+/** Urutan lembar seperti berkas resmi. */
+var URUTAN_TABEL = ["1", "2", "3", "4", "5", "6", "7a", "7b", "8", "9", "10a", "10b", "10c", "ref11a", "11", "12", "13", "14", "15-1", "15-2", "15-3", "15-4",
+  "15a", "16", "17", "18", "19", "20-1", "20-2", "20-3", "21", "22", "23"];
 
 function tsAwal() {
   var v = Number(pengaturan("tsAwal", ""));
@@ -108,7 +110,8 @@ function susunIlkps(ts) {
   daftar("23", "Tabel 23) Pengakuan/Rekognisi DTPS", ["No.", "Nama Dosen", "Bidang Keahlian", "Rekognisi dan Bukti Pendukung", "Tingkat: Wilayah", "Tingkat: Nasional", "Tingkat: Internasional", "Tahun (YYYY)"],
     dari(["rekognisi"]), function (k) { return [dosenKegiatan(k, idx).join("; "), "", [teks(k.isian["Bentuk rekognisi"]), k.judul].filter(String).join(": ")].concat(centangTingkat(k.tingkat, TK), [tahunKegiatan(k)]); },
     "Bidang keahlian diambil dari biodata dosen pada rilis berikutnya.", ["rekognisi"]);
-  return { ts: { awal: ts, label: labelTa(ts), rentang: tsList.map(labelTa) }, tabel: tabelDosen(ts).concat(T), belum: BELUM_OTOMATIS,
+  var semuaT = tabelDosen(ts).concat(T, tabelLulusan(ts)).sort(function (a, b) { return URUTAN_TABEL.indexOf(a.kode) - URUTAN_TABEL.indexOf(b.kode); });
+  return { ts: { awal: ts, label: labelTa(ts), rentang: tsList.map(labelTa) }, tabel: semuaT, belum: BELUM_OTOMATIS,
     jumlahDisetujui: ok.length, jumlahProses: semuaK.filter(function (k) { return k.status !== "disetujui" && k.status !== "ditolak" && k.st !== "ditolak_aju"; }).length };
 }
 

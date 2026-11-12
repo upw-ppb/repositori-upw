@@ -134,6 +134,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   catatAsesor mencatat ke Log. Uji: uji-asesor-bagian.mjs (223 skenario). PELAJARAN: node --check tidak menangkap pemakaian
   const sebelum dideklarasikan (AKSI); uji UI wajib memuat halaman dari awal.
 
+- v0.10.0 (12 Nov 2026, Uji Coba): gas/Lulusan.js — tabel Lulusan (kunci NIM), Penerimaan (per tahun), Dana (per TA × jenis);
+  tabelLulusan(ts) = Tabel 8, 9, 10a–c, ref11a, 21; susunIlkps mengurutkan dengan URUTAN_TABEL. VERSI_SKEMA 9. Uji: uji-lul-bagian.mjs (247).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
