@@ -160,6 +160,13 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   PELAJARAN: saat menyalin docs/uji ke scratchpad/web untuk uji UI, WAJIB ganti api di web/konfig.js menjadi "/api",
   kalau tidak permintaan pergi ke server Uji Coba sungguhan.
 
+- v0.15.0 (13 Nov 2026, Uji Coba): gas/BankDokumen.js — SLOT_BANK (dari prototipe DOCS, 94 slot/47 butir), tabel BankDokumen
+  (kunci "n-i" baku / "n-x<id>" tambahan; versi JSON, versi lama disimpan; VERSI_SKEMA 14). ringkasBank() → info Penilaian.
+  Asesor: bank.data/bank.lihat versi berlaku saja + catatAsesor. Uji: uji-bank-bagian.mjs (total 375 + 44).
+  PELAJARAN: semua gas/*.js satu ruang nama — nama fungsi ganda diam-diam menimpa (tambahHari di Asesor.js). uji-keg.mjs kini
+  memeriksa nama global ganda. Tampilan: bersihkanData() mengembalikan S ke keadaan awal saat keluar/sesi berakhir
+  (jangan lagi menghapus field satu per satu).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

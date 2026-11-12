@@ -19,6 +19,12 @@ const S = { token: ls.get("token"), pengguna: null, peran: ls.get("peran"), view
   tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {}, porto: null, dokForm: null, ilkps: null, ilkpsTab: "1", ilkpsTs: null, bukaSetelahMasuk: null,
   dp: null, dpTab: "kurikulum", dpSmt: null, dpTa: null, dpImpor: false, asesor: null, setuju: null, setujuQ: "", lul: null, lulTa: null, lulImpor: false,
   sv: null, svForm: null, svSaya: null, svPub: null, nilai: null, nilaiTs: null, nilaiF: "", ded: null, dedTab: "narasi", dedF: "" };
+/** Keadaan awal; dipakai untuk membersihkan SEMUA data saat keluar/sesi berakhir agar akun berikutnya tidak melihat data akun sebelumnya (v0.15.0). */
+const S_AWAL = JSON.stringify(S), TETAP_S = ["token", "peran", "layar", "akt", "lupa", "cek"];
+function bersihkanData() {
+  const awal = JSON.parse(S_AWAL);
+  Object.keys(S).forEach(k => { if (TETAP_S.includes(k)) return; if (k in awal) S[k] = awal[k]; else delete S[k]; });
+}
 const STATUS_MHS = { A: "Aktif", C: "Cuti", N: "Non-aktif", L: "Lulus", D: "Drop out / dikeluarkan", K: "Mengundurkan diri / keluar", M: "Mutasi / pindah", W: "Wafat" };
 
 /* ---------- server ---------- */
@@ -31,7 +37,7 @@ async function api(aksi, data) {
   let j;
   try { j = await r.json(); } catch (_) { throw new Error("Jawaban server tidak terbaca. Coba lagi."); }
   if (!j.ok) {
-    if (/Sesi berakhir/.test(j.galat || "")) { aturToken(null); S.pengguna = null; S.layar = "masuk"; }
+    if (/Sesi berakhir/.test(j.galat || "")) { aturToken(null); bersihkanData(); S.layar = "masuk"; }
     throw new Error(j.galat || "Terjadi kesalahan.");
   }
   return j;
@@ -63,10 +69,11 @@ const I = {
   survei: '<path d="M9 5h10M9 12h10M9 19h10"/><path d="M4 5l1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2"/>',
   penilaian: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   ded: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
-  mk: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7M8 11h7"/>'
+  mk: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7M8 11h7"/>',
+  bank: '<path d="M3 7l9-4 9 4"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", bank: "Bank Dokumen", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -76,13 +83,13 @@ function peranAktif() {
 function menu() {
   const p = peranAktif(), u = S.pengguna;
   if (u.perluBiodata) return ["biodata", "akun"];
-  if (p === "asesor") return ["beranda", "ilkps", "setuju", "cari", "akun"];
+  if (p === "asesor") return ["beranda", "ilkps", "setuju", "bank", "cari", "akun"];
   const m = ["beranda"];
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
   if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
   if (u.peran.includes("dosen")) m.push("mk");
-  if (u.peran.some(r => ["admin", "superadmin", "kps"].includes(r))) m.push("penilaian", "ded", "ilkps", "dprodi", "survei");
-  else if (S.tugas && S.tugas.dedPj) m.push("ded");
+  if (u.peran.some(r => ["admin", "superadmin", "kps"].includes(r))) m.push("penilaian", "ded", "bank", "ilkps", "dprodi", "survei");
+  else { if (S.tugas && S.tugas.dedPj) m.push("ded"); if (S.tugas && S.tugas.bankPj) m.push("bank"); }
   if (u.peran.includes("kps")) m.push("kps"); // antrean KPS selalu terlihat, apa pun peran aktifnya, agar pengajuan tidak terlewat
   if (u.peran.some(r => ["admin", "superadmin", "kps", "dosen"].includes(r))) m.push("verif"); // dosen: sebagai pendamping lomba
   if (u.peran.includes("kps")) m.push("ttd");
@@ -148,6 +155,7 @@ function halaman() {
   if (S.view === "penilaian") return hPenilaian();
   if (S.view === "ded") return hDed();
   if (S.view === "mk") return hMk();
+  if (S.view === "bank") return hBank();
   return hBeranda();
 }
 const tombol = (act, label, kelas = "primary", attr = "") => `<button class="btn ${kelas}" data-act="${act}" ${attr} ${S.sibuk ? "disabled" : ""}>${S.sibuk ? "Memproses…" : label}</button>`;
@@ -207,15 +215,15 @@ function layarLupa() {
 function hBeranda() {
   const u = S.pengguna;
   if (peranAktif() === "asesor") return `<div class="head"><div><h1>Selamat datang, ${esc(namaPendek(u.nama))}</h1><p>Akun asesor${u.instansi ? " · " + esc(u.instansi) : ""} untuk akreditasi Prodi Usaha Perjalanan Wisata, Politeknik Pariwisata Bali.</p></div></div>
-   <div class="callout"><b>Akses baca saja, berlaku sampai ${esc(tglPanjang(u.berlakuSampai))}.</b> Anda dapat melihat <b>Tabel iLKPS</b> dan <b>kegiatan yang datanya sudah diverifikasi</b> beserta bukti, surat tugas, dan kode verifikasinya. Draf, biodata, dan data pribadi lain tidak ditampilkan. Setiap akses tercatat oleh prodi.</div>
-   <div class="row"><button class="btn primary" data-go="ilkps">Buka Tabel iLKPS</button><button class="btn" data-go="setuju">Kegiatan disetujui</button></div>
+   <div class="callout"><b>Akses baca saja, berlaku sampai ${esc(tglPanjang(u.berlakuSampai))}.</b> Anda dapat melihat <b>Tabel iLKPS</b>, <b>Bank Dokumen</b> (dokumen mutu versi berlaku), dan <b>kegiatan yang datanya sudah diverifikasi</b> beserta bukti, surat tugas, dan kode verifikasinya. Draf, biodata, dan data pribadi lain tidak ditampilkan. Setiap akses tercatat oleh prodi.</div>
+   <div class="row" style="flex-wrap:wrap"><button class="btn primary" data-go="ilkps">Buka Tabel iLKPS</button><button class="btn" data-go="setuju">Kegiatan disetujui</button><button class="btn" data-go="bank">Bank Dokumen</button></div>
    <section class="panel"><h2>Cara memakai</h2><ol class="small" style="margin:6px 0 0 18px;padding:0;display:grid;gap:4px">
     <li>Di <b>Tabel iLKPS</b>, pilih tabel; klik baris kegiatan untuk membuka detail dan buktinya.</li>
     <li>Tautan bukti di Excel ekspor prodi (kolom "Tautan bukti") juga membuka kegiatan yang sama setelah Anda masuk.</li>
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}
-   <div class="callout"><b>Uji Coba v${K.versi} · Portofolio Mata Kuliah.</b>${menu().includes("mk") ? " Baru: menu <b>Mata Kuliah Saya</b> untuk mengunggah RPS, kontrak kuliah, rubrik, metode, integrasi penelitian/PkM, dan bukti pembelajaran per semester." : ""}${menu().includes("dprodi") ? " Rekap kelengkapannya ada di Data Prodi › Portofolio MK dan ikut tampil di Penilaian butir 8, 22, 25." : ""} Sebelumnya: menu <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   <div class="callout"><b>Uji Coba v${K.versi} · Bank Dokumen.</b>${menu().includes("bank") ? " Baru: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GPM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -235,6 +243,7 @@ function panelTugas() {
   });
   if (t.verifikasi) baris.push(`<div class="item" style="cursor:pointer" data-go="verif"><div class="body"><div class="title">${t.verifikasi} data kegiatan menunggu verifikasi Anda</div></div><span class="chip s-diajukan">Verifikasi</span></div>`);
   (t.mkpBelumRps || []).forEach(m => baris.push(`<div class="item" style="cursor:pointer" data-act="mkpBuka" data-s="${m.semester}" data-kode="${esc(m.kode)}"><div class="body"><div class="title">${esc(m.kode)} · ${esc(m.nama)}</div><div class="meta"><span>Unggah RPS semester ini (Anda pengampu utama)</span></div></div><span class="chip s-revisi">RPS</span></div>`));
+  (t.bankPerlu || []).forEach(x => baris.push(`<div class="item" style="cursor:pointer" data-go="bank"><div class="body"><div class="title">${esc(x.nama)}</div><div class="meta"><span>Bank Dokumen · butir ${x.butir} · Anda penanggung jawab</span></div></div><span class="chip ${ST_BANK[x.status][1]}">${ST_BANK[x.status][0]}</span></div>`));
   if (t.dedBelum) baris.push(`<div class="item" style="cursor:pointer" data-go="ded"><div class="body"><div class="title">${t.dedBelum} butir DED tanggung jawab Anda belum selesai</div><div class="meta"><span>Dari ${t.dedPj} butir yang ditugaskan kepada Anda</span></div></div><span class="chip s-revisi">DED</span></div>`);
   if (t.kps) baris.push(`<div class="item" style="cursor:pointer" data-go="kps"><div class="body"><div class="title">${t.kps} pengajuan surat tugas menunggu keputusan Anda</div></div><span class="chip s-diajukan">Antrean KPS</span></div>`);
   return `<section class="panel"><h2>Perlu tindakan (${baris.length})</h2><div class="list">${baris.join("") || `<div class="empty">Tidak ada yang perlu ditindaklanjuti. Bagus!</div>`}</div></section>`;
@@ -349,6 +358,8 @@ function laci() {
   if (L.jenis === "gpm") return laciGpm();
   if (L.jenis === "ded") return laciDed();
   if (L.jenis === "mkp") return laciMkp();
+  if (L.jenis === "bank") return laciBank();
+  if (L.jenis === "bankBaru") return laciBankBaru();
   if (L.jenis === "sandi") return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Kata sandi sementara">
    <div class="dh"><h2>Kata sandi sementara</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
    <p>Berikan ${L.username ? "nama pengguna dan " : ""}kata sandi ini kepada <b>${esc(L.nama)}</b> secara langsung (bukan lewat grup percakapan). Kata sandi hanya ditampilkan sekali dan wajib diganti saat masuk pertama.</p>
@@ -509,7 +520,7 @@ async function muatPengguna() { try { S.daftar = (await api("admin.pengguna")).p
 const AKSI = {
   keLupa() { S.layar = "lupa"; S.lupa = { langkah: 1, email: "" }; S.galat = ""; render(); },
   keMasuk() { S.layar = "masuk"; S.galat = ""; render(); },
-  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); S.pengguna = null; S.daftar = null; S.log = null; S.bio = null; S.dir = null; S.ref = null; S.keg = null; S.antrean = null; S.form = null; S.laci = null; S.tugas = null; S.verif = null; S.ttd = null; S.ttdSurat = {}; S.porto = null; S.dokForm = null; S.ilkps = null; S.ilkpsTs = null; S.dp = null; S.asesor = null; S.setuju = null; S.lul = null; S.sv = null; S.svSaya = null; S.nilai = null; S.ded = null; S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
+  async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); bersihkanData(); S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
   aktSandi: () => jalankan(async () => { const a = mentah("p1"); cocok(a, mentah("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
   aktKirim: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; const j = await api("aktivasi.kirimKode", { email: em }); S.akt.terkirim = true; S.akt.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
   aktVerif: () => jalankan(async () => { S.pengguna = (await api("aktivasi.verifikasi", { kode: nilai("kode") })).pengguna; S.view = S.pengguna.perluBiodata ? "biodata" : "beranda"; toast("Akun aktif. Selamat datang!"); }),
@@ -642,7 +653,7 @@ async function muatVerif() {
   return sekali("verif", async () => { S.verif = (await api("verifikasi.antrean")).kegiatan; render(); });
 }
 /** Setelah ada perubahan data: muat ulang daftar, antrean, dan pengingat saat dibutuhkan. */
-function segarkan() { S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
+function segarkan() { S.bank = null; S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
 async function muatAntrean() {
   return sekali("antrean", async () => { S.antrean = (await api("kps.antrean")).kegiatan; render(); });
 }
@@ -1625,6 +1636,133 @@ document.addEventListener("change", e => {
   if (f.size > 10 * 1024 * 1024) { toast("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai tautan."); return; }
   const ket = komp === "interaksi" ? String($("mkpKet")?.value || "").trim() : undefined;
   bacaBase64(f).then(isi => unggahMkp(komp, ket !== undefined ? { nama: f.name, isi, ket } : { nama: f.name, isi }), err => toast(err.message));
+});
+
+/* --- Bank Dokumen (v0.15.0) --- */
+const ST_BANK = { belum: ["Belum ada", "s-revisi"], ada: ["Berlaku", "s-disetujui"], segera: ["Segera berakhir", "s-diajukan"], kedaluwarsa: ["Kedaluwarsa", "s-ditolak"] };
+const chipBank = s => `<span class="chip ${ST_BANK[s][1]}">${ST_BANK[s][0]}</span>`;
+function muatBank() { sekali("bank", async () => { S.bank = await api("bank.data"); render(); }); }
+function hBank() {
+  if (!S.bank) { muatBank(); return `<div class="memuat">Memuat Bank Dokumen…</div>`; }
+  const B = S.bank, f = S.bankF || "", saya = S.pengguna.id;
+  const hit = k => B.slot.filter(s => s.status === k).length, n = B.slot.length, ada = hit("ada") + hit("segera");
+  const cocok = s => !f || (f === "perlu" ? s.status !== "ada" : f === "saya" ? s.pj === saya : f === "tanpaPj" ? !s.pj : false);
+  const butir = B.butir.filter(b => (!/^k:/.test(f) || b.k === f.slice(2)) && B.slot.some(s => s.butir === b.n && (/^k:/.test(f) || cocok(s))));
+  const info = B.asesor ? `<p>Dokumen mutu prodi per butir Matriks LAMWisata, versi yang berlaku. Setiap dokumen yang Anda buka tercatat oleh prodi.</p>`
+    : `<p>Slot dokumen untuk butir Matriks yang dinilai GPM. Setiap slot punya penanggung jawab (PJ) dan masa berlaku; versi lama tetap tersimpan sebagai riwayat. Jumlah dokumen berlaku ikut tampil di Penilaian.</p>`;
+  return `<div class="head"><div><h1>Bank Dokumen</h1>${info}</div></div>
+   ${B.asesor ? "" : `<div class="grid g3"><div class="panel stat"><span class="v num">${ada}/${n}</span><span class="l">Dokumen berlaku</span><div class="bar ${ada < n ? "gold" : ""}" style="margin-top:6px"><i style="width:${n ? ada / n * 100 : 0}%"></i></div></div>
+    <div class="panel stat"><span class="v num">${hit("belum")}</span><span class="l">Belum diunggah</span></div>
+    <div class="panel stat"><span class="v num">${hit("kedaluwarsa") + hit("segera")}</span><span class="l">Kedaluwarsa atau berakhir ≤ ${B.hariSegera} hari</span></div></div>`}
+   <div class="filters"><select id="bankF" aria-label="Saring dokumen" style="width:auto"><option value="">Semua butir</option>
+    ${B.asesor ? "" : `<option value="perlu" ${f === "perlu" ? "selected" : ""}>Perlu tindakan (belum/kedaluwarsa/segera)</option>`}
+    ${B.kelola ? `<option value="tanpaPj" ${f === "tanpaPj" ? "selected" : ""}>Belum ada penanggung jawab</option>` : ""}
+    ${!B.kelola && !B.asesor ? "" : B.kelola ? `<option value="saya" ${f === "saya" ? "selected" : ""}>Tanggung jawab saya</option>` : ""}
+    ${Object.entries(B.kriteria).map(([k, l]) => `<option value="k:${k}" ${f === "k:" + k ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></div>
+   ${butir.map(b => `<section class="panel"><div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:6px"><h2 style="font-size:.95rem;margin:0">${b.n}. ${esc(b.nm)}</h2><span class="tag">${esc(B.kriteria[b.k] || b.k)} · bobot ${String(b.w).replace(".", ",")}</span></div>
+     ${B.asesor ? "" : `<p class="small muted" style="margin:0 0 8px">Agar skor 4: ${esc(b.s4)}</p>`}
+     <div class="list">${B.slot.filter(s => s.butir === b.n && (/^k:/.test(f) || cocok(s))).map(s => {
+       const v = s.versi[s.versi.length - 1];
+       const ket = v ? `${v.t === "file" ? esc(v.nama) : "Tautan"}${v.berlaku ? " · berlaku s.d. " + esc(tglPendek(v.berlaku)) : " · tanpa batas berlaku"} · ${esc(namaPendek(v.oleh))}, ${tglJam(v.w)}${s.versi.length > 1 ? ` · ${s.versi.length} versi` : ""}` : "Belum ada dokumen";
+       return `<div class="item bk"><div class="body"><div class="title" style="font-weight:600">${esc(s.nama)}${s.baku ? "" : ' <span class="tag">tambahan</span>'}</div><div class="meta"><span>${ket}</span>${B.asesor ? "" : `<span>PJ: ${s.pjNama ? esc(namaPendek(s.pjNama)) : "belum ditunjuk"}</span>`}</div></div>
+        <div class="row bk-aksi">${v ? `<button class="btn sm" data-act="bankLihat" data-kunci="${s.kunci}" data-id="${v.id}">${v.t === "tautan" ? "Buka" : "Lihat"}</button>` : ""}${B.asesor ? "" : `<button class="btn sm ${s.bolehUnggah && s.status !== "ada" ? "primary" : ""}" data-act="bankBuka" data-kunci="${s.kunci}">${s.bolehUnggah ? (v ? "Kelola" : "Unggah") : "Riwayat"}</button>`}${B.asesor ? "" : chipBank(s.status)}</div></div>`;
+     }).join("")}</div>
+     ${B.kelola ? `<div class="row" style="margin-top:8px"><button class="btn sm" data-act="bankBaruBuka" data-n="${b.n}">+ Dokumen lain untuk butir ${b.n}</button></div>` : ""}</section>`).join("") || `<div class="empty panel">Tidak ada dokumen yang cocok dengan saringan.</div>`}
+   ${B.kelola ? `<div class="row"><button class="btn" data-act="bankBaruBuka" data-n="">+ Dokumen untuk butir lain</button></div>` : ""}`;
+}
+function laciBank() {
+  const L = S.laci, B = S.bank, s = B.slot.find(x => x.kunci === L.kunci);
+  if (!s) return "";
+  const b = B.butir.find(x => x.n === s.butir), m = L.mode || "file", dis = S.sibuk ? "disabled" : "";
+  const versi = s.versi.slice().reverse();
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Dokumen" style="width:min(640px,100%)">
+   <div class="dh"><h2>${esc(s.nama)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <p class="small muted" style="margin:0">Butir ${s.butir}${b ? " · " + esc(b.nm) : ""} · ${chipBank(s.status)}</p>
+   ${galatHtml()}
+   ${B.kelola ? `<div class="picker"><h3 style="margin:0">Pengaturan slot</h3>
+     <div class="field"><label for="bankPj">Penanggung jawab</label><select id="bankPj"><option value="">– belum ditunjuk –</option>${B.pegawai.map(o => `<option value="${o.id}" ${o.id === s.pj ? "selected" : ""}>${esc(o.nama)}</option>`).join("")}</select><span class="hint">PJ bisa mengunggah dokumen ini dan mendapat pengingat di Beranda bila belum ada atau kedaluwarsa.</span></div>
+     ${s.baku ? "" : `<div class="field"><label for="bankNama">Nama dokumen</label><input id="bankNama" type="text" maxlength="150" value="${esc(s.nama)}"></div>`}
+     <div class="row" style="flex-wrap:wrap">${tombol("bankAturSimpan", "Simpan pengaturan", "sm")}${!s.baku && !s.versi.length ? tombol("bankSlotHapus", "Hapus slot", "bad sm") : ""}</div></div>` : ""}
+   ${s.bolehUnggah ? `<div class="picker"><h3 style="margin:0">${s.versi.length ? "Unggah versi baru" : "Unggah dokumen"}</h3>
+     ${s.versi.length ? `<p class="small muted" style="margin:0">Versi lama tetap tersimpan sebagai riwayat; yang dipakai adalah versi terbaru.</p>` : ""}
+     <div class="seg" role="group" aria-label="Bentuk dokumen"><button data-act="bankMode" data-m="file" aria-pressed="${m === "file"}">File</button><button data-act="bankMode" data-m="tautan" aria-pressed="${m === "tautan"}">Tautan</button></div>
+     ${m === "file" ? `<div class="field"><label for="bankFile">File (maks. 10 MB: PDF, gambar, Word, Excel, PowerPoint)</label><input id="bankFile" type="file" accept="${TERIMA}" ${dis}>${L.berkas ? `<span class="hint">Dipilih: ${esc(L.berkas.nama)} · ${ukuranT(L.berkas.ukuran)}</span>` : ""}</div>`
+       : `<div class="field"><label for="bankUrl">Tautan</label><input id="bankUrl" type="url" inputmode="url" placeholder="https://drive.google.com/…"><span class="hint">Pastikan bisa dibuka oleh akun prodi (upw@ppb.ac.id) atau siapa saja dengan tautan.</span></div>`}
+     <div class="field"><label for="bankBerlaku">Berlaku sampai (kosongkan bila tidak ada batas)</label><input id="bankBerlaku" type="date"></div>
+     <div class="field"><label for="bankKet">Keterangan (opsional)</label><input id="bankKet" type="text" maxlength="200" placeholder="Contoh: SK Direktur No. 123 Tahun 2026"></div>
+     <div class="row">${tombol("bankSimpan", "Simpan dokumen")}</div></div>` : ""}
+   <div class="picker"><h3 style="margin:0">Riwayat versi (${s.versi.length})</h3>
+    ${versi.map((v, i) => `<div class="item bk"><div class="body"><div class="title" style="font-weight:600">${i === 0 ? "Versi berlaku" : "Versi " + (s.versi.length - i)}</div><div class="meta"><span>${v.t === "file" ? esc(v.nama) + " · " + ukuranT(v.ukuran) : "Tautan"}${v.berlaku ? " · berlaku s.d. " + esc(tglPendek(v.berlaku)) : ""}${v.ket ? " · " + esc(v.ket) : ""} · ${esc(namaPendek(v.oleh))}, ${tglJam(v.w)}</span></div></div>
+      <div class="row bk-aksi"><button class="btn sm" data-act="bankLihat" data-kunci="${s.kunci}" data-id="${v.id}" ${dis}>${v.t === "tautan" ? "Buka" : "Lihat"}</button>${i === 0 && s.bolehHapusAkhir ? `<button class="btn sm bad" data-act="bankHapus" data-kunci="${s.kunci}" data-id="${v.id}" ${dis}>Hapus</button>` : ""}</div></div>`).join("") || '<span class="small muted">Belum ada dokumen.</span>'}</div>
+  </div></div>`;
+}
+function laciBankBaru() {
+  const B = S.bank, n = S.laci.n;
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Tambah dokumen">
+   <div class="dh"><h2>Tambah slot dokumen</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <p class="small">Untuk dokumen pendukung di luar daftar baku, misalnya SOP atau laporan khusus prodi.</p>
+   <div class="field"><label for="bankBaruN">Butir Matriks</label><select id="bankBaruN">${S.bankMatriks.map(m => `<option value="${m.n}" ${m.n === n ? "selected" : ""}>${m.n}. ${esc(m.nm)}</option>`).join("")}</select></div>
+   <div class="field"><label for="bankBaruNama">Nama dokumen</label><input id="bankBaruNama" type="text" maxlength="150" placeholder="Contoh: SOP peninjauan RPS"></div>
+   <div class="field"><label for="bankBaruPj">Penanggung jawab (opsional)</label><select id="bankBaruPj"><option value="">– belum ditunjuk –</option>${B.pegawai.map(o => `<option value="${o.id}">${esc(o.nama)}</option>`).join("")}</select></div>
+   ${galatHtml()}<div class="row" style="justify-content:flex-end;margin-top:auto">${tombol("bankBaruSimpan", "Tambah")}</div></div></div>`;
+}
+Object.assign(AKSI, {
+  bankBuka(d) { S.laci = { jenis: "bank", kunci: d.kunci, mode: "file", berkas: null }; S.galat = ""; render(); },
+  bankMode(d) { S.laci.mode = d.m; S.laci.berkas = null; render(); },
+  async bankBaruBuka(d) {
+    if (!S.bankMatriks) { try { S.bankMatriks = (await api("penilaian.data")).rows.filter(r => r.perluGpm).map(r => ({ n: r.n, nm: r.nm })); } catch (e) { toast(e.message); return; } }
+    S.laci = { jenis: "bankBaru", n: d.n ? Number(d.n) : null }; S.galat = ""; render();
+  },
+  bankBaruSimpan() {
+    const data = { baru: 1, butir: Number($("bankBaruN").value), nama: String($("bankBaruNama").value || "").trim(), pj: $("bankBaruPj").value };
+    jalankan(async () => { S.bank = await api("bank.atur", data); S.laci = null; S.nilai = null; toast("Slot dokumen ditambahkan."); });
+  },
+  bankAturSimpan() {
+    const data = { kunci: S.laci.kunci, pj: $("bankPj").value };
+    if ($("bankNama")) data.nama = String($("bankNama").value || "").trim();
+    jalankan(async () => { S.bank = await api("bank.atur", data); S.tugas = null; toast("Pengaturan tersimpan."); });
+  },
+  bankSlotHapus() {
+    if (!confirm("Hapus slot dokumen tambahan ini?")) return;
+    const kunci = S.laci.kunci;
+    jalankan(async () => { S.bank = await api("bank.atur", { kunci, hapus: 1 }); S.laci = null; S.nilai = null; toast("Slot dihapus."); });
+  },
+  bankSimpan() {
+    const L = S.laci, data = { kunci: L.kunci, berlaku: $("bankBerlaku").value, ket: String($("bankKet").value || "").trim() };
+    if (L.mode === "tautan") data.tautan = String($("bankUrl").value || "").trim();
+    else { if (!L.berkas) { S.galat = "Pilih file dulu, atau pakai Tautan."; render(); return; } data.nama = L.berkas.nama; data.isi = L.berkas.isi; toast("Mengunggah…"); }
+    jalankan(async () => { S.bank = await api("bank.unggah", data); S.laci.berkas = null; S.tugas = null; S.nilai = null; toast("Dokumen tersimpan."); });
+  },
+  bankHapus(d) {
+    if (!confirm("Hapus versi terbaru ini? File dipindahkan ke sampah Drive; versi sebelumnya (bila ada) kembali berlaku.")) return;
+    jalankan(async () => { S.bank = await api("bank.hapus", { kunci: d.kunci, id: d.id }); S.tugas = null; S.nilai = null; toast("Versi dihapus."); });
+  },
+  async bankLihat(d) {
+    const s = S.bank.slot.find(x => x.kunci === d.kunci), v = s && s.versi.find(x => x.id === d.id);
+    if (!v) return;
+    if (v.t === "tautan") { window.open(v.url, "_blank", "noopener,noreferrer"); if (S.bank.asesor) api("bank.lihat", { kunci: d.kunci, id: d.id }).catch(() => {}); return; }
+    const w = window.open("", "_blank");
+    if (w) w.document.write('<p style="font-family:sans-serif;padding:16px">Membuka berkas…</p>');
+    try {
+      const j = await api("bank.lihat", { kunci: d.kunci, id: d.id });
+      const bin = atob(j.isi), arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([arr], { type: j.mime }));
+      if (w && /pdf|image/.test(j.mime)) w.location.href = url;
+      else { if (w) w.close(); const a = document.createElement("a"); a.href = url; a.download = j.nama; document.body.appendChild(a); a.click(); a.remove(); }
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
+    } catch (err) { if (w) w.close(); toast(err.message); }
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.id === "bankF") { S.bankF = t.value; render(); return; }
+  if (t.id !== "bankFile" || !S.laci || S.laci.jenis !== "bank") return;
+  const f = t.files && t.files[0];
+  if (!f) return;
+  if (f.size > 10 * 1024 * 1024) { t.value = ""; toast("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai Tautan."); return; }
+  const L = S.laci;
+  bacaBase64(f).then(isi => { L.berkas = { nama: f.name, ukuran: f.size, isi }; render(); }, err => toast(err.message));
 });
 
 /* --- Penilaian (v0.12.0) --- */

@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.15.0 — 13 Nov 2026 — Uji Coba
+- Menu "Bank Dokumen" (Admin Prodi, KPS, Super Admin; pegawai yang ditunjuk sebagai penanggung jawab; asesor baca saja):
+  - 94 slot dokumen baku untuk 47 butir Matriks yang dinilai GPM (daftar dari prototipe), ditambah slot "dokumen lain" per butir oleh Admin/KPS.
+  - Setiap slot: penanggung jawab (PJ), unggah file atau tautan, tanggal berlaku, keterangan. Status: belum ada, berlaku,
+    segera berakhir (≤ 60 hari), kedaluwarsa. Versi lama TIDAK dibuang saat diganti (riwayat versi); hanya versi terbaru yang bisa dihapus.
+  - Saringan: perlu tindakan, belum ada PJ, tanggung jawab saya, per kriteria. Pengingat di Beranda untuk PJ.
+  - Asesor melihat versi yang berlaku saja; setiap akses tercatat di log.
+- Penilaian: keterangan butir menyebut "Bank Dokumen: x dari n dokumen berlaku".
+- Perbaikan: saat keluar atau sesi berakhir, semua data yang termuat kini dibersihkan. Sebelumnya, data menu Mata Kuliah Saya
+  (v0.14.0) dan Bank Dokumen bisa tetap tampil bila akun lain masuk di perangkat yang sama tanpa memuat ulang halaman.
+- File di Drive: Bukti / Bank Dokumen / Butir NN.
+- Struktur data versi 14: tabel baru BankDokumen. Cadangan otomatis sebelum perubahan.
+  Versi lama (v0.14.0) tetap bisa membaca data ini; rollback tidak memerlukan pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.14.0 — 13 Nov 2026 — Uji Coba
 - Menu "Mata Kuliah Saya" (dosen): mata kuliah yang diampu per semester sesuai tim pengajar dari Data Prodi.
   - Pengampu utama mengunggah RPS, kontrak kuliah, rubrik/portofolio penilaian (file atau tautan; bisa diganti, file lama ke sampah Drive)
