@@ -3,7 +3,7 @@
  *
  * Alur surat (kolom st): draf_aju → menunggu_kps → terbit | ditunda | revisi_aju | ditolak_aju.
  *   Tanpa surat tugas: st = "tanpa".
- * Alur data akreditasi (kolom status): draf → diajukan → (verifikasi Admin, rilis berikutnya).
+ * Alur data akreditasi (kolom status): draf → diajukan → revisi → diajukan_ulang → disetujui | ditolak (lihat Bukti.js).
  * Saat KPS menyetujui, isi surat dan daftar peserta dibekukan di kolom lampiran, agar surat yang sudah terbit tidak berubah.
  */
 var ST_SAH = ["draf_aju", "menunggu_kps", "ditunda", "revisi_aju", "ditolak_aju", "terbit", "tanpa"];
@@ -100,7 +100,8 @@ function kegiatanDari(r) {
     mhs: jsonDari(r.mhs, []), excl: jsonDari(r.excl, []), pendampingId: teks(r.pendampingId), isian: jsonDari(r.isian, {}), gcet: jsonDari(r.gcet, []),
     perluST: benar(r.perluST), tempat: teks(r.tempat), aktivitas: teks(r.aktivitas), ket: teks(r.ket), bentuk: teks(r.bentuk), kegDosen: teks(r.kegDosen),
     st: r.st, status: r.status, riwayat: jsonDari(r.riwayat, []), kodeSurat: teks(r.kodeSurat), tglSurat: r.tglSurat ? new Date(r.tglSurat).toISOString() : "",
-    kpsId: teks(r.kpsId), lampiran: jsonDari(r.lampiran, null), dibuat: r.dibuat, dihapus: r.dihapus };
+    kpsId: teks(r.kpsId), lampiran: jsonDari(r.lampiran, null), dibuat: r.dibuat, diubah: r.diubah, dihapus: r.dihapus,
+    bukti: jsonDari(r.bukti, {}), verifId: teks(r.verifId), tglVerif: r.tglVerif ? new Date(r.tglVerif).toISOString() : "" };
 }
 function semuaKegiatan() { return semua("Kegiatan").filter(function (r) { return !r.dihapus; }).map(kegiatanDari); }
 function ambilKegiatan(id) {
@@ -114,7 +115,8 @@ function barisKegiatan(k) {
     pendampingId: k.pendampingId, isian: JSON.stringify(k.isian), gcet: JSON.stringify(k.gcet), perluST: !!k.perluST, tempat: k.tempat,
     aktivitas: k.aktivitas, ket: k.ket, bentuk: k.bentuk, kegDosen: k.kegDosen, st: k.st, status: k.status, riwayat: JSON.stringify(k.riwayat),
     kodeSurat: k.kodeSurat, tglSurat: k.tglSurat ? new Date(k.tglSurat) : "", kpsId: k.kpsId, lampiran: k.lampiran ? JSON.stringify(k.lampiran) : "",
-    dibuat: k.dibuat || new Date(), diubah: new Date(), dihapus: "" };
+    dibuat: k.dibuat || new Date(), diubah: new Date(), dihapus: "",
+    bukti: JSON.stringify(k.bukti || {}), verifId: k.verifId || "", tglVerif: k.tglVerif ? new Date(k.tglVerif) : "" };
 }
 function simpanKegiatan(k) {
   var obj = barisKegiatan(k);
@@ -125,7 +127,7 @@ function simpanKegiatan(k) {
 }
 
 function bisaDiubah(k) {
-  return ["draf_aju", "revisi_aju", "ditunda"].indexOf(k.st) >= 0 || (k.st === "tanpa" && k.status === "draf");
+  return ["draf_aju", "revisi_aju", "ditunda"].indexOf(k.st) >= 0 || (k.st === "tanpa" && (k.status === "draf" || k.status === "revisi"));
 }
 function terlibat(k, p, idx) {
   if (k.olehId === p.id || k.pendampingId === p.id || k.pegawai.indexOf(p.id) >= 0) return true;
@@ -145,7 +147,8 @@ function pengaturanSurat() {
     sapaanDosen: teks(m.sapaanDosen) || "Bapak",
     tujuanDosen: teks(m.tujuanDosen) || "Kepala Bagian Administrasi Umum",
     tujuanMhs: teks(m.tujuanMhs) || "Kabag. Administrasi Akademik, Kemahasiswaan dan Kerjasama",
-    hk: Number(m.batasHariKerja || 5),
+    hk: Math.max(1, Math.min(30, Number(m.batasHariKerja) || 5)),
+    libur: (m.hariLibur instanceof Date ? teksTgl(m.hariLibur) : teks(m.hariLibur)).split(/[\s,;]+/).filter(tanggalSah),
     kps: kps ? { nama: kps.nama, nip: String(kps.username) } : null
   };
 }
@@ -170,7 +173,8 @@ function buatKodeSurat() {
 }
 
 /** Data kegiatan yang dikirim ke tampilan. */
-function kegiatanKeKlien(k, p, idx, lengkap) {
+function kegiatanKeKlien(k, p, idx, lengkap, set) {
+  set = set || pengaturanSurat();
   var mhs = mhsPeserta(k, idx), oleh = idx.byId[k.olehId], def = jenisDef(k.jenis), s = k.tgl && tanggalSah(k.tgl) ? semesterInfo(keTanggal(k.tgl)) : null;
   var o = { id: k.id, jenis: k.jenis, jenisLabel: def ? def.l : k.jenis, tabel: def ? def.t : "", jenisLain: k.jenisLain, judul: k.judul, tgl: k.tgl,
     sampai: k.sampai, tingkat: k.tingkat, olehId: k.olehId, olehNama: oleh ? oleh.nama : "(akun dihapus)", kelompok: k.kelompok,
@@ -180,7 +184,9 @@ function kegiatanKeKlien(k, p, idx, lengkap) {
     milikSaya: k.olehId === p.id, bisaUbah: k.olehId === p.id && bisaDiubah(k),
     bisaHapus: k.olehId === p.id && (k.st === "draf_aju" || (k.st === "tanpa" && k.status === "draf")),
     riwayat: k.riwayat.map(function (r) { var x = idx.byId[r.o]; return { waktu: r.w, oleh: x ? x.nama : "", aksi: r.a, catatan: r.c || "" }; }) };
-  if (lengkap) o.lampiran = k.st === "terbit" && k.lampiran ? k.lampiran : lampiranSurat(k, idx, pengaturanSurat());
+  var bk = buktiKeKlien(k, p, idx, set, lengkap);
+  Object.keys(bk).forEach(function (c) { o[c] = bk[c]; });
+  if (lengkap) o.lampiran = k.st === "terbit" && k.lampiran ? k.lampiran : lampiranSurat(k, idx, set);
   return o;
 }
 
@@ -199,6 +205,14 @@ function idSah(daftar, idx, jenis, pesan, maks) {
 }
 function potong(v, n) { return teks(v).slice(0, n); }
 
+/** Isian akreditasi: tingkat, kolom khusus jenis, dan pasal GCET. */
+function bersihkanAkreditasi(x, def) {
+  var isian = x.isian && typeof x.isian === "object" ? x.isian : {}, o = { tingkat: TINGKAT.indexOf(x.tingkat) >= 0 ? x.tingkat : "", isian: {} };
+  (def ? def.fx : []).forEach(function (f) { var v = potong(isian[f.l], 300); if (v) o.isian[f.l] = v; });
+  o.gcet = (Array.isArray(x.gcet) ? x.gcet : []).map(Number).filter(function (n, i, a) { return n >= 1 && n <= 10 && Math.floor(n) === n && a.indexOf(n) === i; }).sort(function (a, b) { return a - b; });
+  return o;
+}
+
 function bersihkanKegiatan(x, kelompok, p, idx, kirim) {
   var izin = jenisUntuk(kelompok), def = jenisDef(String(x.jenis || ""));
   if (!def || izin.indexOf(def) < 0) throw galat("Jenis kegiatan tidak tersedia untuk peran Anda.");
@@ -208,11 +222,8 @@ function bersihkanKegiatan(x, kelompok, p, idx, kirim) {
   if (k.tgl && !tanggalSah(k.tgl)) throw galat("Tanggal mulai tidak valid.");
   if (k.sampai && !tanggalSah(k.sampai)) throw galat("Tanggal selesai tidak valid.");
   if (k.tgl && k.sampai < k.tgl) throw galat("Tanggal selesai tidak boleh sebelum tanggal mulai.");
-  k.tingkat = TINGKAT.indexOf(x.tingkat) >= 0 ? x.tingkat : "";
-  k.isian = {};
-  var isian = x.isian && typeof x.isian === "object" ? x.isian : {};
-  def.fx.forEach(function (f) { var v = potong(isian[f.l], 300); if (v) k.isian[f.l] = v; });
-  k.gcet = (Array.isArray(x.gcet) ? x.gcet : []).map(Number).filter(function (n, i, a) { return n >= 1 && n <= 10 && Math.floor(n) === n && a.indexOf(n) === i; }).sort(function (a, b) { return a - b; });
+  var ak = bersihkanAkreditasi(x, def);
+  k.tingkat = ak.tingkat; k.isian = ak.isian; k.gcet = ak.gcet;
   k.pegawai = idSah(x.pegawai, idx, ["dosen", "tendik"], "Ada dosen/tendik yang ditandai tetapi tidak ditemukan.", 100);
   k.mhs = idSah(x.mhs, idx, ["mahasiswa"], "Ada mahasiswa yang ditandai tetapi tidak ditemukan.", 400);
   k.excl = idSah(x.excl, idx, ["mahasiswa"], "Ada mahasiswa yang dikecualikan tetapi tidak ditemukan.", 400);
@@ -270,7 +281,8 @@ function aksiKegiatanDaftar(d, token) {
   var idx = indeksOrang();
   var l = semuaKegiatan().filter(function (k) { return semuaJ ? !(k.st === "draf_aju" || (k.st === "tanpa" && k.status === "draf")) || k.olehId === p.id : terlibat(k, p, idx); });
   l.sort(function (a, b) { return (b.tgl || "9").localeCompare(a.tgl || "9") || String(b.dibuat).localeCompare(String(a.dibuat)); });
-  return { kegiatan: l.map(function (k) { return kegiatanKeKlien(k, p, idx, false); }) };
+  var set = pengaturanSurat();
+  return { kegiatan: l.map(function (k) { return kegiatanKeKlien(k, p, idx, false, set); }) };
 }
 
 function aksiKegiatanDetail(d, token) {
@@ -294,18 +306,25 @@ function aksiKegiatanSimpan(d, token) {
       kel = lama.kelompok;
     } else kel = kelompokDari(peranPencatat(p, d.peran));
     var b = bersihkanKegiatan(x, kel, p, idx, kirim);
-    var k = lama || { id: "k" + acak(10), olehId: p.id, kelompok: kel, riwayat: [], status: "draf", st: "", kodeSurat: "", tglSurat: "", kpsId: "", lampiran: null, dibuat: new Date() };
+    var k = lama || { id: "k" + acak(10), olehId: p.id, kelompok: kel, riwayat: [], status: "draf", st: "", kodeSurat: "", tglSurat: "", kpsId: "", lampiran: null, dibuat: new Date(), bukti: {} };
     Object.keys(b).forEach(function (c) { k[c] = b[c]; });
-    var dulu = lama ? lama.st : "";
+    var dulu = lama ? lama.st : "", statusDulu = lama ? lama.status : "draf";
     if (k.perluST) {
+      if (lama && lama.st === "tanpa" && statusDulu === "revisi") throw galat("Data ini sedang direvisi. Perbaiki tanpa mengubah pilihan surat tugas.");
       k.st = kirim ? "menunggu_kps" : (["revisi_aju", "ditunda"].indexOf(dulu) >= 0 ? dulu : "draf_aju");
       k.status = "draf";
+      if (Object.keys(k.bukti || {}).length) throw galat("Kegiatan ini sudah punya bukti terunggah. Batalkan dulu bukti tersebut sebelum beralih ke pengajuan surat tugas.");
     } else {
       k.st = "tanpa";
-      k.status = kirim ? "diajukan" : "draf";
+      k.status = statusDulu === "revisi" ? "revisi" : "draf";
+      if (kirim) {
+        var sb = statBukti(k, idx);
+        if (!sb.lengkap) throw galat("Simpan dulu, lalu lengkapi bukti di halaman detail (" + sb.ada + " dari " + sb.perlu + " dokumen wajib sudah ada).");
+        k.status = statusDulu === "revisi" ? "diajukan_ulang" : "diajukan";
+      }
     }
     if (!lama) k.riwayat.push({ w: new Date().toISOString(), o: p.id, a: "buat" });
-    if (kirim) k.riwayat.push({ w: new Date().toISOString(), o: p.id, a: ["revisi_aju", "ditunda"].indexOf(dulu) >= 0 ? "ajukan_ulang" : "ajukan" });
+    if (kirim) k.riwayat.push({ w: new Date().toISOString(), o: p.id, a: !k.perluST ? (statusDulu === "revisi" ? "ajukan_ulang_data" : "ajukan_data") : ["revisi_aju", "ditunda"].indexOf(dulu) >= 0 ? "ajukan_ulang" : "ajukan" });
     simpanKegiatan(k);
     catat(p.id, kirim ? "kegiatan.ajukan" : "kegiatan.simpan", { id: k.id, st: k.st });
     return { kegiatan: kegiatanKeKlien(ambilKegiatan(k.id), p, idx, true) };
@@ -329,9 +348,10 @@ function aksiKpsAntrean(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["kps"]);
   var idx = indeksOrang();
-  var l = semuaKegiatan().filter(function (k) { return k.st === "menunggu_kps" || k.st === "ditunda"; });
+  var semuaK = semuaKegiatan(), set = pengaturanSurat();
+  var l = semuaK.filter(function (k) { return k.st === "menunggu_kps" || k.st === "ditunda"; });
   l.sort(function (a, b) { return (a.tgl || "").localeCompare(b.tgl || ""); });
-  return { kegiatan: l.map(function (k) { return kegiatanKeKlien(k, p, idx, true); }) };
+  return { kegiatan: l.map(function (k) { var o = kegiatanKeKlien(k, p, idx, true, set); o.tunggakan = tunggakanUntuk(k, semuaK, idx, set); return o; }) };
 }
 
 function aksiKpsPutuskan(d, token) {

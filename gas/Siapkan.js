@@ -34,7 +34,8 @@ function aksiSiapkan(d) {
     { kunci: "sapaanDosen", nilai: "Bapak", keterangan: "Sapaan pejabat tujuan surat dosen/tendik" },
     { kunci: "batasHariKerja", nilai: 5, keterangan: "Batas pelengkapan bukti setelah kegiatan selesai" },
     { kunci: "tujuanDosen", nilai: "Kepala Bagian Administrasi Umum", keterangan: "Tujuan surat penugasan dosen/tendik" },
-    { kunci: "tujuanMhs", nilai: "Kabag. Administrasi Akademik, Kemahasiswaan dan Kerjasama", keterangan: "Tujuan surat tugas mahasiswa" }
+    { kunci: "tujuanMhs", nilai: "Kabag. Administrasi Akademik, Kemahasiswaan dan Kerjasama", keterangan: "Tujuan surat tugas mahasiswa" },
+    { kunci: "hariLibur", nilai: "2026-12-25, 2027-01-01", keterangan: "Hari libur & cuti bersama (YYYY-MM-DD, pisahkan koma). Sabtu–Minggu otomatis tidak dihitung. Lengkapi sesuai SKB libur nasional." }
   ]);
 
   // Akun Super Admin awal: kata sandi sementara ditampilkan sekali, wajib diganti saat masuk pertama.

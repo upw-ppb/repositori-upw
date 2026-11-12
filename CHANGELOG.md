@@ -3,6 +3,26 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.4.0 — 12 Nov 2026 — Uji Coba
+- Unggah bukti bersama di detail kegiatan: tiap dokumen cukup diunggah sekali oleh pengaju/peserta mana pun, lalu terkunci;
+  hanya pengunggah yang bisa membatalkan (file dipindah ke sampah Drive). Bisa berupa file (PDF, gambar, Word, Excel, PowerPoint,
+  maks. 10 MB, isi dicek sesuai jenisnya), tautan https (video/album), atau keterangan "tidak tersedia" dengan alasan.
+  File disimpan di Drive: Bukti / <semester> / <id> <judul>, tidak dibagikan, dibuka lewat aplikasi.
+- Daftar dokumen: kegiatan bersurat tugas memakai daftar baku (surat tugas resmi, laporan dosen/mahasiswa, daftar hadir, foto,
+  plus MoU mitra / piagam / materi narasumber sesuai jenis); kegiatan tanpa surat mengikuti daftar bukti jenis kegiatannya.
+- Batas pelengkapan bukti = 5 hari kerja setelah kegiatan selesai (Sabtu–Minggu dan hari libur di Pengaturan "hariLibur" tidak dihitung).
+  Penanda "Bukti terlambat"; pengingat di Beranda ("Perlu tindakan") dan angka di menu.
+- Antrean KPS menampilkan peringatan bila pengaju/peserta masih punya kegiatan yang buktinya terlambat (pertimbangan menunda).
+- Verifikasi data: bukti wajib lengkap → otomatis "Menunggu verifikasi data" (kegiatan tanpa surat: tombol "Ajukan verifikasi").
+  Menu "Verifikasi": dosen pendamping untuk lomba mahasiswa; Admin Prodi/KPS/Super Admin untuk lainnya; pengaju tidak
+  memverifikasi miliknya sendiri. Setujui / minta revisi / tolak (catatan wajib selain setuju) → perbaiki → "Ajukan ulang".
+- Pengaju bisa melengkapi data akreditasi (tingkat, isian jenis, pasal GCET) setelah surat terbit tanpa mengubah surat.
+- Struktur data versi 4: kolom baru di akhir tabel Kegiatan (bukti, verifId, tglVerif); pengaturan hariLibur.
+  Cadangan otomatis sebelum perubahan. Versi lama (v0.3.0) tetap bisa membaca data ini (kolom baru diabaikan);
+  rollback tidak memerlukan pemulihan data, tetapi bukti yang sudah diunggah tidak tampil di versi lama.
+- Belum ada: tanda tangan KPS dan QR, portofolio, ekspor iLKPS.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.3.0 — 12 Nov 2026 — Uji Coba
 - Menu "Kegiatan": catat kegiatan (23 jenis dari prototipe, isian tambahan per jenis, pencari jenis, "Lainnya"),
   tanggal mulai–selesai, tingkat, semester otomatis, saran pasal GCET.

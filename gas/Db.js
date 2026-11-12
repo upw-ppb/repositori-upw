@@ -16,11 +16,12 @@ var SKEMA = {
   /* v0.3.0 */
   Kegiatan: ["id", "jenis", "jenisLain", "judul", "tgl", "sampai", "tingkat", "olehId", "kelompok", "pegawai", "kelas", "mhs", "excl",
              "pendampingId", "isian", "gcet", "perluST", "tempat", "aktivitas", "ket", "bentuk", "kegDosen", "st", "status", "riwayat",
-             "kodeSurat", "tglSurat", "kpsId", "lampiran", "dibuat", "diubah", "dihapus"]
+             "kodeSurat", "tglSurat", "kpsId", "lampiran", "dibuat", "diubah", "dihapus",
+             /* v0.4.0 */ "bukti", "verifId", "tglVerif"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 3;
+var VERSI_SKEMA = 4;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
@@ -154,6 +155,12 @@ function pastikanSkema() {
 
 /** Pengisian data untuk kolom baru. */
 function migrasiData(dari) {
+  if (dari < 4) {
+    var ada4 = semua("Pengaturan").map(function (x) { return x.kunci; });
+    if (ada4.indexOf("hariLibur") < 0) tambah("Pengaturan", { kunci: "hariLibur", nilai: "2026-12-25, 2027-01-01",
+      keterangan: "Hari libur & cuti bersama (YYYY-MM-DD, pisahkan koma). Sabtu–Minggu otomatis tidak dihitung. Lengkapi sesuai SKB libur nasional." });
+    if (ada4.indexOf("batasHariKerja") < 0) tambah("Pengaturan", { kunci: "batasHariKerja", nilai: 5, keterangan: "Batas pelengkapan bukti setelah kegiatan selesai" });
+  }
   if (dari < 3) {
     // Pengaturan tujuan surat (bisa diubah di sheet Pengaturan).
     var ada = semua("Pengaturan").map(function (x) { return x.kunci; });

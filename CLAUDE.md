@@ -103,6 +103,14 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Lampiran surat dibekukan saat KPS setuju. PDF = jendela cetak browser (#cetak, @media print). Cek surat: ?cek=KODE.
   Uji: scratchpad uji-keg.mjs (56 skenario); server-uji.mjs menyiapkan akun uji lengkap biodata (sandi uji di skrip).
 
+- v0.4.0 (12 Nov 2026, Uji Coba, deployment @5): gas/Bukti.js — bukti per slot di kolom Kegiatan.bukti (JSON), file di Drive
+  Bukti/<semester>/<id judul>, dibuka lewat aksi bukti.lihat (base64), maks 10 MB + cek tanda tangan berkas. Slot: bersurat = daftar
+  baku (slotBukti), tanpa surat = JENIS_KEG.bukti. Batas = tambahHariKerja(sampai, Pengaturan batasHariKerja, hariLibur).
+  Status data: draf → diajukan (otomatis saat lengkap bila bersurat) → revisi → diajukan_ulang → disetujui | ditolak.
+  Verifikator: pendampingId, selain itu admin/superadmin/kps; pengaju tidak memverifikasi miliknya. Pengingat = aksi tugas.saya
+  (dihitung saat diminta, tanpa email/trigger). VERSI_SKEMA 4. Uji: uji-keg.mjs + uji-bukti-bagian.mjs (113 skenario).
+  Catatan UI: jangan panggil nilai() di luar jalankan() (bisa membaca potret isian lama).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
