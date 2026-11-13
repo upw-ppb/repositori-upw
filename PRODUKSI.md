@@ -33,10 +33,12 @@ Setelah itu prodi cukup memberi tahu; pengecekan dan uji kirim email dilakukan d
 
 - Proyek Apps Script **Repositori UPW (Produksi)** sudah dibuat (atas permintaan pemilik "Buat sekarang"), terpisah dari Uji Coba.
   Data proyek: `alat/produksi.json` (scriptId, deploymentId, URL).
-- Kode v0.15.1 sudah dikirim dan diterapkan (deployment @1). Server masih **terkunci** (HTTP 403) sampai pemilik memberi izin,
-  dan **belum disiapkan** (belum ada spreadsheet, folder Drive, atau akun).
+- Kode v0.15.1 sudah dikirim dan diterapkan (deployment @1).
+- 13 Nov 2026: pemilik menjalankan `izinkanServer` dan `siapkanProduksi` di editor. Server menjawab `lingkungan: "produksi"`.
+  Spreadsheet "Repositori UPW — Data" dan folder "Repositori UPW" ada di Drive upw@. Akun `superadmin` dengan kata sandi
+  sementara yang hanya diketahui pemilik (wajib diganti saat masuk pertama, setelah tampilan Produksi dibuka).
 - Tampilan Produksi (folder `docs/`) tetap halaman "belum dibuka". Alamat server tidak diumumkan.
-- Berikutnya (oleh pemilik, langkah C.3): jalankan `izinkanServer` lalu `siapkanProduksi` di editor Apps Script Produksi.
+- Berikutnya: menunggu DKIM (A.1) dan "setuju tayang" (A.2), lalu langkah C.5 dan seterusnya.
 
 Memperbarui kode server Produksi (HANYA setelah "setuju tayang"): salin `gas/*.js`, `gas/appsscript.json`, `gas/.claspignore`
 ke folder sementara, buat `.clasp.json` berisi scriptId dari `alat/produksi.json`, lalu `clasp push -f` dan
@@ -47,7 +49,7 @@ ke folder sementara, buat `.clasp.json` berisi scriptId dari `alat/produksi.json
 1. Rilis yang akan ditayangkan sudah lulus di Uji Coba (uji otomatis, uji tampilan, pemeriksaan server langsung).
 2. ~~Buat proyek Apps Script Produksi~~ (sudah, 13 Nov 2026). Kirim kode `gas/` versi rilis ke proyek itu
    (lihat "Memperbarui kode server Produksi" di atas; `gas/.clasp.json` tetap milik Uji Coba).
-3. **Pemilik** membuka editor Apps Script proyek Produksi:
+3. ~~Pemilik menjalankan izinkanServer dan siapkanProduksi~~ (sudah, 13 Nov 2026). Catatan cara:
    - jalankan fungsi `izinkanServer` (memberi izin Sheets, Drive, email);
    - jalankan fungsi `siapkanProduksi`; nama pengguna dan kata sandi awal Super Admin tampil di **Log eksekusi**. Kata sandi ini
      hanya dilihat pemilik, tidak ditulis di chat atau berkas.
