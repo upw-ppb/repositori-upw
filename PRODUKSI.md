@@ -29,17 +29,30 @@ Setelah itu prodi cukup memberi tahu; pengecekan dan uji kirim email dilakukan d
 3. **Biodata lama dari PDF:** migrasi sekali sebelum peluncuran (fitur belum dibuat; perlu contoh berkasnya).
 4. **Siapa Super Admin dan Admin Prodi** di Produksi (akun upw@ppb.ac.id tetap pemilik semua layanan).
 
+## Status server Produksi (13 Nov 2026)
+
+- Proyek Apps Script **Repositori UPW (Produksi)** sudah dibuat (atas permintaan pemilik "Buat sekarang"), terpisah dari Uji Coba.
+  Data proyek: `alat/produksi.json` (scriptId, deploymentId, URL).
+- Kode v0.15.1 sudah dikirim dan diterapkan (deployment @1). Server masih **terkunci** (HTTP 403) sampai pemilik memberi izin,
+  dan **belum disiapkan** (belum ada spreadsheet, folder Drive, atau akun).
+- Tampilan Produksi (folder `docs/`) tetap halaman "belum dibuka". Alamat server tidak diumumkan.
+- Berikutnya (oleh pemilik, langkah C.3): jalankan `izinkanServer` lalu `siapkanProduksi` di editor Apps Script Produksi.
+
+Memperbarui kode server Produksi (HANYA setelah "setuju tayang"): salin `gas/*.js`, `gas/appsscript.json`, `gas/.claspignore`
+ke folder sementara, buat `.clasp.json` berisi scriptId dari `alat/produksi.json`, lalu `clasp push -f` dan
+`clasp redeploy <deploymentId> --description "vX.Y.Z"` (URL tetap).
+
 ## C. Urutan rilis Produksi (setelah A beres dan "setuju tayang")
 
 1. Rilis yang akan ditayangkan sudah lulus di Uji Coba (uji otomatis, uji tampilan, pemeriksaan server langsung).
-2. Buat proyek Apps Script **Repositori UPW (Produksi)** di akun upw@ppb.ac.id, lalu kirim kode `gas/` versi rilis ke proyek itu
-   (salin `gas/` ke folder sementara dengan `.clasp.json` Produksi; `gas/.clasp.json` tetap milik Uji Coba).
+2. ~~Buat proyek Apps Script Produksi~~ (sudah, 13 Nov 2026). Kirim kode `gas/` versi rilis ke proyek itu
+   (lihat "Memperbarui kode server Produksi" di atas; `gas/.clasp.json` tetap milik Uji Coba).
 3. **Pemilik** membuka editor Apps Script proyek Produksi:
    - jalankan fungsi `izinkanServer` (memberi izin Sheets, Drive, email);
    - jalankan fungsi `siapkanProduksi`; nama pengguna dan kata sandi awal Super Admin tampil di **Log eksekusi**. Kata sandi ini
      hanya dilihat pemilik, tidak ditulis di chat atau berkas.
    - (Penyiapan Produksi lewat web sudah ditutup sejak v0.15.1.)
-4. Terapkan (Deploy) sebagai Web App: jalankan sebagai **saya (upw@ppb.ac.id)**, akses **Siapa saja**. Catat URL `/exec`.
+4. ~~Terapkan sebagai Web App~~ (sudah: deployment tetap di `alat/produksi.json`; rilis berikutnya cukup `clasp redeploy`).
 5. Pemilik masuk sebagai Super Admin di Produksi, ganti kata sandi, verifikasi email (butuh DKIM), lalu buat cadangan pertama
    (menu Riwayat Versi → Buat cadangan sekarang).
 6. Gabungkan cabang `fase-1/fondasi` ke `main`; GitHub Pages diarahkan ke `main` folder `/docs`.

@@ -71,7 +71,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - Data Uji Coba: spreadsheet "Repositori UPW — Data (Uji Coba)" 1rZ82bHhMfNK8ik2cuUXfn7cokGOAGrPVuTsXfKzldvk,
   folder Drive "Repositori UPW (Uji Coba)" 1jVQDYt8rbdCWSLSEI8X6Vt2z0P2-bJhb (Bukti, Surat, Tanda Tangan, Cadangan).
   Rahasia server (MERICA) di Script Properties, BUKAN di repo.
-- Produksi nanti = proyek Apps Script + spreadsheet TERPISAH (aksi "siapkan" dengan lingkungan "produksi").
+- Server Produksi DIBUAT 13 Nov 2026 (pemilik: "Buat sekarang"): proyek "Repositori UPW (Produksi)", scriptId
+  1zQ7xhO3bgX4NsfHiRCeMdr3T8VH8L5u_TlTuilPp3KXUxU3JYR_lhXr0, deployment AKfycbylF-ZVlYYDbAmQE3OBH0q7P_cOBaAFO-WSK0OKsErHLyEf4JmbWe4jrkV3VZVk2uK3
+  (v0.15.1, @1). Semua di alat/produksi.json. Belum diberi izin (403) dan belum disiapkan; pemilik menjalankan izinkanServer +
+  siapkanProduksi di editor. Spreadsheet/Drive Produksi dibuat oleh siapkanProduksi. gas/.clasp.json TETAP Uji Coba; push ke Produksi
+  dari folder sementara (lihat PRODUKSI.md) dan HANYA setelah "setuju tayang".
 - Kredensial uji: akun-uji-coba.local.md (gitignored). JANGAN tulis kata sandi di chat atau di berkas yang ter-commit.
 - Mode Uji: server mengembalikan kodeUji (kode verifikasi) agar bisa diuji otomatis; dimatikan otomatis di Produksi.
 - Uji otomatis server: skrip node di scratchpad (uji-api.mjs) — 25 skenario lulus 9 Nov 2026.
