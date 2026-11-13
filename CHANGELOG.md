@@ -3,6 +3,18 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.16.0 — 13 Nov 2026 — Uji Coba
+- Aktivasi tanpa email (sementara), karena email kampus belum bisa terkirim (DKIM ppb.ac.id belum dipasang):
+  - Super Admin menyalakan/mematikannya di menu Pengguna › Aktivasi akun (bawaan: mati).
+  - Selama menyala: pengguna baru mengganti kata sandi awal, menuliskan email, lalu langsung aktif (email ditandai "belum terverifikasi").
+    Lupa kata sandi ditangani Super Admin (reset dari daftar akun); halaman Lupa kata sandi kini menyebutkan hal ini.
+  - Setelah dimatikan: akun yang emailnya belum terverifikasi diminta memverifikasi sekali (kode lewat email; alamat boleh diganti)
+    sebelum bisa memakai aplikasi lagi. Akun lain tidak terpengaruh.
+  - Daftar akun menandai email yang belum terverifikasi.
+- Tidak ada perubahan struktur data (tetap versi 14; penanda memakai kolom emailTerverifikasi yang sudah ada, nilai "tertunda").
+  Rollback ke v0.15.1 aman tanpa pemulihan data; akun "tertunda" tetap bisa masuk di versi lama.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.15.1 — 13 Nov 2026 — Uji Coba
 - Persiapan Produksi (tanpa mengubah Produksi):
   - Keamanan: penyiapan server Produksi tidak bisa lagi dipanggil lewat web; pemilik menjalankan fungsi siapkanProduksi() dari editor

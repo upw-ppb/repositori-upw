@@ -178,6 +178,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   docs/uji; tujuan docs HANYA setelah "setuju tayang"). Halaman Riwayat Versi (Super Admin). LABEL_VERSI & catatan "Baru" hanya di uji.
   sw.js mengabaikan permintaan di luar foldernya dan subfolder uji/. Daftar periksa Produksi: PRODUKSI.md.
 
+- v0.16.0 (13 Nov 2026, Uji Coba): aktivasi tanpa email sementara (pemilik memilih ini karena DKIM belum bisa dibereskan).
+  Pengaturan "aktivasiTanpaEmail" = ya/tidak (admin.tanpaEmail, Super Admin). aktivasi.tanpaEmail → status aktif,
+  emailTerverifikasi "tertunda"; perluVerifikasiEmail = tertunda && mode mati (dicek di wajibPeran); email.kirimKode/email.verifikasi.
+  Uji: uji-email-bagian.mjs (total 400 + 44). Di Produksi mode ini perlu DINYALAKAN Super Admin setelah tayang.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

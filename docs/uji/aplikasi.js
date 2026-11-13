@@ -117,6 +117,7 @@ function gambar() {
   if (!S.pengguna) { app.innerHTML = S.layar === "cek" ? layarCek() : S.layar === "lupa" ? layarLupa() : layarMasuk(); return; }
   if (S.pengguna.perluAktivasi) { app.innerHTML = layarAktivasi(); return; }
   if (S.pengguna.wajibGanti) { app.innerHTML = layarGanti(); return; }
+  if (S.pengguna.perluVerifikasiEmail) { app.innerHTML = layarVerifEmail(); return; }
   const m = menu(); if (!m.includes(S.view)) S.view = m[0];
   const u = S.pengguna, p = peranAktif();
   if (!S.tugas && !u.perluBiodata) muatTugas();
@@ -189,6 +190,10 @@ function layarAktivasi() {
     <div class="field"><label for="p1">Kata sandi baru</label><input id="p1" type="password" autocomplete="new-password"></div>
     <div class="field"><label for="p2">Ulangi kata sandi baru</label><input id="p2" type="password" autocomplete="new-password"></div>
     ${galatHtml()}<div class="row">${tombol("aktSandi", "Lanjut")}</div>`
+  : u.tanpaEmail ? `<h2>Langkah 2 dari 2 · Email Anda</h2>
+    <p class="muted small">Tuliskan email yang aktif Anda buka. Untuk sementara email kampus belum bisa mengirim kode, jadi akun langsung aktif; Anda akan diminta memverifikasi email ini nanti setelah layanan email pulih. Bila lupa kata sandi, minta Super Admin prodi untuk mereset.</p>
+    <div class="field"><label for="em">Email</label><input id="em" type="email" value="${esc(a.email)}" placeholder="Contoh: nama@gmail.com" autocomplete="email"></div>
+    ${galatHtml()}<div class="row">${tombol("aktTanpaEmail", "Simpan email dan mulai")}</div>`
   : `<h2>Langkah 2 dari 2 · Verifikasi email</h2>
     <p class="muted small">Email dipakai untuk kode reset kata sandi dan pengumuman penting. Gunakan email yang aktif Anda buka.</p>
     <div class="field"><label for="em">Email</label><input id="em" type="email" value="${esc(a.email)}" placeholder="Contoh: nama@gmail.com"></div>
@@ -197,6 +202,17 @@ function layarAktivasi() {
     ${galatHtml()}<div class="row">${a.terkirim ? tombol("aktVerif", "Verifikasi") + tombol("aktKirim", "Kirim ulang kode", "") : tombol("aktKirim", "Kirim kode")}</div>`;
   return bingkai(`Selamat datang, ${esc(u.nama.split(",")[0])}`, "Aktifkan akun Anda dalam dua langkah singkat.",
     `<div class="steps"><i class="on"></i><i class="${langkah >= 2 ? "on" : ""}"></i></div>${isi}<button class="btn" data-act="keluar" style="align-self:flex-start">Batal dan keluar</button>`);
+}
+/** Verifikasi email susulan untuk akun yang diaktifkan tanpa email (v0.16.0). */
+function layarVerifEmail() {
+  const u = S.pengguna, v = S.vem = S.vem || { email: u.email || "", terkirim: false, kodeUji: "" };
+  return bingkai(`Halo, ${esc(u.nama.split(",")[0])}`, "Layanan email sudah pulih. Verifikasi email Anda sekali saja untuk melanjutkan.",
+   `<p class="muted small">Akun Anda diaktifkan saat email kampus belum bisa mengirim kode. Sekarang kirim kode ke email Anda (boleh diganti bila alamatnya keliru), lalu masukkan kodenya.</p>
+    <div class="field"><label for="vem">Email</label><input id="vem" type="email" value="${esc(v.email)}" autocomplete="email"></div>
+    ${v.terkirim ? `<div class="auto">Kode 6 digit dikirim ke <b>${esc(v.email)}</b>. Periksa juga folder spam.${v.kodeUji ? `<br><b>Mode Uji Coba:</b> kode = <span class="mono">${esc(v.kodeUji)}</span>` : ""}</div>
+     <div class="field"><label for="vkode">Kode verifikasi</label><input id="vkode" type="text" inputmode="numeric" maxlength="6" class="mono" autocomplete="one-time-code"></div>` : ""}
+    ${galatHtml()}<div class="row">${v.terkirim ? tombol("vemVerif", "Verifikasi") + tombol("vemKirim", "Kirim ulang kode", "") : tombol("vemKirim", "Kirim kode")}</div>
+    <button class="btn" data-act="keluar" style="align-self:flex-start">Keluar</button>`);
 }
 function layarGanti() {
   return bingkai("Ganti kata sandi", "Kata sandi Anda baru direset. Buat kata sandi baru untuk melanjutkan.",
@@ -207,7 +223,7 @@ function layarGanti() {
 function layarLupa() {
   const l = S.lupa;
   return bingkai("Lupa kata sandi", "Kode reset dikirim ke email yang Anda daftarkan saat aktivasi.",
-   l.langkah === 1 ? `<div class="field"><label for="le">Email terdaftar</label><input id="le" type="email" value="${esc(l.email)}"></div>${galatHtml()}<div class="row">${tombol("lupaKirim", "Kirim kode")}<button class="btn" data-act="keMasuk">Kembali</button></div>`
+   l.langkah === 1 ? `<div class="field"><label for="le">Email terdaftar</label><input id="le" type="email" value="${esc(l.email)}"></div><p class="small muted">Tidak menerima kode? Hubungi Super Admin prodi untuk mereset kata sandi Anda.</p>${galatHtml()}<div class="row">${tombol("lupaKirim", "Kirim kode")}<button class="btn" data-act="keMasuk">Kembali</button></div>`
    : `<div class="auto">Bila email terdaftar, kode sudah dikirim ke <b>${esc(l.email)}</b>. Kode berlaku 15 menit.${l.kodeUji ? `<br><b>Mode Uji Coba:</b> kode = <span class="mono">${esc(l.kodeUji)}</span>` : ""}</div>
      <div class="field"><label for="lk">Kode</label><input id="lk" type="text" inputmode="numeric" maxlength="6" class="mono" autocomplete="one-time-code"></div>
      <div class="field"><label for="l1">Kata sandi baru</label><input id="l1" type="password" autocomplete="new-password"></div>
@@ -227,7 +243,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Bank Dokumen.</b>${menu().includes("bank") ? " Baru: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GPM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Aktivasi tanpa email.</b>${peranAktif() === "superadmin" ? " Baru: di menu <b>Pengguna</b>, Super Admin bisa menyalakan aktivasi akun tanpa kode email selama email kampus belum terkirim." : ""}${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GPM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -269,7 +285,7 @@ function hPengguna() {
   const bio = x => !x.jenisBiodata ? '<span class="muted small">–</span>' : x.biodataLengkap ? '<span class="chip s-disetujui">Lengkap</span>' : '<span class="chip s-draf">Belum</span>';
   const st = s => s === "aktif" ? '<span class="chip s-disetujui">Aktif</span>' : s === "impor" ? '<span class="chip s-draf">Belum aktivasi</span>' : '<span class="chip s-ditolak">Nonaktif</span>';
   return `<div class="head"><div><h1>Pengguna</h1><p>${sa ? "Semua akun. Super Admin dapat mengimpor semua peran, mereset kata sandi, dan mengatur peran." : "Akun mahasiswa. Admin Prodi dapat mengimpor mahasiswa."}</p></div></div>
-   ${sa ? panelAsesor() : ""}
+   ${sa ? panelTanpaEmail() + panelAsesor() : ""}
    <section class="panel"><h2>Impor akun</h2>
     <p class="small muted">Satu baris per orang. Mahasiswa: <b>NIM; Nama lengkap; tahun masuk; kelas</b>.${sa ? " Dosen/tendik: <b>NIP; Nama lengkap; peran</b>, peran dipisah koma, misalnya <span class=\"mono\">dosen,kps</span>." : ""} Bisa ditempel langsung dari Excel (kolom dipisah tab juga diterima).</p>
     <textarea id="imporTeks" style="min-height:110px;margin-top:8px" placeholder="${sa ? "260101; Made Contoh; 2026; A\n198501012010121001; Ni Luh Contoh, M.Par.; dosen" : "260101; Made Contoh; 2026; A\n260102; Ketut Contoh; 2026; B"}">${esc(S.impor.teks)}</textarea>
@@ -278,11 +294,19 @@ function hPengguna() {
    <section class="panel"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Daftar akun (${l.length})</h2>
     <div class="row"><input id="cariP" type="search" placeholder="Cari NIM/NIP, nama, email" value="${esc(S.cari)}" style="width:240px"><button class="btn sm" data-act="muatUlang">Muat ulang</button></div></div>
     <div class="tbl-wrap"><table><thead><tr><th>NIM/NIP</th><th>Nama</th>${sa ? "<th>Peran</th>" : ""}<th>Kelas</th><th>Status akun</th><th>Biodata</th><th>Email</th><th>Masuk terakhir</th><th></th></tr></thead><tbody>
-    ${l.map(x => `<tr><td class="mono">${esc(x.username)}</td><td>${esc(x.nama)}</td>${sa ? `<td>${x.peran.map(r => `<span class="tag t">${PERAN_L[r]}</span>`).join(" ")}</td>` : ""}<td class="small">${sem(x)}</td><td>${st(x.status)}</td><td>${bio(x)}</td><td class="small">${esc(x.email || "–")}</td><td class="small num">${tgl(x.masukTerakhir)}</td>
+    ${l.map(x => `<tr><td class="mono">${esc(x.username)}</td><td>${esc(x.nama)}</td>${sa ? `<td>${x.peran.map(r => `<span class="tag t">${PERAN_L[r]}</span>`).join(" ")}</td>` : ""}<td class="small">${sem(x)}</td><td>${st(x.status)}</td><td>${bio(x)}</td><td class="small">${esc(x.email || "–")}${x.emailTertunda ? '<div class="muted">belum terverifikasi</div>' : ""}</td><td class="small num">${tgl(x.masukTerakhir)}</td>
      <td><div class="row">${x.jenisBiodata ? `<button class="btn sm" data-act="lihatBio" data-id="${x.id}">Biodata</button>` : ""}${x.jenisBiodata === "mahasiswa" ? `<button class="btn sm" data-act="laciMhs" data-id="${x.id}">Data mhs</button>` : ""}${sa ? `<button class="btn sm" data-act="laciPeran" data-id="${x.id}">Peran</button><button class="btn sm" data-act="resetSandi" data-id="${x.id}">Reset sandi</button>` : ""}</div></td></tr>`).join("")}
     </tbody></table></div></section>`;
 }
 /* --- akun asesor (v0.9.0, Super Admin) --- */
+function panelTanpaEmail() {
+  const T = S.tanpaEmail;
+  if (!T) { sekali("tanpaEmail", async () => { S.tanpaEmail = await api("admin.tanpaEmail"); render(); }); return `<section class="panel"><h2>Aktivasi akun</h2><div class="memuat" style="min-height:60px">Memuat…</div></section>`; }
+  return `<section class="panel"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 style="margin:0">Aktivasi akun</h2>${T.nyala ? '<span class="chip s-diajukan">Tanpa email (sementara)</span>' : '<span class="chip s-disetujui">Dengan kode email</span>'}</div>
+   <p class="small">${T.nyala ? "<b>Aktivasi tanpa email sedang menyala.</b> Pengguna baru cukup mengganti kata sandi dan menuliskan email, lalu langsung aktif. Lupa kata sandi: reset dari daftar akun di bawah." : "Pengguna baru mengaktifkan akun dengan kode yang dikirim ke email. Nyalakan aktivasi tanpa email <b>hanya</b> bila email kampus belum bisa terkirim (DKIM ppb.ac.id belum dipasang)."}
+    ${T.tertunda ? ` <b>${T.tertunda}</b> akun aktif dengan email belum terverifikasi${T.nyala ? "; mereka akan diminta memverifikasi setelah mode ini dimatikan." : " sedang diminta memverifikasi email saat masuk."}` : ""}</p>
+   ${galatHtml()}<div class="row">${tombol("aturTanpaEmail", T.nyala ? "Matikan (email kampus sudah bisa terkirim)" : "Nyalakan aktivasi tanpa email", T.nyala ? "" : "primary")}</div></section>`;
+}
 function panelAsesor() {
   if (!S.asesor) { sekali("asesor", async () => { S.asesor = await api("asesor.daftar"); render(); }); return `<section class="panel"><h2>Akun asesor</h2><div class="memuat" style="min-height:80px">Memuat…</div></section>`; }
   const A = S.asesor, dis = S.sibuk ? "disabled" : "";
@@ -527,6 +551,9 @@ const AKSI = {
   async keluar() { try { await api("keluar"); } catch (_) {} aturToken(null); bersihkanData(); S.layar = "masuk"; S.akt = { langkah: 1, email: "" }; render(); },
   aktSandi: () => jalankan(async () => { const a = mentah("p1"); cocok(a, mentah("p2")); S.pengguna = (await api("aktivasi.sandi", { sandiBaru: a })).pengguna; S.akt.langkah = 2; }),
   aktKirim: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; const j = await api("aktivasi.kirimKode", { email: em }); S.akt.terkirim = true; S.akt.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
+  aktTanpaEmail: () => jalankan(async () => { const em = nilai("em"); S.akt.email = em; S.pengguna = (await api("aktivasi.tanpaEmail", { email: em })).pengguna; S.view = S.pengguna.perluBiodata ? "biodata" : "beranda"; toast("Akun aktif. Selamat datang!"); }),
+  vemKirim: () => jalankan(async () => { const em = nilai("vem"); S.vem.email = em; const j = await api("email.kirimKode", { email: em }); S.vem.terkirim = true; S.vem.kodeUji = j.kodeUji || ""; toast("Kode dikirim ke " + j.terkirimKe); }),
+  vemVerif: () => jalankan(async () => { S.pengguna = (await api("email.verifikasi", { kode: nilai("vkode") })).pengguna; S.vem = null; toast("Email terverifikasi. Terima kasih!"); }),
   aktVerif: () => jalankan(async () => { S.pengguna = (await api("aktivasi.verifikasi", { kode: nilai("kode") })).pengguna; S.view = S.pengguna.perluBiodata ? "biodata" : "beranda"; toast("Akun aktif. Selamat datang!"); }),
   lupaKirim: () => jalankan(async () => { S.lupa.email = nilai("le"); if (!S.lupa.email) throw new Error("Isi email terdaftar."); const j = await api("lupa.kirimKode", { email: S.lupa.email }); S.lupa.langkah = 2; S.lupa.kodeUji = j.kodeUji || ""; }),
   lupaReset: () => jalankan(async () => { const a = mentah("l1"); cocok(a, mentah("l2")); const j = await api("lupa.reset", { email: S.lupa.email, kode: nilai("lk"), sandiBaru: a }); S.layar = "masuk"; toast(j.pesan); }),
@@ -1787,6 +1814,13 @@ Object.assign(AKSI, {
   buatCadangan() { const label = nilaiLangsung("cadLabel") || "manual"; jalankan(async () => { S.cadangan = await api("admin.cadangkan", { label }); toast("Cadangan dibuat."); }); }
 });
 function nilaiLangsung(id) { return String($(id)?.value || "").trim(); }
+Object.assign(AKSI, {
+  aturTanpaEmail() {
+    const nyala = !S.tanpaEmail.nyala;
+    if (!confirm(nyala ? "Nyalakan aktivasi tanpa email? Pengguna baru langsung aktif tanpa kode email." : "Matikan aktivasi tanpa email? Pastikan email kampus sudah bisa terkirim: akun yang emailnya belum terverifikasi akan diminta memverifikasi saat masuk.")) return;
+    jalankan(async () => { S.tanpaEmail = await api("admin.tanpaEmail", { nyala }); toast(nyala ? "Aktivasi tanpa email menyala." : "Aktivasi kembali memakai kode email."); });
+  }
+});
 /* --- Penilaian (v0.12.0) --- */
 const CARA_L = { a: "Otomatis dari data", m: "Penilaian GPM (rubrik)", c: "Data + penilaian GPM" };
 const warnaSkor = s => s >= 3.5 ? "var(--ok)" : s >= 2.5 ? "var(--brand)" : s >= 1.5 ? "var(--warn)" : "var(--bad)";

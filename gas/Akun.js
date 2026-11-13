@@ -9,6 +9,7 @@ function punyaPeran(p, daftar) { var r = peranDari(p); return daftar.some(functi
 function wajibPeran(p, daftar) {
   if (p.status === "impor") throw galat("Selesaikan aktivasi akun terlebih dahulu.");
   if (p.wajibGanti === true || p.wajibGanti === "TRUE") throw galat("Ganti kata sandi Anda terlebih dahulu.");
+  if (perluVerifikasiEmail(p)) throw galat("Verifikasi email Anda terlebih dahulu.");
   if (!punyaPeran(p, daftar)) throw galat("Anda tidak memiliki izin untuk tindakan ini.");
   if (perluBiodata(p)) throw galat("Lengkapi biodata Anda terlebih dahulu.");
 }
@@ -18,6 +19,8 @@ function profilPublik(p) {
   return { id: p.id, username: String(p.username), nama: p.nama, email: p.email, peran: peranDari(p), status: p.status,
     wajibGanti: p.wajibGanti === true || p.wajibGanti === "TRUE", emailTerverifikasi: p.emailTerverifikasi === true || p.emailTerverifikasi === "TRUE",
     perluAktivasi: p.status === "impor", jenisBiodata: jenisBiodata(p), perluBiodata: perluBiodata(p),
+    emailTertunda: p.emailTerverifikasi === "tertunda", perluVerifikasiEmail: perluVerifikasiEmail(p),
+    tanpaEmail: p.status === "impor" && modeTanpaEmail(),
     masuk: p.masuk ? Number(p.masuk) : null, kelas: String(p.kelas || ""), statusMhs: String(p.statusMhs || ""),
     semesterMhs: semesterMhs(p.masuk), semesterKini: semesterInfo(),
     berlakuSampai: peranDari(p).indexOf("asesor") >= 0 ? teksTgl(p.berlakuSampai) : "", instansi: peranDari(p).indexOf("asesor") >= 0 ? teks(p.instansi) : "" };
@@ -230,4 +233,68 @@ function aksiAdminLog(d, token) {
   wajibPeran(p, ["superadmin"]);
   var l = semua("Log").slice(-200).reverse();
   return { log: l.map(function (x) { return { waktu: new Date(x.waktu).toISOString(), userId: x.userId, aksi: x.aksi, detail: x.detail }; }) };
+}
+
+/* ---------- Aktivasi tanpa email (v0.16.0) ----------
+ * Sementara email kampus belum bisa terkirim (DKIM ppb.ac.id belum dipasang), Super Admin dapat menyalakan pengaturan
+ * "aktivasiTanpaEmail". Selama menyala, akun impor aktif setelah ganti kata sandi + menuliskan email (emailTerverifikasi = "tertunda").
+ * Lupa kata sandi ditangani Super Admin (admin.resetSandi). Setelah dimatikan, akun "tertunda" wajib memverifikasi email
+ * (kode lewat email) sebelum bisa memakai aplikasi lagi.
+ */
+function modeTanpaEmail() { return String(pengaturan("aktivasiTanpaEmail", "")) === "ya"; }
+function perluVerifikasiEmail(p) { return p.status === "aktif" && p.emailTerverifikasi === "tertunda" && !modeTanpaEmail(); }
+function emailBaru(d, p) {
+  var email = String(d.email || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200) throw galat("Format email tidak valid.");
+  if (cari("Pengguna", function (x) { return String(x.email).toLowerCase() === email && x.id !== p.id; })) throw galat("Email ini sudah dipakai akun lain.");
+  return email;
+}
+
+/** Aktivasi langkah 2 tanpa kode (hanya saat mode tanpa email menyala). */
+function aksiAktivasiTanpaEmail(d, token) {
+  var p = penggunaDariToken(token);
+  if (p.status !== "impor") throw galat("Akun sudah aktif.");
+  if (!p.hash) throw galat("Buat kata sandi baru terlebih dahulu.");
+  if (!modeTanpaEmail()) throw galat("Aktivasi tanpa email sedang tidak berlaku. Gunakan kode verifikasi yang dikirim ke email Anda.");
+  var email = emailBaru(d, p);
+  kunciTulis(function () { ubah("Pengguna", p, { email: email, emailTerverifikasi: "tertunda", status: "aktif", aktivasiPada: new Date(), diubahPada: new Date() }); });
+  catat(p.id, "aktivasi.tanpaEmail", { email: email });
+  return { pengguna: profilPublik(cari("Pengguna", function (x) { return x.id === p.id; })) };
+}
+
+/** Verifikasi email susulan untuk akun "tertunda" (setelah mode tanpa email dimatikan). Boleh mengganti alamat email. */
+function aksiEmailKirimKode(d, token) {
+  var p = penggunaDariToken(token);
+  if (p.status !== "aktif" || p.emailTerverifikasi !== "tertunda") throw galat("Email akun ini tidak perlu diverifikasi.");
+  var email = emailBaru(d, p), kode = buatKode(p.id, "email", email);
+  kirimEmailKode(email, p.nama, kode, "aktivasi");
+  catat(p.id, "email.kirimKode", { email: email });
+  var hasil = { terkirimKe: email };
+  if (modeUji()) hasil.kodeUji = kode;
+  return hasil;
+}
+function aksiEmailVerifikasi(d, token) {
+  var p = penggunaDariToken(token);
+  if (p.status !== "aktif" || p.emailTerverifikasi !== "tertunda") throw galat("Email akun ini tidak perlu diverifikasi.");
+  var k = periksaKode(p.id, "email", d.kode);
+  kunciTulis(function () { ubah("Pengguna", p, { email: k.email, emailTerverifikasi: true, diubahPada: new Date() }); });
+  catat(p.id, "email.verifikasi", { email: k.email });
+  return { pengguna: profilPublik(cari("Pengguna", function (x) { return x.id === p.id; })) };
+}
+
+/** Super Admin: lihat/ubah mode aktivasi tanpa email. */
+function aksiAdminTanpaEmail(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["superadmin"]);
+  if (d.nyala !== undefined) {
+    var v = d.nyala ? "ya" : "tidak";
+    kunciTulis(function () {
+      var r = cari("Pengaturan", function (x) { return x.kunci === "aktivasiTanpaEmail"; });
+      if (r) ubah("Pengaturan", r, { nilai: v });
+      else tambah("Pengaturan", { kunci: "aktivasiTanpaEmail", nilai: v, keterangan: "ya = akun aktif tanpa kode email (sementara, selama email kampus belum terkirim)" });
+    });
+    catat(p.id, "admin.tanpaEmail", { nyala: !!d.nyala });
+  }
+  var tertunda = semua("Pengguna").filter(function (x) { return x.emailTerverifikasi === "tertunda" && x.status === "aktif"; }).length;
+  return { nyala: modeTanpaEmail(), tertunda: tertunda };
 }
