@@ -42,6 +42,8 @@ async function api(aksi, data) {
   }
   return j;
 }
+/** Label versi: "Uji Coba v…" di Uji Coba, "v…" di Produksi (v0.15.1). */
+const LABEL_VERSI = (K.lingkungan === "uji" ? "Uji Coba v" : "v") + K.versi;
 function aturToken(t) { S.token = t; ls.set("token", t); }
 
 /* ---------- utilitas ---------- */
@@ -70,10 +72,11 @@ const I = {
   penilaian: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   ded: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
   mk: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7M8 11h7"/>',
-  bank: '<path d="M3 7l9-4 9 4"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/>'
+  bank: '<path d="M3 7l9-4 9 4"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/>',
+  versi: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", bank: "Bank Dokumen", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", bank: "Bank Dokumen", versi: "Riwayat Versi", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -96,7 +99,7 @@ function menu() {
   if (u.jenisBiodata) m.push("biodata");
   m.push("cari");
   if (p === "superadmin" || p === "admin") m.push("pengguna");
-  if (p === "superadmin") m.push("log");
+  if (p === "superadmin") m.push("log", "versi");
   m.push("akun");
   return m;
 }
@@ -124,7 +127,7 @@ function gambar() {
     <nav class="nav" aria-label="Menu utama">${m.map(v => `<button data-go="${v}" ${S.view === v ? 'aria-current="page"' : ""}>${ic(v)}<span>${MENU_L[v]}</span>${lencana(v)}</button>`).join("")}</nav>
     <div class="who"><div class="avatar">${esc(u.nama.split(" ").slice(0, 2).map(x => x[0]).join(""))}</div><div style="min-width:0"><div class="small" style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.nama)}</div><div class="small muted">${esc(PERAN_L[p])}</div></div></div></aside>
    <div class="main"><header class="top"><div class="brand-m"><img src="logo.png" alt=""><b>Repositori UPW</b></div>
-    <span class="ta">Uji Coba v${K.versi}</span><span class="spacer"></span>
+    <span class="ta">${LABEL_VERSI}</span><span class="spacer"></span>
     ${u.peran.length > 1 ? `<label class="row small" style="gap:6px"><span class="muted">Peran</span><select id="peranSel" aria-label="Peran aktif" style="width:auto">${u.peran.map(r => `<option value="${r}" ${r === p ? "selected" : ""}>${PERAN_L[r]}</option>`).join("")}</select></label>` : ""}
     <button class="iconbtn" data-act="keluar" aria-label="Keluar" title="Keluar">${ic("keluar")}</button></header>
     <main class="content">${halaman()}</main></div></div>
@@ -156,6 +159,7 @@ function halaman() {
   if (S.view === "ded") return hDed();
   if (S.view === "mk") return hMk();
   if (S.view === "bank") return hBank();
+  if (S.view === "versi") return hRiwayat();
   return hBeranda();
 }
 const tombol = (act, label, kelas = "primary", attr = "") => `<button class="btn ${kelas}" data-act="${act}" ${attr} ${S.sibuk ? "disabled" : ""}>${S.sibuk ? "Memproses…" : label}</button>`;
@@ -223,8 +227,8 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}
-   <div class="callout"><b>Uji Coba v${K.versi} · Bank Dokumen.</b>${menu().includes("bank") ? " Baru: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GPM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
-   Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Bank Dokumen.</b>${menu().includes("bank") ? " Baru: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GPM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
     <tr><td>NIM/NIP</td><td class="mono">${esc(u.username)}</td></tr><tr><td>Email</td><td>${esc(u.email || "–")}</td></tr>
@@ -1765,6 +1769,24 @@ document.addEventListener("change", e => {
   bacaBase64(f).then(isi => { L.berkas = { nama: f.name, ukuran: f.size, isi }; render(); }, err => toast(err.message));
 });
 
+/* --- Riwayat Versi (v0.15.1; hanya Super Admin; dari CHANGELOG.md lewat alat/tampilan.mjs) --- */
+function hRiwayat() {
+  if (!S.riwayat) {
+    sekali("riwayat", async () => { const r = await fetch("riwayat.json?v=" + encodeURIComponent(K.versi), { cache: "no-store" }); if (!r.ok) throw new Error("Riwayat versi belum tersedia."); S.riwayat = await r.json(); render(); });
+    return `<div class="memuat">Memuat riwayat versi…</div>`;
+  }
+  const baris = l => { const m = /^(\s*)- (.*)$/.exec(l); return m ? `<li style="margin-left:${m[1].length * 6}px">${esc(m[2])}</li>` : `<li style="list-style:none">${esc(l.trim())}</li>`; };
+  return `<div class="head"><div><h1>Riwayat Versi</h1><p>Semua rilis aplikasi: versi, tanggal, lingkungan, isi, dan penyetuju. Versi yang sedang dipakai: <b>v${esc(K.versi)}</b>. Pengembalian versi hanya atas permintaan tertulis pemilik (lihat panduan darurat).</p></div></div>
+   <section class="panel"><h2>Cadangan data</h2><p class="small">Salinan spreadsheet + daftar file Drive disimpan di folder Cadangan. Wajib dibuat sebelum setiap rilis (aturan tetap no. 3); server juga mencadangkan otomatis setiap kali struktur data berubah.</p>
+    <div class="row" style="flex-wrap:wrap;align-items:flex-end"><div class="field" style="flex:1;min-width:200px"><label for="cadLabel">Label cadangan</label><input id="cadLabel" type="text" maxlength="60" placeholder="Contoh: sebelum v0.16.0"></div>${tombol("buatCadangan", "Buat cadangan sekarang", "")}</div>
+    ${S.cadangan ? `<p class="small">Tersimpan: <b>${esc(S.cadangan.nama)}</b> (${S.cadangan.jumlahFile} file Drive tercatat) · <a href="${esc(S.cadangan.url)}" target="_blank" rel="noopener noreferrer">Buka salinan</a></p>` : ""}${galatHtml()}</section>
+   ${S.riwayat.map(v => `<section class="panel"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 style="margin:0">${esc(v.versi)}${v.versi === "v" + K.versi ? ' <span class="chip s-disetujui">dipakai</span>' : ""}</h2><span class="small muted">${esc(v.tanggal)} · ${esc(v.lingkungan)}</span></div>
+     <ul class="small" style="margin:8px 0 0 18px;padding:0;display:grid;gap:3px">${v.isi.map(baris).join("")}</ul></section>`).join("")}`;
+}
+Object.assign(AKSI, {
+  buatCadangan() { const label = nilaiLangsung("cadLabel") || "manual"; jalankan(async () => { S.cadangan = await api("admin.cadangkan", { label }); toast("Cadangan dibuat."); }); }
+});
+function nilaiLangsung(id) { return String($(id)?.value || "").trim(); }
 /* --- Penilaian (v0.12.0) --- */
 const CARA_L = { a: "Otomatis dari data", m: "Penilaian GPM (rubrik)", c: "Data + penilaian GPM" };
 const warnaSkor = s => s >= 3.5 ? "var(--ok)" : s >= 2.5 ? "var(--brand)" : s >= 1.5 ? "var(--warn)" : "var(--bad)";

@@ -3,6 +3,19 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.15.1 — 13 Nov 2026 — Uji Coba
+- Persiapan Produksi (tanpa mengubah Produksi):
+  - Keamanan: penyiapan server Produksi tidak bisa lagi dipanggil lewat web; pemilik menjalankan fungsi siapkanProduksi() dari editor
+    Apps Script, dan kata sandi awal Super Admin hanya tampil di log eksekusi pemilik.
+  - Halaman "Riwayat Versi" (menu khusus Super Admin), dibuat otomatis dari CHANGELOG.md (aturan tetap no. 4).
+  - Label versi dan pita "UJI COBA" menyesuaikan lingkungan; alat/tampilan.mjs menyusun tampilan Produksi dari docs/uji
+    (konfig Produksi, tanpa pita uji, nama cache sendiri).
+  - Service worker hanya melayani berkas aplikasinya sendiri, sehingga Produksi (folder utama) tidak mencampuri Uji Coba (folder uji/).
+  - Tombol "Buat cadangan sekarang" di halaman Riwayat Versi (Super Admin), untuk cadangan sebelum rilis (aturan tetap no. 3).
+  - Daftar periksa Produksi: PRODUKSI.md (penghalang, keputusan pemilik, urutan rilis, rollback).
+- Tidak ada perubahan struktur data (tetap versi 14). Rollback ke v0.15.0 aman tanpa pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.15.0 — 13 Nov 2026 — Uji Coba
 - Menu "Bank Dokumen" (Admin Prodi, KPS, Super Admin; pegawai yang ditunjuk sebagai penanggung jawab; asesor baca saja):
   - 94 slot dokumen baku untuk 47 butir Matriks yang dinilai GPM (daftar dari prototipe), ditambah slot "dokumen lain" per butir oleh Admin/KPS.

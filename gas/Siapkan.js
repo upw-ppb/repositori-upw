@@ -11,10 +11,23 @@ var AKUN_CONTOH_UJI = [
   { username: "pppk-2023-0412", nama: "Wayan Suarta, A.Md.Par. (contoh)", peran: "laboran,tendik" }
 ];
 
+/**
+ * Lewat web (aksi "siapkan") HANYA untuk Uji Coba. Produksi disiapkan pemilik dari editor Apps Script dengan fungsi
+ * siapkanProduksi(), agar tidak ada orang lain (termasuk agen) yang bisa memanggilnya atau melihat kata sandi awal (v0.15.1).
+ */
 function aksiSiapkan(d) {
+  if (d.lingkungan === "produksi") throw galat("Produksi disiapkan dari editor Apps Script (fungsi siapkanProduksi), bukan lewat web.");
+  return siapkanLingkungan("uji");
+}
+/** Jalankan SEKALI dari editor Apps Script proyek Produksi (pilih fungsi ini, tekan Run). Kata sandi awal tampil di Log eksekusi. */
+function siapkanProduksi() {
+  var h = siapkanLingkungan("produksi");
+  Logger.log("Produksi siap. Spreadsheet: " + h.spreadsheet + " | Folder: " + h.folder);
+  Logger.log("Masuk pertama: nama pengguna = " + h.superadmin + " ; kata sandi sementara = " + h.sandiAwal + " (wajib diganti saat masuk).");
+}
+function siapkanLingkungan(env) {
   var k = konfig();
   if (k.getProperty("SPREADSHEET_ID")) throw galat("Server sudah disiapkan.");
-  var env = d.lingkungan === "produksi" ? "produksi" : "uji";
   var label = env === "uji" ? " (Uji Coba)" : "";
 
   var induk = DriveApp.createFolder("Repositori UPW" + label);

@@ -167,6 +167,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   memeriksa nama global ganda. Tampilan: bersihkanData() mengembalikan S ke keadaan awal saat keluar/sesi berakhir
   (jangan lagi menghapus field satu per satu).
 
+- v0.15.1 (13 Nov 2026, Uji Coba): persiapan Produksi. Produksi disiapkan HANYA lewat fungsi siapkanProduksi() di editor Apps Script
+  (oleh pemilik; aksi web "siapkan" ditolak untuk produksi). alat/tampilan.mjs: `riwayat` (tulis docs/uji/riwayat.json dari
+  CHANGELOG.md — jalankan SETIAP rilis setelah menulis CHANGELOG) dan `produksi <URL /exec> <tujuan>` (susun tampilan Produksi dari
+  docs/uji; tujuan docs HANYA setelah "setuju tayang"). Halaman Riwayat Versi (Super Admin). LABEL_VERSI & catatan "Baru" hanya di uji.
+  sw.js mengabaikan permintaan di luar foldernya dan subfolder uji/. Daftar periksa Produksi: PRODUKSI.md.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
