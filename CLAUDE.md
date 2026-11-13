@@ -61,8 +61,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 
 ## Infrastruktur (dibuat 9 Nov 2026)
 - Repositori publik: https://github.com/upw-ppb/repositori-upw (git lokal di folder ini; core.fileMode=false karena OneDrive).
-  Cabang kerja Fase 1: fase-1/fondasi. GitHub Pages sementara dari cabang fase-1/fondasi, folder /docs
-  (pindahkan ke main saat cabang digabung).
+  Cabang kerja Fase 1: fase-1/fondasi. GitHub Pages dari cabang main, folder /docs (dipindah 13 Nov 2026).
+  JANGAN `git checkout` cabang lain di folder OneDrive ini: OneDrive menamai ulang folder yang dihapus-buat ulang menjadi
+  "gas 2", "docs 2", "alat 2" (terjadi 13 Nov 2026; dipulihkan dengan mv setelah dicek isinya sama dengan HEAD).
+  Perbarui main dengan `git push origin fase-1/fondasi:main` (main selalu fast-forward dari fase-1/fondasi).
 - PRODUKSI TAYANG 13 Nov 2026 (v0.16.0, "Setuju tayang v0.16.0"): https://upw-ppb.github.io/repositori-upw/ = docs/ (dibuat
   alat/tampilan.mjs dari docs/uji; JANGAN ubah docs/*.js langsung). Pages dari cabang main /docs. Kerja tetap di cabang
   fase-1/fondasi; setiap rilis Uji Coba juga DIGABUNG ke main (Pages membaca main) — aman karena rilis uji hanya mengubah docs/uji,
@@ -76,7 +78,7 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Rahasia server (MERICA) di Script Properties, BUKAN di repo.
 - Server Produksi DIBUAT 13 Nov 2026 (pemilik: "Buat sekarang"): proyek "Repositori UPW (Produksi)", scriptId
   1zQ7xhO3bgX4NsfHiRCeMdr3T8VH8L5u_TlTuilPp3KXUxU3JYR_lhXr0, deployment AKfycbylF-ZVlYYDbAmQE3OBH0q7P_cOBaAFO-WSK0OKsErHLyEf4JmbWe4jrkV3VZVk2uK3
-  (v0.15.1, @1). Semua di alat/produksi.json. 13 Nov 2026: pemilik sudah menjalankan izinkanServer + siapkanProduksi (ping: lingkungan
+  (v0.16.0 sejak 13 Nov 2026, @2). Semua di alat/produksi.json. 13 Nov 2026: pemilik sudah menjalankan izinkanServer + siapkanProduksi (ping: lingkungan
   produksi); kata sandi Super Admin Produksi hanya diketahui pemilik. JANGAN panggil aksi "siapkan" ke URL Produksi.
   Cek dari luar cukup ping (curl -sL --data '{"aksi":"ping"}', tanpa -X POST agar redirect jadi GET). Spreadsheet/Drive Produksi dibuat oleh siapkanProduksi. gas/.clasp.json TETAP Uji Coba; push ke Produksi
   dari folder sementara (lihat PRODUKSI.md) dan HANYA setelah "setuju tayang".
