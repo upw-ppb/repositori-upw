@@ -63,8 +63,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - Repositori publik: https://github.com/upw-ppb/repositori-upw (git lokal di folder ini; core.fileMode=false karena OneDrive).
   Cabang kerja Fase 1: fase-1/fondasi. GitHub Pages sementara dari cabang fase-1/fondasi, folder /docs
   (pindahkan ke main saat cabang digabung).
-- Tampilan Uji Coba: https://upw-ppb.github.io/repositori-upw/uji/ (docs/uji). Alamat Produksi (docs/) masih halaman
-  "belum dibuka". Tanpa build step; versi di docs/uji/konfig.js dan nama cache di docs/uji/sw.js (naikkan tiap rilis).
+- PRODUKSI TAYANG 13 Nov 2026 (v0.16.0, "Setuju tayang v0.16.0"): https://upw-ppb.github.io/repositori-upw/ = docs/ (dibuat
+  alat/tampilan.mjs dari docs/uji; JANGAN ubah docs/*.js langsung). Pages dari cabang main /docs. Kerja tetap di cabang
+  fase-1/fondasi; setiap rilis Uji Coba juga DIGABUNG ke main (Pages membaca main) — aman karena rilis uji hanya mengubah docs/uji,
+  sedangkan berkas Produksi di docs/ hanya dibangun ulang alat saat rilis Produksi (setelah "setuju tayang").
+- Tampilan Uji Coba: https://upw-ppb.github.io/repositori-upw/uji/ (docs/uji). Tanpa build step; versi di docs/uji/konfig.js dan nama cache di docs/uji/sw.js (naikkan tiap rilis).
 - Server Uji Coba (Apps Script): scriptId 1R2S8BM3glkyOYqsqX36XvdHMW24r77mcaKlHEF22pjva-4Gp3G6kvEvf (gas/.clasp.json),
   deployment AKfycbyILM_1zheYuMXf-zt7GYIhVr7o1z8S3bCfucZkW1VP9Jj6Wa3Zu4UWXQOq8vrVPBMb.
   Perbarui: `cd gas && clasp push -f && clasp redeploy <deploymentId> --description "..."` (URL tetap).

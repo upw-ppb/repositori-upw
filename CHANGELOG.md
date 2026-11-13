@@ -3,6 +3,16 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.16.0 — 13 Nov 2026 — Produksi
+- Rilis Produksi pertama: https://upw-ppb.github.io/repositori-upw/ (server Apps Script "Repositori UPW (Produksi)", deployment @2).
+  Isi sama dengan v0.16.0 Uji Coba (semua fitur v0.1.0–v0.16.0), tanpa akun contoh, tanpa Mode Uji, tanpa pita UJI COBA.
+- Email kampus belum bisa terkirim (DKIM ppb.ac.id belum dipasang): pemilik memilih aktivasi tanpa email sementara
+  (dinyalakan Super Admin di menu Pengguna setelah masuk pertama).
+- Cadangan: Produksi baru disiapkan hari ini dan belum berisi data pengguna (hanya akun Super Admin); cadangan pertama dibuat
+  pemilik dari menu Riwayat Versi setelah masuk pertama. Struktur data versi 14.
+- GitHub Pages dipindah ke cabang main, folder /docs (Uji Coba tetap di /uji/).
+- Penyetuju: pemilik, di chat 13 Nov 2026: "Setuju tayang v0.16.0" (sebelumnya "Setuju tayang", sebelum v0.16.0 dibuat).
+
 ## v0.16.0 — 13 Nov 2026 — Uji Coba
 - Aktivasi tanpa email (sementara), karena email kampus belum bisa terkirim (DKIM ppb.ac.id belum dipasang):
   - Super Admin menyalakan/mematikannya di menu Pengguna › Aktivasi akun (bawaan: mati).

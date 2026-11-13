@@ -1,9 +1,10 @@
 {
-  "keterangan": "Server Produksi (Apps Script) — proyek TERPISAH dari Uji Coba. Dibuat 13 Nov 2026 atas permintaan pemilik (\"Buat sekarang\"); belum disiapkan, belum dibuka.",
+  "keterangan": "Server Produksi (Apps Script) — proyek TERPISAH dari Uji Coba. Tayang 13 Nov 2026 (v0.16.0, \"Setuju tayang v0.16.0\").",
   "judul": "Repositori UPW (Produksi)",
   "scriptId": "1zQ7xhO3bgX4NsfHiRCeMdr3T8VH8L5u_TlTuilPp3KXUxU3JYR_lhXr0",
   "deploymentId": "AKfycbylF-ZVlYYDbAmQE3OBH0q7P_cOBaAFO-WSK0OKsErHLyEf4JmbWe4jrkV3VZVk2uK3",
   "url": "https://script.google.com/macros/s/AKfycbylF-ZVlYYDbAmQE3OBH0q7P_cOBaAFO-WSK0OKsErHLyEf4JmbWe4jrkV3VZVk2uK3/exec",
   "editor": "https://script.google.com/d/1zQ7xhO3bgX4NsfHiRCeMdr3T8VH8L5u_TlTuilPp3KXUxU3JYR_lhXr0/edit",
-  "versiKode": "v0.15.1"
+  "versiKode": "v0.16.0",
+  "deploymentVersi": 2
 }

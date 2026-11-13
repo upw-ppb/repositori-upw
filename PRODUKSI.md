@@ -1,5 +1,14 @@
 # Daftar periksa Produksi — Repositori Akreditasi UPW
 
+**TAYANG 13 Nov 2026: v0.16.0** di https://upw-ppb.github.io/repositori-upw/ (persetujuan pemilik: "Setuju tayang v0.16.0").
+Email kampus (DKIM) belum beres → pakai aktivasi tanpa email sementara (v0.16.0). Bagian A tetap berlaku untuk DKIM.
+
+Langkah pemilik setelah tayang: masuk sebagai `superadmin` (sandi sementara dari log) → ganti sandi → Pengguna › Aktivasi akun →
+Nyalakan aktivasi tanpa email → Riwayat Versi › Buat cadangan sekarang → impor akun (dosen/tendik oleh Super Admin, mahasiswa oleh Admin Prodi).
+
+Rilis Produksi berikutnya: uji di Uji Coba → "setuju tayang vX.Y.Z" → cadangan (Riwayat Versi) → push server Produksi (lihat bawah) →
+`node alat/tampilan.mjs produksi <URL> docs` → CHANGELOG (Produksi, kutip persetujuan) → commit di main, tag vX.Y.Z, push.
+
 Disusun 13 Nov 2026 (v0.15.1). Produksi **belum dibuka**. Aturan tetap: Produksi hanya diubah setelah pemilik menulis
 **"setuju tayang"** di chat, dan setiap perubahan dicoba di Uji Coba lebih dulu (CLAUDE.md, aturan no. 1–2).
 

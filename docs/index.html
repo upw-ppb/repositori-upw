@@ -2,24 +2,37 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Repositori UPW</title>
+<meta name="description" content="Repositori kegiatan Prodi Usaha Perjalanan Wisata, Politeknik Pariwisata Bali, untuk akreditasi LAMWisata.">
+<meta name="theme-color" content="#0A5188">
 <meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="ikon-192.png">
+<link rel="apple-touch-icon" href="ikon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="gaya.css">
 <style>
-:root{color-scheme:light dark;--bg:#f4f6f9;--fg:#14202c;--muted:#5a6878;--brand:#0A5188}
-@media (prefers-color-scheme:dark){:root{--bg:#0d151d;--fg:#e6edf3;--muted:#9aa9b8;--brand:#5aa2dc}}
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:24px}
-main{max-width:520px;text-align:center}
-img{width:96px;height:96px}
-h1{font-size:1.4rem;margin:16px 0 8px}
-p{color:var(--muted);line-height:1.5}
+:root{color-scheme:light}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+.uji{background:var(--gold-soft);border-bottom:1px solid var(--line);padding-block:6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.8rem}
+.uji b{color:var(--warn)}
+.memuat{min-height:60vh;display:grid;place-items:center;color:var(--muted)}
+.galat{color:var(--bad);font-size:.85rem}
+.sandi-baru{font-family:var(--f-mono);font-size:1.2rem;letter-spacing:.06em;background:var(--surface-2);padding:10px 14px;border-radius:8px;user-select:all}
 </style>
 </head>
 <body>
-<main>
-<img src="uji/logo.png" alt="Logo Politeknik Pariwisata Bali">
-<h1>Repositori Kegiatan Prodi Usaha Perjalanan Wisata</h1>
-<p>Politeknik Pariwisata Bali. Aplikasi sedang dalam tahap uji coba dan belum dibuka untuk umum.</p>
-</main>
+<div id="app"><div class="memuat">Memuat…</div></div>
+<div id="toast" class="toast" hidden></div>
+<script src="konfig.js"></script>
+<script src="qr.js"></script>
+<script src="zip.js"></script>
+<script src="docx.js"></script>
+<script src="aplikasi.js"></script>
 </body>
 </html>
