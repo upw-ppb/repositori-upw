@@ -1,10 +1,10 @@
 {
-  "keterangan": "Server Produksi (Apps Script) — proyek TERPISAH dari Uji Coba. Tayang 13 Nov 2026 (v0.16.0); diperbarui 14 Nov 2026 ke v0.23.0 (\"Setuju tayang v0.23.0\").",
+  "keterangan": "Server Produksi (Apps Script) — proyek TERPISAH dari Uji Coba. Tayang 13 Nov 2026 (v0.16.0); diperbarui 14 Nov 2026 ke v0.24.0 (\"Setuju tayang v0.24.0\").",
   "judul": "Repositori UPW (Produksi)",
   "scriptId": "1zQ7xhO3bgX4NsfHiRCeMdr3T8VH8L5u_TlTuilPp3KXUxU3JYR_lhXr0",
   "deploymentId": "AKfycbylF-ZVlYYDbAmQE3OBH0q7P_cOBaAFO-WSK0OKsErHLyEf4JmbWe4jrkV3VZVk2uK3",
   "url": "https://script.google.com/macros/s/AKfycbylF-ZVlYYDbAmQE3OBH0q7P_cOBaAFO-WSK0OKsErHLyEf4JmbWe4jrkV3VZVk2uK3/exec",
   "editor": "https://script.google.com/d/1zQ7xhO3bgX4NsfHiRCeMdr3T8VH8L5u_TlTuilPp3KXUxU3JYR_lhXr0/edit",
-  "versiKode": "v0.23.0",
-  "deploymentVersi": 3
+  "versiKode": "v0.24.0",
+  "deploymentVersi": 4
 }

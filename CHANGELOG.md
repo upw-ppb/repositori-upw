@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.24.0 — 14 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.24.0 (server Apps Script Produksi deployment @4): foto profil, menu Data Terkumpul, tombol Sumber data di Penilaian.
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama ("Cadangan / sebelum v0.24.0 (struktur data 18 → 19)") di folder Cadangan Drive Produksi.
+- Rollback: versi v0.23.x tetap bisa membaca data (tabel FotoProfil diabaikan); tidak perlu pemulihan data.
+- Penyetuju: pemilik, di chat 14 Nov 2026: "Setuju tayang v0.24.0".
+
 ## v0.24.0 — 14 Nov 2026 — Uji Coba
 Permintaan pemilik (2 butir):
 - **Foto profil** untuk semua pengguna (menu Akun saya, atau klik nama di bawah menu): pilih foto JPG/PNG, bagian tengah dipotong persegi dan
