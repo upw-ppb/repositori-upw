@@ -1,0 +1,54 @@
+// Uji v0.15.0: Bank Dokumen.
+export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA }) {
+  console.log("25. Bank Dokumen");
+  const pdf = n => Buffer.concat([Buffer.from("%PDF-1.4\n"), Buffer.alloc(n || 50, 65)]).toString("base64");
+  const tgl = n => new Date(Date.now() + n * 864e5).toLocaleDateString("sv-SE", { timeZone: "Asia/Makassar" });
+  const dsn = ID("199001152015041001");
+  cek("mahasiswa dan dosen tanpa tugas tidak bisa membuka", /izin/.test(salah("bank.data", {}, tM)) && /izin/.test(salah("bank.data", {}, tDsn)));
+  let B = ok("bank.data", {}, tAdm);
+  cek("94 slot baku di 47 butir; semua 'belum'", B.slot.length === 94 && B.butir.length === 47 && B.slot.every(s => s.status === "belum" && s.baku) && B.kelola && B.pegawai.length > 0, [B.slot.length, B.butir.length]);
+  cek("butir 1: 6 slot, berbobot", B.slot.filter(s => s.butir === 1).length === 6 && B.butir[0].n === 1 && B.butir[0].w > 0);
+  cek("dosen tidak bisa mengunggah slot tanpa PJ", /Hanya penanggung jawab/.test(salah("bank.unggah", { kunci: "1-0", nama: "sk.pdf", isi: pdf() }, tDsn)));
+  cek("dosen tidak bisa menunjuk PJ", /izin/.test(salah("bank.atur", { kunci: "1-0", pj: dsn }, tDsn)));
+  ok("bank.atur", { kunci: "1-0", pj: dsn }, tAdm);
+  ok("bank.atur", { kunci: "1-1", pj: dsn }, tKps);
+  cek("tugas.saya: 2 slot PJ, 2 perlu", (j => j.bankPj === 2 && j.bankPerlu.length === 2)(ok("tugas.saya", {}, tDsn)));
+  B = ok("bank.data", {}, tDsn);
+  cek("dosen PJ melihat slot miliknya saja", !B.kelola && B.slot.length === 2 && B.slot.every(s => s.bolehUnggah));
+  cek("isi palsu ditolak", /tidak sesuai/.test(salah("bank.unggah", { kunci: "1-0", nama: "sk.pdf", isi: Buffer.from("<html>").toString("base64") }, tDsn)));
+  cek("tanggal berlaku tidak valid ditolak", /berlaku tidak valid/.test(salah("bank.unggah", { kunci: "1-0", nama: "sk.pdf", isi: pdf(), berlaku: "31-12-2027" }, tDsn)));
+  B = ok("bank.unggah", { kunci: "1-0", nama: "SK GPM 2025.pdf", isi: pdf(), berlaku: tgl(30), ket: "SK Direktur 2025" }, tDsn);
+  let s = B.slot.find(x => x.kunci === "1-0");
+  const f1 = Object.values(g.files).find(f => /SK GPM 2025\.pdf/.test(f.nama || ""));
+  cek("unggah: status 'segera' (berlaku ≤ 60 hari), file di Bukti/Bank Dokumen/Butir 01", s.status === "segera" && s.versi.length === 1 && f1 && f1.folder.nama === "Butir 01", [s.status, f1 && f1.folder.nama]);
+  B = ok("bank.unggah", { kunci: "1-0", tautan: "https://drive.google.com/sk-gpm-2026", berlaku: tgl(400) }, tAdm);
+  s = B.slot.find(x => x.kunci === "1-0");
+  cek("versi baru: status 'ada', versi lama tetap tersimpan (tidak dibuang)", s.status === "ada" && s.versi.length === 2 && !f1.terbuang);
+  cek("dosen tidak bisa menghapus versi terakhir milik Admin", /Hanya pengunggah/.test(salah("bank.hapus", { kunci: "1-0", id: s.versi[1].id }, tDsn)));
+  cek("hanya versi terakhir yang bisa dihapus", /Hanya versi terakhir/.test(salah("bank.hapus", { kunci: "1-0", id: s.versi[0].id }, tAdm)));
+  ok("bank.unggah", { kunci: "1-1", nama: "kebijakan.pdf", isi: pdf(), berlaku: tgl(-1) }, tDsn);
+  cek("berlaku lewat: kedaluwarsa", ok("bank.data", {}, tAdm).slot.find(x => x.kunci === "1-1").status === "kedaluwarsa");
+  B = ok("bank.hapus", { kunci: "1-1", id: ok("bank.data", {}, tDsn).slot.find(x => x.kunci === "1-1").versi[0].id }, tDsn);
+  cek("pengunggah menghapus versinya: kembali 'belum', file ke sampah", B.slot.find(x => x.kunci === "1-1").status === "belum" && Object.values(g.files).find(f => /kebijakan\.pdf/.test(f.nama || "")).terbuang === true);
+  cek("slot tambahan: nama wajib, butir harus ada", /Nama dokumen/.test(salah("bank.atur", { baru: 1, butir: 1, nama: "" }, tAdm)) && /tidak dikenal/.test(salah("bank.atur", { baru: 1, butir: 99, nama: "Dokumen X" }, tAdm)));
+  B = ok("bank.atur", { baru: 1, butir: 8, nama: "SOP peninjauan RPS" }, tAdm);
+  const lain = B.slot.find(x => !x.baku);
+  cek("slot tambahan di butir tanpa slot baku (butir 8) muncul", lain && lain.butir === 8 && B.butir.some(b => b.n === 8) && B.slot.length === 95);
+  cek("slot baku tidak bisa dihapus/diubah nama", /baku tidak bisa dihapus/.test(salah("bank.atur", { kunci: "1-0", hapus: 1 }, tAdm)) && /baku tidak bisa diubah/.test(salah("bank.atur", { kunci: "1-0", nama: "X baru" }, tAdm)));
+  ok("bank.atur", { kunci: lain.kunci, nama: "SOP peninjauan RPS berkala" }, tAdm);
+  B = ok("bank.atur", { kunci: lain.kunci, hapus: 1 }, tAdm);
+  cek("ubah nama lalu hapus slot tambahan", !B.slot.some(x => x.kunci === lain.kunci) && B.slot.length === 94);
+  const L = ok("bank.lihat", { kunci: "1-0", id: s.versi[0].id }, tKps);
+  cek("KPS membuka versi lama (file)", L.t === "file" && L.mime === "application/pdf" && L.isi);
+  // Asesor: baca saja, versi berlaku saja, tercatat.
+  const b = ok("asesor.buat", { nama: "Dr. Wayan Bank Uji", instansi: "LAMWisata", berlakuSampai: tgl(10) }, tSA);
+  const tA = ok("masuk", { username: b.username, sandi: b.sandiSementara }).token; ok("ganti.sandi", { sandiBaru: "AsesorBank1x" }, tA);
+  const A = ok("bank.data", {}, tA);
+  cek("asesor: hanya slot berisi, versi berlaku, tanpa PJ, tanpa tombol", A.asesor && A.slot.length === 1 && A.slot[0].versi.length === 1 && A.slot[0].versi[0].url === "https://drive.google.com/sk-gpm-2026" && !A.slot[0].pjNama && !A.slot[0].bolehUnggah, A.slot);
+  cek("asesor tidak bisa membuka versi lama atau mengunggah", /versi yang berlaku/.test(salah("bank.lihat", { kunci: "1-0", id: s.versi[0].id }, tA)) && /izin/.test(salah("bank.unggah", { kunci: "1-0", tautan: "https://x.id" }, tA)));
+  ok("bank.lihat", { kunci: "1-0", id: s.versi[1].id }, tA);
+  cek("akses asesor tercatat di log", g.sheets.Log.slice(1).some(r => /asesor\.bankLihat/.test(r.join("|"))));
+  const P = ok("penilaian.data", {}, tAdm);
+  cek("Penilaian butir 1 menyebut Bank Dokumen 1 dari 6", /Bank Dokumen: 1 dari 6 dokumen berlaku/.test(P.rows.find(r => r.n === 1).info), P.rows.find(r => r.n === 1).info);
+  cek("migrasi: BankDokumen", !!g.sheets.BankDokumen);
+}

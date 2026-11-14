@@ -13,6 +13,16 @@ sebelum menayangkan ke Produksi, dan jangan pernah mengetik kata sandi atas nama
   "LAMWISATA_IAPS 1.0 Status Terakreditasi Unggul Program Sarjana Terapan".
 - Logo: aset/logo-poltekpar-bali.png (asal: artifact "Aset Logo Poltekpar Bali").
 
+## Alat uji (disimpan di proyek sejak 14 Nov 2026)
+- alat/uji/ berisi semua skrip uji (dulu di scratchpad). Jalankan dari folder proyek:
+  `bash alat/uji/jalankan.sh uji` (semua uji server, harus 0 gagal), `bash alat/uji/jalankan.sh server` (server lokal :8790 untuk uji
+  tampilan; konfigurasi "uji-lokal" di .claude/launch.json), `bash alat/uji/jalankan.sh langsung` (cek baca-saja ke server Uji Coba).
+  Skrip menyalin gas/ dan docs/uji ke /tmp/upw-uji lalu mengganti api menjadi "/api". Pratinjau di aplikasi Claude tidak bisa membaca
+  OneDrive: jalankan dulu `bash alat/uji/jalankan.sh siapkan`, lalu preview "uji-lokal" (berjalan dari /tmp/upw-uji). Uji fitur baru: tambah uji-<versi>-bagian.mjs
+  dan panggil dari uji-keg.mjs. Penjelajah halaman: alat/uji/jelajah.js (dimuat di halaman lokal, window.jelajah()).
+- Kata sandi di skrip hanya untuk server tiruan lokal. Kata sandi akun Uji Coba sungguhan tetap di akun-uji-coba.local.md (gitignored).
+- AGENTS.md = penunjuk untuk AI lain ke berkas ini.
+
 ## Keputusan utama
 - PWA di GitHub Pages (alamat bawaan github.io) + Google Apps Script sebagai server,
   Google Sheets sebagai database, Drive untuk bukti, Gmail untuk kode & pengumuman.
@@ -84,7 +94,7 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   dari folder sementara (lihat PRODUKSI.md) dan HANYA setelah "setuju tayang".
 - Kredensial uji: akun-uji-coba.local.md (gitignored). JANGAN tulis kata sandi di chat atau di berkas yang ter-commit.
 - Mode Uji: server mengembalikan kodeUji (kode verifikasi) agar bisa diuji otomatis; dimatikan otomatis di Produksi.
-- Uji otomatis server: skrip node di scratchpad (uji-api.mjs) — 25 skenario lulus 9 Nov 2026.
+- Uji otomatis server: lihat "Alat uji" (alat/uji/).
 - Batasan agen: jangan mengetik kata sandi di browser untuk alamat github.io (bukan host lokal/uji); uji login lewat API/skrip.
 - PELAJARAN v0.1.1: uji API saja tidak cukup. Setiap rilis tampilan WAJIB diuji lewat UI: salin docs/uji ke scratchpad,
   sajikan di localhost (preview), ganti window.fetch dengan server tiruan, isi formulir dan tekan tombol, lalu cek isi
@@ -96,7 +106,7 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   dengan awalan ' (amankan). Riwayat rilis di CHANGELOG.md.
 - Uji lokal penuh: scratchpad gas-tiruan.mjs (tiruan Apps Script menjalankan gas/*.js asli sebagai satu skrip),
   uji-bio.mjs (44 skenario), server-uji.mjs (menyajikan salinan docs/uji + /api tiruan; konfigurasi "uji-lokal" di
-  .claude/launch.json). Scratchpad berganti per sesi: buat ulang bila hilang.
+  .claude/launch.json). Kini tersimpan di alat/uji/ (lihat "Alat uji").
 - clasp login kedaluwarsa berkala (Workspace, galat invalid_rapt). Browser pemilik otomatis memilih Gmail pribadi:
   minta pemilik membuka tautan login di jendela incognito dan masuk sebagai upw@ppb.ac.id; cek dengan
   `clasp show-authorized-user` sebelum push.
@@ -205,6 +215,7 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 
 - v0.22.1 (14 Nov 2026, Uji Coba): ikon aplikasi = konsep D (koper arsip + "UPW"), dipilih pemilik; sumber 512 px di aset/ikon-aplikasi-upw-512.png.
   Ikon digambar dengan canvas di pratinjau (bukan dari logo Poltekpar); logo Poltekpar tetap di header dan surat.
+  v0.23.1: ikon diperbesar (isi memenuhi kotak); kode pembuatnya alat/ikon.js.
 
 - v0.23.0 (14 Nov 2026, Uji Coba): gas/Masukan.js — tabel Masukan (VERSI_SKEMA 18), aksi masukan.kirim/saya/daftar/ubah/lampiran, lampiran di
   folder Drive "Masukan"; tombol Kirim masukan di Info, menu Masukan (superadmin/admin). Field formulir jenis = S.laci.jm (S.laci.jenis = nama laci!).

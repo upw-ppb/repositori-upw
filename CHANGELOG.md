@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.23.1 — 14 Nov 2026 — Uji Coba
+- Ikon aplikasi diperbesar (permintaan pemilik): koper dan tulisan UPW kini memenuhi kotak biru ke atas-bawah dan kiri-kanan
+  (sebelumnya banyak ruang kosong). Bentuk dan warna tetap konsep D. Kode pembuat ikon disimpan di alat/ikon.js.
+- Alat uji disimpan di proyek (alat/uji/, dijalankan dengan `bash alat/uji/jalankan.sh uji|server|langsung`) dan AGENTS.md dibuat
+  sebagai penunjuk bagi asisten AI lain ke catatan proyek (CLAUDE.md). Tidak mengubah aplikasi.
+- Tidak ada perubahan struktur data. Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.23.0 — 14 Nov 2026 — Produksi
 - Produksi diperbarui dari v0.16.0 ke v0.23.0 (server Apps Script Produksi deployment @3). Isi sama dengan Uji Coba v0.17.0–v0.23.0:
   21 + 7 catatan prodi (impor massal, dokumen pendukung biodata, riwayat keputusan, penanda tangan, laboratorium, panduan bergambar,
