@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.25.0 — 15 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.25.0 (server Apps Script Produksi deployment @5): panel Kesiapan akreditasi di Beranda, peran dan Laporan GKM,
+  istilah GKM, akun Super Admin tidak dihitung sebagai data prodi.
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama ("Cadangan / sebelum v0.25.0 (struktur data 19 → 20)").
+- Rollback: v0.24.0 tetap bisa membaca data (tabel LaporanGkm dan peran gkm diabaikan); tanpa pemulihan data. Catatan: setelah rollback, akun
+  Super Admin yang diberi peran mahasiswa/dosen akan kembali terhitung.
+- Penyetuju: pemilik, di chat 15 Nov 2026: "Setuju tayang v0.25.0".
+
 ## v0.25.0 — 15 Nov 2026 — Uji Coba
 Permintaan pemilik (kesiapan akreditasi dan GKM):
 - **Kesiapan akreditasi di Beranda** (KPS, Admin Prodi, Super Admin, GKM): nilai simulasi dibanding target; jumlah butir rubrik belum dinilai,
