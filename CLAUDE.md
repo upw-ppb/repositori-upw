@@ -206,6 +206,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - v0.22.1 (14 Nov 2026, Uji Coba): ikon aplikasi = konsep D (koper arsip + "UPW"), dipilih pemilik; sumber 512 px di aset/ikon-aplikasi-upw-512.png.
   Ikon digambar dengan canvas di pratinjau (bukan dari logo Poltekpar); logo Poltekpar tetap di header dan surat.
 
+- v0.23.0 (14 Nov 2026, Uji Coba): gas/Masukan.js — tabel Masukan (VERSI_SKEMA 18), aksi masukan.kirim/saya/daftar/ubah/lampiran, lampiran di
+  folder Drive "Masukan"; tombol Kirim masukan di Info, menu Masukan (superadmin/admin). Field formulir jenis = S.laci.jm (S.laci.jenis = nama laci!).
+  Uji menyeluruh: scratchpad jelajah.js (penjelajah semua menu/tab/laci per peran, cek galat/teks rusak/konsol/lebar layar) + uji-v23-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

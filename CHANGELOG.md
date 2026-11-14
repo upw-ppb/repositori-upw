@@ -3,6 +3,20 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.23.0 — 14 Nov 2026 — Uji Coba
+- Masukan dan saran (permintaan pemilik): tombol **Kirim masukan** di Info (juga bisa dibuka sebelum biodata lengkap). Isian: jenis (masalah/error,
+  permintaan fitur, saran perbaikan, pertanyaan, lainnya), bagian aplikasi (otomatis terisi halaman terakhir), judul, uraian, lampiran gambar/PDF
+  (maks 5 MB, disimpan di folder Drive "Masukan"). Versi aplikasi dan jenis perangkat tercatat otomatis. Pengguna melihat riwayat masukannya
+  beserta status dan tanggapan. Batas 20 masukan per orang per hari.
+- Menu **Masukan** (Admin Prodi, Super Admin): daftar dengan saringan status/jenis, ubah status (baru, ditinjau, direncanakan, selesai, ditolak)
+  dan tulis tanggapan, buka lampiran, unduh Excel. Semua isian tersimpan di sheet "Masukan" pada spreadsheet. Beranda Admin menampilkan jumlah masukan baru.
+- Uji menyeluruh sebelum rilis: 515 uji otomatis server (471 + 44 biodata), penjelajahan semua halaman/tab/laci untuk 6 peran (177 pemeriksaan, lebar komputer)
+  dan lebar ponsel (36 pemeriksaan), serta 5 alur ujung-ke-ujung (aktivasi mahasiswa baru, pengajuan lomba sampai disetujui, masukan,
+  unduhan DED/iLKPS/Penilaian/Lab/Portofolio, survei). Dua perbaikan kecil pada formulir masukan ditemukan dan dibereskan sebelum rilis.
+- Struktur data versi 18: tabel baru "Masukan" (ditambahkan otomatis, cadangan dibuat lebih dulu). Versi lama tetap bisa membaca data
+  (tabel baru diabaikan), jadi rollback ke v0.22.1 aman tanpa pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.22.1 — 14 Nov 2026 — Uji Coba
 - Ikon aplikasi baru (pilihan pemilik: konsep D "koper arsip" dengan tulisan UPW), biru #0A5188 dan emas dari logo Poltekpar Bali;
   ukuran 192, 512, maskable (Android), dan 180 (iPhone). Logo institusi Poltekpar Bali tetap dipakai di dalam aplikasi dan surat.
