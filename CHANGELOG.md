@@ -3,6 +3,24 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.22.0 — 14 Nov 2026 — Uji Coba
+Catatan prodi lanjutan (7 butir):
+- Kolom Cari orang: petunjuk "Nama, Inisial, NIP atau bidang keahlian".
+- Biodata: persentase kini dari semua kolom isian (kolom "kosongkan bila belum/tidak ada" tidak dihitung), dengan keterangan terpisah
+  apakah kolom wajib sudah terisi; pengguna tetap bisa melanjutkan bila kolom wajib lengkap.
+- Dokumen pendukung dosen: tombol unggah mengikuti isian saat itu (S1 selalu; S2/S3 bila diisi; Serdos bila nomor diisi; sertifikat
+  kompetensi/profesi bila diisi, boleh banyak) dan langsung berubah saat mengetik.
+- Tombol lihat kata sandi berupa ikon mata.
+- Unduhan di aplikasi terpasang: membuka jendela "Simpan ke…" sehingga folder dipilih sendiri (tombol "Buka folder" milik Chrome sering
+  tidak berfungsi di aplikasi terpasang macOS); bila tidak tersedia, aplikasi memberi tahu bahwa berkas ada di folder Unduhan.
+- Pintasan aplikasi (klik kanan ikon di Dock/taskbar): Info dan panduan, Catat kegiatan, Beranda. Menu macOS (History, Window) milik
+  Chrome/macOS dan tidak bisa ditambah oleh aplikasi web.
+- Info: 10 gambar panduan dengan penanda nomor (masuk, Beranda, catat kegiatan, peserta & GCET, bukti, biodata, dokumen pendukung,
+  Antrean KPS, Laboratorium, impor Excel).
+- Perbaikan: KPS yang memilih peran Dosen tidak lagi melihat menu Tanda Tangan.
+- Tidak ada perubahan struktur data (tetap versi 17). Rollback ke v0.21.0 aman.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.21.0 — 14 Nov 2026 — Uji Coba
 Catatan prodi tahap 3–5 (versi 0.19.0 dan 0.20.0 tidak dirilis terpisah):
 - Biodata dosen: bagian "Dokumen pendukung (opsional)": ijazah per jenjang yang diisi, sertifikat pendidik, sertifikat kompetensi/profesi

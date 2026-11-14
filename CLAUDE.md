@@ -198,6 +198,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   PELAJARAN: isian formulir yang bisa memicu render (pilih file) harus disimpan ke state saat diketik (event input).
   Uji: uji-v17..v21-bagian.mjs (total 459 + 44).
 
+- v0.22.0 (14 Nov 2026, Uji Coba): docs/uji/panduan/*.jpg = gambar panduan (tangkapan layar versi Produksi + data contoh, 1100x720)
+  dengan penanda di GAMBAR_PANDUAN (aplikasi.js; [x%, y%, nomor, keterangan], diletakkan dengan membaca gambar — screenshot pratinjau
+  TIDAK mengikuti gulir di dalam laci/drawer, hanya gulir halaman). alat/tampilan.mjs kini menyalin sub-folder. Unduhan lewat simpanBerkas()
+  (showSaveFilePicker di aplikasi terpasang). manifest shortcuts ?buka=info|kegiatan|beranda. Menu macOS tidak bisa ditambah aplikasi web.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

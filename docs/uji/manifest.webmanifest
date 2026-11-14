@@ -28,5 +28,45 @@
       "purpose": "maskable"
     }
   ],
-  "id": "./"
+  "id": "./",
+  "shortcuts": [
+    {
+      "name": "Info dan panduan",
+      "short_name": "Info",
+      "description": "Tentang aplikasi dan panduan sesuai peran",
+      "url": "./?buka=info",
+      "icons": [
+        {
+          "src": "ikon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Catat kegiatan",
+      "short_name": "Catat",
+      "description": "Catat kegiatan baru",
+      "url": "./?buka=kegiatan",
+      "icons": [
+        {
+          "src": "ikon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Beranda",
+      "short_name": "Beranda",
+      "url": "./?buka=beranda",
+      "icons": [
+        {
+          "src": "ikon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }
