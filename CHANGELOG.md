@@ -3,6 +3,17 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.25.2 — 15 Nov 2026 — Uji Coba
+Permintaan pemilik (seperti di Chrome, terutama untuk aplikasi terpasang yang tidak punya bilah alamat):
+- **Tombol ← dan →** di kiri bilah atas: kembali ke halaman sebelumnya dan maju lagi. Setiap pindah menu tercatat di riwayat, sehingga tombol
+  mundur/maju pada mouse dan gestur geser trackpad juga bekerja. Tombol pudar bila tidak ada halaman sebelumnya/berikutnya.
+- **Ikon Unduhan** di pojok kanan atas: setelah mengunduh, kotak "Unduhan terakhir" muncul beberapa detik (nama berkas, ukuran, waktu, dan
+  letaknya: folder Unduhan atau folder pilihan), dengan angka penanda. Berkas dari sesi ini bisa dibuka (PDF/gambar) atau diunduh lagi; daftar
+  disimpan di perangkat (30 terakhir). Catatan: aplikasi web tidak bisa membuka Finder/File Explorer langsung, jadi letak berkas disebutkan.
+- Perbaikan: nama berkas unduhan memakai tanggal menurut jam perangkat (sebelumnya UTC, sehingga pagi hari tertulis tanggal kemarin).
+- Bilah atas di ponsel dirapikan agar tombol baru muat tanpa melebar.
+- Tidak ada perubahan server maupun struktur data. Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.25.1 — 15 Nov 2026 — Uji Coba
 - Permintaan pemilik: daftar yang sebelumnya dipotong ("… dan N baris lainnya") kini ditampilkan **lengkap dalam kotak bergulir** dengan kepala
   tabel tetap terlihat:

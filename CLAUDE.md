@@ -234,6 +234,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   direktori, admin.pengguna (Admin Prodi), ekspor akun, cocokSasaran survei, KPS penanda tangan bawaan; kegiatan olehId akun sistem tidak dihitung
   (idAkunSistem() di susunIlkps, konteksNilai, Tabel 5). Data prodi baru WAJIB memakai aturan ini.
 
+- v0.25.1–v0.25.2 (15 Nov 2026, Uji Coba): daftar panjang TIDAK dipotong lagi; pakai kelas CSS .gulir (kotak bergulir, kepala tabel sticky), .gulir.tinggi.
+  Riwayat halaman: catatNavigasi() di render() → history.pushState({upw,i,v}); popstate mengganti S.view; tombol ← → (navKembali/navMaju).
+  Unduhan: simpanBerkas → catatUnduhan() → kotak .unduh-pop di dalam header (ls "unduhan:<userId>"). Nama berkas pakai hariIniLokal(), bukan toISOString.
+  PELAJARAN (lagi): Object.assign(AKSI, …) hanya boleh SETELAH const AKSI dideklarasikan; halaman macet "Memuat…" bila dilanggar.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
