@@ -43,7 +43,8 @@ function barisDana(v) { v = teks(v); return v.indexOf("Dalam negeri") === 0 ? 1 
 /** Susun semua tabel. Mengembalikan struktur umum yang dipakai tampilan dan ekspor Excel. */
 function susunIlkps(ts) {
   var idx = indeksOrang(), tsList = [ts - 2, ts - 1, ts];
-  var semuaK = semuaKegiatan().filter(function (k) { var a = taKegiatan(k); return a !== null && a >= ts - 2 && a <= ts; });
+  var sis = idAkunSistem(); // v0.25.0: kegiatan yang diajukan akun Super Admin tidak dihitung
+  var semuaK = semuaKegiatan().filter(function (k) { var a = taKegiatan(k); return a !== null && a >= ts - 2 && a <= ts && !sis[k.olehId]; });
   var ok = semuaK.filter(function (k) { return k.status === "disetujui"; });
   var proses = function (jenis) { return semuaK.filter(function (k) { return jenis.indexOf(k.jenis) >= 0 && k.status !== "disetujui" && k.status !== "ditolak" && !(k.st === "ditolak_aju"); }).length; };
   var dari = function (jenis) { return ok.filter(function (k) { return jenis.indexOf(k.jenis) >= 0; }).sort(function (a, b) { return (a.tgl || "").localeCompare(b.tgl || ""); }); };

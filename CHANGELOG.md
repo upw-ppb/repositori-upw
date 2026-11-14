@@ -21,9 +21,14 @@ Permintaan pemilik (kesiapan akreditasi dan GKM):
 - **Pengingat di Beranda**: GKM melihat jumlah butir rubrik yang belum dinilai pada TS dan laporan semester yang belum dikirim/perlu revisi
   (mulai 30 hari sebelum semester berakhir); KPS melihat laporan yang menunggu keputusan. Tanda "terlambat" hanya untuk semester berjalan dan
   satu semester sebelumnya.
+- **Akun Super Admin bukan data prodi** (permintaan pemilik): akun yang memiliki peran Super Admin, walaupun diberi peran lain (mahasiswa, dosen,
+  KPS, dst.), tidak dihitung sebagai mahasiswa aktif/dosen (Penilaian, Tabel iLKPS, Data Prodi), tidak memakai biodata, tidak tampil di Cari orang,
+  daftar pengguna Admin Prodi, ekspor daftar akun, pilihan peserta kegiatan, maupun sasaran survei, dan tidak dipakai sebagai penanda tangan KPS
+  bawaan. Kegiatan yang ia ajukan tetap tersimpan tetapi tidak dihitung di Tabel iLKPS dan Penilaian (ditandai "akun Super Admin · tidak dihitung"
+  di Data Terkumpul).
 - Perbaikan saat uji tampilan: tab Data Prodi › Dokumen dosen tidak termuat untuk GKM (kini GKM bisa melihat dan mengingatkan); menu ganda (Bank Dokumen) untuk GKM yang juga PJ dokumen; kotak angka di Beranda/Data Terkumpul melebar di layar
   sempit; tanda "terlambat" pada semester lama sebelum aplikasi dipakai.
-- Uji: 523 + 44 uji server lulus (26 uji baru); uji tampilan alur GKM (draf, lampiran, kirim, revisi KPS, unduh Word) dan penjelajah semua halaman.
+- Uji: 531 + 44 uji server lulus (34 uji baru); uji tampilan alur GKM (draf, lampiran, kirim, revisi KPS, unduh Word) dan penjelajah semua halaman.
 - Struktur data versi 20: tabel baru "LaporanGkm" (ditambahkan otomatis, cadangan dibuat lebih dulu). Versi lama tetap bisa membaca data;
   rollback ke v0.24.0 aman tanpa pemulihan data (peran "gkm" diabaikan versi lama).
 - Penyetuju: tidak diperlukan (Uji Coba).

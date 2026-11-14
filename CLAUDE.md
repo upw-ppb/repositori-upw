@@ -230,6 +230,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   daftar PERAN_* lihat/nilai). gas/Gkm.js: LaporanGkm (VERSI_SKEMA 20, kunci semester "2026-1"), gkm.data/simpan/unggah/hapusLampiran/lampiran/putuskan/batas,
   tugasGkm() dipanggil di awal aksiTugasSaya, BUTIR_LAPORAN_GKM [1,2,4,23,77], kesiapan.data (hitungPenilaian(ts, X) kini menerima konteks).
   Tampilan: panelKesiapan() di Beranda, hGkm(), barisTugasGkm(); menu() kini tanpa duplikat. Uji: alat/uji/uji-v25-bagian.mjs.
+  AKUN SISTEM: akunSistem(p) = punya peran superadmin → jenisBiodata null, dikecualikan dari daftarDosen, NM Penilaian, indeksOrang (jenis "lain"),
+  direktori, admin.pengguna (Admin Prodi), ekspor akun, cocokSasaran survei, KPS penanda tangan bawaan; kegiatan olehId akun sistem tidak dihitung
+  (idAkunSistem() di susunIlkps, konteksNilai, Tabel 5). Data prodi baru WAJIB memakai aturan ini.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

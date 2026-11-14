@@ -120,6 +120,7 @@ function semesterMhs(masuk, s) {
 /* ---------- jenis biodata per akun ---------- */
 
 function jenisBiodata(p) {
+  if (akunSistem(p)) return null; // v0.25.0: akun Super Admin tanpa biodata
   var r = peranDari(p);
   if (r.indexOf("mahasiswa") >= 0) return "mahasiswa";
   if (r.indexOf("dosen") >= 0 || r.indexOf("tendik") >= 0) return "pegawai";

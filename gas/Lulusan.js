@@ -83,7 +83,7 @@ function aksiLulImpor(d, token) {
   });
   return kunciTulis(function () {
     var ada = {}; semua("Lulusan").filter(function (r) { return !r.dihapus; }).forEach(function (r) { ada[teks(r.nim)] = r; });
-    var akun = {}; semua("Pengguna").forEach(function (u) { if (peranDari(u).indexOf("mahasiswa") >= 0) akun[String(u.username)] = u; });
+    var akun = {}; semua("Pengguna").forEach(function (u) { if (peranDari(u).indexOf("mahasiswa") >= 0 && !akunSistem(u)) akun[String(u.username)] = u; });
     var baru = 0, ubahN = 0, lulusAkun = 0;
     bersih.forEach(function (o) {
       o.diubah = new Date();

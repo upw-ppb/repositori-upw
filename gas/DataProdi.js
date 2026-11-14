@@ -42,7 +42,7 @@ function dosenTs(ta) {
 function daftarDosen() {
   var bio = {};
   semua("BiodataPegawai").forEach(function (b) { bio[b.userId] = b; });
-  return semua("Pengguna").filter(function (p) { return p.status !== "nonaktif" && peranDari(p).indexOf("dosen") >= 0; }).map(function (p) {
+  return semua("Pengguna").filter(function (p) { return p.status !== "nonaktif" && peranDari(p).indexOf("dosen") >= 0 && !akunSistem(p); }).map(function (p) {
     var b = bio[p.id] || {};
     return { id: p.id, nama: p.nama, nip: String(p.username), nidn: teks(b.nidn), status: teks(b.statusDosen), jabfung: teks(b.jabfung),
       pendS1: teks(b.pendS1), pendS2: teks(b.pendS2), pendS3: teks(b.pendS3), pddikti: teks(b.pddikti), bidang: teks(b.bidang),
@@ -275,7 +275,8 @@ function tabelDosen(ts) {
       mks.reduce(function (s, m) { return s + m.sksPraktik; }, 0) + " sks praktik." });
   // Tabel 5: pembimbing utama TA, dari kegiatan "bimbingan" yang disetujui.
   var idx = indeksOrang(), tsL = [ts - 2, ts - 1, ts], hit = {};
-  semuaKegiatan().filter(function (k) { return k.jenis === "bimbingan" && k.status === "disetujui" && teks(k.isian.Peran) === "Pembimbing utama"; }).forEach(function (k) {
+  var sis = idAkunSistem();
+  semuaKegiatan().filter(function (k) { return k.jenis === "bimbingan" && k.status === "disetujui" && !sis[k.olehId] && teks(k.isian.Peran) === "Pembimbing utama"; }).forEach(function (k) {
     var c = tsL.indexOf(taKegiatan(k)); if (c < 0) return;
     var lain = teks(k.isian["Prodi mahasiswa"]) === "Prodi lain di Poltekpar Bali", n = lain ? angka(k.isian["Jumlah mahasiswa (prodi lain)"], 500) : mhsKegiatan(k, idx).length;
     var ds = [k.olehId].concat(k.pegawai).filter(function (id, i, a) { return a.indexOf(id) === i && idx.byId[id] && idx.byId[id].jenis === "dosen"; });

@@ -60,7 +60,7 @@ function aksiAdminEksporAkun(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["superadmin", "admin"]);
   var sa = punyaPeran(p, ["superadmin"]);
-  var l = semua("Pengguna").filter(function (x) { return sa || peranDari(x).indexOf("mahasiswa") >= 0; }).map(function (x) {
+  var l = semua("Pengguna").filter(function (x) { return !akunSistem(x) && (sa || peranDari(x).indexOf("mahasiswa") >= 0); }).map(function (x) {
     return [String(x.username), x.nama, sa ? peranDari(x).join(", ") : "mahasiswa", teks(x.masuk), teks(x.kelas), teks(x.statusMhs), x.status,
       teks(x.email), x.emailTerverifikasi === true || x.emailTerverifikasi === "TRUE" ? "Ya" : x.emailTerverifikasi === "tertunda" ? "Belum (tertunda)" : "Tidak",
       x.biodataLengkap === true || x.biodataLengkap === "TRUE" ? "Lengkap" : "Belum", x.masukTerakhir ? Utilities.formatDate(new Date(x.masukTerakhir), "Asia/Makassar", "yyyy-MM-dd HH:mm") : ""];

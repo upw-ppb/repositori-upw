@@ -44,13 +44,13 @@ function petaJenisButir() {
 function butirGcet() { var m = MATRIKS.filter(function (x) { return x.f === "gcet"; })[0]; return m ? m.n : null; }
 function dalamTs(k, ts, hanyaTs) { var a = taKegiatan(k); return a !== null && (hanyaTs ? a === ts : a >= ts - 2 && a <= ts); }
 
-function kegiatanSumber(k, idx, peta, nGcet) {
-  var def = jenisDef(k.jenis), o = idx.byId[k.olehId], v = idx.byId[k.verifId];
+function kegiatanSumber(k, idx, peta, nGcet, sis) {
+  var def = jenisDef(k.jenis), o = idx.byId[k.olehId], v = idx.byId[k.verifId], sistem = !!(sis && sis[k.olehId]);
   var butir = (peta[k.jenis] || []).slice();
   if (nGcet && (k.gcet || []).length) butir.push({ n: nGcet, cara: "dihitung" });
   return { id: k.id, judul: k.judul, jenis: k.jenis, jenisLabel: def ? def.l : k.jenis, jenisLain: k.jenisLain, tabel: def ? def.t : "",
     tgl: k.tgl, sampai: k.sampai, ta: taKegiatan(k), olehNama: o ? o.nama : "(akun dihapus)", olehUser: o ? o.username : "", kelompok: k.kelompok,
-    status: k.status, statusLabel: LABEL_STATUS_DATA[k.status] || k.status, st: k.st, dihitung: k.status === "disetujui",
+    status: k.status, statusLabel: LABEL_STATUS_DATA[k.status] || k.status, st: k.st, dihitung: k.status === "disetujui" && !sistem, akunSistem: sistem,
     verifNama: v ? v.nama : "", tglVerif: k.tglVerif, gcet: (k.gcet || []).length, butir: butir,
     dibuat: k.dibuat ? new Date(k.dibuat).toISOString() : "" };
 }
@@ -107,14 +107,14 @@ function aksiSumberButir(d, token) {
   var ts = d.ts ? Number(d.ts) : tsAwal(), n = Number(d.butir), m = MATRIKS.filter(function (x) { return x.n === n; })[0];
   if (!(ts >= 2000 && ts < 2100)) throw galat("TS tidak valid.");
   if (!m) throw galat("Butir tidak dikenal.");
-  var X = konteksNilai(ts), idx = indeksOrang(), peta = petaJenisButir(), nG = butirGcet();
+  var X = konteksNilai(ts), idx = indeksOrang(), peta = petaJenisButir(), nG = butirGcet(), sis = idAkunSistem();
   var fj = m.f ? F_JENIS[m.f] : null, dedJ = m.t === "a" ? [] : JENIS_KEG.filter(function (j) { return dedDariJenis(j).indexOf(Number(m.ded)) >= 0; }).map(function (j) { return j.k; });
   var cocok = function (k) {
     if (fj === "*") return (k.gcet || []).length > 0;
     return (fj && fj.indexOf(k.jenis) >= 0) || dedJ.indexOf(k.jenis) >= 0;
   };
   var keg = semuaKegiatan().filter(function (k) { return cocok(k) && dalamTs(k, ts, m.f === "suasana"); })
-    .map(function (k) { var o = kegiatanSumber(k, idx, peta, nG); o.dihitungButir = !!(fj && o.dihitung && (fj === "*" || fj.indexOf(k.jenis) >= 0)); return o; });
+    .map(function (k) { var o = kegiatanSumber(k, idx, peta, nG, sis); o.dihitungButir = !!(fj && o.dihitung && (fj === "*" || fj.indexOf(k.jenis) >= 0)); return o; });
   keg.sort(function (a, b) { return (b.dihitung - a.dihitung) || String(b.tgl).localeCompare(String(a.tgl)); });
   return { butir: { n: m.n, nm: m.nm, t: m.t, ded: m.ded, src: m.src, f: m.f || "" }, ts: { awal: ts, label: labelTa(ts) },
     jenis: (fj === "*" ? ["(semua jenis yang memilih pasal GCET)"] : (fj || []).concat(dedJ)).map(function (k) { var j = jenisDef(k); return j ? j.l : k; }),
@@ -126,13 +126,13 @@ function aksiSumberButir(d, token) {
 function aksiSumberKegiatan(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["superadmin"]);
-  var idx = indeksOrang(), peta = petaJenisButir(), nG = butirGcet();
-  var l = semuaKegiatan().map(function (k) { return kegiatanSumber(k, idx, peta, nG); });
+  var idx = indeksOrang(), peta = petaJenisButir(), nG = butirGcet(), sis = idAkunSistem();
+  var l = semuaKegiatan().map(function (k) { return kegiatanSumber(k, idx, peta, nG, sis); });
   l.sort(function (a, b) { return String(b.dibuat).localeCompare(String(a.dibuat)); });
   var hitung = function (nama) { try { return semua(nama).filter(function (r) { return !r.dihapus; }).length; } catch (e) { return 0; } };
   var ringkas = [
     { judul: "Dosen", jumlah: daftarDosen().length, menu: "dprodi" },
-    { judul: "Mahasiswa aktif", jumlah: semua("Pengguna").filter(function (x) { return x.status !== "nonaktif" && peranDari(x).indexOf("mahasiswa") >= 0 && (x.statusMhs || "A") === "A"; }).length, menu: "pengguna" },
+    { judul: "Mahasiswa aktif", jumlah: semua("Pengguna").filter(function (x) { return x.status !== "nonaktif" && peranDari(x).indexOf("mahasiswa") >= 0 && !akunSistem(x) && (x.statusMhs || "A") === "A"; }).length, menu: "pengguna" },
     { judul: "Mata kuliah", jumlah: hitung("MataKuliah"), menu: "dprodi" },
     { judul: "Lulusan", jumlah: hitung("Lulusan"), menu: "dprodi" },
     { judul: "Data PMB (tahun)", jumlah: semua("Penerimaan").length, menu: "dprodi" },

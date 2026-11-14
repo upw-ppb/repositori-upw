@@ -141,7 +141,7 @@ function boleLihatSemua(p) { return punyaPeran(p, PERAN_LIHAT_SEMUA); }
 function pengaturanSurat() {
   var m = {};
   semua("Pengaturan").forEach(function (x) { m[x.kunci] = x.nilai; });
-  var kps = semua("Pengguna").filter(function (x) { return x.status !== "nonaktif" && peranDari(x).indexOf("kps") >= 0; })[0];
+  var kps = semua("Pengguna").filter(function (x) { return x.status !== "nonaktif" && peranDari(x).indexOf("kps") >= 0 && !akunSistem(x); })[0];
   return {
     unit: teks(m.unitKerja) || "Prodi Usaha Perjalanan Wisata",
     tempat: teks(m.tempatSurat) || "Nusa Dua",

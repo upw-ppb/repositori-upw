@@ -6,6 +6,14 @@ var PERAN_SAH = ["superadmin", "admin", "kps", "gkm", "kalab", "laboran", "dosen
 
 function peranDari(p) { return String(p.peran || "").split(",").map(function (x) { return x.trim(); }).filter(String); }
 function punyaPeran(p, daftar) { var r = peranDari(p); return daftar.some(function (x) { return r.indexOf(x) >= 0; }); }
+/**
+ * Akun sistem (v0.25.0): akun yang memiliki peran Super Admin BUKAN bagian dari data prodi, walaupun diberi peran lain (mahasiswa, dosen,
+ * KPS, dst.) untuk keperluan uji/pengelolaan. Akun ini tidak dihitung sebagai mahasiswa/dosen (Penilaian, Tabel iLKPS, survei), tidak
+ * wajib/tidak memakai biodata, tidak tampil di Cari orang, daftar pengguna Admin Prodi, ekspor, maupun pilihan peserta; kegiatan yang ia ajukan
+ * tidak dihitung di Tabel iLKPS dan Penilaian.
+ */
+function akunSistem(p) { return !!p && peranDari(p).indexOf("superadmin") >= 0; }
+function idAkunSistem() { var m = {}; semua("Pengguna").forEach(function (x) { if (akunSistem(x)) m[x.id] = 1; }); return m; }
 function wajibPeran(p, daftar) {
   if (p.status === "impor") throw galat("Selesaikan aktivasi akun terlebih dahulu.");
   if (p.wajibGanti === true || p.wajibGanti === "TRUE") throw galat("Ganti kata sandi Anda terlebih dahulu.");
@@ -163,7 +171,7 @@ function aksiAdminPengguna(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["superadmin", "admin"]);
   var lihatSemua = punyaPeran(p, ["superadmin"]);
-  var daftar = semua("Pengguna").filter(function (x) { return lihatSemua || peranDari(x).indexOf("mahasiswa") >= 0; });
+  var daftar = semua("Pengguna").filter(function (x) { return lihatSemua || (peranDari(x).indexOf("mahasiswa") >= 0 && !akunSistem(x)); });
   return { pengguna: daftar.map(function (x) { return profilAdmin(x, lihatSemua); }), semester: semesterInfo() };
 }
 

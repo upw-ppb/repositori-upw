@@ -64,6 +64,7 @@ function statusEfektif(s) {
 }
 function jawabanSurvei(id) { return semua("Jawaban").filter(function (r) { return r.survei === id; }); }
 function cocokSasaran(s, p) {
+  if (akunSistem(p)) return false; // v0.25.0: akun Super Admin bukan responden
   var r = peranDari(p);
   return s.sasaran.some(function (x) {
     if (x === "mahasiswa") return r.indexOf("mahasiswa") >= 0 && (p.statusMhs || "A") === "A";

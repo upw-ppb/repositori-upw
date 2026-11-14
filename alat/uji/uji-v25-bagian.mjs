@@ -53,5 +53,25 @@ export function jalankan({ g, cek, ok, salah, tKps, tDsn, tAdm, tM, tD2, tSA }) 
   const kp = K.kurang.find(r => r.n === 64);
   cek("butir PMB (data kosong) disarankan mengisi Data Prodi › PMB dan Bank Dokumen", kp && kp.saran.some(x => /PMB/.test(x.teks) && x.menu === "dprodi") && kp.saran.some(x => x.menu === "bank"), K.kurang.map(r => r.n));
   cek("kesiapan juga untuk GKM dan Super Admin", ok("kesiapan.data", {}, tD2).total === K.total && ok("kesiapan.data", {}, tSA).ok);
+  console.log("36. Akun Super Admin bukan data prodi");
+  const ts0 = ok("penilaian.data", {}, tSA).ts.awal;
+  const sebelum = { P: ok("penilaian.data", {}, tSA).ringkas, dosen: ok("dp.data", {}, tAdm).dosen.length, dir: ok("direktori", {}, tKps).orang.length,
+    pengAdm: ok("admin.pengguna", {}, tAdm).pengguna.length, ekspor: ok("admin.eksporAkun", {}, tSA).baris.length, ilkps: ok("ilkps.data", { ts: ts0 }, tSA).tabel.find(t => t.kode === "1").baris.length };
+  const sa = ok("saya", {}, tSA).pengguna;
+  ok("admin.peran", { userId: sa.id, peran: ["superadmin", "admin", "kps", "gkm", "kalab", "laboran", "dosen", "tendik", "mahasiswa"] }, tSA);
+  const sa2 = ok("saya", {}, tSA).pengguna;
+  cek("Super Admin dengan semua peran: tidak wajib/tidak memakai biodata", sa2.peran.length === 9 && sa2.jenisBiodata === null && !sa2.perluBiodata);
+  const sesudah = { P: ok("penilaian.data", {}, tSA).ringkas, dosen: ok("dp.data", {}, tAdm).dosen.length, dir: ok("direktori", {}, tKps).orang.length,
+    pengAdm: ok("admin.pengguna", {}, tAdm).pengguna.length, ekspor: ok("admin.eksporAkun", {}, tSA).baris.length, ilkps: ok("ilkps.data", { ts: ts0 }, tSA).tabel.find(t => t.kode === "1").baris.length };
+  cek("jumlah mahasiswa aktif (NM) dan DTPS (NDTPS) di Penilaian tidak bertambah", sesudah.P.NM === sebelum.P.NM && sesudah.P.NDTPS === sebelum.P.NDTPS, [sebelum.P, sesudah.P]);
+  cek("Data Prodi › dosen dan Tabel iLKPS 1 tidak bertambah", sesudah.dosen === sebelum.dosen && sesudah.ilkps === sebelum.ilkps);
+  cek("tidak tampil di Cari orang dan daftar pengguna Admin Prodi", sesudah.dir === sebelum.dir && sesudah.pengAdm === sebelum.pengAdm && !ok("direktori", {}, tKps).orang.some(o => o.id === sa.id));
+  cek("tidak ikut ekspor daftar akun", sesudah.ekspor === sebelum.ekspor && !ok("admin.eksporAkun", {}, tSA).baris.some(r => r[0] === sa.username));
+  cek("bukan sasaran survei", ok("survei.saya", {}, tSA).survei.length === 0);
+  cek("tidak bisa dipilih sebagai peserta (daftar mahasiswa/pegawai di formulir)", (() => { const r = ok("kegiatan.ref", { peran: "mahasiswa" }, tSA); return !JSON.stringify(r).includes(sa.id); })());
+  const n0 = ok("ilkps.data", { ts: ts0 }, tSA).jumlahDisetujui;
+  const D0 = ok("sumber.kegiatan", {}, tSA).kegiatan.filter(k => k.akunSistem);
+  cek("Data Terkumpul menandai kegiatan akun Super Admin (tidak dihitung)", D0.every(k => !k.dihitung) && ok("ilkps.data", { ts: ts0 }, tSA).jumlahDisetujui === n0);
+  ok("admin.peran", { userId: sa.id, peran: ["superadmin"] }, tSA);
   cek("migrasi: LaporanGkm; SKEMA_VERSI 20", g.sheets.LaporanGkm && g.props.SKEMA_VERSI === "20");
 }

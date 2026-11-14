@@ -29,9 +29,9 @@ function konteksNilai(ts) {
   I.tabel.forEach(function (t) { T[t.kode] = t; });
   var dosen = daftarDosen(), dts = dosenTs(ts);
   var dtps = dosen.filter(function (x) { return x.status === STATUS_TETAP[0]; });
-  var mhsAktif = semua("Pengguna").filter(function (p) { return p.status !== "nonaktif" && peranDari(p).indexOf("mahasiswa") >= 0 && (p.statusMhs || "A") === "A"; });
+  var mhsAktif = semua("Pengguna").filter(function (p) { return p.status !== "nonaktif" && peranDari(p).indexOf("mahasiswa") >= 0 && !akunSistem(p) && (p.statusMhs || "A") === "A"; });
   var tsL = [ts - 2, ts - 1, ts];
-  var setuju = semuaKegiatan().filter(function (k) { return k.status === "disetujui"; });
+  var sis = idAkunSistem(), setuju = semuaKegiatan().filter(function (k) { return k.status === "disetujui" && !sis[k.olehId]; });
   var dalamTs = function (k) { var a = taKegiatan(k); return a !== null && a >= ts - 2 && a <= ts; };
   return { ts: ts, T: T, dosen: dosen, dts: dts, dtps: dtps, NDTPS: dtps.length, mhs: mhsAktif, NM: mhsAktif.length, tsL: tsL,
     setuju: setuju, setujuTs: setuju.filter(dalamTs), lulusan: semuaLulusan(), pmb: semuaPenerimaan(), mk: semuaMk() };
