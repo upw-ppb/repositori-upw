@@ -221,6 +221,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   folder Drive "Masukan"; tombol Kirim masukan di Info, menu Masukan (superadmin/admin). Field formulir jenis = S.laci.jm (S.laci.jenis = nama laci!).
   Uji menyeluruh: scratchpad jelajah.js (penjelajah semua menu/tab/laci per peran, cek galat/teks rusak/konsol/lebar layar) + uji-v23-bagian.mjs.
 
+- v0.24.0 (14 Nov 2026, Uji Coba): gas/Foto.js (FotoProfil, VERSI_SKEMA 19; JPEG data URL di sheet: foto ≤48k, kecil ≤12k karakter; foto.saya/simpan/hapus/kecil).
+  gas/SumberData.js: F_JENIS/F_DATA (rumus → jenis kegiatan/data lain), petaJenisButir (juga lewat "DED butir N" di Jenis.t untuk butir GPM),
+  sumber.butir (lihat: admin/superadmin/kps), sumber.kegiatan/tinjau/hapus/pulihkan (superadmin; hapus = kolom dihapus + riwayat "hapus_sa").
+  Tampilan: menu "data" (Data Terkumpul), laci "sumber"/"sumberAksi", avatar(). Klik data-go kini menutup laci. Uji: alat/uji/uji-v24-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

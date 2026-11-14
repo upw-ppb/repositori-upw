@@ -22,5 +22,5 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   const S = ok("masukan.saya", {}, tM).masukan[0];
   cek("pengirim melihat status dan tanggapan beserta nama penanggap", S.status === "direncanakan" && /Terima kasih/.test(S.tanggapan) && S.olehTanggapan);
   cek("lampiran: pengirim dan Admin bisa membuka; pengguna lain tidak", ok("masukan.lampiran", { id }, tM).mime === "image/png" && ok("masukan.lampiran", { id }, tSA).isi && /tidak ditemukan/.test(salah("masukan.lampiran", { id }, tDsn)));
-  cek("migrasi: Masukan; SKEMA_VERSI 18", g.sheets.Masukan && g.props.SKEMA_VERSI === "18");
+  cek("migrasi: Masukan; SKEMA_VERSI ≥ 18", g.sheets.Masukan && Number(g.props.SKEMA_VERSI) >= 18);
 }

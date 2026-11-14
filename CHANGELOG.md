@@ -3,6 +3,27 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.24.0 — 14 Nov 2026 — Uji Coba
+Permintaan pemilik (2 butir):
+- **Foto profil** untuk semua pengguna (menu Akun saya, atau klik nama di bawah menu): pilih foto JPG/PNG, bagian tengah dipotong persegi dan
+  diperkecil otomatis di perangkat; bisa diganti atau dihapus. Tampil di bilah samping dan di Cari orang (yang belum punya foto tetap berinisial).
+  Disimpan di sheet "FotoProfil" (bukan Drive, agar cepat dimuat).
+- **Data Terkumpul** (menu baru, Super Admin): semua kegiatan dari semua status beserta kategorinya: jenis, Tabel iLKPS/DED, dan nomor butir
+  Penilaian yang memakainya (dihitung otomatis atau bahan GPM). Saring menurut status, jenis, butir, atau pengaju; unduh Excel. Ringkasan data lain
+  (dosen, mahasiswa, kurikulum, lulusan, PMB, keuangan, survei, skor GPM, Bank Dokumen) dengan tautan ke menunya.
+- Tindakan Super Admin atas kegiatan mana pun, termasuk yang sudah disetujui: Terima, Minta revisi (alasan wajib), Tolak (alasan wajib), Hapus
+  (alasan wajib; bisa banyak sekaligus dengan centang). Kegiatan terhapus tidak dibuang: tampil di tab Terhapus dan bisa dipulihkan.
+  Semua keputusan tercatat di Riwayat keputusan dan Log.
+- **Sumber data** di setiap butir Penilaian (Super Admin, Admin Prodi, KPS boleh melihat; tindakan hanya Super Admin): kegiatan pada rentang TS
+  (mana yang ikut dihitung) dan data lain yang menjadi dasar skor.
+- Catatan: beberapa butir otomatis memang memberi skor minimum walau datanya kosong, sesuai rumus Matriks (mis. butir 49 produk diadopsi = 2,
+  butir 63 suasana akademik = 1, butir 75 GCET = 1). Itu bukan data uji coba; tombol Sumber data menunjukkan bahwa kegiatannya kosong.
+- Perbaikan saat uji tampilan: alasan tindakan terbaca kosong setelah percobaan pertama gagal (dibaca di luar proses kirim). Diperbaiki sebelum rilis.
+- Uji: 496 + 44 uji server lulus (24 uji baru); uji tampilan dengan klik dan isian sungguhan; penjelajah semua halaman di layar komputer dan ponsel.
+- Struktur data versi 19: tabel baru "FotoProfil" (ditambahkan otomatis, cadangan dibuat lebih dulu). Versi lama tetap bisa membaca data
+  (tabel baru diabaikan), jadi rollback ke v0.23.x aman tanpa pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.23.1 — 14 Nov 2026 — Produksi
 - Tampilan Produksi diperbarui ke v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak).
 - Hanya tampilan yang berubah. Kode server tidak berubah, jadi server Produksi tetap v0.23.0 (deployment @3) dan tidak diterapkan ulang.

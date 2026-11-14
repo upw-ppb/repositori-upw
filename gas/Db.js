@@ -52,11 +52,13 @@ var SKEMA = {
   Sarana: ["id", "nama", "jenis", "lokasi", "kapasitas", "kepemilikan", "kondisi", "perangkat", "mk", "pj", "ket", "dibuat", "diubah", "dihapus"],
   LogSarana: ["id", "saranaId", "tipe", "tgl", "isi", "mk", "jumlah", "jam", "oleh", "dibuat", "dihapus"],
   /* v0.23.0 */
-  Masukan: ["id", "waktu", "userId", "peran", "jenis", "menu", "judul", "isi", "lampiran", "versi", "perangkat", "status", "tanggapan", "olehTanggapan", "waktuTanggapan"]
+  Masukan: ["id", "waktu", "userId", "peran", "jenis", "menu", "judul", "isi", "lampiran", "versi", "perangkat", "status", "tanggapan", "olehTanggapan", "waktuTanggapan"],
+  /* v0.24.0 */
+  FotoProfil: ["userId", "foto", "kecil", "waktu", "dihapus"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 18;
+var VERSI_SKEMA = 19;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
