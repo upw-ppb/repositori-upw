@@ -2,7 +2,7 @@
 (function () {
 "use strict";
 const K = window.UPW_KONFIG;
-const PERAN_L = { superadmin: "Super Admin", admin: "Admin Prodi", kps: "Koordinator Program Studi", kalab: "Kepala Laboratorium",
+const PERAN_L = { superadmin: "Super Admin", admin: "Admin Prodi", kps: "Koordinator Program Studi", gkm: "GKM (Gugus Kendali Mutu)", kalab: "Kepala Laboratorium",
   laboran: "Laboran", dosen: "Dosen", tendik: "Tendik", mahasiswa: "Mahasiswa", asesor: "Asesor" };
 
 /* ---------- penyimpanan lokal (aman bila diblokir) ---------- */
@@ -77,10 +77,11 @@ const I = {
   lab: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 15h9"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
   masukan: '<path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/>',
+  gkm: '<path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
   data: '<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V12"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", bank: "Bank Dokumen", versi: "Riwayat Versi", lab: "Laboratorium", masukan: "Masukan", data: "Data Terkumpul", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", bank: "Bank Dokumen", versi: "Riwayat Versi", lab: "Laboratorium", masukan: "Masukan", data: "Data Terkumpul", gkm: "Laporan GKM", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -95,7 +96,7 @@ function menu() {
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
   if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
   if (u.peran.includes("dosen")) m.push("mk");
-  if (["admin", "superadmin", "kps"].includes(p)) m.push("penilaian", "ded", "bank", "ilkps", "dprodi", "survei");
+  if (["admin", "superadmin", "kps", "gkm"].includes(p)) m.push("penilaian", "ded", "bank", "ilkps", "dprodi", "survei", "gkm"); // v0.25.0: GKM
   if (p === "superadmin") m.push("data"); // v0.24.0: Data Terkumpul
   else { if (S.tugas && S.tugas.dedPj) m.push("ded"); if (S.tugas && S.tugas.bankPj) m.push("bank"); }
   // Menu mengikuti PERAN AKTIF (v0.17.0): KPS yang memilih peran Dosen melihat menu seperti dosen lain.
@@ -109,7 +110,7 @@ function menu() {
   if (p === "superadmin" || p === "admin") m.push("masukan");
   if (p === "superadmin") m.push("log", "versi");
   m.push("akun");
-  return m;
+  return [...new Set(m)]; // tanpa menu ganda (mis. GKM yang juga PJ Bank Dokumen)
 }
 
 /* ---------- render ---------- */
@@ -193,6 +194,7 @@ function halaman() {
   if (S.view === "info") return hInfo();
   if (S.view === "masukan") return hMasukan();
   if (S.view === "data") return hData();
+  if (S.view === "gkm") return hGkm();
   if (S.view === "versi") return hRiwayat();
   return hBeranda();
 }
@@ -276,8 +278,8 @@ function hBeranda() {
     <li>Tautan bukti di Excel ekspor prodi (kolom "Tautan bukti") juga membuka kegiatan yang sama setelah Anda masuk.</li>
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
-   ${panelSurveiSaya()}${panelTugas()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GPM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${panelSurveiSaya()}${panelTugas()}${panelKesiapan()}
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -302,6 +304,7 @@ function panelTugas() {
   (t.bankPerlu || []).forEach(x => baris.push(`<div class="item" style="cursor:pointer" data-go="bank"><div class="body"><div class="title">${esc(x.nama)}</div><div class="meta"><span>Bank Dokumen · butir ${x.butir} · Anda penanggung jawab</span></div></div><span class="chip ${ST_BANK[x.status][1]}">${ST_BANK[x.status][0]}</span></div>`));
   if (t.masukanBaru && ["superadmin", "admin"].includes(peranAktif())) baris.push(`<div class="item" style="cursor:pointer" data-go="masukan"><div class="body"><div class="title">${t.masukanBaru} masukan baru dari pengguna</div><div class="meta"><span>Laporan masalah, permintaan fitur, dan saran</span></div></div><span class="chip s-diajukan">Masukan</span></div>`);
   if (t.dedBelum) baris.push(`<div class="item" style="cursor:pointer" data-go="ded"><div class="body"><div class="title">${t.dedBelum} butir DED tanggung jawab Anda belum selesai</div><div class="meta"><span>Dari ${t.dedPj} butir yang ditugaskan kepada Anda</span></div></div><span class="chip s-revisi">DED</span></div>`);
+  baris.push(...barisTugasGkm(t));
   if (t.kps && peranAktif() === "kps") baris.push(`<div class="item" style="cursor:pointer" data-go="kps"><div class="body"><div class="title">${t.kps} pengajuan surat tugas menunggu keputusan Anda</div></div><span class="chip s-diajukan">Antrean KPS</span></div>`);
   return `<section class="panel"><h2>Perlu tindakan (${baris.length})</h2><div class="list">${baris.join("") || `<div class="empty">Tidak ada yang perlu ditindaklanjuti. Bagus!</div>`}</div></section>`;
 }
@@ -745,7 +748,7 @@ async function muatVerif() {
   return sekali("verif", async () => { S.verif = (await api("verifikasi.antrean")).kegiatan; render(); });
 }
 /** Setelah ada perubahan data: muat ulang daftar, antrean, dan pengingat saat dibutuhkan. */
-function segarkan() { S.sdata = null; S.mskAdm = null; S.rkep = null; S.lab = null; S.dokd = null; S.dokBio = null; S.sdos = null; S.bank = null; S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
+function segarkan() { S.kesiapan = null; S.gkm = null; S.sdata = null; S.mskAdm = null; S.rkep = null; S.lab = null; S.dokd = null; S.dokBio = null; S.sdos = null; S.bank = null; S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
 async function muatAntrean() {
   return sekali("antrean", async () => { S.antrean = (await api("kps.antrean")).kegiatan; render(); });
 }
@@ -1486,7 +1489,7 @@ function hDed() {
      <section class="panel"><h2>Tim penyusun</h2><p class="small muted">Nama dan NIDN diambil dari akun dosen bila dipilih. Tanda tangan dibubuhkan pada dokumen cetak.</p><div class="tbl-wrap"><table><thead><tr><th>Dosen / nama</th><th>NIDN</th><th>Jabatan</th><th>Tanggal pengisian</th><th></th></tr></thead><tbody>
       ${tim.map((r, i) => `<tr data-timi="${i}"><td><select data-timk="userId" style="min-width:180px" aria-label="Dosen ${i + 1}"><option value="">– nama lain –</option>${D.dosen.map(o => `<option value="${o.id}" ${r.userId === o.id ? "selected" : ""}>${esc(namaPendek(o.nama))}</option>`).join("")}</select>
         <input data-timk="nama" type="text" value="${esc(r.userId ? "" : r.nama)}" placeholder="Nama (bila bukan akun dosen)" aria-label="Nama ${i + 1}" style="margin-top:4px;${r.userId ? "display:none" : ""}"></td>
-        <td><input data-timk="nidn" type="text" value="${esc(r.nidn || (r.userId ? D.nidn[r.userId] || "" : ""))}" style="width:120px" aria-label="NIDN ${i + 1}"></td><td><input data-timk="jabatan" type="text" value="${esc(r.jabatan)}" placeholder="Contoh: Ketua Tim / GPM" aria-label="Jabatan ${i + 1}"></td>
+        <td><input data-timk="nidn" type="text" value="${esc(r.nidn || (r.userId ? D.nidn[r.userId] || "" : ""))}" style="width:120px" aria-label="NIDN ${i + 1}"></td><td><input data-timk="jabatan" type="text" value="${esc(r.jabatan)}" placeholder="Contoh: Ketua Tim / GKM" aria-label="Jabatan ${i + 1}"></td>
         <td><input data-timk="tanggal" type="date" value="${esc(r.tanggal)}" aria-label="Tanggal ${i + 1}"></td><td><button class="btn sm bad" data-act="dedTimHapus" data-i="${i}" aria-label="Hapus anggota">×</button></td></tr>`).join("")}</tbody></table></div>
       <div class="row" style="justify-content:space-between;flex-wrap:wrap"><button class="btn sm" data-act="dedTimTambah">+ Anggota</button>${tombol("dedIdSimpan", "Simpan identitas dan tim")}</div></section>`;
   })();
@@ -1752,7 +1755,7 @@ function hBank() {
   const cocok = s => !f || (f === "perlu" ? s.status !== "ada" : f === "saya" ? s.pj === saya : f === "tanpaPj" ? !s.pj : false);
   const butir = B.butir.filter(b => (!/^k:/.test(f) || b.k === f.slice(2)) && B.slot.some(s => s.butir === b.n && (/^k:/.test(f) || cocok(s))));
   const info = B.asesor ? `<p>Dokumen mutu prodi per butir Matriks LAMWisata, versi yang berlaku. Setiap dokumen yang Anda buka tercatat oleh prodi.</p>`
-    : `<p>Slot dokumen untuk butir Matriks yang dinilai GPM. Setiap slot punya penanggung jawab (PJ) dan masa berlaku; versi lama tetap tersimpan sebagai riwayat. Jumlah dokumen berlaku ikut tampil di Penilaian.</p>`;
+    : `<p>Slot dokumen untuk butir Matriks yang dinilai GKM. Setiap slot punya penanggung jawab (PJ) dan masa berlaku; versi lama tetap tersimpan sebagai riwayat. Jumlah dokumen berlaku ikut tampil di Penilaian.</p>`;
   return `<div class="head"><div><h1>Bank Dokumen</h1>${info}</div></div>
    ${B.asesor ? "" : `<div class="grid g3"><div class="panel stat"><span class="v num">${ada}/${n}</span><span class="l">Dokumen berlaku</span><div class="bar ${ada < n ? "gold" : ""}" style="margin-top:6px"><i style="width:${n ? ada / n * 100 : 0}%"></i></div></div>
     <div class="panel stat"><span class="v num">${hit("belum")}</span><span class="l">Belum diunggah</span></div>
@@ -2298,6 +2301,15 @@ const TUTORIAL = [
     "Langkah 1: buat kata sandi baru (minimal 8 karakter, memuat huruf dan angka, tidak sama dengan NIM/NIP). Tekan tombol <b>Lihat</b> di ujung kolom untuk memeriksa ketikan.",
     "Langkah 2: tuliskan email yang aktif Anda buka. Bila prodi menyalakan aktivasi tanpa email, akun langsung aktif; bila tidak, masukkan kode 6 digit yang dikirim ke email Anda.",
     "Lengkapi <b>Biodata</b>: kolom bertanda * wajib. Menu lain terbuka setelah biodata tersimpan."], c: "Kata sandi awal berlaku terbatas. Bila kedaluwarsa, hubungi Admin Prodi." },
+  { j: "Kesiapan akreditasi di Beranda", p: ["kps", "admin", "superadmin", "gkm"], l: [
+    "Panel <b>Kesiapan akreditasi</b> di Beranda merangkum nilai simulasi dibanding target, jumlah butir yang belum dinilai GKM, butir yang datanya belum ada, Tabel iLKPS yang masih kosong, dan dokumen Bank Dokumen yang belum ada.",
+    "<b>5 prioritas perbaikan</b> diurutkan dari potensi kenaikan nilai terbesar, lengkap dengan syarat skor 4, saran, dan tombol menuju menu tempat kegiatan atau data itu dicatat.",
+    "Buka bagian <b>Data yang belum ada</b> untuk melihat semua butir otomatis yang datanya kosong beserta jenis kegiatan atau data yang perlu dikumpulkan. Tekan <b>Hitung ulang</b> setelah data ditambahkan."] },
+  { j: "Laporan GKM (Gugus Kendali Mutu)", p: ["gkm", "kps", "admin", "superadmin"], l: [
+    "Super Admin memberi peran <b>GKM</b> kepada anggota Gugus Kendali Mutu Program Studi (menu Pengguna › Akun dan peran). Pilih peran GKM di bilah atas.",
+    "GKM menilai butir rubrik di menu <b>Penilaian</b> (tombol Nilai), dan menyusun <b>Laporan GKM</b> setiap semester: monev pembelajaran, capaian, temuan, rekomendasi, dan tindak lanjut, beserta lampiran.",
+    "Tekan <b>Simpan draf</b> kapan saja; anggota GKM lain bisa melanjutkan. Setelah lengkap, tekan <b>Kirim ke KPS</b>. KPS menerima atau meminta revisi dengan catatan.",
+    "Batas bawaan: 14 hari setelah semester berakhir; Admin Prodi atau Super Admin bisa mengubahnya. Laporan yang diterima menjadi bukti butir Matriks 1, 2, 4, 23, dan 77 dan bisa diunduh sebagai Word."] },
   { j: "Foto profil", p: SEMUA_PERAN, l: [
     "Buka menu <b>Akun saya</b> (atau klik nama Anda di bawah menu), tekan <b>Pilih foto</b>, lalu pilih foto wajah (JPG/PNG).",
     "Bagian tengah foto dipotong persegi dan diperkecil otomatis. Foto tampil di bilah samping dan di <b>Cari orang</b>.",
@@ -2306,7 +2318,7 @@ const TUTORIAL = [
     "Menu <b>Data Terkumpul</b> menampilkan semua kegiatan (semua status) beserta jenisnya, Tabel iLKPS, dan nomor butir Penilaian yang memakainya.",
     "Saring menurut status, jenis, butir penilaian, atau cari nama pengaju. Tombol <b>Terima</b>, <b>Minta revisi</b>, <b>Tolak</b>, dan <b>Hapus</b> berlaku juga untuk data yang sudah disetujui.",
     "Centang beberapa kegiatan lalu <b>Hapus terpilih</b> untuk membersihkan data uji coba sekaligus. Alasan wajib diisi. Kegiatan terhapus bisa dipulihkan dari tab <b>Terhapus</b>.",
-    "Di menu <b>Penilaian</b>, tombol <b>Sumber data</b> pada setiap butir menunjukkan kegiatan dan data lain (dosen, lulusan, PMB, keuangan, survei, skor GPM) yang menjadi dasar skornya."] },
+    "Di menu <b>Penilaian</b>, tombol <b>Sumber data</b> pada setiap butir menunjukkan kegiatan dan data lain (dosen, lulusan, PMB, keuangan, survei, skor GKM) yang menjadi dasar skornya."] },
   { j: "Ganti kata sandi dan lupa kata sandi", p: SEMUA_PERAN, l: [
     "Ganti: buka menu <b>Akun saya</b>, isi kata sandi lama dan kata sandi baru dua kali, lalu <b>Simpan</b>.",
     "Lupa: di halaman masuk, tekan <b>Lupa kata sandi</b>, isi email terdaftar, lalu masukkan kode dari email dan kata sandi baru.",
@@ -2373,7 +2385,7 @@ const TUTORIAL = [
     "Ubah kelas/status mahasiswa lewat tombol <b>Data mhs</b> di daftar akun. <b>Unduh daftar akun (Excel)</b> tersedia di panel impor."] },
   { j: "Tabel iLKPS, Penilaian, DED, Bank Dokumen, Survei", p: ["admin", "superadmin", "kps"], l: [
     "<b>Tabel iLKPS</b>: 33 tabel terisi otomatis dari data yang disetujui; unduh Excel sesuai format LAMWisata.",
-    "<b>Penilaian</b>: simulasi skor 84 butir; butir rubrik dinilai GPM dengan catatan bukti.",
+    "<b>Penilaian</b>: simulasi skor 84 butir; butir rubrik dinilai GKM dengan catatan bukti.",
     "<b>DED</b>: tulis narasi 64 butir (bisa ditugaskan ke dosen PJ) lalu <b>Unduh DED (.docx)</b>.",
     "<b>Bank Dokumen</b>: tunjuk PJ per slot, unggah dokumen dengan masa berlaku; versi lama tersimpan.",
     "<b>Survei</b>: buat dari templat, buka, bagikan tautan, lihat rekap dan tindak lanjut."] },
@@ -2596,7 +2608,7 @@ function laciSumber() {
   return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Sumber data butir" style="width:min(860px,100%)">${kepala}
    <div><b>${esc(b.nm)}</b><div class="small muted">${CARA_L[b.t]} · DED butir ${b.ded} · Sumber menurut Matriks: ${esc(b.src)} · TS ${esc(B.ts.label)}</div></div>
    ${B.jenis.length ? `<section><h3 style="font-size:1rem">Kegiatan (${B.kegiatan.length})</h3>
-     <p class="small muted">Jenis: ${B.jenis.map(esc).join(", ")} · rentang ${esc(B.rentang)}. ${b.t === "a" || b.t === "c" ? `<b>${hitung}</b> kegiatan berstatus Disetujui ikut dihitung; status lain belum dihitung.` : "Kegiatan ini menjadi bahan penilaian GPM (tidak dihitung otomatis)."}</p>
+     <p class="small muted">Jenis: ${B.jenis.map(esc).join(", ")} · rentang ${esc(B.rentang)}. ${b.t === "a" || b.t === "c" ? `<b>${hitung}</b> kegiatan berstatus Disetujui ikut dihitung; status lain belum dihitung.` : "Kegiatan ini menjadi bahan penilaian GKM (tidak dihitung otomatis)."}</p>
      ${B.kegiatan.length ? `<div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>Kegiatan</th><th>Pengaju</th><th>Status</th></tr></thead><tbody>
       ${B.kegiatan.map(k => `<tr><td style="min-width:220px"><a href="#" data-act="bukaKeg" data-id="${k.id}"><b>${esc(k.judul)}</b></a><div class="small muted">${esc(k.jenisLabel)} · ${esc(k.tgl || "–")}${k.dihitungButir ? ' · <b style="color:var(--ok)">dihitung</b>' : ""}</div>${B.bolehUbah ? `<div style="margin-top:6px">${tombolTinjau(k)}</div>` : ""}</td>
        <td class="small">${esc(k.olehNama)}<div class="muted mono">${esc(k.olehUser)}</div></td><td>${chipData(k)}${k.verifNama ? `<div class="small muted">oleh ${esc(k.verifNama)}</div>` : ""}</td></tr>`).join("")}</tbody></table></div>` : `<p class="small muted">Belum ada kegiatan pada rentang ini.</p>`}</section>` : ""}
@@ -2638,8 +2650,8 @@ function hData() {
      <td style="min-width:220px"><a href="#" data-act="bukaKeg" data-id="${k.id}"><b>${esc(k.judul)}</b></a><div class="small muted">${esc(k.jenisLabel)}${k.jenisLain ? ": " + esc(k.jenisLain) : ""} · ${esc(k.tabel || "–")} · ${esc(k.tgl || "–")}${k.ta ? ` (TA ${k.ta}/${k.ta + 1})` : ""}</div><div style="margin-top:6px">${tombolTinjau(k)}</div></td>
      <td class="small">${esc(k.olehNama)}<div class="muted mono">${esc(k.olehUser)}</div></td>
      <td>${chipData(k)}${tahapSurat(k) ? `<div class="small muted">surat tugas: ${esc(k.st)}</div>` : ""}${k.verifNama ? `<div class="small muted">oleh ${esc(k.verifNama)}</div>` : ""}</td>
-     <td class="small" style="min-width:160px">${k.butir.length ? k.butir.map(b => `<span class="tag" title="${esc(nmB(b.n))}${b.cara === "bahan GPM" ? " (bahan penilaian GPM)" : " (dihitung otomatis bila disetujui)"}" style="${b.cara === "bahan GPM" ? "opacity:.7" : ""}">${b.n}</span>`).join(" ") : '<span class="muted">Tidak dipakai butir mana pun</span>'}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">Tidak ada kegiatan yang cocok.</td></tr>`}</tbody></table></div>
-    <p class="small muted" style="margin-top:6px">Nomor di kolom "Masuk penilaian" adalah butir Matriks Penilaian. Nomor tebal dihitung otomatis bila data Disetujui; nomor pudar menjadi bahan penilaian GPM. Arahkan kursor ke nomor untuk melihat nama butir.</p>`;
+     <td class="small" style="min-width:160px">${k.butir.length ? k.butir.map(b => `<span class="tag" title="${esc(nmB(b.n))}${b.cara === "bahan GKM" ? " (bahan penilaian GKM)" : " (dihitung otomatis bila disetujui)"}" style="${b.cara === "bahan GKM" ? "opacity:.7" : ""}">${b.n}</span>`).join(" ") : '<span class="muted">Tidak dipakai butir mana pun</span>'}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">Tidak ada kegiatan yang cocok.</td></tr>`}</tbody></table></div>
+    <p class="small muted" style="margin-top:6px">Nomor di kolom "Masuk penilaian" adalah butir Matriks Penilaian. Nomor tebal dihitung otomatis bila data Disetujui; nomor pudar menjadi bahan penilaian GKM. Arahkan kursor ke nomor untuk melihat nama butir.</p>`;
   const daftarHapus = D.terhapus.length ? `<div class="tbl-wrap"><table><thead><tr><th>Kegiatan</th><th>Pengaju</th><th>Dihapus</th><th>Alasan</th><th></th></tr></thead><tbody>
     ${D.terhapus.map(k => `<tr><td><b>${esc(k.judul)}</b><div class="small muted">${esc(k.jenisLabel)} · ${esc(k.tgl || "–")} · status terakhir ${esc(D.status[k.status] || k.status)}</div></td><td class="small">${esc(k.olehNama)}</td>
      <td class="small">${tgl(k.waktuHapus)}${k.dihapusOleh ? `<div class="muted">oleh ${esc(k.dihapusOleh)}</div>` : ""}</td><td class="small">${esc(k.alasan)}</td><td><button class="btn sm" data-act="sdPulihkan" data-id="${k.id}">Pulihkan</button></td></tr>`).join("")}</tbody></table></div>`
@@ -2647,7 +2659,7 @@ function hData() {
   return `<div class="head"><div><h1>Data Terkumpul</h1><p>Semua data yang masuk ke aplikasi dan dipakai untuk Tabel iLKPS dan Penilaian. Periksa asal setiap data, lalu terima, minta revisi, tolak, atau hapus (misalnya data uji coba yang terselip). Hanya Super Admin.</p></div>
     <button class="btn" data-act="sdMuatUlang">Muat ulang</button></div>
    <section class="panel"><h2>Data selain kegiatan</h2><p class="small muted" style="margin-bottom:8px">Diisi lewat menu masing-masing; periksa dan perbaiki di sana.</p>
-    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">${D.ringkas.map(r => `<button class="btn" data-go="${r.menu}" style="display:block;text-align:left;height:auto;padding:10px 12px"><span class="row" style="justify-content:space-between"><span>${esc(r.judul)}</span><b class="num">${r.jumlah}</b></span><span class="small muted">${esc(MENU_L[r.menu] || "")}</span></button>`).join("")}</div></section>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">${D.ringkas.map(r => `<button class="btn" data-go="${r.menu}" style="display:block;text-align:left;height:auto;padding:10px 12px;white-space:normal"><span class="row" style="justify-content:space-between"><span>${esc(r.judul)}</span><b class="num">${r.jumlah}</b></span><span class="small muted">${esc(MENU_L[r.menu] || "")}</span></button>`).join("")}</div></section>
    <section class="panel"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px"><h2>Kegiatan</h2>
     <div class="seg" role="group" aria-label="Tampilan"><button data-act="sdTab" data-tab="aktif" aria-pressed="${f.tab === "aktif"}">Semua kegiatan (${D.kegiatan.length})</button><button data-act="sdTab" data-tab="hapus" aria-pressed="${f.tab === "hapus"}">Terhapus (${D.terhapus.length})</button></div></div>
     ${f.tab === "hapus" ? daftarHapus : daftarAktif}</section>`;
@@ -2706,7 +2718,7 @@ Object.assign(AKSI, {
   sdMuatUlang() { S.sdata = null; render(); },
   sdXlsx() {
     const D = S.sdata, nmB = n => (D.butirNama.find(x => x.n === n) || {}).nm || "";
-    unduhBlob(UPW_ZIP.xlsx([{ nama: "Data Terkumpul", baris: [["Judul", "Jenis", "Tabel/DED", "Tanggal", "TA", "Pengaju", "NIM/NIP", "Status", "Diverifikasi oleh", "Butir dihitung", "Butir bahan GPM"]]
+    unduhBlob(UPW_ZIP.xlsx([{ nama: "Data Terkumpul", baris: [["Judul", "Jenis", "Tabel/DED", "Tanggal", "TA", "Pengaju", "NIM/NIP", "Status", "Diverifikasi oleh", "Butir dihitung", "Butir bahan GKM"]]
       .concat(D.kegiatan.map(k => [k.judul, k.jenisLabel, k.tabel, k.tgl, k.ta ? k.ta + "/" + (k.ta + 1) : "", k.olehNama, k.olehUser, k.statusLabel, k.verifNama,
         k.butir.filter(b => b.cara === "dihitung").map(b => b.n + ". " + nmB(b.n)).join("; "), k.butir.filter(b => b.cara !== "dihitung").map(b => b.n + ". " + nmB(b.n)).join("; ")])) },
       { nama: "Terhapus", baris: [["Judul", "Jenis", "Tanggal", "Pengaju", "Dihapus", "Oleh", "Alasan"]].concat(D.terhapus.map(k => [k.judul, k.jenisLabel, k.tgl, k.olehNama, k.waktuHapus.slice(0, 10), k.dihapusOleh, k.alasan])) }]),
@@ -2718,8 +2730,134 @@ Object.assign(AKSI, {
   }
 });
 
+/* --- Kesiapan akreditasi di Beranda dan Laporan GKM (v0.25.0) --- */
+const PERAN_KESIAPAN = ["kps", "admin", "superadmin", "gkm"];
+const CHIP_LAP = { belum: "s-draf", draf: "s-draf", dikirim: "s-diajukan", revisi: "s-revisi", diterima: "s-disetujui" };
+const chipLap = r => `<span class="chip ${CHIP_LAP[r.status] || "s-draf"}">${esc(r.statusLabel)}</span>`;
+const tombolSaran = l => l.map(x => menu().includes(x.menu) ? `<button class="btn sm" data-go="${x.menu}">${esc(x.teks)}</button>` : `<span class="tag">${esc(x.teks)}</span>`).join(" ");
+function panelKesiapan() {
+  if (!PERAN_KESIAPAN.includes(peranAktif())) return "";
+  const K2 = S.kesiapan;
+  if (!K2) { sekali("kesiapan", async () => { S.kesiapan = await api("kesiapan.data"); render(); }); return `<section class="panel"><h2>Kesiapan akreditasi</h2><div class="memuat">Menghitung kesiapan…</div></section>`; }
+  const p = K2.total / 400, cap = K2.total >= K2.target;
+  const butirItem = r => `<div class="item"><div class="body"><div class="title" style="font-size:.92rem">${r.n}. ${esc(r.nm)} <span class="tag">${{ a: "otomatis", m: "dinilai GKM", c: "gabungan" }[r.t]}</span></div>
+     <div class="meta"><span class="num">Skor ${angkaId2(r.skor)}</span><span>${esc(r.info)}</span></div>
+     <div class="small" style="margin-top:4px"><b>Agar skor 4:</b> ${esc(r.s4)}</div><div class="small" style="margin-top:2px;color:var(--brand)"><b>Saran:</b> ${esc(r.sr)}</div>
+     ${r.saran.length ? `<div class="row" style="gap:4px;flex-wrap:wrap;margin-top:6px">${tombolSaran(r.saran)}</div>` : ""}</div>
+     ${r.gain > 0.05 ? `<div style="text-align:right"><div class="num" style="font-weight:800;color:var(--warn)">+${angkaId2(r.gain)}</div><div class="small muted">poin</div></div>` : ""}</div>`;
+  return `<section class="panel"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h2>Kesiapan akreditasi · TS ${esc(K2.ts.label)}</h2>
+     <div class="row" style="gap:6px"><button class="btn sm" data-act="kesiapanUlang">Hitung ulang</button>${menu().includes("penilaian") ? `<button class="btn sm primary" data-go="penilaian">Buka Penilaian</button>` : ""}</div></div>
+    <div class="row" style="align-items:baseline;gap:6px;margin-top:6px"><span class="num" style="font-size:2rem;font-weight:800">${angkaId2(K2.total, 1)}</span><span class="muted">/ 400 · target ${angkaId2(K2.target, 1)} · ${cap ? `<b style="color:var(--ok)">tercapai</b>` : `kurang <b class="num" style="color:var(--warn)">${angkaId2(K2.target - K2.total, 1)}</b> poin`}</span></div>
+    <div class="bar" style="margin:6px 0 10px"><i style="width:${(p * 100).toFixed(1)}%"></i></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">
+     <button class="btn" data-act="kesiapanSaring" data-f="gpm" style="display:block;text-align:left;height:auto;padding:10px 12px;white-space:normal"><b class="num" style="font-size:1.3rem">${K2.belumGkm}</b><span class="small muted" style="display:block">butir belum dinilai GKM</span></button>
+     <button class="btn" data-act="kesiapanSaring" data-f="kurang" style="display:block;text-align:left;height:auto;padding:10px 12px;white-space:normal"><b class="num" style="font-size:1.3rem">${K2.kurangData}</b><span class="small muted" style="display:block">butir otomatis datanya belum ada</span></button>
+     <button class="btn" data-go="ilkps" style="display:block;text-align:left;height:auto;padding:10px 12px;white-space:normal"><b class="num" style="font-size:1.3rem">${K2.tabelKosong.length}</b><span class="small muted" style="display:block">Tabel iLKPS masih kosong</span></button>
+     <button class="btn" data-go="bank" style="display:block;text-align:left;height:auto;padding:10px 12px;white-space:normal"><b class="num" style="font-size:1.3rem">${K2.bankKosong}</b><span class="small muted" style="display:block">dari ${K2.bankTotal} dokumen Bank Dokumen belum ada</span></button></div>
+    <div class="small" style="margin-top:10px"><b>Kriteria terlemah:</b> ${K2.kriteria.map(k => `${esc(k.l)} <span class="num">${k.persen}%</span>`).join(" · ")}</div>
+    <div class="small" style="margin-top:4px"><b>Laporan GKM:</b> ${K2.laporanGkm.map(r => `${esc(r.label)} ${chipLap(r)}${r.terlambat ? ' <b style="color:var(--bad)">terlambat</b>' : ""}`).join(" · ")} ${menu().includes("gkm") ? `<button class="btn sm" data-go="gkm">Buka Laporan GKM</button>` : ""}</div>
+    <h3 style="font-size:1rem;margin-top:14px">5 prioritas perbaikan dan saran tindakannya</h3>
+    <div class="list">${K2.prioritas.map(butirItem).join("") || `<div class="empty">Semua butir sudah skor 4.</div>`}</div>
+    ${K2.kurang.length ? `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--brand)"><b>Data yang belum ada (${K2.kurang.length} butir)</b> dan kegiatan/data yang perlu dikumpulkan</summary><div class="list" style="margin-top:6px">${K2.kurang.map(butirItem).join("")}</div></details>` : ""}
+    ${K2.tabelKosong.length ? `<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--brand)"><b>Tabel iLKPS yang masih kosong (${K2.tabelKosong.length})</b></summary><ul class="small" style="margin:6px 0 0 18px">${K2.tabelKosong.map(t => `<li>${esc(t.judul)}</li>`).join("")}</ul></details>` : ""}
+    ${K2.belum.length ? `<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--brand)"><b>Butir rubrik belum dinilai GKM (${K2.belumGkm})</b>, bobot terbesar lebih dulu</summary><ul class="small" style="margin:6px 0 0 18px">${K2.belum.map(b => `<li>${b.n}. ${esc(b.nm)}</li>`).join("")}${K2.belumGkm > K2.belum.length ? `<li>… dan ${K2.belumGkm - K2.belum.length} lainnya di menu Penilaian</li>` : ""}</ul></details>` : ""}
+   </section>`;
+}
+/** Baris pengingat GKM/KPS untuk panel "Perlu tindakan". */
+function barisTugasGkm(t) {
+  const l = [];
+  if (t.gkm && peranAktif() === "gkm") {
+    if (t.gkm.belumNilai) l.push(`<div class="item" style="cursor:pointer" data-act="kesiapanSaring" data-f="gpm"><div class="body"><div class="title">${t.gkm.belumNilai} butir rubrik belum dinilai GKM</div><div class="meta"><span>TS ${esc(t.gkm.ts)} · nilai dengan rubrik Matriks di menu Penilaian</span></div></div><span class="chip s-revisi">Penilaian</span></div>`);
+    t.gkm.laporan.forEach(r => l.push(`<div class="item" style="cursor:pointer" data-act="gkmBuka" data-s="${r.semester}"><div class="body"><div class="title">${r.status === "revisi" ? "Perbaiki" : "Susun dan kirim"} Laporan GKM ${esc(r.label)}</div><div class="meta"><span>Batas ${tglPendek(r.batas)}${r.terlambat ? " · terlambat" : ""}</span></div></div><span class="chip ${r.terlambat ? "s-ditolak" : "s-revisi"}">${esc(r.statusLabel)}</span></div>`));
+  }
+  if (t.gkmTunggu && ["kps", "superadmin"].includes(peranAktif())) t.gkmTunggu.forEach(r => l.push(`<div class="item" style="cursor:pointer" data-act="gkmBuka" data-s="${r.semester}"><div class="body"><div class="title">Laporan GKM ${esc(r.label)} menunggu keputusan Anda</div></div><span class="chip s-diajukan">Laporan GKM</span></div>`));
+  return l;
+}
+function hGkm() {
+  const D = S.gkm;
+  if (!D) { sekali("gkm", async () => { S.gkm = await api("gkm.data", S.gkmSmt ? { semester: S.gkmSmt } : {}); S.gkmIsi = Object.assign({}, S.gkm.laporan.bagian); render(); }); return `<div class="memuat">Memuat laporan GKM…</div>`; }
+  const L = D.laporan, isi = S.gkmIsi || {}, dis = S.sibuk ? "disabled" : "";
+  return `<div class="head"><div><h1>Laporan GKM</h1><p>Laporan Gugus Kendali Mutu Program Studi per semester: hasil monev pembelajaran, capaian, temuan, rekomendasi, dan tindak lanjut (siklus PPEPP). Disusun anggota GKM, dikirim ke KPS. Laporan yang diterima menjadi bukti butir Matriks 1, 2, 4, 23, dan 77.</p></div>
+     <button class="btn" data-act="gkmWord" ${dis}>Unduh Word</button></div>
+   <section class="panel"><h2>Semester</h2><div class="tbl-wrap"><table><thead><tr><th>Semester</th><th>Status</th><th>Batas</th><th></th></tr></thead><tbody>
+    ${D.daftar.map(r => `<tr ${r.semester === L.semester ? 'style="background:var(--soft,rgba(10,81,136,.08))"' : ""}><td>${esc(r.label)}${r.semester === D.semesterKini ? ' <span class="tag">berjalan</span>' : ""}</td><td>${chipLap(r)}${r.terlambat ? ' <b class="small" style="color:var(--bad)">terlambat</b>' : ""}</td><td class="small">${tglPendek(r.batas)}</td>
+      <td><button class="btn sm" data-act="gkmBuka" data-s="${r.semester}" ${r.semester === L.semester ? "disabled" : ""}>${r.semester === L.semester ? "Dibuka" : "Buka"}</button></td></tr>`).join("")}</tbody></table></div></section>
+   <section class="panel"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h2>Laporan ${esc(L.label)}</h2><span>${chipLap(L)}</span></div>
+    <p class="small muted">Batas pengumpulan ${tglPendek(L.batas)}${L.dikirimPada ? ` · dikirim ${tgl(L.dikirimPada)}` : ""}${L.putusPada ? ` · diputuskan ${tgl(L.putusPada)}` : ""}${L.diubah ? ` · terakhir diubah ${tgl(L.diubah)}` : ""}.</p>
+    ${D.bolehBatas ? `<div class="row small" style="gap:6px;margin:6px 0;flex-wrap:wrap"><label for="gkmBatas">Ubah batas</label><input id="gkmBatas" type="date" value="${esc(L.batas)}" style="width:auto"><button class="btn sm" data-act="gkmBatasSimpan" ${dis}>Simpan batas</button></div>` : ""}
+    ${L.status === "revisi" && L.catatan ? `<div class="callout"><b>Catatan KPS untuk perbaikan:</b> ${esc(L.catatan)}</div>` : ""}
+    ${D.sebelumnya && D.sebelumnya.rekomendasi ? `<details class="small" style="margin:6px 0"><summary style="cursor:pointer;color:var(--brand)">Rekomendasi laporan ${esc(D.sebelumnya.label)} (untuk bagian tindak lanjut)</summary><p style="white-space:pre-wrap;margin-top:4px">${esc(D.sebelumnya.rekomendasi)}</p></details>` : ""}
+    ${D.bagianDef.map(b => `<div class="field"><label for="gkmB_${b.k}">${esc(b.l)}</label>${D.bolehUbah
+      ? `<textarea id="gkmB_${b.k}" data-gkmb="${b.k}" rows="5" placeholder="${esc(b.h)}">${esc(isi[b.k] || "")}</textarea><span class="hint">${esc(b.h)}</span>`
+      : `<div class="small" style="white-space:pre-wrap;border:1px solid var(--line);border-radius:8px;padding:8px">${esc(L.bagian[b.k] || "–")}</div>`}</div>`).join("")}
+    <h3 style="font-size:1rem;margin-top:8px">Lampiran (${L.lampiran.length})</h3>
+    <div class="list">${L.lampiran.map(a => `<div class="item"><div class="body"><div class="title" style="font-size:.9rem">${esc(a.nama)}</div><div class="meta"><span>${ukuranBerkas(a.ukuran)}</span><span>${esc(a.oleh)}</span></div></div>
+      <div class="row" style="gap:4px"><button class="btn sm" data-act="gkmLihat" data-id="${esc(a.fileId)}">Lihat</button>${D.bolehUbah ? `<button class="btn sm" data-act="gkmHapusLamp" data-id="${esc(a.fileId)}" style="color:var(--bad)">Hapus</button>` : ""}</div></div>`).join("") || `<div class="empty">Belum ada lampiran.</div>`}</div>
+    ${D.bolehUbah ? `<p class="small muted" style="margin-top:6px">Contoh lampiran: instrumen dan rekap monev, notulen rapat tinjauan, daftar hadir, hasil survei. PDF, Word, Excel, PowerPoint, atau gambar; maksimal 10 MB per berkas.</p>
+     <label class="btn" style="cursor:pointer;margin-top:4px">Tambah lampiran<input id="gkmBerkas" type="file" accept=".pdf,.docx,.xlsx,.pptx,.jpg,.jpeg,.png" hidden ${dis}></label>
+     ${galatHtml()}<div class="row" style="justify-content:flex-end;gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn" data-act="gkmSimpan" ${dis}>Simpan draf</button>${tombol("gkmKirim", L.status === "revisi" ? "Kirim ulang ke KPS" : "Kirim ke KPS")}</div>` : ""}
+    ${!D.bolehUbah && peranAktif() === "gkm" && L.status === "dikirim" ? `<p class="small muted" style="margin-top:8px">Laporan sudah dikirim dan menunggu keputusan KPS.</p>` : ""}
+    ${D.bolehPutus ? `<div class="field" style="margin-top:12px"><label for="gkmCatatan">Catatan KPS (wajib bila meminta revisi)</label><textarea id="gkmCatatan" rows="3"></textarea></div>
+     ${galatHtml()}<div class="row" style="justify-content:flex-end;gap:6px"><button class="btn" data-act="gkmPutus" data-k="revisi" ${dis}>Minta revisi</button>${tombol("gkmPutus", "Terima laporan", "primary", 'data-k="diterima"')}</div>` : ""}
+    ${L.riwayat.length ? `<details class="small" style="margin-top:10px"><summary style="cursor:pointer">Riwayat</summary><ul style="margin:6px 0 0 18px">${L.riwayat.map(r => `<li>${tgl(r.waktu)} · ${esc(r.oleh)} · ${esc({ buat: "membuat", kirim: "mengirim ke KPS", kirim_ulang: "mengirim ulang", diterima: "menerima", revisi: "meminta revisi" }[r.aksi] || r.aksi)}${r.catatan ? ": " + esc(r.catatan) : ""}</li>`).join("")}</ul></details>` : ""}
+   </section>`;
+}
+const ukuranBerkas = n => n >= 1048576 ? (n / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+document.addEventListener("input", e => { const k = e.target.dataset && e.target.dataset.gkmb; if (k) { S.gkmIsi = S.gkmIsi || {}; S.gkmIsi[k] = e.target.value; } });
+document.addEventListener("change", e => {
+  if (e.target.id !== "gkmBerkas" || !e.target.files[0]) return;
+  const f = e.target.files[0];
+  jalankan(async () => {
+    if (f.size > 10 * 1024 * 1024) throw new Error("Lampiran maksimal 10 MB.");
+    await api("gkm.unggah", { semester: S.gkm.laporan.semester, nama: f.name, isi: await bacaBase64(f) });
+    await muatUlangGkm(); toast("Lampiran ditambahkan.");
+  });
+});
+async function muatUlangGkm() { const isi = S.gkmIsi; S.gkm = await api("gkm.data", { semester: S.gkm.laporan.semester }); S.gkmIsi = isi || Object.assign({}, S.gkm.laporan.bagian); S.tugas = null; S.kesiapan = null; }
+Object.assign(AKSI, {
+  kesiapanUlang() { S.kesiapan = null; render(); },
+  kesiapanSaring(d) { S.nilaiF = d.f; S.nilai = null; S.view = "penilaian"; S.laci = null; render(); window.scrollTo(0, 0); },
+  gkmBuka(d) { S.gkmSmt = d.s; S.gkm = null; S.gkmIsi = null; S.view = "gkm"; S.laci = null; S.galat = ""; render(); window.scrollTo(0, 0); },
+  gkmSimpan() { jalankan(async () => { await api("gkm.simpan", { semester: S.gkm.laporan.semester, bagian: S.gkmIsi || {} }); await muatUlangGkm(); toast("Draf laporan disimpan."); }); },
+  gkmKirim() {
+    if (!confirm("Kirim laporan ke KPS? Setelah dikirim, laporan tidak bisa diubah kecuali KPS meminta revisi.")) return;
+    jalankan(async () => { await api("gkm.simpan", { semester: S.gkm.laporan.semester, bagian: S.gkmIsi || {}, kirim: true }); await muatUlangGkm(); toast("Laporan dikirim ke KPS."); });
+  },
+  gkmPutus(d) {
+    jalankan(async () => { await api("gkm.putuskan", { semester: S.gkm.laporan.semester, keputusan: d.k, catatan: nilai("gkmCatatan") }); await muatUlangGkm(); toast(d.k === "diterima" ? "Laporan diterima." : "Revisi diminta."); });
+  },
+  gkmBatasSimpan() { jalankan(async () => { await api("gkm.batas", { semester: S.gkm.laporan.semester, tanggal: nilai("gkmBatas") }); await muatUlangGkm(); toast("Batas disimpan."); }); },
+  async gkmLihat(d) {
+    const w = window.open("", "_blank");
+    try {
+      const j = await api("gkm.lampiran", { semester: S.gkm.laporan.semester, fileId: d.id }), bin = atob(j.isi), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const blob = new Blob([arr], { type: j.mime }); if (w) w.location.href = URL.createObjectURL(blob); else simpanBerkas(blob, j.nama);
+    } catch (e) { if (w) w.close(); toast(e.message); }
+  },
+  gkmHapusLamp(d) {
+    if (!confirm("Hapus lampiran ini?")) return;
+    jalankan(async () => { await api("gkm.hapusLampiran", { semester: S.gkm.laporan.semester, fileId: d.id }); await muatUlangGkm(); toast("Lampiran dihapus."); });
+  },
+  gkmWord() {
+    const D = S.gkm, L = D.laporan, isi = D.bolehUbah ? (S.gkmIsi || {}) : L.bagian, d = UPW_DOCX.baru();
+    d.p("LAPORAN GUGUS KENDALI MUTU PROGRAM STUDI", { b: 1, ukuran: 14, rata: "center", sesudah: 4 });
+    d.p("Program Studi Usaha Perjalanan Wisata · Politeknik Pariwisata Bali", { rata: "center", sesudah: 4 });
+    d.p("Semester " + L.label, { b: 1, rata: "center", sesudah: 16 });
+    d.tabel([["Status", L.statusLabel], ["Batas pengumpulan", L.batas], ["Dikirim", L.dikirimPada ? tgl(L.dikirimPada) : "–"], ["Diputuskan KPS", L.putusPada ? tgl(L.putusPada) : "–"]], { judul: false, ukuran: 10, lebar: [5, 9] });
+    D.bagianDef.forEach((b, i) => {
+      d.p((i + 1) + ". " + b.l, { b: 1, sebelum: 12, sesudah: 4, tetap: 1 });
+      const par = String(isi[b.k] || "").split(/\n+/).map(s => s.trim()).filter(Boolean);
+      if (!par.length) d.p("[Belum diisi]", { i: 1, warna: "C00000" });
+      par.forEach(s => d.p(s, { rata: "justify" }));
+    });
+    d.p("Lampiran", { b: 1, sebelum: 12, sesudah: 4 });
+    if (L.lampiran.length) L.lampiran.forEach((a, i) => d.p((i + 1) + ". " + a.nama)); else d.p("Tidak ada lampiran.", { i: 1 });
+    unduh(d.blob({ judul: "Laporan GKM " + L.label, kaki: "Laporan GKM UPW – " + L.label }), "Laporan GKM " + L.label.replace("/", "-") + ".docx");
+  }
+});
+
 /* --- Penilaian (v0.12.0) --- */
-const CARA_L = { a: "Otomatis dari data", m: "Penilaian GPM (rubrik)", c: "Data + penilaian GPM" };
+const CARA_L = { a: "Otomatis dari data", m: "Penilaian GKM (rubrik)", c: "Data + penilaian GKM" };
 const warnaSkor = s => s >= 3.5 ? "var(--ok)" : s >= 2.5 ? "var(--brand)" : s >= 1.5 ? "var(--warn)" : "var(--bad)";
 const angkaId2 = (x, d = 2) => Number(x).toLocaleString("id-ID", { maximumFractionDigits: d });
 function hPenilaian() {
@@ -2728,25 +2866,25 @@ function hPenilaian() {
   const th = new Date().getFullYear(), pil = []; for (let a = th; a >= 2018; a--) pil.push(a);
   const top = P.rows.filter(r => r.gain > 0.05).sort((a, b) => b.gain - a.gain).slice(0, 8);
   const rows = P.rows.filter(r => !f || (f === "rendah" ? r.skor < 3 : f === "gpm" ? r.perluGpm && r.gpm === null : f === "kurang" ? r.kurang : r.k === f));
-  return `<div class="head"><div><h1>Penilaian</h1><p>Simulasi penilaian mandiri mengikuti Matriks Penilaian LAMWisata IAPS 1.0 Unggul Sarjana Terapan: 84 butir berbobot (total bobot 100), skor 0–4, nilai maksimum 400. Butir otomatis dihitung dari data aplikasi; butir lain dinilai GPM/Admin/KPS dengan rubrik.</p></div>
+  return `<div class="head"><div><h1>Penilaian</h1><p>Simulasi penilaian mandiri mengikuti Matriks Penilaian LAMWisata IAPS 1.0 Unggul Sarjana Terapan: 84 butir berbobot (total bobot 100), skor 0–4, nilai maksimum 400. Butir otomatis dihitung dari data aplikasi; butir lain dinilai GKM/Admin/KPS dengan rubrik.</p></div>
     <div class="row" style="flex-wrap:wrap"><label class="row small" style="gap:6px">TS <select id="nilaiTs" style="width:auto">${pil.map(a => `<option value="${a}" ${a === P.ts.awal ? "selected" : ""}>${a}/${a + 1}</option>`).join("")}</select></label><button class="btn" data-act="nilaiXlsx" ${dis}>Ekspor Excel</button></div></div>
    <div class="grid g3">
     <div class="panel stat"><span class="l">Nilai simulasi TS ${esc(P.ts.label)}</span><span class="v num" style="font-size:2.1rem">${angkaId2(P.total, 1)}<span class="muted" style="font-size:1rem"> / 400</span></span><div class="bar" style="margin-top:6px"><i style="width:${(p * 100).toFixed(1)}%"></i></div><span class="l num">${angkaId2(p * 100, 1)}% dari nilai maksimum</span></div>
     <div class="panel stat"><span class="l">Target</span><span class="v num">${angkaId2(P.target, 1)}</span><span class="l">${P.total >= P.target ? `<b style="color:var(--ok)">Sudah mencapai target</b>` : `Kurang <b class="num" style="color:var(--warn)">${angkaId2(P.target - P.total, 1)}</b> poin`}</span>
      ${P.bolehTarget ? `<div class="row small" style="margin-top:6px;flex-wrap:nowrap"><input id="nilaiTarget" type="text" inputmode="decimal" value="${String(P.target).replace(".", ",")}" style="width:80px" aria-label="Target nilai"><button class="btn sm" data-act="nilaiTargetSimpan" ${dis}>Ubah target</button></div>` : ""}</div>
-    <div class="panel stat"><span class="l">Kelengkapan</span><span class="small"><b>${P.belumGpm}</b> butir belum dinilai GPM · <b>${P.kurangData}</b> butir otomatis datanya belum lengkap</span>
-     <span class="small muted">${P.rows.filter(r => r.t === "a").length} otomatis · ${P.rows.filter(r => r.t === "c").length} gabungan · ${P.rows.filter(r => r.t === "m").length} GPM · NDTPS ${P.ringkas.NDTPS} · mahasiswa aktif ${P.ringkas.NM}</span></div></div>
+    <div class="panel stat"><span class="l">Kelengkapan</span><span class="small"><b>${P.belumGpm}</b> butir belum dinilai GKM · <b>${P.kurangData}</b> butir otomatis datanya belum lengkap</span>
+     <span class="small muted">${P.rows.filter(r => r.t === "a").length} otomatis · ${P.rows.filter(r => r.t === "c").length} gabungan · ${P.rows.filter(r => r.t === "m").length} GKM · NDTPS ${P.ringkas.NDTPS} · mahasiswa aktif ${P.ringkas.NM}</span></div></div>
    <div class="callout">Perkiraan internal, bukan nilai resmi asesor. Butir yang belum dinilai atau datanya belum lengkap dihitung 0, jadi nilai akan naik setelah data dilengkapi. Ambang peringkat Unggul tidak tercantum di DED/Matriks; target mengacu PerBAN-PT 17/2025 dan bisa diubah Admin. Beberapa rumus memakai tafsiran yang ditulis pada keterangan butir.</div>
    <section class="panel"><h2>Capaian per kriteria</h2><div class="list">${P.kriteria.map(k => { const q = k.maks ? k.nilai / k.maks : 0; return `<div class="item"><div class="body"><div class="row" style="justify-content:space-between"><b>${esc(k.l)}</b><span class="num small">${angkaId2(k.nilai, 1)} / ${angkaId2(k.maks, 1)} · <b>${angkaId2(q * 100, 0)}%</b></span></div><div class="bar ${q < 0.75 ? "gold" : ""}" style="margin-top:6px"><i style="width:${(q * 100).toFixed(1)}%"></i></div><div class="small muted" style="margin-top:2px">Bobot ${angkaId2(k.bobot, 3)}</div></div></div>`; }).join("")}</div></section>
    <section class="panel"><h2>Prioritas perbaikan</h2><p class="small muted" style="margin-bottom:8px">Diurutkan dari potensi kenaikan nilai terbesar: bobot × (4 − skor saat ini).</p>
     <div class="list">${top.map(r => `<div class="item" style="cursor:pointer" data-act="gpmBuka" data-n="${r.n}"><div class="body"><div class="title">${r.n}. ${esc(r.nm)} <span class="tag">${esc(P.kriteria.find(k => k.k === r.k).l)}</span></div><div class="meta"><span class="num">Skor ${angkaId2(r.skor)}</span><span class="num">Bobot ${angkaId2(r.w, 3)}</span><span>${esc(r.info)}</span></div><div class="small" style="margin-top:6px"><b>Agar skor 4:</b> ${esc(r.s4)}</div><div class="small" style="margin-top:4px;color:var(--brand)"><b>Saran:</b> ${esc(r.sr)}</div></div><div style="text-align:right"><div class="num" style="font-weight:800;color:var(--warn)">+${angkaId2(r.gain)}</div><div class="small muted">poin</div></div></div>`).join("") || `<div class="empty">Semua butir sudah skor 4.</div>`}</div></section>
    <section class="panel"><div class="row" style="justify-content:space-between;margin-bottom:10px;flex-wrap:wrap"><h2>84 butir</h2>
-    <select id="nilaiF" style="width:auto" aria-label="Saring butir"><option value="">Semua butir</option><option value="gpm" ${f === "gpm" ? "selected" : ""}>Belum dinilai GPM</option><option value="kurang" ${f === "kurang" ? "selected" : ""}>Data belum lengkap</option><option value="rendah" ${f === "rendah" ? "selected" : ""}>Skor di bawah 3</option>${P.kriteria.map(k => `<option value="${k.k}" ${f === k.k ? "selected" : ""}>${esc(k.l)}</option>`).join("")}</select></div>
+    <select id="nilaiF" style="width:auto" aria-label="Saring butir"><option value="">Semua butir</option><option value="gpm" ${f === "gpm" ? "selected" : ""}>Belum dinilai GKM</option><option value="kurang" ${f === "kurang" ? "selected" : ""}>Data belum lengkap</option><option value="rendah" ${f === "rendah" ? "selected" : ""}>Skor di bawah 3</option>${P.kriteria.map(k => `<option value="${k.k}" ${f === k.k ? "selected" : ""}>${esc(k.l)}</option>`).join("")}</select></div>
     <div class="tbl-wrap"><table><thead><tr><th>No</th><th>Butir</th><th>Bobot</th><th>Skor</th><th>Nilai</th><th>Cara</th></tr></thead><tbody>
-    ${rows.map(r => `<tr><td class="num">${r.n}</td><td style="min-width:260px"><b>${esc(r.nm)}</b><div class="small ${r.kurang ? "" : "muted"}" ${r.kurang ? 'style="color:var(--warn)"' : ""}>${esc(r.info)}</div>${r.catatan ? `<div class="small" style="margin-top:2px">Catatan GPM: ${esc(r.catatan)}</div>` : ""}
+    ${rows.map(r => `<tr><td class="num">${r.n}</td><td style="min-width:260px"><b>${esc(r.nm)}</b><div class="small ${r.kurang ? "" : "muted"}" ${r.kurang ? 'style="color:var(--warn)"' : ""}>${esc(r.info)}</div>${r.catatan ? `<div class="small" style="margin-top:2px">Catatan GKM: ${esc(r.catatan)}</div>` : ""}
       <details class="small" style="margin-top:4px"><summary style="cursor:pointer;color:var(--brand)">Syarat skor 4 dan saran</summary><p style="margin-top:4px">${esc(r.s4)}</p><p style="margin-top:4px"><b>Saran:</b> ${esc(r.sr)}</p><p class="muted" style="margin-top:4px">Sumber: ${esc(r.src)} · DED butir ${r.ded}</p></details></td>
       <td class="num">${angkaId2(r.w, 3)}</td><td class="num" style="font-weight:800;color:${warnaSkor(r.skor)}">${angkaId2(r.skor)}</td><td class="num">${angkaId2(r.nilai)}</td>
-      <td class="small">${CARA_L[r.t]}<br><button class="btn sm" data-act="sumberBuka" data-n="${r.n}" style="margin-top:4px">Sumber data</button>${r.perluGpm ? `<br>GPM: <b>${r.gpm === null ? "belum" : angkaId2(r.gpm)}</b>${r.auto !== null ? ` · data: ${angkaId2(r.auto)}` : ""}<br><button class="btn sm" data-act="gpmBuka" data-n="${r.n}" style="margin-top:4px">${r.gpm === null ? "Nilai" : "Ubah"}</button>` : ""}</td></tr>`).join("")}
+      <td class="small">${CARA_L[r.t]}<br><button class="btn sm" data-act="sumberBuka" data-n="${r.n}" style="margin-top:4px">Sumber data</button>${r.perluGpm ? `<br>GKM: <b>${r.gpm === null ? "belum" : angkaId2(r.gpm)}</b>${r.auto !== null ? ` · data: ${angkaId2(r.auto)}` : ""}<br><button class="btn sm" data-act="gpmBuka" data-n="${r.n}" style="margin-top:4px">${r.gpm === null ? "Nilai" : "Ubah"}</button>` : ""}</td></tr>`).join("")}
     </tbody></table></div></section>`;
 }
 function laciGpm() {
@@ -2755,8 +2893,8 @@ function laciGpm() {
    <div class="dh"><h2>Butir ${r.n}. ${esc(r.nm)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
    <div class="small muted">Bobot ${angkaId2(r.w, 3)} · ${CARA_L[r.t]} · DED butir ${r.ded} · Sumber: ${esc(r.src)}</div>
    <div class="callout"><b>Agar skor 4:</b> ${esc(r.s4)}<div style="margin-top:6px"><b>Saran:</b> ${esc(r.sr)}</div></div>
-   ${r.auto !== null ? `<div class="auto">Bagian otomatis: <b>${angkaId2(r.auto)}</b>. ${esc(r.info.split("; skor GPM")[0])}</div>` : ""}
-   ${r.perluGpm ? `<div class="field"><label for="gpmSkor">Skor GPM (0–4) sesuai rubrik Matriks</label><select id="gpmSkor"><option value="">– belum dinilai –</option>${[4, 3, 2, 1, 0].map(v => `<option value="${v}" ${r.gpm === v ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+   ${r.auto !== null ? `<div class="auto">Bagian otomatis: <b>${angkaId2(r.auto)}</b>. ${esc(r.info.split("; skor GKM")[0])}</div>` : ""}
+   ${r.perluGpm ? `<div class="field"><label for="gpmSkor">Skor GKM (0–4) sesuai rubrik Matriks</label><select id="gpmSkor"><option value="">– belum dinilai –</option>${[4, 3, 2, 1, 0].map(v => `<option value="${v}" ${r.gpm === v ? "selected" : ""}>${v}</option>`).join("")}</select></div>
     <div class="field"><label for="gpmCatatan">Catatan / bukti yang dinilai</label><textarea id="gpmCatatan" rows="4" placeholder="Contoh: SPMI memenuhi aspek 1–4; benchmarking eksternal belum ada.">${esc(r.catatan)}</textarea></div>
     ${r.olehGpm ? `<p class="small muted">Terakhir dinilai ${esc(namaPendek(r.olehGpm))}, ${tgl(r.waktuGpm)}.</p>` : ""}
     ${galatHtml()}<div class="row" style="justify-content:flex-end;margin-top:auto">${tombol("gpmSimpan", "Simpan skor")}</div>` : `<p class="small">Butir ini dihitung otomatis. Untuk menaikkan skor, lengkapi atau perbaiki datanya (lihat keterangan).</p>`}</div></div>`;
@@ -2776,7 +2914,7 @@ Object.assign(AKSI, {
     const ring = [["Simulasi penilaian LAMWisata IAPS 1.0 Unggul — Prodi Usaha Perjalanan Wisata"], ["TS", P.ts.label], ["Nilai", P.total], ["Target", P.target], ["Dihitung", tglCetak()],
       ["Catatan", "Perkiraan internal, bukan nilai resmi asesor. Butir belum dinilai/data belum lengkap dihitung 0."], [], ["Kriteria", "Bobot", "Nilai", "Maksimum", "Capaian (%)"],
       ...P.kriteria.map(k => [k.l, k.bobot, k.nilai, k.maks, k.maks ? Math.round(k.nilai / k.maks * 1000) / 10 : 0])];
-    const bt = [["No", "Kriteria", "Butir", "Bobot", "Cara", "Skor otomatis", "Skor GPM", "Skor", "Nilai", "Potensi kenaikan", "Keterangan", "Catatan GPM", "Syarat skor 4", "Saran", "DED butir"]]
+    const bt = [["No", "Kriteria", "Butir", "Bobot", "Cara", "Skor otomatis", "Skor GKM", "Skor", "Nilai", "Potensi kenaikan", "Keterangan", "Catatan GKM", "Syarat skor 4", "Saran", "DED butir"]]
       .concat(P.rows.map(r => [r.n, kr(r.k), r.nm, r.w, CARA_L[r.t], r.t === "a" ? r.skor : r.auto ?? "", r.gpm ?? "", r.skor, r.nilai, r.gain, r.info, r.catatan, r.s4, r.sr, r.ded]));
     unduh(UPW_ZIP.xlsx([{ nama: "Ringkasan", baris: ring }, { nama: "84 butir", baris: bt }]), "Simulasi penilaian TS " + P.ts.label.replace("/", "-") + ".xlsx");
   }

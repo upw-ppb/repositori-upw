@@ -6,7 +6,7 @@
  * - Pengingat: Admin Prodi / Super Admin / KPS dapat mengirim pengingat di aplikasi ke dosen/tendik (tanpa email).
  *   Tabel Pengingat { id, untuk, dari, pesan, jenis, dibuat, selesai }.
  */
-var PERAN_PENGINGAT = ["admin", "superadmin", "kps"];
+var PERAN_PENGINGAT = ["admin", "superadmin", "kps", "gkm"]; // v0.25.0: GKM ikut memantau kelengkapan dokumen dosen
 
 function kelengkapanDokDosen(bio, dok) {
   var ada = function (j) { return dok.some(function (x) { return x.jenis === j; }); }, butuh = [];

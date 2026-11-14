@@ -6,7 +6,7 @@
  * - EWMP pendidikan di PS dihitung dari tim pengajar TS (sks MK dibagi rata ke dosen dalam tim), bisa ditimpa Admin.
  */
 var PERAN_DP_UBAH = ["admin", "superadmin"];
-var PERAN_DP_LIHAT = ["admin", "superadmin", "kps"];
+var PERAN_DP_LIHAT = ["admin", "superadmin", "kps", "gkm"];
 var JAM_PER_SKS = 45; // Permendikbudristek 53/2023: 1 sks = 45 jam per semester
 
 function angka(v, maks) { var n = Number(String(v === undefined || v === null ? "" : v).replace(",", ".")); return isFinite(n) && n >= 0 && n <= (maks || 1000) ? Math.round(n * 100) / 100 : 0; }

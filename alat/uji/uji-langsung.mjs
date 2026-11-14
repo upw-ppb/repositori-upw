@@ -16,4 +16,6 @@ j = await panggil("kegiatan.daftar", { lingkup: "semua" }, t); c("kegiatan.dafta
 j = await panggil("foto.saya", {}, t); c("foto.saya (v0.24.0)", j.ok && "foto" in j, j);
 j = await panggil("sumber.butir", { butir: 45 }, t); c("sumber.butir 45 (Admin Prodi: lihat saja)", j.ok && Array.isArray(j.kegiatan) && j.bolehUbah === false, j);
 j = await panggil("sumber.kegiatan", {}, t); c("Data Terkumpul tertutup untuk Admin Prodi", !j.ok && /izin/.test(j.galat), j);
+j = await panggil("kesiapan.data", {}, t); c("kesiapan.data (v0.25.0)", j.ok && j.prioritas && j.prioritas.length <= 5 && "tabelKosong" in j, j);
+j = await panggil("gkm.data", {}, t); c("gkm.data dibaca Admin Prodi (tanpa izin ubah)", j.ok && j.daftar.length === 6 && j.bolehUbah === false, j);
 await panggil("keluar", {}, t);

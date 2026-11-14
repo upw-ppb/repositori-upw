@@ -3,6 +3,31 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.25.0 — 15 Nov 2026 — Uji Coba
+Permintaan pemilik (kesiapan akreditasi dan GKM):
+- **Kesiapan akreditasi di Beranda** (KPS, Admin Prodi, Super Admin, GKM): nilai simulasi dibanding target; jumlah butir rubrik belum dinilai,
+  butir otomatis yang datanya belum ada, Tabel iLKPS yang masih kosong, dan dokumen Bank Dokumen yang belum ada; 3 kriteria terlemah; status
+  Laporan GKM; **5 prioritas perbaikan** dengan syarat skor 4, saran, dan tombol menuju menu tempat kegiatan/data dicatat (mis. "Catat kegiatan:
+  Penelitian", "Isi Data Prodi › PMB", "Unggah dokumen di Bank Dokumen butir 42"). Daftar lengkap butir yang datanya belum ada bisa dibuka.
+  Sebelumnya rekomendasi hanya ada di menu Penilaian.
+- **Istilah GPM diganti GKM** (Gugus Kendali Mutu Program Studi) di seluruh aplikasi. Catatan: istilah GPM/GKM tidak ada di DED/Matriks LAMWisata;
+  instrumen menyebut "unsur pelaksana penjaminan mutu" (butir 1 SPMI), siklus PPEPP, dan monev pembelajaran periodik.
+- **Peran baru GKM** (diberikan Super Admin di menu Pengguna). GKM menilai butir rubrik di Penilaian, membuka Tabel iLKPS, Data Prodi, Bank Dokumen,
+  DED, rekap Portofolio MK, Survei, dan Sumber data; tidak bisa menghapus atau memutuskan data kegiatan, dan tidak bisa mengubah target nilai.
+- **Laporan GKM per semester** (menu Laporan GKM): 5 bagian (monev pembelajaran, capaian, temuan, rekomendasi, tindak lanjut semester sebelumnya)
+  dan lampiran (PDF/Word/Excel/PowerPoint/gambar, maks. 10 MB, 15 berkas; disimpan di Drive "Laporan GKM/<semester>"). Draf → dikirim ke KPS →
+  diterima atau perlu revisi (catatan wajib). Batas bawaan 14 hari setelah semester berakhir, bisa diubah Admin/Super Admin. Unduh Word.
+  Laporan yang diterima tampil sebagai bukti di keterangan Penilaian dan Sumber data butir 1, 2, 4, 23, dan 77.
+- **Pengingat di Beranda**: GKM melihat jumlah butir rubrik yang belum dinilai pada TS dan laporan semester yang belum dikirim/perlu revisi
+  (mulai 30 hari sebelum semester berakhir); KPS melihat laporan yang menunggu keputusan. Tanda "terlambat" hanya untuk semester berjalan dan
+  satu semester sebelumnya.
+- Perbaikan saat uji tampilan: tab Data Prodi › Dokumen dosen tidak termuat untuk GKM (kini GKM bisa melihat dan mengingatkan); menu ganda (Bank Dokumen) untuk GKM yang juga PJ dokumen; kotak angka di Beranda/Data Terkumpul melebar di layar
+  sempit; tanda "terlambat" pada semester lama sebelum aplikasi dipakai.
+- Uji: 523 + 44 uji server lulus (26 uji baru); uji tampilan alur GKM (draf, lampiran, kirim, revisi KPS, unduh Word) dan penjelajah semua halaman.
+- Struktur data versi 20: tabel baru "LaporanGkm" (ditambahkan otomatis, cadangan dibuat lebih dulu). Versi lama tetap bisa membaca data;
+  rollback ke v0.24.0 aman tanpa pemulihan data (peran "gkm" diabaikan versi lama).
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.24.0 — 14 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.24.0 (server Apps Script Produksi deployment @4): foto profil, menu Data Terkumpul, tombol Sumber data di Penilaian.
 - Cadangan: dibuat otomatis oleh server pada permintaan pertama ("Cadangan / sebelum v0.24.0 (struktur data 18 → 19)") di folder Cadangan Drive Produksi.

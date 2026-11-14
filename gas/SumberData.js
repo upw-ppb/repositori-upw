@@ -1,12 +1,12 @@
 /**
  * Sumber data penilaian (v0.24.0).
  * - Setiap butir Penilaian bisa ditelusuri ke data asalnya: kegiatan (semua status, ditandai mana yang dihitung) dan data lain
- *   (dosen, mahasiswa, kurikulum, lulusan, PMB, keuangan, survei, skor GPM, Bank Dokumen).
+ *   (dosen, mahasiswa, kurikulum, lulusan, PMB, keuangan, survei, skor GKM, Bank Dokumen).
  * - Halaman "Data Terkumpul" (Super Admin): semua kegiatan beserta kategorinya (jenis, Tabel iLKPS, butir penilaian), dan tindakan
  *   Super Admin: terima, minta revisi, tolak (juga atas data yang sudah disetujui), hapus (bisa dipulihkan), pulihkan.
  * Admin Prodi dan KPS boleh MELIHAT sumber data butir dari halaman Penilaian; tindakan hanya Super Admin.
  */
-var PERAN_SUMBER_LIHAT = ["admin", "superadmin", "kps"];
+var PERAN_SUMBER_LIHAT = ["admin", "superadmin", "kps", "gkm"];
 var SUMBER_HAPUS_MAKS = 200;
 /** Rumus otomatis → jenis kegiatan yang dihitung. "*" = semua kegiatan yang memilih pasal GCET. */
 var F_JENIS = { pa: ["prestasi_a"], pn: ["prestasi_n"], pen: ["penelitian"], ppdm: ["penelitian"], dpd: ["penelitian"], pkm: ["pkm"], ppkmdm: ["pkm"],
@@ -36,7 +36,7 @@ function petaJenisButir() {
     var fj = m.f ? F_JENIS[m.f] : null;
     JENIS_KEG.forEach(function (j) {
       if (fj && fj !== "*" && fj.indexOf(j.k) >= 0) peta[j.k].push({ n: m.n, cara: "dihitung" });
-      else if (m.t !== "a" && dedDariJenis(j).indexOf(Number(m.ded)) >= 0) peta[j.k].push({ n: m.n, cara: "bahan GPM" });
+      else if (m.t !== "a" && dedDariJenis(j).indexOf(Number(m.ded)) >= 0) peta[j.k].push({ n: m.n, cara: "bahan GKM" });
     });
   });
   return peta;
@@ -89,9 +89,11 @@ function dataLainButir(m, ts, X) {
   if (m.t !== "a") {
     var g = semua("SkorGpm").filter(function (r) { return Number(r.ts) === ts && Number(r.butir) === m.n; })[0];
     idx = idx || indeksOrang();
-    hasil.push({ kunci: "gpm", judul: "Skor GPM (halaman Penilaian)", menu: "penilaian", kolom: ["Skor", "Catatan", "Oleh", "Waktu"],
+    hasil.push({ kunci: "gpm", judul: "Skor GKM (halaman Penilaian)", menu: "penilaian", kolom: ["Skor", "Catatan", "Oleh", "Waktu"],
       baris: g ? [[g.skor === "" ? "(kosong)" : g.skor, teks(g.catatan), (idx.byId[g.oleh] || {}).nama || "", g.waktu ? new Date(g.waktu).toISOString().slice(0, 10) : ""]] : [] });
   }
+  if (BUTIR_LAPORAN_GKM.indexOf(m.n) >= 0) hasil.push({ kunci: "gkm", judul: "Laporan GKM diterima KPS (TS-2 s.d. TS)", menu: "gkm", kolom: ["Semester", "Diterima"],
+    baris: laporanGkmTs(ts).map(function (x) { return [x.label, x.putusPada]; }) });
   var b = ringkasBank()[m.n];
   if (b) hasil.push({ kunci: "bank", judul: "Bank Dokumen butir " + m.n, menu: "bank", kolom: ["Dokumen berlaku", "Slot dokumen"], baris: [[b.ada, b.n]] });
   return hasil;
@@ -137,7 +139,7 @@ function aksiSumberKegiatan(d, token) {
     { judul: "Data keuangan (baris)", jumlah: semua("Dana").length, menu: "dprodi" },
     { judul: "Survei", jumlah: hitung("Survei"), menu: "survei" },
     { judul: "Jawaban survei", jumlah: semua("Jawaban").length, menu: "survei" },
-    { judul: "Skor GPM", jumlah: semua("SkorGpm").filter(function (r) { return r.skor !== ""; }).length, menu: "penilaian" },
+    { judul: "Skor GKM", jumlah: semua("SkorGpm").filter(function (r) { return r.skor !== ""; }).length, menu: "penilaian" },
     { judul: "Dokumen Bank Dokumen", jumlah: semua("BankDokumen").length, menu: "bank" }];
   return { kegiatan: l, ringkas: ringkas, status: LABEL_STATUS_DATA, jenis: JENIS_KEG.map(function (j) { return { k: j.k, l: j.l }; }),
     butirNama: MATRIKS.map(function (m) { return { n: m.n, nm: m.nm }; }), terhapus: daftarTerhapus(idx) };

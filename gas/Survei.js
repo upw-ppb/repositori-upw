@@ -8,7 +8,7 @@
  * - Hasil survei bertujuan t22/t11 mengisi Tabel iLKPS 22/11 (persentase per tingkat) beserta rencana tindak lanjut.
  */
 var PERAN_SURVEI_UBAH = ["admin", "superadmin"];
-var PERAN_SURVEI_LIHAT = ["admin", "superadmin", "kps"];
+var PERAN_SURVEI_LIHAT = ["admin", "superadmin", "kps", "gkm"];
 var SASARAN_SURVEI = { mahasiswa: "Mahasiswa (semua aktif)", mahasiswaBaru: "Mahasiswa baru (semester 1)", dosen: "Dosen", tendik: "Tendik", publik: "Publik / tanpa login (alumni, pengguna lulusan, mitra)" };
 var TIPE_SOAL = ["likert", "pilihan", "centang", "singkat", "paragraf"];
 var LIKERT = ["Kurang", "Cukup", "Baik", "Sangat baik"];

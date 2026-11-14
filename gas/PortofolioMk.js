@@ -19,7 +19,7 @@ var KOMP_MKP = [
 ];
 var METODE_MKP = ["Case based learning", "Project based learning", "Research based education (RBE)", "Industry based education (IBE)",
   "Teaching industry / factory", "Praktik lapangan di destinasi", "Daring / blended"];
-var PERAN_MKP_REKAP = ["admin", "superadmin", "kps"];
+var PERAN_MKP_REKAP = ["admin", "superadmin", "kps", "gkm"];
 var MAKS_DAFTAR_MKP = 30;
 
 function kompMkp(k) { return KOMP_MKP.filter(function (x) { return x.k === k; })[0]; }

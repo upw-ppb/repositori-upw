@@ -1,7 +1,7 @@
 /**
  * Matriks Penilaian LAMWisata IAPS 1.0 Unggul Sarjana Terapan (v0.12.0): 84 butir (Lampiran 1, total bobot 100), kriteria, dan 64 butir DED.
  * DIBUAT OTOMATIS dari prototipe/data-akreditasi.js (satu sumber; ringkasan deskriptor ditulis ulang, rujukan resmi tetap dokumen LAMWisata).
- * t: "a" otomatis dari data, "m" dinilai GPM dengan rubrik, "c" gabungan. f: kunci rumus otomatis (Penilaian.js).
+ * t: "a" otomatis dari data, "m" dinilai GKM dengan rubrik, "c" gabungan. f: kunci rumus otomatis (Penilaian.js).
  */
 var KRITERIA = {
  "A": "Budaya Mutu",

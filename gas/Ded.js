@@ -5,7 +5,7 @@
  * - Penyimpanan narasi memeriksa versi: bila butir sudah diubah orang lain sejak dibuka, simpan ditolak agar tidak saling menimpa.
  * - Ekspor Word dibuat di tampilan (docx) dari data ini + Tabel iLKPS.
  */
-var PERAN_DED = ["admin", "superadmin", "kps"];
+var PERAN_DED = ["admin", "superadmin", "kps", "gkm"];
 var STATUS_DED = ["belum", "draf", "selesai"];
 var IDENTITAS_DED = [
   ["pt", "Perguruan Tinggi", "Politeknik Pariwisata Bali"], ["upps", "Unit Pengelola Program Studi", ""], ["jenis", "Jenis Program", "Sarjana Terapan"],

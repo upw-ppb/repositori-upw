@@ -4,7 +4,7 @@
  * Rentang: TS-2, TS-1, TS (tahun akademik). TS diatur Admin di Pengaturan "tsAwal" (tahun awal TA, mis. 2025 = 2025/2026).
  * Tabel 1–6 (dosen, kurikulum, EWMP) disusun di DataProdi.js; tabel lulusan, keuangan, dan kepuasan belum diisi otomatis.
  */
-var PERAN_ILKPS = ["admin", "superadmin", "kps", "asesor"];
+var PERAN_ILKPS = ["admin", "superadmin", "kps", "gkm", "asesor"];
 var BARIS_DANA = ["a) Perguruan tinggi b) Mandiri", "Lembaga dalam negeri (diluar PT)", "Lembaga luar negeri"];
 var BARIS_PUB14 = ["Jurnal penelitian tidak terakreditasi", "Jurnal penelitian nasional terakreditasi", "Jurnal penelitian internasional",
   "Jurnal penelitian internasional bereputasi", "Seminar wilayah/lokal/perguruan tinggi", "Seminar nasional", "Seminar internasional",

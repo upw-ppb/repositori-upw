@@ -30,7 +30,7 @@ sebelum menayangkan ke Produksi, dan jangan pernah mengetik kata sandi atas nama
 - Akun hanya dibuat lewat impor (mahasiswa oleh Admin: Nama, NIM, tahun masuk, kelas;
   dosen/tendik oleh Super Admin: Nama, NIP). Login awal username = kata sandi = NIM/NIP,
   lalu wajib ganti sandi + verifikasi email, lalu wajib lengkapi biodata.
-- Peran: Super Admin, Admin/GPM, Dosen, Tendik, Mahasiswa, Asesor (baca saja, berkedaluwarsa).
+- Peran: Super Admin, Admin Prodi, KPS, GKM (Gugus Kendali Mutu, sejak v0.25.0), Kalab, Laboran, Dosen, Tendik, Mahasiswa, Asesor (baca saja, berkedaluwarsa).
 - Alur status: Draf → Diajukan → Perlu Revisi (catatan) → Diajukan Ulang → Disetujui / Ditolak.
   Kegiatan non-akademik/lomba mahasiswa diverifikasi dosen pendamping; lainnya oleh Admin.
 - Semester: Ganjil = Juli–Desember, Genap = Januari–Juni. Jul–Des 2026 = Ganjil 2026/2027;
@@ -225,6 +225,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   gas/SumberData.js: F_JENIS/F_DATA (rumus → jenis kegiatan/data lain), petaJenisButir (juga lewat "DED butir N" di Jenis.t untuk butir GPM),
   sumber.butir (lihat: admin/superadmin/kps), sumber.kegiatan/tinjau/hapus/pulihkan (superadmin; hapus = kolom dihapus + riwayat "hapus_sa").
   Tampilan: menu "data" (Data Terkumpul), laci "sumber"/"sumberAksi", avatar(). Klik data-go kini menutup laci. Uji: alat/uji/uji-v24-bagian.mjs.
+
+- v0.25.0 (15 Nov 2026, Uji Coba): istilah GPM → GKM (Gugus Kendali Mutu Prodi; nama tabel SkorGpm dan variabel *Gpm tetap). Peran "gkm" (PERAN_SAH dan
+  daftar PERAN_* lihat/nilai). gas/Gkm.js: LaporanGkm (VERSI_SKEMA 20, kunci semester "2026-1"), gkm.data/simpan/unggah/hapusLampiran/lampiran/putuskan/batas,
+  tugasGkm() dipanggil di awal aksiTugasSaya, BUTIR_LAPORAN_GKM [1,2,4,23,77], kesiapan.data (hitungPenilaian(ts, X) kini menerima konteks).
+  Tampilan: panelKesiapan() di Beranda, hGkm(), barisTugasGkm(); menu() kini tanpa duplikat. Uji: alat/uji/uji-v25-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

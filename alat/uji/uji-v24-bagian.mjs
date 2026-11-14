@@ -53,5 +53,5 @@ export function jalankan({ g, cek, ok, salah, tKps, tDsn, tAdm, tM, tSA }) {
   ok("sumber.pulihkan", { id: setuju.id }, tSA);
   const D3 = ok("sumber.kegiatan", {}, tSA);
   cek("pulihkan: kembali dengan status semula", D3.kegiatan.some(x => x.id === setuju.id && x.status === "disetujui") && !D3.terhapus.some(x => x.id === setuju.id));
-  cek("migrasi: FotoProfil; SKEMA_VERSI 19", g.sheets.FotoProfil && g.props.SKEMA_VERSI === "19");
+  cek("migrasi: FotoProfil; SKEMA_VERSI ≥ 19", g.sheets.FotoProfil && Number(g.props.SKEMA_VERSI) >= 19);
 }

@@ -2,7 +2,7 @@
  * Akun: masuk, aktivasi, lupa kata sandi, dan pengelolaan pengguna.
  * Peran: superadmin, admin, kps, kalab, laboran, dosen, tendik, mahasiswa, asesor (satu akun boleh beberapa peran).
  */
-var PERAN_SAH = ["superadmin", "admin", "kps", "kalab", "laboran", "dosen", "tendik", "mahasiswa", "asesor"];
+var PERAN_SAH = ["superadmin", "admin", "kps", "gkm", "kalab", "laboran", "dosen", "tendik", "mahasiswa", "asesor"];
 
 function peranDari(p) { return String(p.peran || "").split(",").map(function (x) { return x.trim(); }).filter(String); }
 function punyaPeran(p, daftar) { var r = peranDari(p); return daftar.some(function (x) { return r.indexOf(x) >= 0; }); }

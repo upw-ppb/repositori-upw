@@ -2,12 +2,12 @@
  * Simulasi penilaian mandiri (v0.12.0) mengikuti Matriks Penilaian LAMWisata IAPS 1.0 Unggul Sarjana Terapan.
  * - 84 butir berbobot (MATRIKS, total bobot 100), skor 0–4, nilai = Σ bobot × skor (maks. 400).
  * - Butir "a" dihitung dari data aplikasi (Tabel iLKPS, Data Prodi, lulusan, survei, dana) memakai rumus di Matriks;
- *   butir "m" diisi skor GPM (0–4) dengan rubrik; butir "c" menggabungkan keduanya sesuai rumus butir.
+ *   butir "m" diisi skor GKM (0–4) dengan rubrik; butir "c" menggabungkan keduanya sesuai rumus butir.
  * - Bila data belum ada, skor otomatis 0 dan ditandai "data belum lengkap".
  * - Tafsiran yang tidak dirinci di Matriks (PTW, PPS, PBS, TKM, komposisi publikasi butir 48) ditulis di keterangan butir.
  * Ini perkiraan internal, bukan nilai resmi asesor.
  */
-var PERAN_NILAI = ["admin", "superadmin", "kps"];
+var PERAN_NILAI = ["admin", "superadmin", "kps", "gkm"];
 
 function cap4(x) { return Math.max(0, Math.min(4, x)); }
 /** Pola RI/RN/RW pada Matriks (prestasi, penelitian, PkM, publikasi, tempat kerja, kerja sama). */
@@ -160,7 +160,7 @@ function rumusOtomatis(f, X) {
   }
   return null;
 }
-/** Gabungkan bagian otomatis dan skor GPM untuk butir "c". */
+/** Gabungkan bagian otomatis dan skor GKM untuk butir "c". */
 function gabung(n, auto, gpm) {
   var g = gpm === null ? 0 : gpm;
   if (n === 26) return (g + auto) / 2;
@@ -170,16 +170,17 @@ function gabung(n, auto, gpm) {
   return g;
 }
 
-function hitungPenilaian(ts) {
-  var X = konteksNilai(ts), gpm = {};
+function hitungPenilaian(ts, X) {
+  X = X || konteksNilai(ts); var gpm = {};
   semua("SkorGpm").filter(function (r) { return Number(r.ts) === ts; }).forEach(function (r) { gpm[Number(r.butir)] = { skor: r.skor === "" ? null : Number(r.skor), catatan: teks(r.catatan), oleh: teks(r.oleh), waktu: r.waktu ? new Date(r.waktu).toISOString() : "" }; });
-  var idx = indeksOrang(), mkp = infoMkpTs(ts), bank = ringkasBank(), lab = ringkasLab();
+  var idx = indeksOrang(), mkp = infoMkpTs(ts), bank = ringkasBank(), lab = ringkasLab(), lapGkm = laporanGkmTs(ts);
   var rows = MATRIKS.map(function (m) {
     var g = gpm[m.n] || { skor: null, catatan: "" }, r = m.f ? rumusOtomatis(m.f, X) : null, s, info, auto = null;
     if (m.t === "a") { s = r.s; info = r.info; }
-    else if (m.t === "c" && r) { auto = r.s; s = gabung(m.n, r.s, g.skor); info = r.info + "; skor GPM " + (g.skor === null ? "belum diisi" : g.skor); }
-    else { s = g.skor === null ? 0 : g.skor; info = g.skor === null ? "Belum dinilai GPM" : "Dinilai GPM"; }
+    else if (m.t === "c" && r) { auto = r.s; s = gabung(m.n, r.s, g.skor); info = r.info + "; skor GKM " + (g.skor === null ? "belum diisi" : g.skor); }
+    else { s = g.skor === null ? 0 : g.skor; info = g.skor === null ? "Belum dinilai GKM" : "Dinilai GKM"; }
     if (mkp[m.n]) info += "; " + mkp[m.n];
+    if (BUTIR_LAPORAN_GKM.indexOf(m.n) >= 0) info += "; Laporan GKM diterima KPS: " + (lapGkm.length ? lapGkm.length + " semester (" + lapGkm.map(function (x) { return x.label; }).join(", ") + ")" : "belum ada pada TS-2 s.d. TS");
     if (bank[m.n]) info += "; Bank Dokumen: " + bank[m.n].ada + " dari " + bank[m.n].n + " dokumen berlaku";
     if ((m.n === 19 || m.n === 21) && lab.n) info += "; Data Lab: " + lab.n + " sarana (" + lab.lab + " laboratorium, " + lab.baik + " kondisi baik); 12 bulan terakhir " + lab.rawat + " perawatan dan " + lab.pakai + " pemakaian tercatat";
     s = Math.round(cap4(s) * 100) / 100;
