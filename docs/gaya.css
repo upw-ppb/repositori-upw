@@ -109,6 +109,11 @@ a{color:var(--brand)}
 .item .title{font-weight:700}
 .item .meta{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:4px;font-size:.8rem;color:var(--muted)}
 .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+/* v0.25.1: kotak bergulir untuk melihat SEMUA baris (kepala tabel tetap terlihat) */
+.gulir{max-height:300px;overflow:auto}
+.gulir.tinggi{max-height:560px}
+.gulir thead th{position:sticky;top:0;z-index:1;background:linear-gradient(var(--surface-2),var(--surface-2)),var(--surface)}
+ul.gulir{max-height:180px;overflow:auto;padding-right:6px}
 table{border-collapse:collapse;width:100%;font-size:.84rem}
 th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
 th{background:var(--surface-2);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
@@ -191,7 +196,13 @@ textarea{min-height:70px;resize:vertical}
   .brand-m{display:flex!important}
   .top .ta{display:none}
   .brand-m b{white-space:nowrap}
+  /* v0.25.2: bilah atas ponsel muat dengan tombol kembali/maju dan Unduhan */
+  .top{gap:6px}
+  .top .nav-hist + .brand-m b{display:none}
+  .top label.row.small > .muted{display:none}
+  #peranSel{max-width:118px}
 }
+@media (max-width:420px){ .top .brand-m{display:none!important} }
 .brand-m{display:none;align-items:center;gap:8px}
 .brand-m img{width:28px;height:28px}
 @media (prefers-reduced-motion:no-preference){.overlay.anim .drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px)}}}
@@ -278,3 +289,13 @@ label.btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
 .gbr-panduan figcaption { font-size: .85rem; margin-top: 6px; }
 .gbr-panduan figcaption ol { margin: 4px 0 0 20px; padding: 0; display: grid; gap: 2px; }
 .gbr-panduan figcaption li::marker { font-weight: 800; color: #b8860b; }
+
+/* v0.25.2: kembali/maju dan kotak Unduhan (seperti Chrome) */
+.iconbtn:disabled{opacity:.35;cursor:default}
+.unduh-pop{position:absolute;top:calc(100% + 6px);right:max(16px,env(safe-area-inset-right,0px));width:min(380px,calc(100vw - 32px));max-height:min(70vh,520px);display:flex;flex-direction:column;gap:6px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.28);padding:12px;z-index:40}
+.unduh-list{overflow:auto;display:flex;flex-direction:column;gap:6px;min-height:0}
+.unduh-item{display:flex;gap:10px;align-items:flex-start;padding:8px;border:1px solid var(--line);border-radius:10px}
+.unduh-ikon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand);flex:none}
+.unduh-ikon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8}
+.unduh-nama{font-weight:700;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

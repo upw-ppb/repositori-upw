@@ -49,6 +49,8 @@ function aturToken(t) { S.token = t; ls.set("token", t); if (!t) ls.set("profil"
 /* ---------- utilitas ---------- */
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const $ = id => document.getElementById(id);
+/** Tanggal hari ini menurut jam perangkat (bukan UTC), untuk nama berkas unduhan (v0.25.2). */
+const hariIniLokal = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 let tt;
 function toast(m) { const el = $("toast"); el.textContent = m; el.hidden = false; clearTimeout(tt); tt = setTimeout(() => el.hidden = true, 3200); }
 const tgl = s => s ? new Date(s).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "–";
@@ -77,6 +79,9 @@ const I = {
   lab: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 15h9"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
   masukan: '<path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/>',
+  kembali: '<path d="M15 5l-7 7 7 7"/>',
+  maju: '<path d="M9 5l7 7-7 7"/>',
+  unduhan: '<path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 19h14"/>',
   gkm: '<path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
   data: '<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V12"/>'
 };
@@ -116,6 +121,7 @@ function menu() {
 /* ---------- render ---------- */
 const app = $("app");
 function render() {
+  catatNavigasi();
   // Simpan posisi gulir laci, agar menggambar ulang (misalnya setelah mencentang kelas) tidak melompat ke atas.
   const lama = document.querySelector(".drawer"), gulir = lama ? lama.scrollTop : 0;
   gambar();
@@ -156,15 +162,82 @@ function gambar() {
    <aside class="side"><div class="brand"><img src="logo.png" alt="Logo Politeknik Pariwisata Bali"><div><b>Repositori UPW</b><span>Akreditasi LAMWisata</span></div></div>
     <nav class="nav" aria-label="Menu utama">${m.map(v => `<button data-go="${v}" ${S.view === v ? 'aria-current="page"' : ""}>${ic(v)}<span>${MENU_L[v]}</span>${lencana(v)}</button>`).join("")}</nav>
     <div class="who" style="cursor:pointer" data-go="akun" title="Akun saya">${avatar(S.fotoSaya && S.fotoSaya.kecil, u.nama)}<div style="min-width:0"><div class="small" style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.nama)}</div><div class="small muted">${esc(PERAN_L[p])}</div></div></div></aside>
-   <div class="main"><header class="top"><div class="brand-m"><img src="logo.png" alt=""><b>Repositori UPW</b></div>
+   <div class="main"><header class="top">${tombolNavigasi()}<div class="brand-m"><img src="logo.png" alt=""><b>Repositori UPW</b></div>
     <span class="ta">${LABEL_VERSI}</span><span class="spacer"></span>
     ${u.peran.length > 1 ? `<label class="row small" style="gap:6px"><span class="muted">Peran</span><select id="peranSel" aria-label="Peran aktif" style="width:auto">${u.peran.map(r => `<option value="${r}" ${r === p ? "selected" : ""}>${PERAN_L[r]}</option>`).join("")}</select></label>` : ""}
+    ${tombolUnduhan()}
     <button class="iconbtn" data-go="info" aria-label="Info dan panduan" title="Info dan panduan" ${S.view === "info" ? 'aria-current="page"' : ""}>${ic("info")}</button>
-    <button class="iconbtn" data-act="keluar" aria-label="Keluar" title="Keluar">${ic("keluar")}</button></header>
+    <button class="iconbtn" data-act="keluar" aria-label="Keluar" title="Keluar">${ic("keluar")}</button>${S.unduhBuka ? kotakUnduhan() : ""}</header>
     <main class="content">${halaman()}</main></div></div>
    <nav class="tabbar" aria-label="Menu">${m.map(v => `<button data-go="${v}" ${S.view === v ? 'aria-current="page"' : ""}>${ic(v)}<span>${MENU_L[v]}</span>${lencana(v)}</button>`).join("")}</nav>
    ${S.laci ? laci() : ""}`;
 }
+
+/* ---------- Kembali / Maju (v0.25.2) ----------
+   Setiap pindah halaman (menu) dicatat ke riwayat browser, sehingga tombol ← → di bilah atas, tombol mundur/maju mouse, dan gestur geser
+   trackpad bekerja seperti di Chrome — juga di aplikasi terpasang yang tidak punya bilah alamat. */
+let navI = history.state && history.state.upw ? history.state.i : 0, navMax = navI, navLihat = null, navDariPop = false;
+function catatNavigasi() {
+  if (!S.pengguna || S.layar === "survei") { navLihat = null; return; }
+  if (navLihat === null) { navLihat = S.view; history.replaceState({ upw: 1, i: navI, v: S.view }, ""); return; }
+  if (S.view === navLihat) return;
+  navLihat = S.view;
+  if (navDariPop) return;
+  navI++; navMax = navI; history.pushState({ upw: 1, i: navI, v: S.view }, "");
+}
+window.addEventListener("popstate", e => {
+  const st = e.state; if (!st || !st.upw || !S.pengguna) return;
+  if (!bolehTutup()) { history.go(st.i < navI ? 1 : -1); return; }
+  navDariPop = true; navI = st.i; if (navI > navMax) navMax = navI;
+  S.view = st.v; S.laci = null; S.galat = ""; S.unduhBuka = false; if (st.v === "penilaian") S.nilai = null;
+  render(); window.scrollTo(0, 0); navDariPop = false;
+});
+function tombolNavigasi() {
+  if (!S.pengguna) return "";
+  return `<div class="row nav-hist" style="gap:4px;flex-wrap:nowrap"><button class="iconbtn" data-act="navKembali" aria-label="Kembali ke halaman sebelumnya" title="Kembali" ${navI > 0 ? "" : "disabled"}>${ic("kembali")}</button>
+    <button class="iconbtn" data-act="navMaju" aria-label="Maju ke halaman berikutnya" title="Maju" ${navI < navMax ? "" : "disabled"}>${ic("maju")}</button></div>`;
+}
+
+/* ---------- Unduhan (v0.25.2) ----------
+   Daftar berkas yang diunduh dari aplikasi, di pojok kanan atas seperti di Chrome. Aplikasi terpasang tidak menampilkan kotak unduhan Chrome;
+   daftar ini menggantikannya. Berkas dari sesi ini bisa dibuka atau diunduh lagi; daftar sesi sebelumnya hanya berisi nama dan waktunya.
+   Aplikasi web tidak bisa membuka Finder/Explorer, jadi letak berkas disebutkan. */
+let tutupUnduhan = null;
+const kunciUnduhan = () => "unduhan:" + (S.pengguna ? S.pengguna.id : "");
+function daftarUnduhan() {
+  if (!S.unduhan) { S.unduhan = []; try { S.unduhan = JSON.parse(ls.get(kunciUnduhan()) || "[]"); } catch (_) {} }
+  return S.unduhan;
+}
+function catatUnduhan(blob, nama, tempat) {
+  const l = daftarUnduhan(), url = URL.createObjectURL(blob);
+  l.unshift({ id: Date.now() + "" + Math.random().toString(36).slice(2, 6), nama, ukuran: blob.size, tipe: blob.type || "", waktu: new Date().toISOString(), tempat, url });
+  l.splice(30);
+  simpanDaftarUnduhan(); S.unduhBaru = (S.unduhBaru || 0) + 1; S.unduhBuka = true; render();
+  clearTimeout(tutupUnduhan); tutupUnduhan = setTimeout(() => { if (S.unduhBuka && !S.unduhTetap) { S.unduhBuka = false; render(); } }, 6000);
+}
+function simpanDaftarUnduhan() { try { ls.set(kunciUnduhan(), JSON.stringify(daftarUnduhan().map(x => ({ id: x.id, nama: x.nama, ukuran: x.ukuran, tipe: x.tipe, waktu: x.waktu, tempat: x.tempat })))); } catch (_) {} }
+function tombolUnduhan() {
+  if (!S.pengguna) return "";
+  const n = S.unduhBaru || 0;
+  return `<button class="iconbtn" data-act="unduhToggle" aria-label="Unduhan" title="Unduhan" aria-expanded="${S.unduhBuka ? "true" : "false"}">${ic("unduhan")}${n ? `<span class="dot">${n}</span>` : ""}</button>`;
+}
+const bisaDibuka = t => /^(application\/pdf|image\/|text\/)/.test(t || "");
+function kotakUnduhan() {
+  const l = daftarUnduhan();
+  return `<div class="unduh-pop" role="dialog" aria-label="Unduhan terakhir"><div class="row" style="justify-content:space-between"><b>Unduhan terakhir</b>
+     ${l.length ? `<button class="btn sm" data-act="unduhBersih">Bersihkan daftar</button>` : ""}</div>
+   <div class="unduh-list">${l.map(x => `<div class="unduh-item"><div class="unduh-ikon">${ic("unduhan")}</div><div style="min-width:0;flex:1">
+      <div class="unduh-nama" title="${esc(x.nama)}">${esc(x.nama)}</div>
+      <div class="small muted">${ukuranBerkas(x.ukuran || 0)} · ${tgl(x.waktu)}<br>Di ${esc(x.tempat)}</div>
+      ${x.url ? `<div class="row" style="gap:4px;margin-top:4px">${bisaDibuka(x.tipe) ? `<button class="btn sm" data-act="unduhBuka" data-id="${x.id}">Buka</button>` : ""}<button class="btn sm" data-act="unduhLagi" data-id="${x.id}">Unduh lagi</button></div>` : `<div class="small muted" style="margin-top:2px">Dari sesi sebelumnya</div>`}</div>
+      <button class="iconbtn" data-act="unduhHapus" data-id="${x.id}" aria-label="Hapus dari daftar" title="Hapus dari daftar" style="height:28px;min-width:28px">✕</button></div>`).join("") || `<div class="empty small">Belum ada unduhan.</div>`}</div>
+   <p class="small muted" style="margin:6px 0 0">Berkas ada di folder Unduhan (Downloads) atau folder yang Anda pilih saat menyimpan. Buka lewat Finder (Mac) atau File Explorer (Windows).</p></div>`;
+}
+document.addEventListener("click", e => {
+  if (!S.unduhBuka) return;
+  if (e.target.closest(".unduh-pop") || e.target.closest('[data-act="unduhToggle"]')) { S.unduhTetap = true; return; }
+  S.unduhBuka = false; render();
+}, true);
 /** Angka kecil di menu: hal yang menunggu tindakan. */
 function lencana(v) {
   const t = S.tugas; if (!t) return "";
@@ -279,7 +352,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}${panelKesiapan()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -767,7 +840,7 @@ const tabelBaris = rows => `<table class="surat-baris">${rows.map(([a, b]) => `<
 
 function kertasSurat(k, jenis) {
   const L = k.lampiran, i = L.isi, set = L.set, dsn = jenis === "dosen", terbit = k.st === "terbit";
-  const tg = terbit ? L.tglSurat : (S.ref ? S.ref.hariIni : new Date().toISOString().slice(0, 10));
+  const tg = terbit ? L.tglSurat : (S.ref ? S.ref.hariIni : hariIniLokal());
   const kps = L.kps || { nama: "[nama Koordinator Program Studi]", nip: "–" };
   const url = location.origin + location.pathname + "?cek=" + encodeURIComponent(k.kodeSurat || "");
   const gbr = terbit && L.ttd ? S.ttdSurat[k.id] : "";
@@ -1950,16 +2023,18 @@ async function kolomImpor(jenis) {
 function unduhBlob(blob, nama) { return simpanBerkas(blob, nama); }
 function panelImporExcel(jenis) {
   const J = JENIS_IMPOR[jenis], X = S.imx && S.imx.jenis === jenis ? S.imx : null, dis = S.sibuk ? "disabled" : "";
-  const contohBaris = X && X.baris.length ? `<div class="tbl-wrap" style="margin-top:6px"><table><thead><tr>${X.kolom.map(k => `<th>${esc(k.l)}</th>`).join("")}</tr></thead><tbody>
-    ${X.baris.slice(0, 5).map(r => `<tr>${X.kolom.map(k => `<td class="small">${esc(r[k.k] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${X.baris.length > 5 ? `<p class="small muted">… dan ${X.baris.length - 5} baris lainnya.</p>` : ""}` : "";
+  // v0.25.1: SEMUA baris ditampilkan di kotak bergulir agar bisa diperiksa satu per satu sebelum diimpor.
+  const contohBaris = X && X.baris.length ? `<p class="small muted" style="margin-top:6px">Semua ${X.baris.length} baris ditampilkan${X.baris.length > 5 ? "; gulir di dalam kotak untuk memeriksa satu per satu" : ""}.</p>
+    <div class="tbl-wrap gulir" style="margin-top:4px"><table><thead><tr><th>No</th>${X.kolom.map(k => `<th>${esc(k.l)}</th>`).join("")}</tr></thead><tbody>
+    ${X.baris.map((r, i) => `<tr><td class="small num muted">${i + 1}</td>${X.kolom.map(k => `<td class="small">${k.k === "masuk" && !r.masuk && /^\d{2}/.test(String(r.username || "")) ? `<span class="muted">20${esc(String(r.username).slice(0, 2))} (dari NIM)</span>` : esc(r[k.k] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : "";
   return `<div class="picker" style="margin-top:10px"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><b>Impor dari Excel · ${esc(J.judul)}</b>
      <div class="row small" style="flex-wrap:wrap"><button class="btn sm" data-act="imxTemplat" data-j="${jenis}" ${dis}>Unduh templat Excel</button>
      <label class="btn sm primary" ${S.sibuk ? 'aria-disabled="true"' : ""}>Unggah berkas Excel<input type="file" data-imx="${jenis}" accept=".xlsx" hidden ${dis}></label></div></div>
     <span class="hint">1) Unduh templat · 2) isi lembar <b>Data</b> di Excel/Google Sheets (lihat lembar Petunjuk dan Contoh) · 3) unggah berkasnya (.xlsx), periksa pratinjau, lalu tekan Impor.</span>
     ${X ? `<div class="auto">Berkas <b>${esc(X.nama)}</b>: <b>${X.baris.length}</b> baris siap diimpor${X.masalah.length ? `, <b>${X.masalah.length}</b> perlu diperbaiki` : ""}.</div>
-      ${X.masalah.length ? `<ul class="small" style="margin:0 0 0 18px;color:var(--bad)">${X.masalah.slice(0, 10).map(m => `<li>${esc(m)}</li>`).join("")}${X.masalah.length > 10 ? `<li>… ${X.masalah.length - 10} lainnya</li>` : ""}</ul>` : ""}
+      ${X.masalah.length ? `<ul class="small gulir" style="margin:0 0 0 18px;color:var(--bad)">${X.masalah.map(m => `<li>${esc(m)}</li>`).join("")}</ul>` : ""}
       ${contohBaris}
-      ${X.hasil ? `<div class="auto">${esc(X.hasil)}${X.lewati && X.lewati.length ? `<ul class="small" style="margin:4px 0 0 18px">${X.lewati.slice(0, 15).map(l => `<li>Baris ${l.baris}${l.nip ? " (" + esc(l.nip) + ")" : ""}: ${esc(l.alasan)}</li>`).join("")}</ul>` : ""}</div>` : ""}
+      ${X.hasil ? `<div class="auto">${esc(X.hasil)}${X.lewati && X.lewati.length ? `<ul class="small gulir" style="margin:4px 0 0 18px">${X.lewati.map(l => `<li>Baris ${l.baris}${l.nip ? " (" + esc(l.nip) + ")" : ""}: ${esc(l.alasan)}</li>`).join("")}</ul>` : ""}</div>` : ""}
       <div class="row">${X.baris.length && !X.hasil ? tombol("imxKirim", `Impor ${X.baris.length} ${J.satuan}`, "primary sm") : ""}<button class="btn sm" data-act="imxBatal" ${dis}>${X.hasil ? "Selesai" : "Batal"}</button></div>` : ""}
   </div>`;
 }
@@ -2012,7 +2087,7 @@ Object.assign(AKSI, {
     jalankan(async () => { const j = await J.kirim(X.baris); X.hasil = J.pesan(j); X.lewati = J.lewati ? J.lewati(j) : []; J.segarkan(); toast(X.hasil); });
   },
   async eksporAkun() {
-    try { const E = await api("admin.eksporAkun"); unduhBlob(UPW_ZIP.xlsx([{ nama: "Akun", baris: [E.kepala, ...E.baris], teks: [0] }]), `Daftar akun Repositori UPW ${new Date().toISOString().slice(0, 10)}.xlsx`); }
+    try { const E = await api("admin.eksporAkun"); unduhBlob(UPW_ZIP.xlsx([{ nama: "Akun", baris: [E.kepala, ...E.baris], teks: [0] }]), `Daftar akun Repositori UPW ${hariIniLokal()}.xlsx`); }
     catch (e) { toast(e.message); }
   }
 });
@@ -2188,8 +2263,8 @@ function hRiwayatKeputusan() {
      <select id="rkKep" aria-label="Keputusan" style="width:auto"><option value="">Semua keputusan</option>${Object.entries(R.label).map(([k, v]) => `<option value="${k}" ${f.kep === k ? "selected" : ""}>${esc(v)}</option>`).join("")}</select>
      <button class="btn sm" data-act="rkXlsx">Unduh Excel</button></div>
    <p class="small muted">${l.length} keputusan · disetujui/terbit ${hit("terbit") + hit("disetujui")} · ditunda ${hit("ditunda")} · revisi ${hit("revisi_aju") + hit("revisi")} · ditolak ${hit("ditolak_aju") + hit("ditolak")}. Riwayat ini tetap tersimpan dan tidak bisa diubah.</p>
-   <div class="tbl-wrap"><table><thead><tr><th>Waktu</th><th>Keputusan</th><th>Kegiatan</th><th>Pengaju</th><th>Oleh</th><th>Catatan</th></tr></thead><tbody>
-   ${l.slice(0, 300).map(x => `<tr><td class="small num">${tgl(x.waktu)}</td><td><span class="chip ${CHIP_KEP[x.keputusan] || ""}">${esc(x.label)}</span>${x.kodeSurat ? `<div class="small mono">${esc(x.kodeSurat)}</div>` : ""}</td>
+   <div class="tbl-wrap gulir tinggi"><table><thead><tr><th>Waktu</th><th>Keputusan</th><th>Kegiatan</th><th>Pengaju</th><th>Oleh</th><th>Catatan</th></tr></thead><tbody>
+   ${l.map(x => `<tr><td class="small num">${tgl(x.waktu)}</td><td><span class="chip ${CHIP_KEP[x.keputusan] || ""}">${esc(x.label)}</span>${x.kodeSurat ? `<div class="small mono">${esc(x.kodeSurat)}</div>` : ""}</td>
      <td class="small"><button class="lnk" data-act="bukaKeg" data-id="${x.id}">${esc(x.judul)}</button></td><td class="small">${esc(namaPendek(x.pengaju))}</td><td class="small">${esc(namaPendek(x.oleh))}</td><td class="small">${esc(x.catatan || "–")}</td></tr>`).join("") || `<tr><td colspan="6"><div class="empty">Belum ada keputusan.</div></td></tr>`}</tbody></table></div>`;
 }
 document.addEventListener("change", e => {
@@ -2224,8 +2299,8 @@ function hLab() {
      ${ub ? `<div class="row" style="flex-wrap:wrap">${tombol("labLogBuka", "+ Perawatan", "sm", `data-id="${x.id}" data-t="rawat"`)}${tombol("labLogBuka", "+ Pemakaian", "sm", `data-id="${x.id}" data-t="pakai"`)}<button class="btn sm" data-act="labUbah" data-id="${x.id}">Ubah</button></div>` : ""}
    </article>`).join("") || `<div class="empty panel">Belum ada sarana. ${ub ? "Tekan <b>+ Tambah sarana</b>." : ""}</div>`}</div>
    <section class="panel"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Catatan perawatan dan pemakaian</h2><button class="btn sm" data-act="labXlsx">Unduh Excel</button></div>
-    <div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Tanggal</th><th>Sarana</th><th>Jenis</th><th>Kegiatan / keperluan</th><th>MK / kelas</th><th>Pengguna</th><th>Jam</th><th>Dicatat</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
-    ${L.log.slice(0, 100).map(g => `<tr><td class="small num">${esc(tglPendek(g.tgl))}</td><td class="small">${esc((L.sarana.find(x => x.id === g.saranaId) || {}).nama || "–")}</td><td class="small">${g.tipe === "rawat" ? "Perawatan" : "Pemakaian"}</td><td class="small">${esc(g.isi)}</td><td class="small">${esc(g.mk || "–")}</td><td class="small num">${g.jumlah || "–"}</td><td class="small num">${g.jam ? String(g.jam).replace(".", ",") : "–"}</td><td class="small">${esc(namaPendek(g.oleh))}</td>
+    <div class="tbl-wrap gulir tinggi" style="margin-top:8px"><table><thead><tr><th>Tanggal</th><th>Sarana</th><th>Jenis</th><th>Kegiatan / keperluan</th><th>MK / kelas</th><th>Pengguna</th><th>Jam</th><th>Dicatat</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
+    ${L.log.map(g => `<tr><td class="small num">${esc(tglPendek(g.tgl))}</td><td class="small">${esc((L.sarana.find(x => x.id === g.saranaId) || {}).nama || "–")}</td><td class="small">${g.tipe === "rawat" ? "Perawatan" : "Pemakaian"}</td><td class="small">${esc(g.isi)}</td><td class="small">${esc(g.mk || "–")}</td><td class="small num">${g.jumlah || "–"}</td><td class="small num">${g.jam ? String(g.jam).replace(".", ",") : "–"}</td><td class="small">${esc(namaPendek(g.oleh))}</td>
       ${ub ? `<td><button class="btn sm bad" data-act="labLogHapus" data-id="${g.id}">Hapus</button></td>` : ""}</tr>`).join("") || `<tr><td colspan="9"><div class="empty">Belum ada catatan.</div></td></tr>`}</tbody></table></div></section>`;
 }
 function laciLab() {
@@ -2507,7 +2582,7 @@ Object.assign(AKSI, {
     const D = S.mskAdm;
     unduhBlob(UPW_ZIP.xlsx([{ nama: "Masukan", baris: [["Waktu", "Status", "Jenis", "Bagian aplikasi", "Judul", "Uraian", "Pengirim", "NIM/NIP", "Peran", "Versi", "Perangkat", "Lampiran", "Tanggapan", "Ditanggapi oleh", "Waktu tanggapan"]]
       .concat(D.masukan.map(x => [tgl(x.waktu), D.status[x.status] || x.status, x.jenis, x.menu, x.judul, x.isi, x.nama, x.username, PERAN_L[x.peran] || x.peran, x.versi, x.perangkat, x.lampiran ? x.lampiran.nama : "", x.tanggapan, x.olehTanggapan, x.waktuTanggapan ? tgl(x.waktuTanggapan) : ""])), teks: [7] }]),
-      "Masukan pengguna Repositori UPW " + new Date().toISOString().slice(0, 10) + ".xlsx");
+      "Masukan pengguna Repositori UPW " + hariIniLokal() + ".xlsx");
   }
 });
 document.addEventListener("input", e => {
@@ -2722,12 +2797,26 @@ Object.assign(AKSI, {
       .concat(D.kegiatan.map(k => [k.judul, k.jenisLabel, k.tabel, k.tgl, k.ta ? k.ta + "/" + (k.ta + 1) : "", k.olehNama, k.olehUser, k.statusLabel, k.verifNama,
         k.butir.filter(b => b.cara === "dihitung").map(b => b.n + ". " + nmB(b.n)).join("; "), k.butir.filter(b => b.cara !== "dihitung").map(b => b.n + ". " + nmB(b.n)).join("; ")])) },
       { nama: "Terhapus", baris: [["Judul", "Jenis", "Tanggal", "Pengaju", "Dihapus", "Oleh", "Alasan"]].concat(D.terhapus.map(k => [k.judul, k.jenisLabel, k.tgl, k.olehNama, k.waktuHapus.slice(0, 10), k.dihapusOleh, k.alasan])) }]),
-      "Data Terkumpul " + new Date().toISOString().slice(0, 10) + ".xlsx");
+      "Data Terkumpul " + hariIniLokal() + ".xlsx");
   },
   async fotoHapus() {
     if (!confirm("Hapus foto profil?")) return;
     jalankan(async () => { await api("foto.hapus"); S.fotoSaya = { foto: "", kecil: "" }; ls.set("foto:" + S.pengguna.id, null); S.dirFoto = null; toast("Foto profil dihapus."); });
   }
+});
+
+/* Aksi kembali/maju dan Unduhan (v0.25.2); didaftarkan di sini karena AKSI baru ada setelah bagian bilah atas. */
+Object.assign(AKSI, {
+  navKembali() { if (navI > 0) history.back(); },
+  navMaju() { if (navI < navMax) history.forward(); },
+  unduhToggle() { S.unduhBuka = !S.unduhBuka; S.unduhTetap = true; S.unduhBaru = 0; clearTimeout(tutupUnduhan); render(); },
+  unduhBuka(d) { const x = daftarUnduhan().find(y => y.id === d.id); if (x && x.url) window.open(x.url, "_blank"); },
+  unduhLagi(d) {
+    const x = daftarUnduhan().find(y => y.id === d.id); if (!x || !x.url) return;
+    const a = document.createElement("a"); a.href = x.url; a.download = x.nama; document.body.appendChild(a); a.click(); a.remove(); toast("Diunduh lagi ke folder Unduhan: " + x.nama);
+  },
+  unduhHapus(d) { const l = daftarUnduhan(), i = l.findIndex(y => y.id === d.id); if (i >= 0) { if (l[i].url) URL.revokeObjectURL(l[i].url); l.splice(i, 1); } simpanDaftarUnduhan(); render(); },
+  unduhBersih() { daftarUnduhan().forEach(x => x.url && URL.revokeObjectURL(x.url)); S.unduhan = []; simpanDaftarUnduhan(); render(); }
 });
 
 /* --- Kesiapan akreditasi di Beranda dan Laporan GKM (v0.25.0) --- */
@@ -2760,7 +2849,7 @@ function panelKesiapan() {
     <div class="list">${K2.prioritas.map(butirItem).join("") || `<div class="empty">Semua butir sudah skor 4.</div>`}</div>
     ${K2.kurang.length ? `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--brand)"><b>Data yang belum ada (${K2.kurang.length} butir)</b> dan kegiatan/data yang perlu dikumpulkan</summary><div class="list" style="margin-top:6px">${K2.kurang.map(butirItem).join("")}</div></details>` : ""}
     ${K2.tabelKosong.length ? `<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--brand)"><b>Tabel iLKPS yang masih kosong (${K2.tabelKosong.length})</b></summary><ul class="small" style="margin:6px 0 0 18px">${K2.tabelKosong.map(t => `<li>${esc(t.judul)}</li>`).join("")}</ul></details>` : ""}
-    ${K2.belum.length ? `<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--brand)"><b>Butir rubrik belum dinilai GKM (${K2.belumGkm})</b>, bobot terbesar lebih dulu</summary><ul class="small" style="margin:6px 0 0 18px">${K2.belum.map(b => `<li>${b.n}. ${esc(b.nm)}</li>`).join("")}${K2.belumGkm > K2.belum.length ? `<li>… dan ${K2.belumGkm - K2.belum.length} lainnya di menu Penilaian</li>` : ""}</ul></details>` : ""}
+    ${K2.belum.length ? `<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--brand)"><b>Butir rubrik belum dinilai GKM (${K2.belumGkm})</b>, bobot terbesar lebih dulu</summary><ul class="small gulir" style="margin:6px 0 0 18px">${K2.belum.map(b => `<li>${b.n}. ${esc(b.nm)}</li>`).join("")}</ul></details>` : ""}
    </section>`;
 }
 /** Baris pengingat GKM/KPS untuk panel "Perlu tindakan". */
@@ -3277,13 +3366,12 @@ async function simpanBerkas(blob, nama) {
       const eks = (nama.match(/\.[^.]+$/) || [""])[0], tipe = blob.type || "application/octet-stream";
       const h = await window.showSaveFilePicker({ suggestedName: nama, types: eks ? [{ description: "Berkas " + eks.slice(1).toUpperCase(), accept: { [tipe]: [eks] } }] : undefined });
       const w = await h.createWritable(); await w.write(blob); await w.close();
-      toast("Tersimpan: " + h.name + " (di folder yang Anda pilih)."); return;
+      catatUnduhan(blob, h.name, "folder yang Anda pilih"); return;
     } catch (e) { if (e && e.name === "AbortError") { toast("Penyimpanan dibatalkan."); return; } }
   }
   const url = URL.createObjectURL(blob), a = document.createElement("a");
   a.href = url; a.download = nama; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 120000);
-  if (terpasang()) toast("Berkas " + nama + " tersimpan di folder Unduhan (Downloads). Buka lewat Finder › Unduhan.");
+  catatUnduhan(blob, nama, "folder Unduhan (Downloads)");
 }
 const namaBerkas = s => String(s || "").replace(/[\\/:*?"<>| -]/g, "_").replace(/\s+/g, " ").trim().slice(0, 80) || "berkas";
 const dariBase64 = b => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };

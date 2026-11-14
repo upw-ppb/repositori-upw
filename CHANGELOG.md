@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.25.2 — 15 Nov 2026 — Produksi
+- Produksi diperbarui dari v0.25.0 ke v0.25.2 (tampilan) dengan server v0.25.1 (deployment @6): daftar lengkap dalam kotak bergulir (v0.25.1),
+  tombol ← → dan kotak Unduhan seperti Chrome, tanggal lokal di nama berkas (v0.25.2).
+- Tidak ada perubahan struktur data, sehingga server tidak membuat cadangan otomatis; data tidak diubah oleh rilis ini. Cadangan terakhir:
+  "Cadangan / sebelum v0.25.0" (hari yang sama). Rollback ke v0.25.0 aman (tampilan tag v0.25.0, deployment versi milik v0.25.0).
+- Penyetuju: pemilik, di chat 15 Nov 2026: "Setuju tayang v0.25.2".
+
 ## v0.25.2 — 15 Nov 2026 — Uji Coba
 Permintaan pemilik (seperti di Chrome, terutama untuk aplikasi terpasang yang tidak punya bilah alamat):
 - **Tombol ← dan →** di kiri bilah atas: kembali ke halaman sebelumnya dan maju lagi. Setiap pindah menu tercatat di riwayat, sehingga tombol
