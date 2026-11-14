@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.23.1 — 14 Nov 2026 — Produksi
+- Tampilan Produksi diperbarui ke v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak).
+- Hanya tampilan yang berubah. Kode server tidak berubah, jadi server Produksi tetap v0.23.0 (deployment @3) dan tidak diterapkan ulang.
+  Data tidak tersentuh; cadangan terakhir: "Cadangan / sebelum v0.23.0" (hari yang sama). Rollback ke v0.23.0 cukup tampilan (tag v0.23.0).
+- Penyetuju: pemilik, di chat 14 Nov 2026: "Setuju tayang v0.23.1".
+
 ## v0.23.1 — 14 Nov 2026 — Uji Coba
 - Ikon aplikasi diperbesar (permintaan pemilik): koper dan tulisan UPW kini memenuhi kotak biru ke atas-bawah dan kiri-kanan
   (sebelumnya banyak ruang kosong). Bentuk dan warna tetap konsep D. Kode pembuat ikon disimpan di alat/ikon.js.
