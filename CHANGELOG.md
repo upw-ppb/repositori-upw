@@ -3,6 +3,15 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.25.1 — 15 Nov 2026 — Uji Coba
+- Permintaan pemilik: daftar yang sebelumnya dipotong ("… dan N baris lainnya") kini ditampilkan **lengkap dalam kotak bergulir** dengan kepala
+  tabel tetap terlihat:
+  - pratinjau impor Excel (semua jenis impor): semua baris, kolom nomor baris, dan tahun masuk yang diambil dari NIM bila kolomnya kosong;
+  - daftar masalah dan baris yang dilewati saat impor;
+  - Riwayat keputusan (sebelumnya 300 terbaru) dan catatan perawatan/pemakaian Laboratorium (sebelumnya 100 terbaru);
+  - daftar butir rubrik yang belum dinilai GKM di panel Kesiapan (sebelumnya 8).
+- Tidak ada perubahan struktur data. Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.25.0 — 15 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.25.0 (server Apps Script Produksi deployment @5): panel Kesiapan akreditasi di Beranda, peran dan Laporan GKM,
   istilah GKM, akun Super Admin tidak dihitung sebagai data prodi.

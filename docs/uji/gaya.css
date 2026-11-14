@@ -109,6 +109,11 @@ a{color:var(--brand)}
 .item .title{font-weight:700}
 .item .meta{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:4px;font-size:.8rem;color:var(--muted)}
 .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+/* v0.25.1: kotak bergulir untuk melihat SEMUA baris (kepala tabel tetap terlihat) */
+.gulir{max-height:300px;overflow:auto}
+.gulir.tinggi{max-height:560px}
+.gulir thead th{position:sticky;top:0;z-index:1;background:linear-gradient(var(--surface-2),var(--surface-2)),var(--surface)}
+ul.gulir{max-height:180px;overflow:auto;padding-right:6px}
 table{border-collapse:collapse;width:100%;font-size:.84rem}
 th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
 th{background:var(--surface-2);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);white-space:nowrap}

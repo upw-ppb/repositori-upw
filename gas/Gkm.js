@@ -233,7 +233,7 @@ function aksiKesiapanData(d, token) {
   return { ts: H.ts, total: H.total, target: H.target, belumGkm: H.belumGpm, kurangData: H.kurangData,
     prioritas: H.rows.filter(function (r) { return r.gain > 0.05; }).sort(function (a, b) { return b.gain - a.gain; }).slice(0, 5).map(butir),
     kurang: H.rows.filter(function (r) { return r.kurang; }).sort(function (a, b) { return b.w - a.w; }).map(butir),
-    belum: H.rows.filter(function (r) { return r.perluGpm && r.gpm === null; }).sort(function (a, b) { return b.w - a.w; }).slice(0, 8).map(function (r) { return { n: r.n, nm: r.nm }; }),
+    belum: H.rows.filter(function (r) { return r.perluGpm && r.gpm === null; }).sort(function (a, b) { return b.w - a.w; }).map(function (r) { return { n: r.n, nm: r.nm }; }),
     kriteria: H.kriteria.map(function (k) { return { l: k.l, persen: k.maks ? Math.round(k.nilai / k.maks * 100) : 0 }; }).sort(function (a, b) { return a.persen - b.persen; }).slice(0, 3),
     tabelKosong: kosongT, bankKosong: bankKosong, bankTotal: bankTotal,
     laporanGkm: [ringkasLaporanGkm(smtSebelum(kini)), ringkasLaporanGkm(kini)] };

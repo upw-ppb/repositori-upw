@@ -30,7 +30,7 @@ function aksiLabData(d, token) {
     s.jamSetahun = lg.filter(function (x) { return x.tipe === "pakai" && x.tgl >= setahun; }).reduce(function (a, x) { return a + x.jam; }, 0);
     return s;
   }).sort(function (a, b) { return a.nama.localeCompare(b.nama); });
-  return { bolehUbah: punyaPeran(p, PERAN_LAB_UBAH), hariIni: kini, sarana: sarana, log: log.slice(0, 500),
+  return { bolehUbah: punyaPeran(p, PERAN_LAB_UBAH), hariIni: kini, sarana: sarana, log: log, // v0.25.1: semua catatan (ditampilkan di kotak bergulir)
     pilihan: { jenis: JENIS_SARANA, kepemilikan: MILIK_SARANA, kondisi: KONDISI_SARANA },
     pegawai: idx.pegawai.map(function (o) { return { id: o.id, nama: o.nama }; }) };
 }
