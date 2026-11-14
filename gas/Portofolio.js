@@ -4,7 +4,19 @@
  * Dokumen pribadi disimpan di Drive: Repositori UPW / Portofolio / <NIM/NIP> <nama> / <jenis> - <nama dokumen> - <berkas>.
  */
 var JENIS_DOK = ["Sertifikat kompetensi (BNSP/LSP)", "Sertifikat profesi", "Sertifikat pendidik (Serdos)", "Bahasa asing (TOEIC/TOEFL/IELTS)",
-  "Pelatihan / workshop", "Lomba / penghargaan", "SK jabatan / penugasan", "Ijazah / transkrip", "Lainnya"];
+  "Pelatihan / workshop", "Lomba / penghargaan", "SK jabatan / penugasan", "Ijazah / transkrip", "Lainnya",
+  /* v0.19.0: dokumen pendukung biodata dosen */ "Ijazah D4/S1", "Ijazah S2", "Ijazah S3"];
+var JENIS_DOK_BIODATA = ["Ijazah D4/S1", "Ijazah S2", "Ijazah S3", "Sertifikat pendidik (Serdos)", "Sertifikat kompetensi (BNSP/LSP)", "Sertifikat profesi"];
+/** Seperti wajibPeran, tetapi dokumen pendukung biodata boleh diunggah sebelum biodata lengkap. */
+function wajibPeranDok(p, d) {
+  if (d && d.dariBiodata && JENIS_DOK_BIODATA.indexOf(d.jenis) >= 0) {
+    if (p.status !== "aktif") throw galat("Selesaikan aktivasi akun terlebih dahulu.");
+    if (p.wajibGanti === true || p.wajibGanti === "TRUE") throw galat("Ganti kata sandi Anda terlebih dahulu.");
+    if (!punyaPeran(p, ["dosen", "tendik"])) throw galat("Anda tidak memiliki izin untuk tindakan ini.");
+    return;
+  }
+  wajibPeran(p, PERAN_KEGIATAN);
+}
 
 function peranDiKegiatan(k, p, idx) {
   if (k.olehId === p.id) return "Pengaju";
@@ -51,7 +63,7 @@ function aksiPortofolioSaya(d, token) {
 
 function aksiDokSimpan(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, PERAN_KEGIATAN);
+  wajibPeranDok(p, d);
   var nama = potong(d.nama, 200).trim(), jenis = JENIS_DOK.indexOf(d.jenis) >= 0 ? d.jenis : "", tahun = teks(d.tahun).trim();
   if (!nama) throw galat("Isi nama dokumen, misalnya: Sertifikat Kompetensi Pemandu Wisata.");
   if (!jenis) throw galat("Pilih jenis dokumen.");
@@ -89,7 +101,7 @@ function ambilDokSaya(p, id) {
 }
 function aksiDokHapus(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, PERAN_KEGIATAN);
+  wajibPeranDok(p, d && d.dariBiodata ? { dariBiodata: 1, jenis: (cari("DokumenPribadi", function (x) { return x.id === String(d.id || ""); }) || {}).jenis } : d);
   return kunciTulis(function () {
     var x = ambilDokSaya(p, String(d.id || ""));
     ubah("DokumenPribadi", x._r, { dihapus: new Date() });
@@ -100,7 +112,7 @@ function aksiDokHapus(d, token) {
 }
 function aksiDokLihat(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, PERAN_KEGIATAN);
+  wajibPeranDok(p, d && d.dariBiodata ? { dariBiodata: 1, jenis: (cari("DokumenPribadi", function (x) { return x.id === String(d.id || ""); }) || {}).jenis } : d);
   var x = ambilDokSaya(p, String(d.id || ""));
   if (x.t !== "file") return { t: x.t, url: x.url };
   return { t: "file", nama: x.namaFile, mime: x.mime, isi: Utilities.base64Encode(DriveApp.getFileById(x.fileId).getBlob().getBytes()) };

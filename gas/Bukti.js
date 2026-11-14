@@ -336,6 +336,7 @@ function aksiTugasSaya(d, token) {
   // Butir DED yang menjadi tanggung jawab akun ini (v0.13.0)
   var nar = narasiSemua(), ded = Object.keys(nar).filter(function (k) { return nar[k].pj === p.id; });
   hasil.mkpBelumRps = mkpBelumRps(p); // v0.14.0
+  hasil.dokBelum = dokBiodataSaya(p); hasil.pengingat = pengingatSaya(p); // v0.19.0
   var bk = bankTugas(p); // v0.15.0
   hasil.bankPj = bk.length; hasil.bankPerlu = bk.filter(function (s) { return s.status !== "ada"; });
   hasil.dedPj = ded.length; hasil.dedBelum = ded.filter(function (k) { return nar[k].status !== "selesai"; }).length;
