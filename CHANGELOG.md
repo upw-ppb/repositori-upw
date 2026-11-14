@@ -3,6 +3,34 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.18.0 — 14 Nov 2026 — Uji Coba
+Catatan prodi tahap 2:
+- Impor dari Excel dengan templat yang bisa diunduh (catatan no. 1 dan 21): akun mahasiswa, akun dosen/tendik (Super Admin),
+  biodata dosen/tendik massal (sel kosong tidak menghapus isian lama), kurikulum, dan lulusan. Templat berisi lembar Data, Contoh,
+  dan Petunjuk; kolom NIM/NIP berformat Teks dan kolom berpilihan punya daftar pilihan. Sebelum impor tampil pratinjau dan daftar baris
+  yang perlu diperbaiki (mis. NIP yang rusak karena tersimpan sebagai angka). Pembaca Excel buatan sendiri, tanpa pustaka luar.
+- Unduh daftar akun ke Excel di menu Pengguna (Super Admin: semua akun; Admin Prodi: mahasiswa) (no. 3).
+- Data Prodi › Status dosen (no. 13): aktif, tugas belajar (mulai, selesai/kembali ke kampus, lama dihitung otomatis), pensiun;
+  riwayat per dosen; diisi Admin Prodi/Super Admin, dilihat KPS. Tanggal bertumpuk ditolak.
+- Struktur data versi 15: tabel baru StatusDosen. Cadangan otomatis sebelum perubahan. Versi lama (v0.16.0) tetap bisa membaca data ini;
+  rollback tidak memerlukan pemulihan data.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
+## v0.17.0 — 14 Nov 2026 — Uji Coba (dirilis bersama v0.18.0)
+Perbaikan dari catatan prodi (tahap 1):
+- Log aktivitas menampilkan username dan nama pengguna, bukan kode akun (catatan no. 2).
+- Tombol "Lihat/Sembunyikan" di semua kolom kata sandi: masuk, aktivasi, ganti dan reset kata sandi (no. 4).
+- Cari orang: dosen bisa dicari dengan inisial (three letter code), dan inisial tampil di daftar (no. 6).
+- Angkatan mahasiswa dari 2 angka pertama NIM (25… = 2025): impor boleh tanpa tahun masuk ("NIM; Nama; kelas"),
+  dan pilihan angkatan di Cari orang mengikuti mahasiswa yang ada (no. 7).
+- Jenis kegiatan: "Prestasi akademik / lomba" dan "Prestasi non-akademik / lomba" (no. 8).
+- Saran Pasal GCET kini muncul saat judul diketik: bagiannya terbuka sendiri dan menampilkan jumlah saran, kata kunci
+  dicocokkan juga pada kata berimbuhan (budaya → kebudayaan), dan kata kunci ditambah (tour, lomba, pemasaran, perjalanan, dll.) (no. 9).
+- Menu mengikuti peran aktif: KPS yang memilih peran Dosen melihat menu seperti dosen lain, tanpa Antrean KPS (no. 16).
+- Ikon aplikasi baru berbentuk persegi (192, 512, maskable, Apple 180): logo muncul di Dock/peluncur saat dipasang (no. 19).
+- Tidak ada perubahan struktur data. Rollback ke v0.16.0 aman.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.16.0 — 13 Nov 2026 — Produksi
 - Rilis Produksi pertama: https://upw-ppb.github.io/repositori-upw/ (server Apps Script "Repositori UPW (Produksi)", deployment @2).
   Isi sama dengan v0.16.0 Uji Coba (semua fitur v0.1.0–v0.16.0), tanpa akun contoh, tanpa Mode Uji, tanpa pita UJI COBA.

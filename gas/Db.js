@@ -43,11 +43,13 @@ var SKEMA = {
   /* v0.14.0 */
   PortofolioMk: ["semester", "kodeMk", "isi", "oleh", "diubah"],
   /* v0.15.0 */
-  BankDokumen: ["kunci", "butir", "nama", "baku", "pj", "versi", "diubah", "oleh", "dihapus"]
+  BankDokumen: ["kunci", "butir", "nama", "baku", "pj", "versi", "diubah", "oleh", "dihapus"],
+  /* v0.18.0 */
+  StatusDosen: ["id", "userId", "status", "mulai", "selesai", "ket", "oleh", "dibuat", "diubah", "dihapus"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 14;
+var VERSI_SKEMA = 15;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {

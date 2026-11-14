@@ -254,3 +254,9 @@ label.btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
 /* v0.14.0: tombol bergaya tautan (mis. nama MK di tabel rekap) */
 .lnk { background: none; border: 0; padding: 0; color: var(--brand); font: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 .lnk:hover { color: var(--brand-ink); }
+
+/* v0.17.0: tombol lihat kata sandi */
+.sandi-bungkus { position: relative; }
+.sandi-bungkus input { padding-right: 104px; width: 100%; }
+.sandi-lihat { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: var(--brand); font: inherit; font-size: .85rem; font-weight: 600; padding: 4px 8px; cursor: pointer; border-radius: 6px; }
+.sandi-lihat:hover, .sandi-lihat:focus-visible { background: var(--brand-soft); }

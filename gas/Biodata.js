@@ -310,14 +310,14 @@ function aksiDirektori(d, token) {
     if (!j) return;
     var o = { id: x.id, nama: x.nama, username: String(x.username), aktif: x.status === "aktif" };
     if (j === "mahasiswa") {
-      o.jenis = "mahasiswa"; o.masuk = teks(x.masuk); o.kelas = teks(x.kelas); o.semester = semesterMhs(x.masuk, s);
+      o.jenis = "mahasiswa"; o.masuk = teks(x.masuk) || (angkatanNim(x.username) ? String(angkatanNim(x.username)) : ""); o.kelas = teks(x.kelas); o.semester = semesterMhs(x.masuk, s);
       o.statusMhs = staf ? (x.statusMhs || "A") : ((x.statusMhs || "A") === "A" ? "A" : "");
       if (!staf && o.statusMhs !== "A") return; // mahasiswa hanya melihat sesama mahasiswa aktif
     } else {
       var r = peranDari(x), b = peg[x.id] || {};
       o.jenis = r.indexOf("dosen") >= 0 ? "dosen" : "tendik";
       o.peran = r.filter(function (q) { return ["kps", "kalab", "laboran", "admin"].indexOf(q) >= 0; });
-      o.bidang = teks(b.bidang); o.jabfung = teks(b.jabfung); o.jabTendik = teks(b.jabTendik); o.emailKampus = teks(b.emailKampus);
+      o.bidang = teks(b.bidang); o.jabfung = teks(b.jabfung); o.inisial = teks(b.inisial); o.jabTendik = teks(b.jabTendik); o.emailKampus = teks(b.emailKampus);
       if (b.tampilHp === "Ya") o.hp = teks(b.hp);
     }
     l.push(o);

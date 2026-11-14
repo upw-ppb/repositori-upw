@@ -91,11 +91,12 @@ function menu() {
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
   if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
   if (u.peran.includes("dosen")) m.push("mk");
-  if (u.peran.some(r => ["admin", "superadmin", "kps"].includes(r))) m.push("penilaian", "ded", "bank", "ilkps", "dprodi", "survei");
+  if (["admin", "superadmin", "kps"].includes(p)) m.push("penilaian", "ded", "bank", "ilkps", "dprodi", "survei");
   else { if (S.tugas && S.tugas.dedPj) m.push("ded"); if (S.tugas && S.tugas.bankPj) m.push("bank"); }
-  if (u.peran.includes("kps")) m.push("kps"); // antrean KPS selalu terlihat, apa pun peran aktifnya, agar pengajuan tidak terlewat
-  if (u.peran.some(r => ["admin", "superadmin", "kps", "dosen"].includes(r))) m.push("verif"); // dosen: sebagai pendamping lomba
-  if (u.peran.includes("kps")) m.push("ttd");
+  // Menu mengikuti PERAN AKTIF (v0.17.0): KPS yang memilih peran Dosen melihat menu seperti dosen lain.
+  if (p === "kps") m.push("kps");
+  if (["admin", "superadmin", "kps", "dosen"].includes(p)) m.push("verif"); // dosen: sebagai pendamping lomba
+  if (p === "kps") m.push("ttd");
   if (u.jenisBiodata) m.push("biodata");
   m.push("cari");
   if (p === "superadmin" || p === "admin") m.push("pengguna");
@@ -111,6 +112,19 @@ function render() {
   const lama = document.querySelector(".drawer"), gulir = lama ? lama.scrollTop : 0;
   gambar();
   const baru = document.querySelector(".drawer"); if (baru && gulir) baru.scrollTop = gulir;
+  pasangLihatSandi();
+}
+/** Tombol "Lihat" di setiap kolom kata sandi (v0.17.0). */
+function pasangLihatSandi() {
+  document.querySelectorAll('input[type="password"]:not([data-lihat])').forEach(el => {
+    el.dataset.lihat = "1";
+    const bungkus = document.createElement("div"); bungkus.className = "sandi-bungkus";
+    el.parentNode.insertBefore(bungkus, el); bungkus.appendChild(el);
+    const b = document.createElement("button"); b.type = "button"; b.className = "sandi-lihat"; b.textContent = "Lihat";
+    b.setAttribute("aria-label", "Tampilkan kata sandi"); b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => { const buka = el.type === "password"; el.type = buka ? "text" : "password"; b.textContent = buka ? "Sembunyikan" : "Lihat"; b.setAttribute("aria-pressed", String(buka)); b.setAttribute("aria-label", buka ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"); el.focus(); });
+    bungkus.appendChild(b);
+  });
 }
 function gambar() {
   if (S.layar === "survei") { app.innerHTML = layarSurveiPublik(); return; }
@@ -138,7 +152,7 @@ function gambar() {
 /** Angka kecil di menu: hal yang menunggu tindakan. */
 function lencana(v) {
   const t = S.tugas; if (!t) return "";
-  const n = v === "beranda" ? t.tugas.length : v === "verif" ? t.verifikasi : v === "kps" ? t.kps : 0;
+  const n = v === "beranda" ? t.tugas.length : v === "verif" ? t.verifikasi : v === "kps" && peranAktif() === "kps" ? t.kps : 0;
   return n ? `<span class="count num" aria-label="${n} menunggu">${n}</span>` : "";
 }
 function halaman() {
@@ -243,7 +257,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Aktivasi tanpa email.</b>${peranAktif() === "superadmin" ? " Baru: di menu <b>Pengguna</b>, Super Admin bisa menyalakan aktivasi akun tanpa kode email selama email kampus belum terkirim." : ""}${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GPM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GPM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -265,7 +279,7 @@ function panelTugas() {
   (t.mkpBelumRps || []).forEach(m => baris.push(`<div class="item" style="cursor:pointer" data-act="mkpBuka" data-s="${m.semester}" data-kode="${esc(m.kode)}"><div class="body"><div class="title">${esc(m.kode)} · ${esc(m.nama)}</div><div class="meta"><span>Unggah RPS semester ini (Anda pengampu utama)</span></div></div><span class="chip s-revisi">RPS</span></div>`));
   (t.bankPerlu || []).forEach(x => baris.push(`<div class="item" style="cursor:pointer" data-go="bank"><div class="body"><div class="title">${esc(x.nama)}</div><div class="meta"><span>Bank Dokumen · butir ${x.butir} · Anda penanggung jawab</span></div></div><span class="chip ${ST_BANK[x.status][1]}">${ST_BANK[x.status][0]}</span></div>`));
   if (t.dedBelum) baris.push(`<div class="item" style="cursor:pointer" data-go="ded"><div class="body"><div class="title">${t.dedBelum} butir DED tanggung jawab Anda belum selesai</div><div class="meta"><span>Dari ${t.dedPj} butir yang ditugaskan kepada Anda</span></div></div><span class="chip s-revisi">DED</span></div>`);
-  if (t.kps) baris.push(`<div class="item" style="cursor:pointer" data-go="kps"><div class="body"><div class="title">${t.kps} pengajuan surat tugas menunggu keputusan Anda</div></div><span class="chip s-diajukan">Antrean KPS</span></div>`);
+  if (t.kps && peranAktif() === "kps") baris.push(`<div class="item" style="cursor:pointer" data-go="kps"><div class="body"><div class="title">${t.kps} pengajuan surat tugas menunggu keputusan Anda</div></div><span class="chip s-diajukan">Antrean KPS</span></div>`);
   return `<section class="panel"><h2>Perlu tindakan (${baris.length})</h2><div class="list">${baris.join("") || `<div class="empty">Tidak ada yang perlu ditindaklanjuti. Bagus!</div>`}</div></section>`;
 }
 function hAkun() {
@@ -287,10 +301,12 @@ function hPengguna() {
   return `<div class="head"><div><h1>Pengguna</h1><p>${sa ? "Semua akun. Super Admin dapat mengimpor semua peran, mereset kata sandi, dan mengatur peran." : "Akun mahasiswa. Admin Prodi dapat mengimpor mahasiswa."}</p></div></div>
    ${sa ? panelTanpaEmail() + panelAsesor() : ""}
    <section class="panel"><h2>Impor akun</h2>
-    <p class="small muted">Satu baris per orang. Mahasiswa: <b>NIM; Nama lengkap; tahun masuk; kelas</b>.${sa ? " Dosen/tendik: <b>NIP; Nama lengkap; peran</b>, peran dipisah koma, misalnya <span class=\"mono\">dosen,kps</span>." : ""} Bisa ditempel langsung dari Excel (kolom dipisah tab juga diterima).</p>
+    <p class="small muted">Satu baris per orang. Mahasiswa: <b>NIM; Nama lengkap; tahun masuk; kelas</b> (tahun masuk boleh dilewati, cukup <b>NIM; Nama; kelas</b>: angkatan diambil dari 2 angka pertama NIM, misalnya 25… = 2025).${sa ? " Dosen/tendik: <b>NIP; Nama lengkap; peran</b>, peran dipisah koma, misalnya <span class=\"mono\">dosen,kps</span>." : ""} Bisa ditempel langsung dari Excel (kolom dipisah tab juga diterima).</p>
     <textarea id="imporTeks" style="min-height:110px;margin-top:8px" placeholder="${sa ? "260101; Made Contoh; 2026; A\n198501012010121001; Ni Luh Contoh, M.Par.; dosen" : "260101; Made Contoh; 2026; A\n260102; Ketut Contoh; 2026; B"}">${esc(S.impor.teks)}</textarea>
     ${S.impor.hasil ? `<div class="auto" style="margin-top:8px"><b>${S.impor.hasil.diimpor}</b> akun diimpor.${S.impor.hasil.dilewati.length ? " Dilewati: " + S.impor.hasil.dilewati.map(x => `baris ${x.baris} (${esc(x.alasan)})`).join("; ") : ""}</div>` : ""}
-    ${galatHtml()}<div class="row" style="margin-top:8px">${tombol("impor", "Impor")}</div></section>
+    ${galatHtml()}<div class="row" style="margin-top:8px">${tombol("impor", "Impor")}</div>
+    ${panelImporExcel("mhs")}${sa ? panelImporExcel("pegawai") : ""}${panelImporExcel("biodata")}
+    <div class="row" style="margin-top:10px"><button class="btn sm" data-act="eksporAkun">Unduh daftar akun (Excel)</button></div></section>
    <section class="panel"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Daftar akun (${l.length})</h2>
     <div class="row"><input id="cariP" type="search" placeholder="Cari NIM/NIP, nama, email" value="${esc(S.cari)}" style="width:240px"><button class="btn sm" data-act="muatUlang">Muat ulang</button></div></div>
     <div class="tbl-wrap"><table><thead><tr><th>NIM/NIP</th><th>Nama</th>${sa ? "<th>Peran</th>" : ""}<th>Kelas</th><th>Status akun</th><th>Biodata</th><th>Email</th><th>Masuk terakhir</th><th></th></tr></thead><tbody>
@@ -365,10 +381,10 @@ document.addEventListener("input", ketikUlang("cariSetuju", v => { S.setujuQ = v
 
 function hLog() {
   if (!S.log) { api("admin.log").then(j => { S.log = j.log; render(); }).catch(e => toast(e.message)); return `<div class="memuat">Memuat log…</div>`; }
-  const nama = id => (S.daftar || []).find(x => x.id === id)?.nama || id || "sistem";
+  const nama = x => x.username ? `${x.username}<div class="small muted">${esc(x.nama)}</div>` : esc(x.userId || "sistem");
   return `<div class="head"><div><h1>Log aktivitas</h1><p>200 aktivitas terakhir: siapa, apa, kapan.</p></div><button class="btn" data-act="muatLog">Muat ulang</button></div>
    <div class="tbl-wrap"><table><thead><tr><th>Waktu</th><th>Pengguna</th><th>Aksi</th><th>Detail</th></tr></thead><tbody>
-   ${S.log.map(x => `<tr><td class="num small">${tgl(x.waktu)}</td><td>${esc(nama(x.userId))}</td><td class="mono small">${esc(x.aksi)}</td><td class="small mono">${esc(x.detail)}</td></tr>`).join("")}</tbody></table></div>`;
+   ${S.log.map(x => `<tr><td class="num small">${tgl(x.waktu)}</td><td class="mono small">${nama(x)}</td><td class="mono small">${esc(x.aksi)}</td><td class="small mono">${esc(x.detail)}</td></tr>`).join("")}</tbody></table></div>`;
 }
 function laci() {
   const L = S.laci;
@@ -387,6 +403,7 @@ function laci() {
   if (L.jenis === "ded") return laciDed();
   if (L.jenis === "mkp") return laciMkp();
   if (L.jenis === "bank") return laciBank();
+  if (L.jenis === "sdos") return laciStatusDosen();
   if (L.jenis === "bankBaru") return laciBankBaru();
   if (L.jenis === "sandi") return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Kata sandi sementara">
    <div class="dh"><h2>Kata sandi sementara</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
@@ -479,14 +496,14 @@ function hCari() {
   if (!S.dir) { muatDirektori(); return `<div class="memuat">Memuat direktori…</div>`; }
   const tab = S.dirTab, q = S.dirQ.trim().toLowerCase(), staf = peranAktif() !== "mahasiswa";
   const peg = S.dir.filter(x => x.jenis !== "mahasiswa"), mhs = S.dir.filter(x => x.jenis === "mahasiswa");
-  const cocok = x => !q || [x.nama, x.username, x.bidang, x.jabTendik, x.jabfung].join(" ").toLowerCase().includes(q);
+  const cocok = x => !q || [x.nama, x.username, x.inisial, x.bidang, x.jabTendik, x.jabfung].join(" ").toLowerCase().includes(q);
   const angk = [...new Set(mhs.map(x => x.masuk).filter(Boolean))].sort().reverse();
   const kls = [...new Set(mhs.map(x => x.kelas).filter(Boolean))].sort();
   const sel = (tab === "pegawai" ? peg : mhs).filter(cocok).filter(x => tab === "pegawai" || ((!S.dirAngk || x.masuk === S.dirAngk) && (!S.dirKelas || x.kelas === S.dirKelas)));
   const belum = x => x.aktif ? "" : ' <span class="tag" title="Akun belum diaktivasi">belum aktivasi</span>';
   const tabel = tab === "pegawai"
     ? `<table><thead><tr><th>Nama</th><th>NIP</th><th>Jabatan</th><th>Bidang keahlian</th><th>Kontak</th></tr></thead><tbody>
-      ${sel.map(x => `<tr><td>${esc(x.nama)}${belum(x)}<div class="small muted">${x.jenis === "dosen" ? "Dosen" : "Tendik"}${x.peran.length ? " · " + x.peran.map(r => PERAN_PENDEK[r]).join(", ") : ""}</div></td><td class="mono small">${esc(x.username)}</td>
+      ${sel.map(x => `<tr><td>${esc(x.nama)}${belum(x)}<div class="small muted">${x.jenis === "dosen" ? "Dosen" + (x.inisial ? ` · <span class="mono">${esc(x.inisial)}</span>` : "") : "Tendik"}${x.peran.length ? " · " + x.peran.map(r => PERAN_PENDEK[r]).join(", ") : ""}</div></td><td class="mono small">${esc(x.username)}</td>
        <td class="small">${esc(x.jabfung || x.jabTendik || "–")}</td><td class="small">${esc(x.bidang || "–")}</td><td class="small">${x.emailKampus ? `<a href="mailto:${esc(x.emailKampus)}">${esc(x.emailKampus)}</a>` : ""}${x.hp ? `<div>${esc(x.hp)}</div>` : ""}${!x.emailKampus && !x.hp ? "–" : ""}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">Tidak ada yang cocok.</td></tr>`}</tbody></table>`
     : `<table><thead><tr><th>NIM</th><th>Nama</th><th>Semester · kelas</th><th>Angkatan</th>${staf ? "<th>Status</th>" : ""}</tr></thead><tbody>
       ${sel.map(x => `<tr><td class="mono">${esc(x.username)}</td><td>${esc(x.nama)}${belum(x)}</td><td>${x.statusMhs === "A" && x.semester ? `Semester ${x.semester} – Kelas ${esc(x.kelas)}` : "Kelas " + esc(x.kelas || "–")}</td><td class="num">${esc(x.masuk || "–")}</td>${staf ? `<td><span class="chip ${x.statusMhs === "A" ? "s-disetujui" : "s-draf"}">${esc(x.statusMhs)} · ${esc(STATUS_MHS[x.statusMhs] || "")}</span></td>` : ""}</tr>`).join("") || `<tr><td colspan="5" class="empty">Tidak ada yang cocok.</td></tr>`}</tbody></table>`;
@@ -563,8 +580,10 @@ const AKSI = {
     S.impor.teks = mentah("imporTeks");
     const baris = S.impor.teks.split(/\r?\n/).map(x => x.trim()).filter(Boolean).map(x => {
       const c = x.split(/\t|;/).map(y => y.trim());
-      return /^\d{4}$/.test(c[2] || "") ? { username: c[0], nama: c[1], peran: "mahasiswa", masuk: c[2], kelas: c[3] || "" }
-        : { username: c[0], nama: c[1], peran: c[2] || "mahasiswa", masuk: c[3] || "", kelas: c[4] || "" };
+      // NIM; Nama; tahun masuk; kelas  |  NIM; Nama; kelas (tahun masuk dari 2 angka pertama NIM)  |  NIP; Nama; peran
+      if (/^\d{4}$/.test(c[2] || "")) return { username: c[0], nama: c[1], peran: "mahasiswa", masuk: c[2], kelas: c[3] || "" };
+      if (/^[A-Za-z0-9]{1,3}$/.test(c[2] || "") && !c[3] && !PERAN_L[(c[2] || "").toLowerCase()]) return { username: c[0], nama: c[1], peran: "mahasiswa", masuk: "", kelas: c[2] };
+      return { username: c[0], nama: c[1], peran: c[2] || "mahasiswa", masuk: c[3] || "", kelas: c[4] || "" };
     });
     if (!baris.length) throw new Error("Tempel minimal satu baris data.");
     S.impor.hasil = await api("admin.impor", { baris }); S.impor.teks = ""; S.daftar = null; toast(S.impor.hasil.diimpor + " akun diimpor.");
@@ -684,7 +703,7 @@ async function muatVerif() {
   return sekali("verif", async () => { S.verif = (await api("verifikasi.antrean")).kegiatan; render(); });
 }
 /** Setelah ada perubahan data: muat ulang daftar, antrean, dan pengingat saat dibutuhkan. */
-function segarkan() { S.bank = null; S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
+function segarkan() { S.sdos = null; S.bank = null; S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
 async function muatAntrean() {
   return sekali("antrean", async () => { S.antrean = (await api("kps.antrean")).kegiatan; render(); });
 }
@@ -893,12 +912,14 @@ function mhsTerpilih(f) {
 function saranGcet(f) {
   const txt = (f.judul + " " + Object.values(f.isian || {}).join(" ")).toLowerCase();
   if (txt.trim().length < 4) return [];
-  const ada = k => new RegExp("(^|[^a-z0-9])" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z0-9]|$)").test(txt);
+  // Kata kunci ≥ 5 huruf cocok juga di dalam kata berimbuhan ("budaya" → "kebudayaan"); yang pendek harus kata utuh (v0.17.0).
+  const ada = k => k.length >= 5 ? txt.includes(k) : new RegExp("(^|[^a-z0-9])" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z0-9]|$)").test(txt);
   return Object.entries(S.ref.gcetKw).map(([p, kw]) => ({ p: +p, w: kw.filter(ada) })).filter(x => x.w.length).sort((a, b) => b.w.length - a.w.length).slice(0, 4);
 }
 function htmlSaranGcet(f) {
   const s = saranGcet(f);
   return s.length ? `Saran dari judul dan isian Anda: ${s.map(x => `<b>pasal ${x.p}</b> <span class="muted">(${esc(x.w.join(", "))})</span>`).join("; ")}. Periksa dulu, lalu centang yang benar-benar diterapkan. <button class="btn sm" data-act="gcetSemua" style="margin-top:6px">Centang semua saran</button>`
+    : (f.judul || "").trim().length >= 4 ? `Belum ada pasal yang cocok dengan kata di judul dan isian. Bila kegiatan ini menerapkan salah satu pasal di bawah, centang secara manual.`
     : `Ketik judul kegiatan; aplikasi akan menyarankan pasal yang relevan berdasarkan kata kunci.`;
 }
 function kandidatJenis(q) {
@@ -979,7 +1000,7 @@ function laciForm() {
    ${kandM.length ? `<div class="chips">${kandM.map(m => `<button class="btn sm" data-act="addMhs" data-id="${m.id}">+ ${esc(m.nama)} <span class="mono muted">${esc(m.username)} · Kelas ${esc(m.kelas)}</span></button>`).join("")}</div>` : qm.length >= 2 ? `<span class="small muted">Tidak ada yang cocok.</span>` : ""}
    ${f.mhs.length ? `<div class="small muted">Dipilih satu per satu (${f.mhs.length}):</div><div class="chips">${f.mhs.map(id => { const m = orangId(id); return `<span class="pchip">${esc(m ? m.nama : id)} <span class="mono muted">${esc(m ? m.username : "")}</span><button data-act="rmMhs" data-id="${id}" aria-label="Hapus ${esc(m ? m.nama : id)}">×</button></span>`; }).join("")}</div>` : ""}
   </div>
-  <details class="picker" ${f.gcet.length || saranGcet(f).length ? "open" : ""}><summary style="cursor:pointer"><b>Pasal Global Code of Ethics for Tourism yang diterapkan</b> <span class="small muted">(opsional, untuk butir matriks 75)</span></summary>
+  <details class="picker" ${f.gcet.length || saranGcet(f).length ? "open" : ""}><summary style="cursor:pointer"><b>Pasal Global Code of Ethics for Tourism yang diterapkan</b> <span class="small muted">(opsional, untuk butir matriks 75)</span> <span id="saranJml" class="chip s-diajukan" ${saranGcet(f).length ? "" : "hidden"}>${saranGcet(f).length} saran</span></summary>
    <div class="auto" id="saranGcet" style="margin-top:8px">${htmlSaranGcet(f)}</div>
    <div class="classgrid" style="margin-top:8px">${R.gcet.map((g, n) => `<label><input type="checkbox" data-gc="${n + 1}" ${f.gcet.includes(n + 1) ? "checked" : ""}><span>${esc(g)}</span></label>`).join("")}</div></details>
   <div class="picker"><b>Bukti</b>
@@ -997,7 +1018,12 @@ function dataForm(f) {
 }
 function perbaruiDiTempat() {
   const p = $("pratinjau"); if (p && S.form) p.innerHTML = htmlPratinjau(S.form);
-  const g = $("saranGcet"); if (g && S.form) g.innerHTML = htmlSaranGcet(S.form);
+  const g = $("saranGcet"); if (g && S.form) {
+    g.innerHTML = htmlSaranGcet(S.form);
+    const n = saranGcet(S.form).length, j = $("saranJml"), d = g.closest("details");
+    if (j) { j.hidden = !n; j.textContent = n + " saran"; }
+    if (n && d && !d.open && !d.dataset.ditutup) d.open = true; // buka sekali saat saran muncul; bila pengguna menutupnya, biarkan
+  }
 }
 
 /* --- antrean KPS --- */
@@ -1163,17 +1189,18 @@ function muatDp() { sekali("dp", async () => { S.dp = await api("dp.data", { sem
 const namaAnggota = a => { const D = S.dp; if (a.t === "p") { const x = D.praktisi.find(y => y.id === a.id); return x ? x.nama + " (praktisi)" : "(praktisi dihapus)"; } const x = D.dosen.find(y => y.id === a.id); return x ? namaPendek(x.nama) + (x.inisial ? " (" + x.inisial + ")" : "") : "(akun nonaktif)"; };
 function hDprodi() {
   if (!S.dp) { muatDp(); return `<div class="memuat">Memuat data prodi…</div>`; }
-  const D = S.dp, ub = D.bolehUbah, tabs = [["kurikulum", "Kurikulum"], ["tim", "Tim pengajar"], ["mkp", "Portofolio MK"], ["praktisi", "Praktisi"], ["dosents", "Data dosen TS"], ["lulusan", "Lulusan"], ["pmb", "PMB"], ["keuangan", "Keuangan"]];
+  const D = S.dp, ub = D.bolehUbah, tabs = [["kurikulum", "Kurikulum"], ["tim", "Tim pengajar"], ["mkp", "Portofolio MK"], ["praktisi", "Praktisi"], ["dosents", "Data dosen TS"], ["sdos", "Status dosen"], ["lulusan", "Lulusan"], ["pmb", "PMB"], ["keuangan", "Keuangan"]];
   let isi = "";
   if (["lulusan", "pmb", "keuangan"].includes(S.dpTab)) isi = isiLulusan();
   if (S.dpTab === "mkp") isi = isiMkpRekap();
+  if (S.dpTab === "sdos") isi = isiStatusDosen();
   if (S.dpTab === "kurikulum") {
     const tot = D.mk.reduce((s, m) => s + m.sks, 0), prak = D.mk.reduce((s, m) => s + m.sksPraktik, 0);
     isi = `<div class="grid g3"><div class="panel stat"><span class="v num">${D.mk.length}</span><span class="l">Mata kuliah</span></div><div class="panel stat"><span class="v num">${tot.toLocaleString("id-ID")}</span><span class="l">Total sks</span></div>
       <div class="panel stat"><span class="v num">${tot ? dpPersen(prak / tot) : "–"}</span><span class="l">PJP: sks praktik/praktikum ÷ total sks (${prak.toLocaleString("id-ID")} sks praktik)</span></div></div>
-     ${ub ? `<div class="row" style="flex-wrap:wrap">${tombol("dpMkBaru", "+ Tambah mata kuliah", "primary")}<button class="btn" data-act="dpImporBuka">${S.dpImpor ? "Tutup impor" : "Impor dari Excel (tempel)"}</button></div>` : ""}
+     ${ub ? `<div class="row" style="flex-wrap:wrap">${tombol("dpMkBaru", "+ Tambah mata kuliah", "primary")}<button class="btn" data-act="dpImporBuka">${S.dpImpor ? "Tutup impor" : "Impor (tempel atau berkas Excel)"}</button></div>` : ""}
      ${S.dpImpor ? `<section class="panel"><h2>Impor kurikulum</h2><p class="small">Salin baris dari Excel lalu tempel di sini. Urutan kolom: <b>Kode; Nama mata kuliah; Semester (1–8); sks kuliah; sks seminar; sks praktik/praktikum; Kompetensi (Ya/Tidak)</b>. Pemisah boleh tab (hasil salin Excel) atau titik koma. Kode yang sudah ada akan diperbarui.</p>
-       <textarea id="dpImporTeks" rows="6" placeholder="UPW201&#9;Travel Agency Operation&#9;2&#9;1&#9;0&#9;2&#9;Ya"></textarea>${galatHtml()}<div class="row" style="justify-content:flex-end">${tombol("dpImporSimpan", "Impor")}</div></section>` : ""}
+       <textarea id="dpImporTeks" rows="6" placeholder="UPW201&#9;Travel Agency Operation&#9;2&#9;1&#9;0&#9;2&#9;Ya"></textarea>${galatHtml()}<div class="row" style="justify-content:flex-end">${tombol("dpImporSimpan", "Impor")}</div>${panelImporExcel("mk")}</section>` : ""}
      <div class="tbl-wrap"><table><thead><tr><th>Smt</th><th>Kode</th><th>Mata kuliah</th><th>Kompetensi</th><th>Kuliah</th><th>Seminar</th><th>Praktik</th><th>CPL</th><th>RPS</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
      ${D.mk.map(m => `<tr><td class="num">${m.semester}</td><td class="mono">${esc(m.kode)}</td><td>${esc(m.nama)}</td><td>${m.kompetensi ? '<span class="tag t">Ya</span>' : "–"}</td><td class="num">${m.sksKuliah}</td><td class="num">${m.sksSeminar}</td><td class="num">${m.sksPraktik}</td>
        <td class="small">${[["S", m.cplSikap], ["P", m.cplPengetahuan], ["KU", m.cplKu], ["KK", m.cplKk]].filter(x => x[1]).map(x => x[0]).join(", ") || "–"}</td><td class="small">${m.rps ? (m.rps === "Ada" ? "Ada" : `<a href="${esc(m.rps)}" target="_blank" rel="noopener noreferrer">Tautan</a>`) : '<span class="chip s-revisi">Belum</span>'}</td>
@@ -1325,10 +1352,10 @@ function isiLulusan() {
     return `<div class="grid g3"><div class="panel stat"><span class="v num">${L.lulusan.length}</span><span class="l">Lulusan tercatat</span></div>
       <div class="panel stat"><span class="v num">${L.lulusan.filter(x => x.terlacak).length}</span><span class="l">Terlacak (tracer study terisi)</span></div>
       <div class="panel stat"><span class="v num">${ip.length ? rata.toLocaleString("id-ID", { maximumFractionDigits: 2 }) : "–"}</span><span class="l">Rata-rata IPK</span></div></div>
-     ${ub ? `<div class="row"><button class="btn primary" data-act="lulImporBuka">${S.lulImpor ? "Tutup impor" : "Impor / perbarui dari Excel (tempel)"}</button></div>` : ""}
+     ${ub ? `<div class="row"><button class="btn primary" data-act="lulImporBuka">${S.lulImpor ? "Tutup impor" : "Impor / perbarui (tempel atau berkas Excel)"}</button></div>` : ""}
      ${S.lulImpor ? `<section class="panel"><h2>Impor lulusan</h2><p class="small">Salin baris dari Excel lalu tempel. Urutan kolom: <b>NIM; Nama; Tahun masuk; Tanggal lulus; IPK; Waktu tunggu kerja (bulan); Kesesuaian bidang kerja (Rendah/Sedang/Tinggi); Tempat kerja (Lokal/Nasional/Internasional)</b>.
        Tanggal boleh 2025-08-20 atau 20/08/2025; koma desimal boleh. Kolom tracer (3 terakhir) boleh kosong bila lulusan belum terlacak. NIM yang sudah ada akan diperbarui, dan akun mahasiswa dengan NIM itu otomatis berstatus <b>Lulus</b>.</p>
-       <textarea id="lulTeks" rows="7" placeholder="210101&#9;Kadek Contoh&#9;2021&#9;20/08/2025&#9;3,52&#9;2&#9;Tinggi&#9;Nasional"></textarea>${galatHtml()}<div class="row" style="justify-content:flex-end">${tombol("lulImporSimpan", "Impor")}</div></section>` : ""}
+       <textarea id="lulTeks" rows="7" placeholder="210101&#9;Kadek Contoh&#9;2021&#9;20/08/2025&#9;3,52&#9;2&#9;Tinggi&#9;Nasional"></textarea>${galatHtml()}<div class="row" style="justify-content:flex-end">${tombol("lulImporSimpan", "Impor")}</div>${panelImporExcel("lulusan")}</section>` : ""}
      <div class="tbl-wrap"><table><thead><tr><th>NIM</th><th>Nama</th><th>Masuk</th><th>Lulus</th><th>IPK</th><th>Waktu tunggu</th><th>Kesesuaian</th><th>Tempat kerja</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
      ${L.lulusan.map(x => `<tr><td class="mono small">${esc(x.nim)}</td><td class="small">${esc(x.nama)}</td><td class="num">${x.masuk}</td><td class="small num">${esc(tglPendek(x.tglLulus))}<br><span class="muted">TA ${x.taLulus}/${x.taLulus + 1}</span></td>
        <td class="num">${x.ipk != null ? x.ipk.toLocaleString("id-ID") : "–"}</td><td class="num">${x.wtBulan != null ? x.wtBulan.toLocaleString("id-ID") + " bln" : "–"}</td><td class="small">${esc(x.kesesuaian || "–")}</td><td class="small">${esc(x.tempatKerja || "–")}</td>
@@ -1821,6 +1848,182 @@ Object.assign(AKSI, {
     jalankan(async () => { S.tanpaEmail = await api("admin.tanpaEmail", { nyala }); toast(nyala ? "Aktivasi tanpa email menyala." : "Aktivasi kembali memakai kode email."); });
   }
 });
+/* --- Impor dari Excel dengan templat (v0.18.0) ---
+   Templat: lembar "Data" (kepala kolom "Label [kunci]"), "Contoh", dan "Petunjuk". Kolom NIM/NIP berformat Teks agar angka panjang tidak rusak. */
+const YA_TIDAK = ["Ya", "Tidak"];
+const JENIS_IMPOR = {
+  mhs: { judul: "Akun mahasiswa", satuan: "mahasiswa", kolom: [
+      { k: "username", l: "NIM", wajib: 1, teks: 1, h: "Dua angka pertama = angkatan (25… = 2025)" },
+      { k: "nama", l: "Nama lengkap", wajib: 1 },
+      { k: "masuk", l: "Tahun masuk", h: "Boleh dikosongkan: diambil dari 2 angka pertama NIM" },
+      { k: "kelas", l: "Kelas", wajib: 1, o: ["A", "B", "C", "D"], h: "Huruf/angka kelas, maksimal 3 karakter" }],
+    contoh: ["250101", "Ni Made Contoh Sari", "", "A"],
+    kirim: b => api("admin.impor", { baris: b.map(r => Object.assign({ peran: "mahasiswa" }, r)) }),
+    pesan: j => `${j.diimpor} akun diimpor${j.dilewati.length ? `, ${j.dilewati.length} dilewati` : ""}.`, lewati: j => j.dilewati, segarkan: () => { S.daftar = null; } },
+  pegawai: { judul: "Akun dosen dan tendik", satuan: "orang", kolom: [
+      { k: "username", l: "NIP", wajib: 1, teks: 1, h: "NIP/nomor pegawai tanpa spasi" },
+      { k: "nama", l: "Nama lengkap dengan gelar", wajib: 1 },
+      { k: "peran", l: "Peran", wajib: 1, h: "dosen, tendik, atau gabungan dipisah koma: dosen,kps · dosen,kalab · tendik,admin · tendik,laboran" }],
+    contoh: ["198501012010121001", "Dr. Ni Luh Contoh, M.Par.", "dosen"],
+    kirim: b => api("admin.impor", { baris: b }),
+    pesan: j => `${j.diimpor} akun diimpor${j.dilewati.length ? `, ${j.dilewati.length} dilewati` : ""}.`, lewati: j => j.dilewati, segarkan: () => { S.daftar = null; } },
+  biodata: { judul: "Biodata dosen dan tendik", satuan: "orang", kolom: null, contoh: null,
+    kirim: b => api("biodata.massal", { baris: b }),
+    pesan: j => `${j.diperbarui} biodata diperbarui${j.dilewati.length ? `, ${j.dilewati.length} dilewati` : ""}. Sel kosong tidak mengubah isian lama.`, lewati: j => j.dilewati, segarkan: () => { S.daftar = null; } },
+  mk: { judul: "Kurikulum (mata kuliah)", satuan: "mata kuliah", kolom: [
+      { k: "kode", l: "Kode MK", wajib: 1, teks: 1 }, { k: "nama", l: "Nama mata kuliah", wajib: 1 },
+      { k: "semester", l: "Semester", wajib: 1, o: ["1", "2", "3", "4", "5", "6", "7", "8"] },
+      { k: "sksKuliah", l: "sks kuliah" }, { k: "sksSeminar", l: "sks seminar" }, { k: "sksPraktik", l: "sks praktik/praktikum" },
+      { k: "kompetensi", l: "MK kompetensi", o: YA_TIDAK }, { k: "cplSikap", l: "CPL sikap", o: YA_TIDAK }, { k: "cplPengetahuan", l: "CPL pengetahuan", o: YA_TIDAK },
+      { k: "cplKu", l: "CPL keterampilan umum", o: YA_TIDAK }, { k: "cplKk", l: "CPL keterampilan khusus", o: YA_TIDAK },
+      { k: "rps", l: "RPS", h: "Tautan https://… atau tulis Ada" }, { k: "unit", l: "Unit penyelenggara", h: "Kosongkan bila Prodi UPW" }],
+    contoh: ["UPW201", "Travel Agency Operation", "2", "1", "0", "2", "Ya", "Ya", "Ya", "Tidak", "Ya", "Ada", ""],
+    kirim: b => api("dp.mkSimpan", { daftar: b.map(r => Object.assign({}, r, { semester: Number(r.semester), sksKuliah: angkaId(r.sksKuliah), sksSeminar: angkaId(r.sksSeminar), sksPraktik: angkaId(r.sksPraktik),
+      kompetensi: /^ya$/i.test(r.kompetensi || ""), cplSikap: /^ya$/i.test(r.cplSikap || ""), cplPengetahuan: /^ya$/i.test(r.cplPengetahuan || ""), cplKu: /^ya$/i.test(r.cplKu || ""), cplKk: /^ya$/i.test(r.cplKk || ""),
+      unit: r.unit || "Prodi UPW" })) }),
+    pesan: j => `Impor selesai: ${j.baru} baru, ${j.diubah} diperbarui.`, segarkan: () => { S.dp = null; S.ilkps = null; } },
+  lulusan: { judul: "Data lulusan", satuan: "lulusan", kolom: [
+      { k: "nim", l: "NIM", wajib: 1, teks: 1 }, { k: "nama", l: "Nama", wajib: 1 }, { k: "masuk", l: "Tahun masuk", wajib: 1 },
+      { k: "tglLulus", l: "Tanggal lulus", wajib: 1, tgl: 1, h: "Tanggal Excel atau 20/08/2025" }, { k: "ipk", l: "IPK", h: "Contoh 3,52" },
+      { k: "wtBulan", l: "Waktu tunggu kerja (bulan)", h: "Kosongkan bila belum terlacak" }, { k: "kesesuaian", l: "Kesesuaian bidang kerja", o: ["Rendah", "Sedang", "Tinggi"] },
+      { k: "tempatKerja", l: "Tempat kerja", o: ["Lokal", "Nasional", "Internasional"] }],
+    contoh: ["210101", "Kadek Contoh", "2021", "20/08/2025", "3,52", "2", "Tinggi", "Nasional"],
+    kirim: b => api("lul.impor", { daftar: b }),
+    pesan: j => `Impor selesai: ${j.baru} baru, ${j.diubah} diperbarui${j.akunLulus ? `; ${j.akunLulus} akun mahasiswa ditandai Lulus` : ""}.`, segarkan: () => { S.lul = null; S.ilkps = null; S.daftar = null; } }
+};
+async function kolomImpor(jenis) {
+  const J = JENIS_IMPOR[jenis];
+  if (J.kolom) return J.kolom;
+  const T = await api("impor.templat");
+  J.kolom = T.biodataPegawai.map(f => ({ k: f.k, l: f.l, wajib: f.wajib, teks: f.k === "nip" || f.k === "nidn" || f.k === "hp" ? 1 : 0, o: f.o, h: [f.untuk ? "Hanya " + f.untuk : "", f.hint].filter(Boolean).join(". ") }));
+  J.contoh = J.kolom.map(f => f.k === "nip" ? "199001152015041001" : f.o ? f.o[0] : "");
+  return J.kolom;
+}
+function unduhBlob(blob, nama) {
+  const url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = nama;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+function panelImporExcel(jenis) {
+  const J = JENIS_IMPOR[jenis], X = S.imx && S.imx.jenis === jenis ? S.imx : null, dis = S.sibuk ? "disabled" : "";
+  const contohBaris = X && X.baris.length ? `<div class="tbl-wrap" style="margin-top:6px"><table><thead><tr>${X.kolom.map(k => `<th>${esc(k.l)}</th>`).join("")}</tr></thead><tbody>
+    ${X.baris.slice(0, 5).map(r => `<tr>${X.kolom.map(k => `<td class="small">${esc(r[k.k] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${X.baris.length > 5 ? `<p class="small muted">… dan ${X.baris.length - 5} baris lainnya.</p>` : ""}` : "";
+  return `<div class="picker" style="margin-top:10px"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><b>Impor dari Excel · ${esc(J.judul)}</b>
+     <div class="row small" style="flex-wrap:wrap"><button class="btn sm" data-act="imxTemplat" data-j="${jenis}" ${dis}>Unduh templat Excel</button>
+     <label class="btn sm primary" ${S.sibuk ? 'aria-disabled="true"' : ""}>Unggah berkas Excel<input type="file" data-imx="${jenis}" accept=".xlsx" hidden ${dis}></label></div></div>
+    <span class="hint">1) Unduh templat · 2) isi lembar <b>Data</b> di Excel/Google Sheets (lihat lembar Petunjuk dan Contoh) · 3) unggah berkasnya (.xlsx), periksa pratinjau, lalu tekan Impor.</span>
+    ${X ? `<div class="auto">Berkas <b>${esc(X.nama)}</b>: <b>${X.baris.length}</b> baris siap diimpor${X.masalah.length ? `, <b>${X.masalah.length}</b> perlu diperbaiki` : ""}.</div>
+      ${X.masalah.length ? `<ul class="small" style="margin:0 0 0 18px;color:var(--bad)">${X.masalah.slice(0, 10).map(m => `<li>${esc(m)}</li>`).join("")}${X.masalah.length > 10 ? `<li>… ${X.masalah.length - 10} lainnya</li>` : ""}</ul>` : ""}
+      ${contohBaris}
+      ${X.hasil ? `<div class="auto">${esc(X.hasil)}${X.lewati && X.lewati.length ? `<ul class="small" style="margin:4px 0 0 18px">${X.lewati.slice(0, 15).map(l => `<li>Baris ${l.baris}${l.nip ? " (" + esc(l.nip) + ")" : ""}: ${esc(l.alasan)}</li>`).join("")}</ul>` : ""}</div>` : ""}
+      <div class="row">${X.baris.length && !X.hasil ? tombol("imxKirim", `Impor ${X.baris.length} ${J.satuan}`, "primary sm") : ""}<button class="btn sm" data-act="imxBatal" ${dis}>${X.hasil ? "Selesai" : "Batal"}</button></div>` : ""}
+  </div>`;
+}
+const tglExcel = n => new Date(Math.round((n - 25569) * 864e5)).toISOString().slice(0, 10);
+async function bacaImpor(jenis, file) {
+  const kolom = await kolomImpor(jenis), lembar = await UPW_ZIP.bacaXlsx(await file.arrayBuffer());
+  const L = lembar.find(l => /^data$/i.test(l.nama)) || lembar.find(l => !/^(petunjuk|contoh)$/i.test(l.nama));
+  if (!L || !L.baris.length) throw new Error("Lembar Data tidak ditemukan atau kosong. Pakai templat dari tombol Unduh templat Excel.");
+  const kepala = (L.baris[0] || []).map(v => String(v || "").trim()), peta = {};
+  kepala.forEach((h, i) => { const m = /\[(\w+)\]\s*$/.exec(h), k = m ? m[1] : (kolom.find(c => c.l.toLowerCase() === h.toLowerCase()) || {}).k; if (k) peta[k] = i; });
+  const hilang = kolom.filter(c => c.wajib && !(c.k in peta)).map(c => c.l);
+  if (hilang.length) throw new Error("Kolom wajib tidak ditemukan: " + hilang.join(", ") + ". Pakai templat terbaru dari aplikasi.");
+  const baris = [], masalah = [];
+  L.baris.slice(1).forEach((r, i) => {
+    if (!r.some(v => String(v ?? "").trim() !== "")) return;
+    const o = {}, no = i + 2; let salah = false;
+    kolom.forEach(c => {
+      if (!(c.k in peta)) return;
+      let v = r[peta[c.k]];
+      if (typeof v === "number") {
+        if (c.tgl && v > 20000 && v < 80000) v = tglExcel(v);
+        else if (c.teks && Math.abs(v) >= 1e15) { masalah.push(`Baris ${no}: ${c.l} terbaca sebagai angka besar sehingga digit terakhir hilang. Format kolom sebagai Teks, lalu ketik ulang.`); salah = true; v = ""; }
+        else v = Number.isInteger(v) ? String(v) : String(v).replace(".", ",");
+      }
+      v = String(v ?? "").trim();
+      if (c.wajib && !v && !salah) { masalah.push(`Baris ${no}: ${c.l} kosong.`); salah = true; }
+      o[c.k] = v;
+    });
+    if (!salah) baris.push(o);
+  });
+  if (baris.length > 500) throw new Error("Maksimal 500 baris per impor; bagi berkas menjadi beberapa bagian.");
+  return { jenis, nama: file.name, kolom: kolom.filter(c => c.k in peta), baris, masalah };
+}
+Object.assign(AKSI, {
+  async imxTemplat(d) {
+    try {
+      const J = JENIS_IMPOR[d.j], kolom = await kolomImpor(d.j), kep = kolom.map(c => `${c.l}${c.wajib ? " *" : ""} [${c.k}]`);
+      const teks = kolom.map((c, i) => c.teks ? i : -1).filter(i => i >= 0), pilihan = {}; kolom.forEach((c, i) => { if (c.o) pilihan[i] = c.o; });
+      const blob = UPW_ZIP.xlsx([
+        { nama: "Data", baris: [kep], teks, pilihan },
+        { nama: "Contoh", baris: [kep, J.contoh], teks },
+        { nama: "Petunjuk", baris: [["Kolom", "Wajib", "Keterangan / pilihan"], ...kolom.map(c => [c.l, c.wajib ? "Ya" : "", [c.h, c.o ? "Pilihan: " + c.o.join(" / ") : ""].filter(Boolean).join(". ")]),
+          [], ["Cara mengisi", "", "Isi lembar Data mulai baris 2, satu baris per " + J.satuan + ". Jangan mengubah baris judul (baris 1). Kolom bertanda * wajib. Simpan sebagai .xlsx lalu unggah di aplikasi."]] }]);
+      unduhBlob(blob, `Templat ${J.judul}.xlsx`);
+    } catch (e) { toast(e.message); }
+  },
+  imxBatal() { S.imx = null; S.galat = ""; render(); },
+  imxKirim() {
+    const X = S.imx, J = JENIS_IMPOR[X.jenis];
+    jalankan(async () => { const j = await J.kirim(X.baris); X.hasil = J.pesan(j); X.lewati = J.lewati ? J.lewati(j) : []; J.segarkan(); toast(X.hasil); });
+  },
+  async eksporAkun() {
+    try { const E = await api("admin.eksporAkun"); unduhBlob(UPW_ZIP.xlsx([{ nama: "Akun", baris: [E.kepala, ...E.baris], teks: [0] }]), `Daftar akun Repositori UPW ${new Date().toISOString().slice(0, 10)}.xlsx`); }
+    catch (e) { toast(e.message); }
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target; if (!t.dataset || !t.dataset.imx) return;
+  const f = t.files && t.files[0], jenis = t.dataset.imx; t.value = ""; if (!f) return;
+  if (f.size > 5 * 1024 * 1024) { toast("Berkas Excel maksimal 5 MB."); return; }
+  toast("Membaca berkas…");
+  bacaImpor(jenis, f).then(x => { S.imx = x; S.galat = ""; render(); }, err => { S.imx = null; toast(err.message); });
+});
+
+/* --- Status dosen (v0.18.0) --- */
+function lamaPeriode(a, b) {
+  const x = new Date(a + "T00:00:00"), y = new Date(b + "T00:00:00"); if (!(y >= x)) return "";
+  let th = y.getFullYear() - x.getFullYear(), bl = y.getMonth() - x.getMonth(), hr = y.getDate() - x.getDate();
+  if (hr < 0) { bl--; hr += new Date(y.getFullYear(), y.getMonth(), 0).getDate(); }
+  if (bl < 0) { th--; bl += 12; }
+  return [th ? th + " tahun" : "", bl ? bl + " bulan" : "", hr ? hr + " hari" : ""].filter(Boolean).join(" ") || "0 hari";
+}
+const CHIP_SD = { aktif: "s-disetujui", tugas_belajar: "s-diajukan", pensiun: "s-draf" };
+function isiStatusDosen() {
+  const D = S.sdos;
+  if (!D) { sekali("sdos", async () => { S.sdos = await api("dp.status"); render(); }); return `<div class="memuat">Memuat status dosen…</div>`; }
+  return `<div class="callout">Status dosen per tanggal: <b>Aktif</b>, <b>Tugas belajar</b> (dengan tanggal mulai dan selesai saat kembali ke kampus; lama tugas belajar dihitung otomatis), atau <b>Pensiun</b>. Tanpa catatan, dosen dianggap aktif. ${D.bolehUbah ? "" : "Anda dapat melihat; perubahan oleh Admin Prodi."}</div>
+   <div class="tbl-wrap"><table><thead><tr><th>Dosen</th><th>Status hari ini</th><th>Riwayat</th>${D.bolehUbah ? "<th></th>" : ""}</tr></thead><tbody>
+   ${D.dosen.map(x => `<tr><td class="small"><b>${esc(namaPendek(x.nama))}</b>${x.inisial ? ` <span class="mono muted">${esc(x.inisial)}</span>` : ""}<div class="muted">${esc(x.statusDosen || "")}</div></td>
+     <td><span class="chip ${CHIP_SD[x.kini.status]}">${esc(D.label[x.kini.status])}</span>${x.kini.sejak ? `<div class="small muted">sejak ${esc(tglPendek(x.kini.sejak))}</div>` : ""}</td>
+     <td class="small">${x.periode.map(p => `<div style="margin-bottom:4px"><b>${esc(D.label[p.status])}</b> ${esc(tglPendek(p.mulai))}${p.status === "tugas_belajar" ? ` – ${p.selesai ? esc(tglPendek(p.selesai)) : "sekarang"} · <span class="num">${esc(lamaPeriode(p.mulai, p.selesai || D.hariIni))}</span>${p.selesai ? " (kembali ke kampus)" : ""}` : ""}${p.ket ? `<div class="muted">${esc(p.ket)}</div>` : ""}
+       ${D.bolehUbah ? `<div class="row" style="gap:4px;margin-top:2px">${p.status === "tugas_belajar" && !p.selesai ? `<button class="btn sm" data-act="sdBuka" data-u="${x.id}" data-id="${p.id}" data-akhiri="1">Kembali ke kampus</button>` : ""}<button class="btn sm" data-act="sdBuka" data-u="${x.id}" data-id="${p.id}">Ubah</button><button class="btn sm bad" data-act="sdHapus" data-id="${p.id}">Hapus</button></div>` : ""}</div>`).join("") || '<span class="muted">–</span>'}</td>
+     ${D.bolehUbah ? `<td><button class="btn sm" data-act="sdBuka" data-u="${x.id}">+ Status</button></td>` : ""}</tr>`).join("") || `<tr><td colspan="4"><div class="empty">Belum ada akun dosen.</div></td></tr>`}</tbody></table></div>`;
+}
+function laciStatusDosen() {
+  const L = S.laci, D = S.sdos, x = D.dosen.find(y => y.id === L.u), p = L.id ? x.periode.find(y => y.id === L.id) : null, st = L.status || (p ? p.status : "tugas_belajar");
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Status dosen">
+   <div class="dh"><h2>${L.akhiri ? "Kembali dari tugas belajar" : p ? "Ubah status" : "Tambah status"}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <p class="small"><b>${esc(x.nama)}</b></p>
+   <div class="field"><label for="sdSt">Status</label><select id="sdSt" ${L.akhiri ? "disabled" : ""}><option value="tugas_belajar" ${st === "tugas_belajar" ? "selected" : ""}>Tugas belajar</option><option value="pensiun" ${st === "pensiun" ? "selected" : ""}>Pensiun</option></select></div>
+   <div class="field"><label for="sdMulai">Tanggal mulai</label><input id="sdMulai" type="date" value="${esc(p ? p.mulai : "")}" ${L.akhiri ? "disabled" : ""}></div>
+   ${st === "tugas_belajar" ? `<div class="field"><label for="sdSelesai">Tanggal selesai / kembali ke kampus ${L.akhiri ? "" : "(kosongkan bila masih berjalan)"}</label><input id="sdSelesai" type="date" value="${esc(p ? p.selesai : "")}"></div>` : ""}
+   <div class="field"><label for="sdKet">Keterangan (opsional)</label><input id="sdKet" type="text" maxlength="300" value="${esc(p ? p.ket : "")}" placeholder="${st === "tugas_belajar" ? "Contoh: S3 Pariwisata, Universitas Udayana" : "Contoh: SK pensiun No. …"}"></div>
+   ${galatHtml()}<div class="row" style="justify-content:flex-end;margin-top:auto">${tombol("sdSimpan", "Simpan")}</div></div></div>`;
+}
+Object.assign(AKSI, {
+  sdBuka(d) { S.laci = { jenis: "sdos", u: d.u, id: d.id || "", akhiri: !!d.akhiri }; S.galat = ""; render(); if (d.akhiri) fokus("sdSelesai"); },
+  sdSimpan() {
+    const L = S.laci, data = { userId: L.u, id: L.id || undefined, status: $("sdSt").value, mulai: $("sdMulai").value, selesai: $("sdSelesai") ? $("sdSelesai").value : "", ket: $("sdKet").value };
+    if (L.akhiri && !data.selesai) { S.galat = "Isi tanggal kembali ke kampus."; render(); return; }
+    jalankan(async () => { S.sdos = await api("dp.statusSimpan", data); S.laci = null; toast("Status dosen tersimpan."); });
+  },
+  sdHapus(d) {
+    if (!confirm("Hapus catatan status ini?")) return;
+    jalankan(async () => { S.sdos = await api("dp.statusHapus", { id: d.id }); toast("Catatan status dihapus."); });
+  }
+});
+document.addEventListener("change", e => { if (e.target.id === "sdSt" && S.laci && S.laci.jenis === "sdos") { S.laci.status = e.target.value; render(); } });
+
 /* --- Penilaian (v0.12.0) --- */
 const CARA_L = { a: "Otomatis dari data", m: "Penilaian GPM (rubrik)", c: "Data + penilaian GPM" };
 const warnaSkor = s => s >= 3.5 ? "var(--ok)" : s >= 2.5 ? "var(--brand)" : s >= 1.5 ? "var(--warn)" : "var(--bad)";

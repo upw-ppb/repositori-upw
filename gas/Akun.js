@@ -185,7 +185,7 @@ function aksiAdminImpor(d, token) {
       if (!/^[a-z0-9.\-]{3,30}$/.test(u)) { lewati.push({ baris: i + 1, alasan: "Format NIM/NIP tidak valid" }); return; }
       if (peran.some(function (r) { return PERAN_SAH.indexOf(r) < 0; })) { lewati.push({ baris: i + 1, alasan: "Peran tidak dikenal" }); return; }
       if (!superA && (peran.length !== 1 || peran[0] !== "mahasiswa")) { lewati.push({ baris: i + 1, alasan: "Admin Prodi hanya boleh mengimpor mahasiswa" }); return; }
-      var mhs = peran.indexOf("mahasiswa") >= 0, masuk = Number(b.masuk), kelas = String(b.kelas || "").trim().toUpperCase();
+      var mhs = peran.indexOf("mahasiswa") >= 0, masuk = Number(b.masuk) || (mhs ? angkatanNim(u) : 0), kelas = String(b.kelas || "").trim().toUpperCase();
       if (mhs && !(masuk >= 2000 && masuk <= new Date().getFullYear() + 1)) { lewati.push({ baris: i + 1, alasan: "Tahun masuk kosong atau tidak valid" }); return; }
       if (mhs && !/^[A-Z0-9]{1,3}$/.test(kelas)) { lewati.push({ baris: i + 1, alasan: "Kelas kosong atau tidak valid" }); return; }
       if (ada[u]) { lewati.push({ baris: i + 1, alasan: "Sudah terdaftar" }); return; }
@@ -231,8 +231,12 @@ function aksiAdminPeran(d, token) {
 function aksiAdminLog(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["superadmin"]);
-  var l = semua("Log").slice(-200).reverse();
-  return { log: l.map(function (x) { return { waktu: new Date(x.waktu).toISOString(), userId: x.userId, aksi: x.aksi, detail: x.detail }; }) };
+  var l = semua("Log").slice(-200).reverse(), org = {};
+  semua("Pengguna").forEach(function (x) { org[x.id] = { username: String(x.username), nama: x.nama }; });
+  return { log: l.map(function (x) {
+    var o = org[x.userId] || {};
+    return { waktu: new Date(x.waktu).toISOString(), userId: x.userId, username: o.username || "", nama: o.nama || "", aksi: x.aksi, detail: x.detail };
+  }) };
 }
 
 /* ---------- Aktivasi tanpa email (v0.16.0) ----------
@@ -298,3 +302,6 @@ function aksiAdminTanpaEmail(d, token) {
   var tertunda = semua("Pengguna").filter(function (x) { return x.emailTerverifikasi === "tertunda" && x.status === "aktif"; }).length;
   return { nyala: modeTanpaEmail(), tertunda: tertunda };
 }
+
+/** Angkatan dari NIM: dua angka pertama = tahun masuk (25 → 2025). 0 bila NIM tidak diawali dua angka. (v0.17.0) */
+function angkatanNim(nim) { var m = /^(\d{2})\d/.exec(String(nim || "")); return m ? 2000 + Number(m[1]) : 0; }
