@@ -3,6 +3,16 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.23.0 — 14 Nov 2026 — Produksi
+- Produksi diperbarui dari v0.16.0 ke v0.23.0 (server Apps Script Produksi deployment @3). Isi sama dengan Uji Coba v0.17.0–v0.23.0:
+  21 + 7 catatan prodi (impor massal, dokumen pendukung biodata, riwayat keputusan, penanda tangan, laboratorium, panduan bergambar,
+  ikon baru, dll.) dan fitur Masukan dan saran.
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama ("Cadangan / sebelum v0.23.0 (struktur data 14 → 18)") di folder Cadangan
+  Drive Produksi. Struktur data 14 → 18 (tabel/kolom baru ditambahkan di akhir).
+- Rollback: tampilan dan server v0.16.0 tetap bisa membaca data (tabel baru diabaikan). Catatan: akun yang masuk setelah rilis ini kata sandinya
+  disimpan dengan cara baru (h2) dan tidak bisa masuk di versi < v0.21.0 sampai disetel ulang oleh Super Admin.
+- Penyetuju: pemilik, di chat 14 Nov 2026: "Setuju tayang v0.23.0".
+
 ## v0.23.0 — 14 Nov 2026 — Uji Coba
 - Masukan dan saran (permintaan pemilik): tombol **Kirim masukan** di Info (juga bisa dibuka sebelum biodata lengkap). Isian: jenis (masalah/error,
   permintaan fitur, saran perbaikan, pertanyaan, lainnya), bagian aplikasi (otomatis terisi halaman terakhir), judul, uraian, lampiran gambar/PDF

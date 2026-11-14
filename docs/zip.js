@@ -34,7 +34,8 @@ function zip(berkas) {
 const xml = s => String(s ?? "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const kolom = n => { let s = ""; n++; while (n) { const r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; };
 const NS = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"', KEP = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
-function lembar(baris) {
+function lembar(baris, o = {}) {
+  const teks = o.teks || [], pilihan = o.pilihan || {};
   const lebar = [];
   baris.forEach(r => r.forEach((v, i) => { lebar[i] = Math.min(60, Math.max(lebar[i] || 8, String(v ?? "").length + 2)); }));
   const isi = baris.map((r, y) => `<row r="${y + 1}">${r.map((v, x) => {
@@ -43,8 +44,13 @@ function lembar(baris) {
     return `<c r="${ref}" t="inlineStr"${s}><is><t xml:space="preserve">${xml(v)}</t></is></c>`;
   }).join("")}</row>`).join("");
   return `${KEP}<worksheet ${NS}><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>`
-    + (lebar.length ? `<cols>${lebar.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join("")}</cols>` : "")
-    + `<sheetData>${isi}</sheetData></worksheet>`;
+    + (lebar.length ? `<cols>${lebar.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"${teks.includes(i) ? ' style="2"' : ""}/>`).join("")}</cols>` : "")
+    + `<sheetData>${isi}</sheetData>`
+    + (() => { // daftar pilihan (dropdown) untuk kolom berpilihan, bila muat dalam batas Excel (255 karakter, tanpa koma)
+      const v = Object.entries(pilihan).filter(([, l]) => l && l.length && l.every(x => !String(x).includes(",")) && l.join(",").length < 250);
+      return v.length ? `<dataValidations count="${v.length}">${v.map(([i, l]) => `<dataValidation type="list" allowBlank="1" showErrorMessage="0" sqref="${kolom(+i)}2:${kolom(+i)}1000"><formula1>"${xml(l.join(","))}"</formula1></dataValidation>`).join("")}</dataValidations>` : "";
+    })()
+    + `</worksheet>`;
 }
 function xlsx(daftar) {
   const nama = daftar.map((l, i) => (String(l.nama).replace(/[\\\/?*\[\]:]/g, " ").slice(0, 31) || "Lembar " + (i + 1)));
@@ -53,9 +59,65 @@ function xlsx(daftar) {
     { nama: "_rels/.rels", data: `${KEP}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>` },
     { nama: "xl/workbook.xml", data: `${KEP}<workbook ${NS} xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${nama.map((n, i) => `<sheet name="${xml(n)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets></workbook>` },
     { nama: "xl/_rels/workbook.xml.rels", data: `${KEP}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${daftar.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("")}<Relationship Id="rId${daftar.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>` },
-    { nama: "xl/styles.xml", data: `${KEP}<styleSheet ${NS}><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>` }
-  ].concat(daftar.map((l, i) => ({ nama: `xl/worksheets/sheet${i + 1}.xml`, data: lembar(l.baris) })));
+    { nama: "xl/styles.xml", data: `${KEP}<styleSheet ${NS}><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>` }
+  ].concat(daftar.map((l, i) => ({ nama: `xl/worksheets/sheet${i + 1}.xml`, data: lembar(l.baris, l) })));
   return new Blob([zip(f)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 }
-window.UPW_ZIP = { zip, xlsx, crc32 };
+/* ---------- Pembaca .xlsx (v0.18.0) ----------
+   bacaXlsx(ArrayBuffer) → Promise<[{ nama, baris: [[nilai, ...], ...] }]>. Mendukung berkas dari Excel/Google Sheets/LibreOffice
+   (ZIP tersimpan atau terkompresi deflate; dibuka dengan DecompressionStream bawaan browser). Nilai: teks atau angka. */
+async function bukaZip(buf) {
+  const u = new Uint8Array(buf), d = new DataView(buf), hasil = {};
+  let e = -1;
+  for (let i = u.length - 22; i >= Math.max(0, u.length - 65557); i--) if (d.getUint32(i, true) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error("Berkas bukan Excel (.xlsx) yang sah.");
+  let p = d.getUint32(e + 16, true);
+  const n = d.getUint16(e + 10, true), dek = new TextDecoder();
+  for (let k = 0; k < n; k++) {
+    if (d.getUint32(p, true) !== 0x02014b50) throw new Error("Berkas Excel rusak.");
+    const metode = d.getUint16(p + 10, true), besar = d.getUint32(p + 20, true), nl = d.getUint16(p + 28, true), el = d.getUint16(p + 30, true), cl = d.getUint16(p + 32, true), lok = d.getUint32(p + 42, true);
+    const nama = dek.decode(u.subarray(p + 46, p + 46 + nl));
+    hasil[nama] = { metode, besar, awal: lok + 30 + d.getUint16(lok + 26, true) + d.getUint16(lok + 28, true) };
+    p += 46 + nl + el + cl;
+  }
+  return async nama => {
+    const f = hasil[nama]; if (!f) return null;
+    const data = u.subarray(f.awal, f.awal + f.besar);
+    if (f.metode === 0) return dek.decode(data);
+    if (f.metode !== 8) throw new Error("Format kompresi Excel tidak didukung.");
+    const aliran = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    return await new Response(aliran).text();
+  };
+}
+const kolomKe = ref => { let n = 0; for (const c of ref.replace(/\d+/g, "")) n = n * 26 + c.charCodeAt(0) - 64; return n - 1; };
+async function bacaXlsx(buf) {
+  const ambil = await bukaZip(buf), xmlDoc = s => new DOMParser().parseFromString(s, "application/xml");
+  const t = el => [...el.getElementsByTagName("t")].map(x => x.textContent).join("");
+  const ss = await ambil("xl/sharedStrings.xml"), str = ss ? [...xmlDoc(ss).getElementsByTagName("si")].map(t) : [];
+  const wb = xmlDoc(await ambil("xl/workbook.xml") || "<x/>"), rel = xmlDoc(await ambil("xl/_rels/workbook.xml.rels") || "<x/>");
+  const target = {}; [...rel.getElementsByTagName("Relationship")].forEach(r => { target[r.getAttribute("Id")] = r.getAttribute("Target"); });
+  const out = [];
+  for (const sh of [...wb.getElementsByTagName("sheet")]) {
+    const id = sh.getAttribute("r:id") || sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
+    let jalur = (target[id] || "").replace(/^\//, ""); if (!jalur.startsWith("xl/")) jalur = "xl/" + jalur;
+    const isi = await ambil(jalur); if (!isi) continue;
+    const baris = [];
+    [...xmlDoc(isi).getElementsByTagName("row")].forEach(row => {
+      const y = Number(row.getAttribute("r")) - 1, r = [];
+      [...row.getElementsByTagName("c")].forEach(c => {
+        const x = kolomKe(c.getAttribute("r") || ""), tp = c.getAttribute("t"), v = c.getElementsByTagName("v")[0];
+        let nilai = "";
+        if (tp === "s") nilai = str[Number(v ? v.textContent : -1)] ?? "";
+        else if (tp === "inlineStr") nilai = t(c);
+        else if (tp === "b") nilai = v && v.textContent === "1" ? "TRUE" : "FALSE";
+        else if (v) nilai = tp === "str" || tp === "e" ? v.textContent : (isFinite(Number(v.textContent)) ? Number(v.textContent) : v.textContent);
+        if (x >= 0) r[x] = nilai;
+      });
+      if (y >= 0) baris[y] = Array.from(r, z => z ?? "");
+    });
+    out.push({ nama: sh.getAttribute("name"), baris: Array.from(baris, z => z || []) });
+  }
+  return out;
+}
+window.UPW_ZIP = { zip, xlsx, crc32, bacaXlsx };
 })();
