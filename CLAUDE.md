@@ -203,6 +203,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   TIDAK mengikuti gulir di dalam laci/drawer, hanya gulir halaman). alat/tampilan.mjs kini menyalin sub-folder. Unduhan lewat simpanBerkas()
   (showSaveFilePicker di aplikasi terpasang). manifest shortcuts ?buka=info|kegiatan|beranda. Menu macOS tidak bisa ditambah aplikasi web.
 
+- v0.22.1 (14 Nov 2026, Uji Coba): ikon aplikasi = konsep D (koper arsip + "UPW"), dipilih pemilik; sumber 512 px di aset/ikon-aplikasi-upw-512.png.
+  Ikon digambar dengan canvas di pratinjau (bukan dari logo Poltekpar); logo Poltekpar tetap di header dan surat.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

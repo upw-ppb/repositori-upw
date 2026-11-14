@@ -3,6 +3,11 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.22.1 — 14 Nov 2026 — Uji Coba
+- Ikon aplikasi baru (pilihan pemilik: konsep D "koper arsip" dengan tulisan UPW), biru #0A5188 dan emas dari logo Poltekpar Bali;
+  ukuran 192, 512, maskable (Android), dan 180 (iPhone). Logo institusi Poltekpar Bali tetap dipakai di dalam aplikasi dan surat.
+- Tidak ada perubahan struktur data. Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.22.0 — 14 Nov 2026 — Uji Coba
 Catatan prodi lanjutan (7 butir):
 - Kolom Cari orang: petunjuk "Nama, Inisial, NIP atau bidang keahlian".
