@@ -12,7 +12,7 @@ var MAKS_PERCOBAAN_KODE = 5;
 var MASA_SANDI_AWAL_HARI = 30;
 
 function merica() {
-  var m = konfig().getProperty("MERICA");
+  var m = prop("MERICA");
   if (!m) throw new Error("MERICA belum diatur");
   return m;
 }
@@ -24,11 +24,20 @@ function acak(n) {
   return s.slice(0, n);
 }
 
-function hashSandi(sandi, garam) {
+function hashIterasi(sandi, garam, n) {
   var kunci = garam + merica(), kunciB = Utilities.newBlob(kunci).getBytes();
   var h = Utilities.computeHmacSha256Signature(String(sandi), kunci);
-  for (var i = 0; i < ITERASI_HASH; i++) h = Utilities.computeHmacSha256Signature(h, kunciB);
+  for (var i = 0; i < n; i++) h = Utilities.computeHmacSha256Signature(h, kunciB);
   return b64(h);
+}
+/* v0.21.0: hash baru berawalan "h2:" dengan ITERASI_HASH2 putaran (masuk lebih cepat; tetap aman karena memakai merica rahasia server).
+   Hash lama (tanpa awalan, ITERASI_HASH putaran) tetap dikenali dan diperbarui otomatis saat pemiliknya berhasil masuk. */
+var ITERASI_HASH2 = 300;
+function hashSandi(sandi, garam) { return "h2:" + hashIterasi(sandi, garam, ITERASI_HASH2); }
+function cocokSandi(hash, sandi, garam) {
+  hash = String(hash || "");
+  if (hash.indexOf("h2:") === 0) return samaAman(hash, hashSandi(sandi, garam));
+  return samaAman(hash, hashIterasi(sandi, garam, ITERASI_HASH));
 }
 
 function hashToken(token) { return b64(Utilities.computeHmacSha256Signature(String(token), merica())); }

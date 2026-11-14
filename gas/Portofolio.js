@@ -82,7 +82,7 @@ function aksiDokSimpan(d, token) {
     var bytes = Utilities.base64Decode(isi);
     if (bytes.length > BUKTI_MAKS) throw galat("Ukuran file maksimal 10 MB.");
     if (!isiSesuai(eks, bytes)) throw galat("Isi file tidak sesuai dengan jenisnya (." + eks + "). Simpan ulang file dari aplikasi aslinya, lalu coba lagi.");
-    var induk = folderAnak(DriveApp.getFolderById(konfig().getProperty("FOLDER_ID")), "Portofolio");
+    var induk = folderAnak(DriveApp.getFolderById(prop("FOLDER_ID")), "Portofolio");
     var f = folderAnak(induk, String(p.username) + " " + namaAman(p.nama).slice(0, 60));
     file = f.createFile(Utilities.newBlob(bytes, mime, namaAman(jenis.split(" (")[0] + " - " + nama).slice(0, 80) + " - " + nf));
     x.t = "file"; x.fileId = file.getId(); x.namaFile = nf; x.mime = mime; x.ukuran = bytes.length;

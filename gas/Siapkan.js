@@ -39,7 +39,7 @@ function siapkanLingkungan(env) {
   daftarTabel().forEach(function (nama) { bentukSheet(ss, nama); });
   ss.deleteSheet(awal);
 
-  k.setProperties({ SPREADSHEET_ID: ss.getId(), FOLDER_ID: induk.getId(), LINGKUNGAN: env, MERICA: acak(48), SKEMA_VERSI: String(VERSI_SKEMA) });
+  k.setProperties({ SPREADSHEET_ID: ss.getId(), FOLDER_ID: induk.getId(), LINGKUNGAN: env, MERICA: acak(48), SKEMA_VERSI: String(VERSI_SKEMA) }); setelPropUlang();
 
   tambahBanyak("Pengaturan", [
     { kunci: "unitKerja", nilai: "Prodi Usaha Perjalanan Wisata", keterangan: "Unit kerja pada surat" },

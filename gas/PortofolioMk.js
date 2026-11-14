@@ -168,7 +168,7 @@ function aksiMkpDetail(d, token) {
 /* ---------- aksi ubah ---------- */
 
 function folderMkp(smt, mk) {
-  var induk = folderAnak(folderAnak(DriveApp.getFolderById(konfig().getProperty("FOLDER_ID")), "Bukti"), "Portofolio MK");
+  var induk = folderAnak(folderAnak(DriveApp.getFolderById(prop("FOLDER_ID")), "Bukti"), "Portofolio MK");
   return folderAnak(folderAnak(induk, labelSmt(smt).replace("/", "-")), (mk.kode + " " + mk.nama).replace(/[\\/:*?"<>|]/g, " ").slice(0, 80).trim());
 }
 /** Simpan isi baru di dalam kunci tulis; fn(isi) mengubah isi dan mengembalikan nilai. */

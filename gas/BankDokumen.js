@@ -98,7 +98,7 @@ function simpanSlot(s, perubahan, p) {
   if (s._r) ubah("BankDokumen", s._r, o); else tambah("BankDokumen", o);
 }
 function folderBank(n) {
-  var induk = folderAnak(folderAnak(DriveApp.getFolderById(konfig().getProperty("FOLDER_ID")), "Bukti"), "Bank Dokumen");
+  var induk = folderAnak(folderAnak(DriveApp.getFolderById(prop("FOLDER_ID")), "Bukti"), "Bank Dokumen");
   return folderAnak(induk, "Butir " + (n < 10 ? "0" : "") + n);
 }
 

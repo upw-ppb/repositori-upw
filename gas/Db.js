@@ -65,13 +65,19 @@ function kolomDari(nama) {
 function daftarTabel() { return Object.keys(SKEMA).concat(Object.keys(tabelBiodata())); }
 
 function konfig() { return PropertiesService.getScriptProperties(); }
-function lingkungan() { return konfig().getProperty("LINGKUNGAN") || "belum-disiapkan"; }
+/* Penyimpanan sementara per permintaan (v0.21.0): pengaturan server dan isi sheet dibaca sekali, lalu dipakai ulang.
+   Isi sheet dibuang setiap kali ada penulisan ke sheet itu dan setiap kali masuk kunciTulis (agar data di bawah kunci selalu segar). */
+var _prop = null, _isi = {};
+function prop(k) { if (!_prop) _prop = konfig().getProperties(); return _prop[k] || null; }
+function setelPropUlang() { _prop = null; }
+function bersihkanCache() { _prop = null; _isi = {}; _buku = null; }
+function lingkungan() { return prop("LINGKUNGAN") || "belum-disiapkan"; }
 function modeUji() { return lingkungan() === "uji"; }
 
 var _buku = null;
 function buku() {
   if (_buku) return _buku;
-  var id = konfig().getProperty("SPREADSHEET_ID");
+  var id = prop("SPREADSHEET_ID");
   if (!id) throw galat("Server belum disiapkan.");
   return (_buku = SpreadsheetApp.openById(id));
 }
@@ -84,9 +90,11 @@ function sheet(nama) {
 
 /** Ambil semua baris sebagai objek. */
 function semua(nama) {
-  var sh = sheet(nama), n = sh.getLastRow();
-  if (n < 2) return [];
-  var kolom = kolomDari(nama), nilai = sh.getRange(2, 1, n - 1, kolom.length).getValues();
+  var kolom = kolomDari(nama), nilai = _isi[nama];
+  if (!nilai) {
+    var sh = sheet(nama), n = sh.getLastRow();
+    nilai = _isi[nama] = n < 2 ? [] : sh.getRange(2, 1, n - 1, kolom.length).getValues();
+  }
   return nilai.map(function (r, i) {
     var o = { _baris: i + 2 };
     kolom.forEach(function (k, j) { o[k] = r[j]; });
@@ -103,10 +111,11 @@ function cari(nama, fn) { var l = semua(nama); for (var i = 0; i < l.length; i++
 function amankan(v) { return typeof v === "string" && /^[=+\-@0-9]/.test(v) ? "'" + v : v; }
 function barisDari(nama, obj) { return kolomDari(nama).map(function (k) { return obj[k] === undefined || obj[k] === null ? "" : amankan(obj[k]); }); }
 
-function tambah(nama, obj) { sheet(nama).appendRow(barisDari(nama, obj)); }
+function tambah(nama, obj) { delete _isi[nama]; sheet(nama).appendRow(barisDari(nama, obj)); }
 
 function tambahBanyak(nama, daftar) {
   if (!daftar.length) return;
+  delete _isi[nama];
   var kolom = kolomDari(nama), sh = sheet(nama);
   var nilai = daftar.map(function (o) { return barisDari(nama, o); });
   sh.getRange(sh.getLastRow() + 1, 1, nilai.length, kolom.length).setValues(nilai);
@@ -114,6 +123,7 @@ function tambahBanyak(nama, daftar) {
 
 /** Perbarui kolom tertentu pada baris objek (hasil semua/cari). */
 function ubah(nama, obj, perubahan) {
+  delete _isi[nama];
   var kolom = kolomDari(nama), sh = sheet(nama), ks = Object.keys(perubahan);
   ks.forEach(function (k) { if (kolom.indexOf(k) < 0) throw new Error("Kolom tidak ada: " + nama + "." + k); });
   if (ks.length > 3) {
@@ -128,11 +138,12 @@ function ubah(nama, obj, perubahan) {
   });
 }
 
-function hapusBaris(nama, obj) { sheet(nama).deleteRow(obj._baris); }
+function hapusBaris(nama, obj) { delete _isi[nama]; sheet(nama).deleteRow(obj._baris); }
 
 function kunciTulis(fn) {
   var kunci = LockService.getScriptLock();
   kunci.waitLock(20000);
+  _isi = {}; // data di bawah kunci harus segar (permintaan lain mungkin baru menulis)
   try { return fn(); } finally { kunci.releaseLock(); }
 }
 
@@ -180,8 +191,9 @@ function pastikanSkema() {
     cadangkan("sebelum v" + VERSI_SERVER + " (struktur data " + dari + " → " + VERSI_SKEMA + ")");
     var ss = buku();
     daftarTabel().forEach(function (nama) { bentukSheet(ss, nama); });
+    _isi = {};
     migrasiData(dari);
-    k.setProperty("SKEMA_VERSI", String(VERSI_SKEMA));
+    k.setProperty("SKEMA_VERSI", String(VERSI_SKEMA)); setelPropUlang();
     catat("", "skema.perbarui", { dari: dari, ke: VERSI_SKEMA, versiServer: VERSI_SERVER });
   });
 }
@@ -215,7 +227,7 @@ function migrasiData(dari) {
 /* ---------- Cadangan ---------- */
 
 function folderCadangan() {
-  var induk = DriveApp.getFolderById(konfig().getProperty("FOLDER_ID"));
+  var induk = DriveApp.getFolderById(prop("FOLDER_ID"));
   var it = induk.getFoldersByName("Cadangan");
   return it.hasNext() ? it.next() : induk.createFolder("Cadangan");
 }
@@ -224,7 +236,7 @@ function folderCadangan() {
 function cadangkan(label) {
   var waktu = Utilities.formatDate(new Date(), "Asia/Makassar", "yyyy-MM-dd HH.mm");
   var nama = "Cadangan / " + label + " / " + waktu, tujuan = folderCadangan();
-  var salinan = DriveApp.getFileById(konfig().getProperty("SPREADSHEET_ID")).makeCopy(nama, tujuan);
+  var salinan = DriveApp.getFileById(prop("SPREADSHEET_ID")).makeCopy(nama, tujuan);
   var baris = [["Folder", "Nama file", "ID", "Ukuran (byte)", "Diubah"]];
   (function telusuri(f, jalur) {
     if (f.getId() === tujuan.getId()) return;
@@ -232,7 +244,7 @@ function cadangkan(label) {
     while (fs.hasNext()) { var x = fs.next(); baris.push([jalur, x.getName(), x.getId(), x.getSize(), x.getLastUpdated().toISOString()]); }
     var ds = f.getFolders();
     while (ds.hasNext()) { var d = ds.next(); telusuri(d, jalur + "/" + d.getName()); }
-  })(DriveApp.getFolderById(konfig().getProperty("FOLDER_ID")), "");
+  })(DriveApp.getFolderById(prop("FOLDER_ID")), "");
   var csv = baris.map(function (r) { return r.map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(","); }).join("\n");
   tujuan.createFile(nama + " — daftar file Drive.csv", csv, MimeType.CSV);
   return { nama: nama, url: salinan.getUrl(), jumlahFile: baris.length - 1 };

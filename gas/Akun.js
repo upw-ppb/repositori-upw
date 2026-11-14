@@ -54,9 +54,9 @@ function aksiMasuk(d) {
     if (p.status === "impor") {
       var umur = (Date.now() - new Date(p.diimporPada).getTime()) / 864e5;
       if (umur > MASA_SANDI_AWAL_HARI) throw galat("Kata sandi awal sudah kedaluwarsa. Hubungi Admin Prodi untuk aktivasi ulang.");
-      benar = p.hash ? samaAman(p.hash, hashSandi(sandi, p.garam)) : sandi === String(p.username);
+      benar = p.hash ? cocokSandi(p.hash, sandi, p.garam) : sandi === String(p.username);
     } else {
-      benar = samaAman(p.hash, hashSandi(sandi, p.garam));
+      benar = cocokSandi(p.hash, sandi, p.garam);
     }
     if (!benar) {
       var g = Number(p.gagal || 0) + 1, ubahan = { gagal: g };
@@ -66,7 +66,9 @@ function aksiMasuk(d) {
       throw salah;
     }
     if (asesorKedaluwarsa(p)) { catat(p.id, "asesor.masukDitolak", { sampai: teksTgl(p.berlakuSampai) }); throw pesanAsesorBerakhir(p); }
-    ubah("Pengguna", p, { gagal: 0, kunciSampai: "", masukTerakhir: new Date() });
+    var naik = { gagal: 0, kunciSampai: "", masukTerakhir: new Date() };
+    if (p.hash && String(p.hash).indexOf("h2:") !== 0) naik.hash = hashSandi(sandi, p.garam); // perbarui hash lama ke format cepat
+    ubah("Pengguna", p, naik);
     var token = buatSesi(p, d.perangkat);
     catat(p.id, "masuk", {});
     return { token: token, pengguna: profilPublik(p) };
@@ -146,7 +148,7 @@ function aksiLupaReset(d) {
 function aksiGantiSandi(d, token) {
   var p = penggunaDariToken(token);
   if (!p.wajibGanti || p.wajibGanti === "FALSE") {
-    if (!samaAman(p.hash, hashSandi(d.sandiLama || "", p.garam))) throw galat("Kata sandi lama salah.");
+    if (!cocokSandi(p.hash, d.sandiLama || "", p.garam)) throw galat("Kata sandi lama salah.");
   }
   periksaSandiBaru(d.sandiBaru, p);
   var garam = acak(24);

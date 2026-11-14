@@ -11,8 +11,8 @@
 var TTD_MAKS = 300 * 1024;
 
 function kunciTtd() {
-  var k = konfig().getProperty("KUNCI_TTD");
-  if (!k) { k = acak(48); konfig().setProperty("KUNCI_TTD", k); }
+  var k = prop("KUNCI_TTD");
+  if (!k) { k = acak(48); konfig().setProperty("KUNCI_TTD", k); setelPropUlang(); }
   return k;
 }
 /** Sandi aliran: XOR dengan blok HMAC-SHA256(kunci, nonce:urutan). Fungsi yang sama untuk menyandikan dan membuka. */
@@ -24,7 +24,7 @@ function sandiTtd(bytes, nonce) {
   }
   return out;
 }
-function folderTtd() { return folderAnak(DriveApp.getFolderById(konfig().getProperty("FOLDER_ID")), "Tanda Tangan"); }
+function folderTtd() { return folderAnak(DriveApp.getFolderById(prop("FOLDER_ID")), "Tanda Tangan"); }
 function ttdAktif(userId) {
   var l = semua("TandaTangan").filter(function (r) { return r.userId === userId && !r.dihapus; });
   return l.length ? l[l.length - 1] : null;

@@ -121,6 +121,7 @@ function barisKegiatan(k) {
 function simpanKegiatan(k) {
   var obj = barisKegiatan(k);
   if (k._r) {
+    delete _isi["Kegiatan"]; // tulis langsung: buang isi sementara (v0.21.0)
     var sh = sheet("Kegiatan");
     sh.getRange(k._baris, 1, 1, kolomDari("Kegiatan").length).setValues([barisDari("Kegiatan", obj)]);
   } else tambah("Kegiatan", obj);

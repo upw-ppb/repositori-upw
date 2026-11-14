@@ -188,6 +188,16 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   emailTerverifikasi "tertunda"; perluVerifikasiEmail = tertunda && mode mati (dicek di wajibPeran); email.kirimKode/email.verifikasi.
   Uji: uji-email-bagian.mjs (total 400 + 44). Di Produksi mode ini perlu DINYALAKAN Super Admin setelah tayang.
 
+- v0.17.0–v0.21.0 (14 Nov 2026, Uji Coba): 21 catatan prodi. Baru: gas/Impor.js (impor massal, templat, ekspor akun), StatusDosen.js,
+  DokumenDosen.js (kelengkapan + Pengingat), RiwayatKeputusan.js, Lab.js (Sarana, LogSarana), penanda tangan (Pengaturan penandaTangan).
+  docs/uji/zip.js punya bacaXlsx (DecompressionStream) + kolom Teks/dropdown di templat. Tampilan: pasangLihatSandi, LABEL_VERSI, hInfo/TUTORIAL,
+  profil disimpan di localStorage (upw-uji:profil) untuk muat ulang instan. Menu mengikuti PERAN AKTIF.
+  KECEPATAN: Db.js menyimpan isi sheet (_isi) dan properti (_prop) per permintaan; dibuang saat tulis/kunciTulis/awal doPost.
+  WAJIB: penulisan sheet langsung di luar Db.js harus `delete _isi[nama]` (diuji otomatis). Hash sandi baru "h2:" (300 putaran);
+  rollback ke < v0.21.0 membuat akun berhash h2 tidak bisa masuk (perlu reset oleh Super Admin).
+  PELAJARAN: isian formulir yang bisa memicu render (pilih file) harus disimpan ke state saat diketik (event input).
+  Uji: uji-v17..v21-bagian.mjs (total 459 + 44).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

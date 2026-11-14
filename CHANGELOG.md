@@ -3,6 +3,30 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.21.0 — 14 Nov 2026 — Uji Coba
+Catatan prodi tahap 3–5 (versi 0.19.0 dan 0.20.0 tidak dirilis terpisah):
+- Biodata dosen: bagian "Dokumen pendukung (opsional)": ijazah per jenjang yang diisi, sertifikat pendidik, sertifikat kompetensi/profesi
+  (boleh lebih dari satu, masing-masing dengan nama) (catatan no. 10, 11). Pengingat di Beranda bila belum lengkap (no. 12).
+- Data Prodi › Dokumen dosen: kelengkapan dokumen tiap dosen dan tombol Ingatkan (Admin Prodi, Super Admin, KPS); pengingat tampil di Beranda
+  dosen dan bisa ditandai selesai (no. 12).
+- Antrean KPS › Riwayat keputusan: log tetap semua keputusan surat tugas (disetujui/ditunda/revisi/ditolak) dan verifikasi data, per tahun,
+  bisa diunduh Excel (no. 14).
+- Tanda tangan: Super Admin dapat mengizinkan dosen selain KPS menyiapkan tanda tangan (menu Pengguna › Penanda tangan surat). Pada surat,
+  tanda tangan kini tampil di atas nama penanda tangan (bertumpuk seperti ditandatangani langsung); QR dan kode verifikasi di bawahnya (no. 15).
+- Menu Laboratorium (Kepala Lab, Laboran; juga Admin/Super Admin, KPS melihat): data sarana/lab, catatan perawatan dan pemakaian, unduh Excel;
+  ringkasannya tampil di Penilaian butir 19 dan 21 (no. 17).
+- Portofolio PDF dan Excel memuat tautan bukti kegiatan dan tautan cek keaslian surat tugas (no. 18).
+- Kecepatan (no. 5): isi sheet dan pengaturan server dibaca sekali per permintaan; hash kata sandi baru lebih ringan (300 putaran,
+  tetap memakai kunci rahasia server; hash lama diperbarui otomatis saat masuk); muat ulang aplikasi langsung tampil dari profil terakhir
+  sambil diperiksa ke server.
+- Tombol Info (ikon i di bilah atas): tentang aplikasi, versi, kredit pengembang, dan panduan langkah demi langkah sesuai peran;
+  panduan masuk pertama juga ada di halaman masuk (no. 20).
+- Perbaikan: isian formulir unggah (Bank Dokumen, dokumen biodata) tidak lagi hilang setelah memilih file.
+- Struktur data versi 17: tabel baru Pengingat, Sarana, LogSarana (versi 16–17). Cadangan otomatis sebelum perubahan. Versi lama tetap bisa
+  membaca data ini, dan rollback tidak memerlukan pemulihan data. PERHATIAN: versi lama hanya mengenal format hash kata sandi lama.
+  Bila suatu saat dikembalikan ke versi sebelum v0.21.0, pengguna yang sudah masuk di v0.21.0 perlu direset kata sandinya oleh Super Admin.
+- Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.18.0 — 14 Nov 2026 — Uji Coba
 Catatan prodi tahap 2:
 - Impor dari Excel dengan templat yang bisa diunduh (catatan no. 1 dan 21): akun mahasiswa, akun dosen/tendik (Super Admin),

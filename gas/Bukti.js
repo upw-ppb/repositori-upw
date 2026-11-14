@@ -130,7 +130,7 @@ function tunggakanUntuk(k, semuaK, idx, set) {
 
 function folderAnak(induk, nama) { var it = induk.getFoldersByName(nama); return it.hasNext() ? it.next() : induk.createFolder(nama); }
 function folderBuktiKeg(k) {
-  var induk = folderAnak(DriveApp.getFolderById(konfig().getProperty("FOLDER_ID")), "Bukti");
+  var induk = folderAnak(DriveApp.getFolderById(prop("FOLDER_ID")), "Bukti");
   var s = k.tgl && tanggalSah(k.tgl) ? semesterInfo(keTanggal(k.tgl)) : semesterInfo();
   var smt = folderAnak(induk, s.label.replace("/", "-"));
   return folderAnak(smt, k.id + " " + k.judul.replace(/[\\/:*?"<>|]/g, " ").slice(0, 60).trim());
