@@ -21,6 +21,7 @@ function profilPublik(p) {
     perluAktivasi: p.status === "impor", jenisBiodata: jenisBiodata(p), perluBiodata: perluBiodata(p),
     emailTertunda: p.emailTerverifikasi === "tertunda", perluVerifikasiEmail: perluVerifikasiEmail(p),
     tanpaEmail: p.status === "impor" && modeTanpaEmail(),
+    bolehTtd: p.status === "aktif" && punyaPeran(p, ["dosen"]) && bolehTtd(p),
     masuk: p.masuk ? Number(p.masuk) : null, kelas: String(p.kelas || ""), statusMhs: String(p.statusMhs || ""),
     semesterMhs: semesterMhs(p.masuk), semesterKini: semesterInfo(),
     berlakuSampai: peranDari(p).indexOf("asesor") >= 0 ? teksTgl(p.berlakuSampai) : "", instansi: peranDari(p).indexOf("asesor") >= 0 ? teks(p.instansi) : "" };

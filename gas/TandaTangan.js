@@ -37,7 +37,7 @@ function bacaTtd(r) {
 /** Untuk halaman Tanda Tangan Saya: gambar aktif + log pemakaian (surat yang memakai tanda tangan akun ini). */
 function aksiTtdSaya(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, ["kps"]);
+  wajibPenandaTangan(p);
   var milik = semua("TandaTangan").filter(function (r) { return r.userId === p.id; }), ids = {};
   milik.forEach(function (r) { ids[r.id] = true; });
   var a = ttdAktif(p.id);
@@ -49,7 +49,7 @@ function aksiTtdSaya(d, token) {
 
 function aksiTtdSimpan(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, ["kps"]);
+  wajibPenandaTangan(p);
   if (d.setuju !== true) throw galat("Centang persetujuan pemakaian tanda tangan dulu.");
   var m = /^data:image\/png;base64,([A-Za-z0-9+\/=]+)$/.exec(teks(d.gambar));
   if (!m) throw galat("Gambar tanda tangan tidak terbaca. Coba lagi.");
@@ -70,7 +70,7 @@ function aksiTtdSimpan(d, token) {
 
 function aksiTtdHapus(d, token) {
   var p = penggunaDariToken(token);
-  wajibPeran(p, ["kps"]);
+  wajibPenandaTangan(p);
   return kunciTulis(function () {
     var a = ttdAktif(p.id);
     if (!a) throw galat("Belum ada tanda tangan tersimpan.");
@@ -89,4 +89,34 @@ function aksiSuratTtd(d, token) {
   if (k.st !== "terbit" || !k.lampiran || !k.lampiran.ttd) return { gambar: "" };
   var r = cari("TandaTangan", function (x) { return x.id === k.lampiran.ttd; });
   return { gambar: r ? bacaTtd(r) : "" };
+}
+
+/* ---------- Penanda tangan selain KPS (v0.20.0) ----------
+ * KPS selalu boleh menyimpan tanda tangan. Super Admin dapat memberi izin kepada dosen lain (mis. calon/pelaksana harian KPS)
+ * untuk menyiapkan tanda tangannya. Daftar userId di Pengaturan "penandaTangan" (JSON). Tanda tangan dipakai pada surat yang
+ * disetujui akun itu ketika ia memegang peran KPS.
+ */
+function daftarPenandaTangan() { return jsonDari(pengaturan("penandaTangan", "[]"), []); }
+function bolehTtd(p) { return punyaPeran(p, ["kps"]) || daftarPenandaTangan().indexOf(p.id) >= 0; }
+function wajibPenandaTangan(p) {
+  wajibPeran(p, PERAN_SAH);
+  if (!bolehTtd(p)) throw galat("Anda tidak memiliki izin untuk tindakan ini.");
+}
+function aksiAdminPenandaTangan(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["superadmin"]);
+  var idx = indeksOrang();
+  if (Array.isArray(d.ids)) {
+    var ids = d.ids.map(String).filter(function (id, i, a) { return a.indexOf(id) === i; });
+    ids.forEach(function (id) { var o = idx.byId[id]; if (!o || o.jenis !== "dosen") throw galat("Penanda tangan harus akun dosen."); });
+    kunciTulis(function () {
+      var r = cari("Pengaturan", function (x) { return x.kunci === "penandaTangan"; }), v = JSON.stringify(ids);
+      if (r) ubah("Pengaturan", r, { nilai: v }); else tambah("Pengaturan", { kunci: "penandaTangan", nilai: v, keterangan: "Dosen selain KPS yang boleh menyiapkan tanda tangan (JSON userId)" });
+    });
+    catat(p.id, "admin.penandaTangan", { jumlah: ids.length });
+  }
+  var pilih = daftarPenandaTangan();
+  return { dosen: idx.pegawai.filter(function (o) { return o.jenis === "dosen"; }).map(function (o) {
+    return { id: o.id, nama: o.nama, kps: o.peran.indexOf("kps") >= 0, dipilih: pilih.indexOf(o.id) >= 0, adaTtd: !!ttdAktif(o.id) };
+  }) };
 }

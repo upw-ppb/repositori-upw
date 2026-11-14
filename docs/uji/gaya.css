@@ -260,3 +260,11 @@ label.btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
 .sandi-bungkus input { padding-right: 104px; width: 100%; }
 .sandi-lihat { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: var(--brand); font: inherit; font-size: .85rem; font-weight: 600; padding: 4px 8px; cursor: pointer; border-radius: 6px; }
 .sandi-lihat:hover, .sandi-lihat:focus-visible { background: var(--brand-soft); }
+
+/* v0.20.0: tanda tangan ditumpuk di atas nama penanda tangan (seperti ditandatangani langsung) */
+.ttd .ttd-area { position: relative; height: 20mm; }
+.ttd .ttd-area .ttd-img { position: absolute; left: 0; bottom: -6mm; max-height: 26mm; max-width: 62mm; margin: 0; z-index: 2; mix-blend-mode: multiply; }
+.ttd .ttd-nama { position: relative; z-index: 1; }
+.ttd .sah-baris { margin-top: 12px; }
+.ttd .sah-baris .qr svg { width: 18mm; height: 18mm; }
+.ttd .sah-baris .sah { font-size: 8.5pt; }
