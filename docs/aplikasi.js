@@ -290,7 +290,7 @@ function layarMasuk() {
     ${galatHtml()}<button class="btn primary" type="submit" style="justify-content:center" ${S.sibuk ? "disabled" : ""}>${S.sibuk ? "Memproses…" : "Masuk"}</button>
     <button class="btn" type="button" data-act="keLupa" style="justify-content:center">Lupa kata sandi</button></form>
    <button class="btn sm" type="button" data-act="keCek" style="align-self:flex-start">Cek keaslian surat tugas</button>
-   <details class="small"><summary style="cursor:pointer;font-weight:600">Panduan masuk pertama kali</summary><ol style="margin:8px 0 0 18px;padding:0;display:grid;gap:4px">${TUTORIAL[0].l.map(x => `<li>${x}</li>`).join("")}</ol></details>`);
+   <details class="small"><summary style="cursor:pointer;font-weight:600">Panduan masuk pertama kali</summary><ol style="margin:8px 0 0 18px;padding:0;display:grid;gap:4px">${langkahMasuk().map(x => `<li>${x}</li>`).join("")}</ol></details>`);
 }
 function layarAktivasi() {
   const a = S.akt, u = S.pengguna, langkah = u.emailTerverifikasi ? 3 : (a.langkah);
@@ -352,7 +352,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}${panelKesiapan()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -508,6 +508,7 @@ function laci() {
   if (L.jenis === "labLog") return laciLabLog();
   if (L.jenis === "masukan") return laciMasukan();
   if (L.jenis === "sumber") return laciSumber();
+  if (L.jenis === "gbrBesar") return laciGambarBesar();
   if (L.jenis === "sumberAksi") return laciSumberAksi();
   if (L.jenis === "mskDetail") return laciMasukanDetail();
   if (L.jenis === "bankBaru") return laciBankBaru();
@@ -2367,145 +2368,200 @@ Object.assign(AKSI, {
   }
 });
 
-/* --- Info: tentang aplikasi dan tutorial per peran (v0.21.0) --- */
-const SEMUA_PERAN = ["mahasiswa", "dosen", "tendik", "kps", "kalab", "laboran", "admin", "superadmin", "asesor"];
-const TUTORIAL = [
-  { j: "Masuk pertama kali dan aktivasi akun", g: ["01-masuk", "02-beranda"], p: SEMUA_PERAN.filter(x => x !== "asesor"), l: [
-    "Buka alamat aplikasi yang dibagikan prodi.",
-    "Isi <b>NIM</b> (mahasiswa) atau <b>NIP</b> (dosen/tendik) di kolom pertama. Kata sandi awal sama dengan NIM/NIP Anda. Tekan <b>Masuk</b>.",
-    "Langkah 1: buat kata sandi baru (minimal 8 karakter, memuat huruf dan angka, tidak sama dengan NIM/NIP). Tekan tombol <b>Lihat</b> di ujung kolom untuk memeriksa ketikan.",
-    "Langkah 2: tuliskan email yang aktif Anda buka. Bila prodi menyalakan aktivasi tanpa email, akun langsung aktif; bila tidak, masukkan kode 6 digit yang dikirim ke email Anda.",
-    "Lengkapi <b>Biodata</b>: kolom bertanda * wajib. Menu lain terbuka setelah biodata tersimpan."], c: "Kata sandi awal berlaku terbatas. Bila kedaluwarsa, hubungi Admin Prodi." },
-  { j: "Kesiapan akreditasi di Beranda", p: ["kps", "admin", "superadmin", "gkm"], l: [
-    "Panel <b>Kesiapan akreditasi</b> di Beranda merangkum nilai simulasi dibanding target, jumlah butir yang belum dinilai GKM, butir yang datanya belum ada, Tabel iLKPS yang masih kosong, dan dokumen Bank Dokumen yang belum ada.",
-    "<b>5 prioritas perbaikan</b> diurutkan dari potensi kenaikan nilai terbesar, lengkap dengan syarat skor 4, saran, dan tombol menuju menu tempat kegiatan atau data itu dicatat.",
-    "Buka bagian <b>Data yang belum ada</b> untuk melihat semua butir otomatis yang datanya kosong beserta jenis kegiatan atau data yang perlu dikumpulkan. Tekan <b>Hitung ulang</b> setelah data ditambahkan."] },
-  { j: "Laporan GKM (Gugus Kendali Mutu)", p: ["gkm", "kps", "admin", "superadmin"], l: [
-    "Super Admin memberi peran <b>GKM</b> kepada anggota Gugus Kendali Mutu Program Studi (menu Pengguna › Akun dan peran). Pilih peran GKM di bilah atas.",
-    "GKM menilai butir rubrik di menu <b>Penilaian</b> (tombol Nilai), dan menyusun <b>Laporan GKM</b> setiap semester: monev pembelajaran, capaian, temuan, rekomendasi, dan tindak lanjut, beserta lampiran.",
-    "Tekan <b>Simpan draf</b> kapan saja; anggota GKM lain bisa melanjutkan. Setelah lengkap, tekan <b>Kirim ke KPS</b>. KPS menerima atau meminta revisi dengan catatan.",
-    "Batas bawaan: 14 hari setelah semester berakhir; Admin Prodi atau Super Admin bisa mengubahnya. Laporan yang diterima menjadi bukti butir Matriks 1, 2, 4, 23, dan 77 dan bisa diunduh sebagai Word."] },
-  { j: "Foto profil", p: SEMUA_PERAN, l: [
-    "Buka menu <b>Akun saya</b> (atau klik nama Anda di bawah menu), tekan <b>Pilih foto</b>, lalu pilih foto wajah (JPG/PNG).",
-    "Bagian tengah foto dipotong persegi dan diperkecil otomatis. Foto tampil di bilah samping dan di <b>Cari orang</b>.",
-    "Tekan <b>Ganti foto</b> untuk mengganti, atau <b>Hapus foto</b> untuk kembali ke inisial nama."] },
-  { j: "Data Terkumpul dan sumber data penilaian", p: ["superadmin"], l: [
-    "Menu <b>Data Terkumpul</b> menampilkan semua kegiatan (semua status) beserta jenisnya, Tabel iLKPS, dan nomor butir Penilaian yang memakainya.",
-    "Saring menurut status, jenis, butir penilaian, atau cari nama pengaju. Tombol <b>Terima</b>, <b>Minta revisi</b>, <b>Tolak</b>, dan <b>Hapus</b> berlaku juga untuk data yang sudah disetujui.",
-    "Centang beberapa kegiatan lalu <b>Hapus terpilih</b> untuk membersihkan data uji coba sekaligus. Alasan wajib diisi. Kegiatan terhapus bisa dipulihkan dari tab <b>Terhapus</b>.",
-    "Di menu <b>Penilaian</b>, tombol <b>Sumber data</b> pada setiap butir menunjukkan kegiatan dan data lain (dosen, lulusan, PMB, keuangan, survei, skor GKM) yang menjadi dasar skornya."] },
-  { j: "Ganti kata sandi dan lupa kata sandi", p: SEMUA_PERAN, l: [
-    "Ganti: buka menu <b>Akun saya</b>, isi kata sandi lama dan kata sandi baru dua kali, lalu <b>Simpan</b>.",
-    "Lupa: di halaman masuk, tekan <b>Lupa kata sandi</b>, isi email terdaftar, lalu masukkan kode dari email dan kata sandi baru.",
-    "Bila kode tidak datang, hubungi <b>Super Admin</b> prodi untuk mereset kata sandi; Anda akan diminta membuat kata sandi baru saat masuk."] },
-  { j: "Memasang aplikasi di komputer atau ponsel", p: SEMUA_PERAN, l: [
-    "Mac/Windows (Chrome atau Edge): buka aplikasi, klik ikon <b>Pasang</b> di ujung kanan bilah alamat, lalu <b>Pasang</b>. Ikon logo Poltekpar Bali muncul di Dock/menu Start.",
-    "Android (Chrome): menu ⋮ → <b>Tambahkan ke layar utama</b> / <b>Instal aplikasi</b>.",
-    "iPhone/iPad (Safari): tombol Bagikan → <b>Tambah ke Layar Utama</b>."] },
-  { j: "Mengisi dan memperbarui biodata", g: ["06-biodata", "07-dokumen"], p: ["mahasiswa", "dosen", "tendik"], l: [
-    "Buka menu <b>Biodata</b>. Isi semua kolom bertanda *; kolom abu-abu diisi otomatis dari akun.",
-    "Mahasiswa: setiap awal semester periksa bagian <b>Kehidupan kuliah</b> (tempat tinggal, bekerja, bahasa Inggris), ubah bila berubah, lalu <b>Simpan</b>.",
-    "Dosen: di bagian bawah ada <b>Dokumen pendukung</b>. Pilih jenis (ijazah per jenjang, sertifikat pendidik, sertifikat kompetensi/profesi), isi tahun dan nama, pilih file atau tempel tautan, lalu <b>Simpan dokumen</b>. Sertifikat boleh lebih dari satu.",
-    "Dokumen pendukung opsional, tetapi Beranda akan mengingatkan bila belum lengkap."] },
-  { j: "Mencatat kegiatan dan mengajukan surat tugas", g: ["03-kegiatan", "04-peserta"], p: ["mahasiswa", "dosen", "tendik", "kps", "kalab", "laboran", "admin", "superadmin"], l: [
-    "Buka menu <b>Kegiatan</b> → <b>+ Catat kegiatan</b>.",
-    "Cari jenis kegiatan (mis. ketik \"lomba\", \"PkM\", \"pelatihan\"), lalu isi judul (tanpa tanggal/tempat), tanggal mulai–selesai, tingkat, dan tempat.",
-    "Tandai peserta: dosen/tendik dicari dengan nama, NIP, atau <b>inisial</b>; mahasiswa per kelas (bisa mengecualikan orang tertentu) atau satu per satu.",
-    "Lomba mahasiswa: pilih dosen pendamping (verifikator data).",
-    "Bagian <b>Pasal Global Code of Ethics for Tourism</b> menampilkan saran pasal dari kata di judul; centang yang benar-benar diterapkan.",
-    "Centang <b>Perlu surat tugas</b> bila perlu surat, periksa pratinjau surat, lalu <b>Kirim ke KPS</b>. Status bisa dipantau di daftar kegiatan dan Beranda."] },
-  { j: "Mengunggah bukti dan mengajukan verifikasi data", g: ["05-bukti"], p: ["mahasiswa", "dosen", "tendik", "kps", "kalab", "laboran", "admin", "superadmin"], l: [
-    "Setelah surat terbit (atau langsung untuk kegiatan tanpa surat), buka kegiatan → bagian <b>Bukti kegiatan</b>.",
-    "Setiap dokumen cukup diunggah sekali oleh salah satu anggota: <b>Unggah file</b> (maks. 10 MB), <b>Tautan</b> (untuk video/album), atau <b>Tidak ada</b> dengan alasan.",
-    "Perhatikan <b>batas hari kerja</b> setelah kegiatan selesai; keterlambatan tampil merah di Beranda.",
-    "Kegiatan bersurat otomatis diajukan untuk verifikasi saat bukti wajib lengkap; kegiatan tanpa surat diajukan dengan tombol <b>Ajukan verifikasi</b>.",
-    "Bila diminta revisi, catatan verifikator tampil di Beranda; perbaiki lalu ajukan ulang."] },
-  { j: "Portofolio Saya dan ekspor", p: ["mahasiswa", "dosen", "tendik", "kps", "kalab", "laboran", "admin", "superadmin"], l: [
-    "Menu <b>Portofolio</b> berisi semua kegiatan yang melibatkan Anda dan dokumen pribadi.",
-    "<b>Unduh PDF</b>: pilih Simpan sebagai PDF di jendela cetak. Setiap kegiatan memuat tautan <b>Bukti kegiatan</b> dan <b>cek keaslian</b> surat.",
-    "<b>Unduh Excel</b>: berisi kolom tautan kegiatan/bukti dan tautan cek surat. <b>Unduh ZIP</b>: semua file bukti dalam satu berkas."] },
-  { j: "Mata Kuliah Saya (portofolio MK)", p: ["dosen", "kps", "kalab"], l: [
-    "Buka menu <b>Mata Kuliah Saya</b>, pilih semester.",
-    "Pengampu utama: unggah RPS, kontrak kuliah, rubrik (file atau tautan), dan pilih metode pembelajaran.",
-    "Semua anggota tim: tambahkan catatan integrasi penelitian/PkM dan bukti pembelajaran (tautan LMS, foto sesi)."] },
-  { j: "Verifikasi data sebagai dosen pendamping", p: ["dosen"], l: [
-    "Menu <b>Verifikasi</b> menampilkan data lomba mahasiswa yang Anda dampingi.",
-    "Buka kegiatan, periksa bukti, lalu pilih <b>Setujui</b>, <b>Minta revisi</b> (wajib catatan), atau <b>Tolak</b>."] },
-  { j: "Menyetujui surat tugas (Antrean KPS)", g: ["08-kps"], p: ["kps"], l: [
-    "Pastikan peran aktif di bilah atas adalah <b>Koordinator Program Studi</b>.",
-    "Menu <b>Antrean KPS</b> → buka pengajuan, periksa draf surat dan peringatan tunggakan bukti.",
-    "Pilih <b>Setujui</b> (surat terbit dengan kode verifikasi dan QR), <b>Tunda</b>, <b>Minta revisi</b>, atau <b>Tolak</b> (tiga terakhir wajib catatan).",
-    "Tab <b>Riwayat keputusan</b> mencatat semua keputusan surat dan verifikasi data; bisa disaring per tahun dan diunduh ke Excel."] },
-  { j: "Tanda tangan di surat", p: ["kps", "dosen"], l: [
-    "Menu <b>Tanda Tangan</b> (untuk KPS dan dosen yang ditunjuk Super Admin).",
-    "Pilih <b>Gambar langsung</b> (tanda tangani kotak putih dengan mouse/jari) atau <b>Unggah gambar</b> (PNG/JPG tanda tangan di kertas putih; latar putih dibuang otomatis).",
-    "Centang persetujuan pemakaian, lalu <b>Simpan</b>. Tanda tangan tampil di atas nama Anda pada surat yang Anda setujui, dengan QR dan kode verifikasi di bawahnya."] },
-  { j: "Laboratorium dan sarana", g: ["09-lab"], p: ["kalab", "laboran", "admin", "superadmin", "kps"], l: [
-    "Menu <b>Laboratorium</b> → <b>+ Tambah sarana</b>: isi nama, jenis, kapasitas, kepemilikan, kondisi, perangkat, mata kuliah pengguna, dan penanggung jawab.",
-    "Pada kartu sarana, tekan <b>+ Perawatan</b> untuk mencatat servis/pemeliharaan, atau <b>+ Pemakaian</b> untuk mencatat praktik (MK/kelas, jumlah pengguna, lama).",
-    "Unduh rekap dengan <b>Unduh Excel</b>. Dokumen pendukung (SOP, jadwal, foto) disimpan di Bank Dokumen butir 18/21."] },
-  { j: "Data Prodi: kurikulum, tim pengajar, dosen, lulusan", p: ["admin", "superadmin", "kps"], l: [
-    "Menu <b>Data Prodi</b>. Tab <b>Kurikulum</b>: tambah satu per satu atau <b>Impor</b> (tempel dari Excel atau unggah berkas templat).",
-    "Tab <b>Tim pengajar</b>: tetapkan pengampu utama dan anggota per semester; <b>Salin dari</b> semester yang sama tahun lalu.",
-    "Tab <b>Status dosen</b>: catat tugas belajar (mulai dan tanggal kembali ke kampus; lamanya dihitung otomatis) atau pensiun.",
-    "Tab <b>Dokumen dosen</b>: lihat kelengkapan ijazah/sertifikat setiap dosen dan tekan <b>Ingatkan</b>; pesan tampil di Beranda dosen.",
-    "Tab <b>Lulusan</b>, <b>PMB</b>, <b>Keuangan</b>: isi data untuk Tabel iLKPS 8–10 dan 21."] },
-  { j: "Impor dari Excel dengan templat", g: ["10-impor"], p: ["admin", "superadmin"], l: [
-    "Pada panel impor (Pengguna, Kurikulum, Lulusan), tekan <b>Unduh templat Excel</b>.",
-    "Isi lembar <b>Data</b> mulai baris 2 (lihat lembar Petunjuk dan Contoh). Kolom NIM/NIP sudah berformat Teks; jangan mengubah baris judul.",
-    "Tekan <b>Unggah berkas Excel</b>, periksa pratinjau dan daftar baris yang perlu diperbaiki, lalu tekan <b>Impor</b>.",
-    "Biodata dosen massal: sel kosong tidak menghapus isian lama."] },
-  { j: "Akun mahasiswa", p: ["admin", "superadmin"], l: [
-    "Menu <b>Pengguna</b> → <b>Impor akun</b>: tempel \"NIM; Nama; kelas\" (angkatan diambil dari 2 angka pertama NIM) atau pakai templat Excel.",
-    "Ubah kelas/status mahasiswa lewat tombol <b>Data mhs</b> di daftar akun. <b>Unduh daftar akun (Excel)</b> tersedia di panel impor."] },
-  { j: "Tabel iLKPS, Penilaian, DED, Bank Dokumen, Survei", p: ["admin", "superadmin", "kps"], l: [
-    "<b>Tabel iLKPS</b>: 33 tabel terisi otomatis dari data yang disetujui; unduh Excel sesuai format LAMWisata.",
-    "<b>Penilaian</b>: simulasi skor 84 butir; butir rubrik dinilai GKM dengan catatan bukti.",
-    "<b>DED</b>: tulis narasi 64 butir (bisa ditugaskan ke dosen PJ) lalu <b>Unduh DED (.docx)</b>.",
-    "<b>Bank Dokumen</b>: tunjuk PJ per slot, unggah dokumen dengan masa berlaku; versi lama tersimpan.",
-    "<b>Survei</b>: buat dari templat, buka, bagikan tautan, lihat rekap dan tindak lanjut."] },
-  { j: "Tugas khusus Super Admin", p: ["superadmin"], l: [
-    "Menu <b>Pengguna</b>: impor akun dosen/tendik (NIP; Nama; peran), atur peran, reset kata sandi.",
-    "<b>Aktivasi akun</b>: nyalakan aktivasi tanpa email selama email kampus belum terkirim; matikan setelah DKIM beres.",
-    "<b>Penanda tangan surat</b>: centang dosen lain yang boleh menyiapkan tanda tangan.",
-    "<b>Akun asesor</b>: buat akun baca-saja berkedaluwarsa untuk asesor LAMWisata.",
-    "Menu <b>Log aktivitas</b> (siapa melakukan apa) dan <b>Riwayat Versi</b> (catatan rilis; <b>Buat cadangan sekarang</b> sebelum setiap rilis)."] },
-  { j: "Panduan asesor", p: ["asesor"], l: [
-    "<b>Tabel iLKPS</b>: pilih tabel; klik baris kegiatan untuk membuka detail dan buktinya.",
-    "<b>Kegiatan disetujui</b>: daftar kegiatan yang datanya sudah diverifikasi prodi.",
-    "<b>Bank Dokumen</b>: dokumen mutu versi berlaku per butir Matriks.",
-    "Keaslian surat tugas dapat dicek dengan kode atau QR pada surat. Setiap akses tercatat oleh prodi."] }
-];
-/* Gambar panduan bertanda nomor (v0.22.0): tangkapan layar dari data contoh; penanda [x%, y%, nomor, keterangan]. */
-const GAMBAR_PANDUAN = {"01-masuk": {"j": "Halaman masuk", "t": [[55.6, 34.3, 1, "Kolom NIM / NIP"], [55.6, 44.9, 2, "Kolom kata sandi"], [87.4, 44.9, 3, "Ikon mata: tampilkan atau sembunyikan kata sandi"], [55.6, 55.2, 4, "Tombol Masuk"], [55.6, 62.2, 5, "Lupa kata sandi"], [55.6, 74.8, 6, "Panduan masuk pertama kali"]]}, "02-beranda": {"j": "Beranda setelah masuk", "t": [[1.1, 19, 1, "Menu: pilih halaman"], [24.8, 26, 2, "Perlu tindakan: hal yang menunggu Anda"], [74.2, 4.5, 3, "Pilihan peran (bila Anda punya lebih dari satu)"], [90.4, 4.5, 4, "Info dan panduan"], [94.5, 4.5, 5, "Keluar"]]}, "03-kegiatan": {"j": "Catat kegiatan (bagian atas)", "t": [[36.4, 28.4, 1, "Pilih jenis kegiatan"], [36.4, 52.2, 2, "Bingung memilih jenis? Cari dengan kata kunci"], [36.4, 64.2, 3, "Judul kegiatan, tanpa tanggal dan tempat"]]}, "04-peserta": {"j": "Catat kegiatan (peserta dan GCET)", "t": [[37.4, 15.3, 1, "Tandai dosen/tendik: ketik nama, NIP, atau inisial"], [37.4, 35.0, 2, "Tandai mahasiswa per kelas/angkatan atau satu per satu"], [37.4, 74.4, 3, "Saran Pasal GCET dari judul: centang yang benar-benar diterapkan"]]}, "05-bukti": {"j": "Detail kegiatan dan bukti", "t": [[40, 10.9, 1, "Tahapan kegiatan"], [40, 37.5, 2, "Unduh surat tugas (PDF)"], [40, 62.7, 3, "Bukti kegiatan dan batas waktunya"], [75.4, 75.7, 4, "Unggah file"], [84.5, 75.7, 5, "Tempel tautan (video/album)"], [90.9, 75.7, 6, "Tidak ada (tulis alasannya)"]]}, "06-biodata": {"j": "Biodata", "t": [[24.9, 25.8, 1, "Persentase kelengkapan semua kolom"], [24.9, 31.7, 2, "Status kolom wajib (*)"], [62.8, 70.9, 3, "Contoh kolom pendidikan S2"], [94, 16.8, 4, "Simpan"]]}, "07-dokumen": {"j": "Dokumen pendukung biodata dosen", "t": [[24.9, 66.5, 1, "Dokumen pendukung (opsional)"], [26.1, 80.1, 2, "Slot ijazah D4/S1"], [26.1, 90.1, 3, "Slot ijazah S2 muncul karena kolom S2 diisi"], [92.1, 81.6, 4, "Tombol Unggah"]]}, "08-kps": {"j": "Antrean KPS", "t": [[71, 4.4, 1, "Peran aktif: Koordinator Program Studi"], [23.4, 42.2, 2, "Tab Antrean"], [33.1, 42.2, 3, "Tab Riwayat keputusan"], [24.9, 75.2, 4, "Lihat draf surat"], [24.9, 86.5, 5, "Catatan untuk pengaju"], [24.9, 94.3, 6, "Setujui dan terbitkan surat"], [42.1, 94.3, 7, "Tunda, minta revisi, atau tolak"]]}, "09-lab": {"j": "Laboratorium dan sarana", "t": [[23.4, 26.7, 1, "Tambah sarana"], [24.9, 62.8, 2, "Kartu sarana"], [25, 84.2, 3, "Catat perawatan"], [34.6, 84.2, 4, "Catat pemakaian"], [87.5, 97, 5, "Unduh Excel"]]}, "10-impor": {"j": "Impor akun", "t": [[24.9, 28.6, 1, "Tempel baris dari Excel"], [24.9, 45.6, 2, "Tombol Impor"], [67.5, 53.2, 3, "Unduh templat Excel"], [81.8, 53.2, 4, "Unggah berkas Excel yang sudah diisi"], [24.9, 96, 5, "Unduh daftar akun (Excel)"]]}};
-function htmlGambar(id) {
-  const g = GAMBAR_PANDUAN[id]; if (!g) return "";
-  const batas = (v, a, b) => Math.min(b, Math.max(a, v));
-  return `<figure class="gbr-panduan"><div class="gbr"><img src="panduan/${id}.jpg" alt="${esc(g.j)}" loading="lazy" width="800" height="524">
-    ${g.t.map(([x, y, n]) => `<span class="tanda" style="left:${batas(x - 1.7, 2.5, 97.5)}%;top:${batas(y - 3.6, 3.5, 96.5)}%" aria-hidden="true">${n}</span>`).join("")}</div>
-    <figcaption><b>${esc(g.j)}</b><ol>${g.t.map(([, , n, k]) => `<li value="${n}">${esc(k)}</li>`).join("")}</ol></figcaption></figure>`;
+/* --- Info dan panduan (v0.26.0) ---
+   Isi panduan ada di panduan.js (window.UPW_PANDUAN): topik per peran, gambar asli bertanda (nomor, kotak, panah), dan kamus sinonim.
+   Pencarian berjalan di perangkat, tanpa AI dan tanpa internet: kata dinormalkan (imbuhan dibuang, sinonim disamakan, salah ketik ditoleransi),
+   lalu topik diberi skor. Saran muncul saat mengetik. */
+const SEMUA_PERAN = ["mahasiswa", "dosen", "tendik", "kps", "gkm", "kalab", "laboran", "admin", "superadmin", "asesor"];
+const PDN = () => window.UPW_PANDUAN || { topik: [], gambar: {}, sinonim: [], kategori: [] };
+const PERAN_TOPIK = (t, r) => t.p === "semua" ? r !== "asesor" || t.asesor : t.p.includes(r);
+/** Langkah masuk pertama kali (juga dipakai di halaman masuk). */
+const langkahMasuk = () => (PDN().topik.find(t => t.id === "masuk-pertama") || { l: [] }).l;
+
+/* ---- gambar bertanda ---- */
+function htmlGambar(id, besar) {
+  const g = PDN().gambar[id]; if (!g) return "";
+  const W = 1100, H = 720, uid = "g" + id.replace(/\W/g, "") + (besar ? "b" : "");
+  const kotak = g.a.map(a => {
+    let s = a.w ? `<rect data-n="${a.n}" x="${a.x}" y="${a.y}" width="${a.w}" height="${a.h}" rx="7" class="gk"/>` : "";
+    if (a.bx != null) {
+      const tx = a.w ? Math.min(Math.max(a.bx, a.x), a.x + a.w) : a.x, ty = a.w ? Math.min(Math.max(a.by, a.y), a.y + a.h) : a.y;
+      s += `<line x1="${a.bx}" y1="${a.by}" x2="${tx}" y2="${ty}" class="gp" marker-end="url(#${uid}m)"/>`;
+    }
+    return s;
+  }).join("");
+  const tanda = g.a.map(a => { const bx = a.bx != null ? a.bx : a.x, by = a.by != null ? a.by : a.y;
+    return `<span class="tanda" data-n="${a.n}" style="left:${(Math.min(Math.max(bx, 12), W - 12) / W * 100).toFixed(2)}%;top:${(Math.min(Math.max(by, 12), H - 12) / H * 100).toFixed(2)}%">${a.n}</span>`; }).join("");
+  return `<figure class="gbr-panduan" data-gbr="${esc(id)}"><div class="gbr" ${besar ? "" : `data-act="gbrBesar" data-id="${esc(id)}" title="Klik untuk memperbesar"`}>
+     <img src="panduan/${esc(id)}.webp" alt="${esc(g.j)}" loading="lazy" width="1600" height="1047">
+     <svg class="gsvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="${uid}m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="gm"/></marker></defs>${kotak}</svg>${tanda}
+     ${besar ? "" : `<span class="gbr-zoom" aria-hidden="true">Perbesar</span>`}</div>
+    <figcaption><b>${esc(g.j)}</b><ol>${g.a.map(a => `<li value="${a.n}" data-sorot="${a.n}">${esc(a.k)}</li>`).join("")}</ol></figcaption></figure>`;
+}
+document.addEventListener("mouseover", e => {
+  const li = e.target.closest && e.target.closest("[data-sorot]"); const fig = e.target.closest && e.target.closest(".gbr-panduan");
+  document.querySelectorAll(".gbr-panduan.sorot").forEach(f => { if (f !== fig || !li) { f.classList.remove("sorot"); f.querySelectorAll(".aktif").forEach(x => x.classList.remove("aktif")); } });
+  if (!li || !fig) return;
+  fig.classList.add("sorot"); fig.querySelectorAll(".aktif").forEach(x => x.classList.remove("aktif"));
+  fig.querySelectorAll(`[data-n="${li.dataset.sorot}"]`).forEach(x => x.classList.add("aktif"));
+});
+function laciGambarBesar() {
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Gambar panduan" style="width:min(1180px,100%)">
+   <div class="dh"><h2>${esc((PDN().gambar[S.laci.id] || {}).j || "Gambar")}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>${htmlGambar(S.laci.id, true)}</div></div>`;
+}
+
+/* ---- mesin pencari (tanpa AI) ---- */
+const STOP_CARI = new Set(("yang di ke dari dan atau untuk dengan pada dalam ini itu saya aku gue kami kita anda bapak ibu pak bu bagaimana gimana bgmn cara caranya apa apakah "
+  + "mengapa dimana mana kapan sudah udah belum ada adalah jadi juga lagi saja aja dong deh sih ya yg utk dgn tdk sy mau ingin pengen tolong mohon bisa dapat "
+  + "bisakah boleh harus perlu kalau kalo jika agar supaya biar oleh tentang seperti tsb tersebut sebuah suatu nya the how to i my").split(" "));
+const MASALAH_CARI = new Set("tidak tdk gagal error eror galat lupa kenapa kok terkunci kunci hilang salah macet lambat lemot tak gak nggak ga ngga belum kosong muncul rusak".split(" "));
+/* Kata penanda masalah yang terlalu umum untuk dicocokkan sebagai isi (tetap menaikkan topik "Masalah umum"). */
+const UMUM_CARI = new Set("tidak tdk kenapa kok tak gak nggak ga ngga belum".split(" "));
+function bersihTeks(s) { return String(s || "").toLowerCase().replace(/<[^>]+>/g, " ").replace(/[’'`]/g, "").replace(/[^a-z0-9\s-]/g, " ").replace(/-/g, " "); }
+/** Bentuk dasar kata (kasar, cukup untuk mencocokkan): buang akhiran lalu awalan; awalan peN-/meN- menghasilkan beberapa kemungkinan. */
+function akarKata(w) {
+  const v = new Set([w]); let x = w;
+  if (x.length > 5) x = x.replace(/(nya|lah|kah|pun)$/, "");
+  if (x.length > 5) x = x.replace(/(kan|an)$/, ""); else if (x.length > 6) x = x.replace(/i$/, "");
+  v.add(x);
+  const vok = c => /[aiueo]/.test(c || "");
+  const aw = [["meng", ["k", ""]], ["peng", ["k", ""]], ["meny", ["s"]], ["peny", ["s"]], ["mem", ["p", "m"]], ["pem", ["p", "m"]], ["men", ["t", "n"]], ["pen", ["t", "n"]],
+    ["me", [""]], ["pe", [""]], ["ber", [""]], ["be", [""]], ["ter", [""]], ["per", [""]], ["di", [""]], ["ke", [""]], ["se", [""]]];
+  for (const [a, ganti] of aw) {
+    if (!x.startsWith(a) || x.length - a.length < 3) continue;
+    const sisa = x.slice(a.length);
+    if (["meng", "peng", "meny", "peny", "mem", "pem", "men", "pen"].includes(a) && !vok(sisa[0])) { v.add(sisa); break; }
+    ganti.forEach(g => v.add(g + sisa));
+    break;
+  }
+  return [...v].filter(s => s.length >= 2);
+}
+let KAMUS_CARI = null;
+function kamusCari() {
+  if (KAMUS_CARI) return KAMUS_CARI;
+  const kanon = new Map(), frasa = [];
+  (PDN().sinonim || []).forEach(gr => { const utama = bersihTeks(gr[0]).trim(); gr.forEach(w => { const b = bersihTeks(w).trim(); if (b.includes(" ")) frasa.push([b, utama.split(" ")[0]]); else akarKata(b).forEach(a => kanon.set(a, utama.split(" ")[0])); }); });
+  frasa.sort((a, b) => b[0].length - a[0].length);
+  const token = s => {
+    let t = " " + bersihTeks(s) + " ";
+    frasa.forEach(([f, u]) => { t = t.split(" " + f + " ").join(" " + u + " "); });
+    return t.split(/\s+/).filter(Boolean);
+  };
+  const varian = [...kanon.keys()].filter(x => x.length >= 4);
+  const kunci = w => {
+    const a = akarKata(w); for (const x of a) if (kanon.has(x)) return [kanon.get(x)];
+    // salah ketik pada kata bersinonim (mis. "pasword" → sandi)
+    if (w.length >= 5) { const v = varian.find(x => jarak(x, w) <= (w.length >= 8 ? 2 : 1)); if (v) return [kanon.get(v)]; }
+    return a;
+  };
+  const indeks = PDN().topik.map(t => {
+    const bidang = { j: t.j, kw: (t.kw || "") + " " + (t.menuL || ""), r: t.r || "", l: (t.l || []).join(" ") + " " + (t.tips || []).join(" ") };
+    const set = {}; Object.keys(bidang).forEach(b => { set[b] = new Set(); token(bidang[b]).forEach(w => { if (!STOP_CARI.has(w)) kunci(w).forEach(k => set[b].add(k)); }); });
+    return { t, set, judul: bersihTeks(t.j) };
+  });
+  // kata yang sedang diketik (belum selesai): cocokkan awalannya dengan semua bentuk sinonim, mis. "upl" → upload → unggah
+  const awalan = w => { const l = new Set(); kanon.forEach((u, v) => { if (v.startsWith(w)) l.add(u); }); return [...l]; };
+  KAMUS_CARI = { token, kunci, indeks, awalan };
+  return KAMUS_CARI;
+}
+function jarak(a, b) { if (Math.abs(a.length - b.length) > 2) return 9; const d = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) { let p = d[0]; d[0] = i; for (let j = 1; j <= b.length; j++) { const t = d[j]; d[j] = Math.min(d[j] + 1, d[j - 1] + 1, p + (a[i - 1] === b[j - 1] ? 0 : 1)); p = t; } }
+  return d[b.length]; }
+/** Cari topik. Mengembalikan [{t, skor}] urut menurun. */
+function cariPanduan(q, peran) {
+  const K = kamusCari(), kata = K.token(q), akhirSedang = !/\s$/.test(q);
+  const masalah = kata.some(w => MASALAH_CARI.has(w));
+  const isi = kata.filter(w => !STOP_CARI.has(w) && !UMUM_CARI.has(w));
+  if (!isi.length && !masalah) return [];
+  const BOBOT = { j: 6, kw: 4, r: 2.5, l: 1 };
+  const hasil = K.indeks.map(x => {
+    let skor = 0, cocok = 0;
+    isi.forEach((w, i) => {
+      const awalan = akhirSedang && i === isi.length - 1 && w.length >= 2, kk = K.kunci(w).concat(awalan && w.length >= 3 ? K.awalan(w) : []);
+      let terbaik = 0;
+      Object.keys(BOBOT).forEach(b => {
+        const s = x.set[b];
+        if (kk.some(k => s.has(k))) terbaik = Math.max(terbaik, BOBOT[b]);
+        else if (awalan && [...s].some(k => k.startsWith(w))) terbaik = Math.max(terbaik, BOBOT[b] * 0.8);
+        else if (w.length >= 4 && [...s].some(k => k.length >= 4 && jarak(k, w) <= (w.length >= 8 ? 2 : 1))) terbaik = Math.max(terbaik, BOBOT[b] * 0.6);
+      });
+      if (terbaik) { skor += terbaik; cocok++; }
+    });
+    if (isi.length && cocok === 0) return { t: x.t, skor: 0 };
+    skor *= 0.5 + 0.5 * (isi.length ? cocok / isi.length : 1);
+    const frasa = bersihTeks(q).trim(); if (frasa.length >= 4 && x.judul.includes(frasa)) skor += 6;
+    if (masalah && x.t.kat === "masalah") skor = skor * 1.6 + 2;
+    if (!PERAN_TOPIK(x.t, peran)) skor *= 0.55;
+    return { t: x.t, skor };
+  }).filter(x => x.skor > 0.9).sort((a, b) => b.skor - a.skor);
+  const atas = hasil.length ? hasil[0].skor : 0;
+  return hasil.filter(x => x.skor >= atas * 0.35);
+}
+function htmlSaranCari() {
+  const q = S.infoQ || "", p = S.infoPeranLihat || peranAktif();
+  if (q.trim().length < 2) return "";
+  const l = cariPanduan(q, p).slice(0, 7);
+  const kat = Object.fromEntries((PDN().kategori || []).map(k => [k.k, k.l]));
+  return `<div class="cari-saran" role="listbox" aria-label="Saran topik">${l.map((x, i) => `<button class="cari-item ${i === (S.infoPilih || 0) ? "aktif" : ""}" role="option" data-act="infoBukaTopik" data-id="${x.t.id}">
+      <b>${esc(x.t.j)}</b><span class="small muted">${esc(kat[x.t.kat] || "")}${PERAN_TOPIK(x.t, p) ? "" : " · untuk " + esc(x.t.p === "semua" ? "semua peran" : x.t.p.map(r => PERAN_L[r]).join(", "))}</span>
+      <span class="small">${esc(x.t.r || "")}</span></button>`).join("")
+    || `<div class="cari-kosong small">Belum ada topik yang cocok dengan "<b>${esc(q)}</b>". Coba kata lain (misalnya "unggah bukti", "lupa sandi"), atau <button class="lnk" data-act="infoTanya">kirim pertanyaan ini ke Admin Prodi</button>.</div>`}</div>`;
+}
+function perbaruiSaranCari() { const el = $("cariSaranWadah"); if (el) el.innerHTML = htmlSaranCari(); }
+document.addEventListener("input", e => { if (e.target.id === "infoCari") { S.infoQ = e.target.value; S.infoPilih = 0; perbaruiSaranCari(); } });
+document.addEventListener("keydown", e => {
+  if (e.target.id !== "infoCari") return;
+  const n = document.querySelectorAll(".cari-item").length;
+  if (e.key === "ArrowDown" && n) { e.preventDefault(); S.infoPilih = ((S.infoPilih || 0) + 1) % n; perbaruiSaranCari(); }
+  else if (e.key === "ArrowUp" && n) { e.preventDefault(); S.infoPilih = ((S.infoPilih || 0) - 1 + n) % n; perbaruiSaranCari(); }
+  else if (e.key === "Enter") { e.preventDefault(); const b = document.querySelectorAll(".cari-item")[S.infoPilih || 0]; if (b) AKSI.infoBukaTopik(b.dataset); }
+  else if (e.key === "Escape") { S.infoQ = ""; e.target.value = ""; perbaruiSaranCari(); }
+});
+
+/* ---- halaman Info ---- */
+function htmlTopik(t, buka) {
+  const terkait = (t.terkait || []).map(id => PDN().topik.find(x => x.id === id)).filter(Boolean);
+  return `<details class="topik" id="topik-${t.id}" ${buka ? "open" : ""}><summary><b>${esc(t.j)}</b>${t.r ? `<span class="small muted">${esc(t.r)}</span>` : ""}</summary>
+    <div class="topik-isi">
+     ${t.siapa ? `<p class="small"><b>Siapa:</b> ${t.siapa}</p>` : ""}
+     ${(t.g || []).length ? (t.g || []).map(id => htmlGambar(id)).join("") : ""}
+     ${(t.l || []).length ? `<h4>Langkah</h4><ol class="langkah">${t.l.map(x => `<li>${x}</li>`).join("")}</ol>` : ""}
+     ${(t.tips || []).length ? `<div class="callout small"><b>Perlu diketahui</b><ul>${t.tips.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""}
+     <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">${t.menu && menu().includes(t.menu) ? `<button class="btn sm primary" data-go="${t.menu}">Buka menu ${esc(MENU_L[t.menu])}</button>` : ""}
+      ${terkait.map(x => `<button class="btn sm" data-act="infoBukaTopik" data-id="${x.id}">${esc(x.j)}</button>`).join("")}</div></div></details>`;
 }
 function hInfo() {
-  const u = S.pengguna, p = peranAktif(), punya = u.peran, pilih = S.infoPeran && punya.includes(S.infoPeran) ? S.infoPeran : p;
-  const l = TUTORIAL.filter(t => t.p.includes(pilih) || (pilih === "superadmin" && t.p.includes("admin")));
-  return `<div class="head"><div><h1>Info</h1><p>Tentang aplikasi, masukan dan saran, serta panduan pemakaian sesuai peran Anda.</p></div><button class="btn primary" data-act="mskBuka">Kirim masukan</button></div>
+  const u = S.pengguna, punya = u.peran, pilih = S.infoPeranLihat && punya.includes(S.infoPeranLihat) ? S.infoPeranLihat : peranAktif();
+  const D = PDN(), l = D.topik.filter(t => PERAN_TOPIK(t, pilih)), mulai = l.filter(t => (t.mulai || []).includes(pilih));
+  return `<div class="head"><div><h1>Info dan panduan</h1><p>Penjelasan setiap fitur sesuai peran Anda, dengan gambar asli aplikasi. Ketik pertanyaan Anda di kolom pencarian.</p></div><button class="btn primary" data-act="mskBuka">Kirim masukan</button></div>
+   <section class="panel cari-panel"><label for="infoCari" class="small muted">Cari fitur atau tulis pertanyaan</label>
+    <div class="cari-wadah"><input id="infoCari" type="search" autocomplete="off" placeholder="Contoh: cara unggah bukti lomba, lupa kata sandi, surat tugas ditunda" value="${esc(S.infoQ || "")}">
+     <div id="cariSaranWadah">${htmlSaranCari()}</div></div>
+    ${punya.length > 1 ? `<label class="row small" style="gap:6px;margin-top:8px"><span class="muted">Panduan untuk peran</span><select id="infoPeranPilih" style="width:auto">${punya.map(r => `<option value="${r}" ${r === pilih ? "selected" : ""}>${PERAN_L[r]}</option>`).join("")}</select></label>` : ""}</section>
+   ${mulai.length ? `<section class="panel"><h2>Mulai di sini</h2><p class="small muted">Hal terpenting untuk ${esc(PERAN_L[pilih])}.</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">${mulai.map(t => `<button class="btn" data-act="infoBukaTopik" data-id="${t.id}" style="display:block;text-align:left;height:auto;padding:10px 12px;white-space:normal"><b>${esc(t.j)}</b><span class="small muted" style="display:block;margin-top:2px">${esc(t.r || "")}</span></button>`).join("")}</div></section>` : ""}
+   ${(D.kategori || []).map(k => { const tk = l.filter(t => t.kat === k.k); return tk.length ? `<section class="panel"><h2>${esc(k.l)} <span class="small muted">(${tk.length})</span></h2>${k.r ? `<p class="small muted">${esc(k.r)}</p>` : ""}${tk.map(t => htmlTopik(t, S.infoTopik === t.id)).join("")}</section>` : ""; }).join("")}
+   ${panelMasukanSaya()}
    <section class="panel"><h2>Tentang aplikasi</h2>
     <div class="row" style="gap:14px;align-items:center;flex-wrap:nowrap"><img src="ikon-192.png" alt="" style="width:56px;height:56px"><div>
      <b>Repositori Akreditasi UPW</b> · <span class="num">${esc(LABEL_VERSI)}</span><br>
      <span class="small">Repositori kegiatan Prodi Usaha Perjalanan Wisata, Politeknik Pariwisata Bali, untuk akreditasi LAMWisata IAPS 1.0.</span><br>
      <span class="small">Dikembangkan oleh <b>@adeprimanda</b> bersama <b>Claude Opus 5.5</b> (Anthropic).</span></div></div>
     ${punya.includes("superadmin") ? `<p class="small" style="margin-top:8px">Catatan setiap versi ada di menu <b>Riwayat Versi</b>.</p>` : ""}</section>
-   ${panelMasukanSaya()}
-   <section class="panel"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 style="margin:0">Panduan untuk ${esc(PERAN_L[pilih])}</h2>
-    ${punya.length > 1 ? `<label class="row small" style="gap:6px"><span class="muted">Lihat panduan peran</span><select id="infoPeran" style="width:auto">${punya.map(r => `<option value="${r}" ${r === pilih ? "selected" : ""}>${PERAN_L[r]}</option>`).join("")}</select></label>` : ""}</div>
-    <p class="small muted">Klik judul untuk membuka langkah-langkahnya.</p>
-    ${l.map((t, i) => `<details class="picker" style="margin-top:8px" ${i === 0 ? "open" : ""}><summary style="cursor:pointer"><b>${esc(t.j)}</b></summary>
-      <ol class="small" style="margin:8px 0 0 18px;padding:0;display:grid;gap:6px">${t.l.map(x => `<li>${x}</li>`).join("")}</ol>${t.c ? `<p class="small muted" style="margin-top:6px">${t.c}</p>` : ""}
-      ${(t.g || []).map(htmlGambar).join("")}</details>`).join("")}
-   </section>
-   <p class="small muted">Butuh bantuan? Hubungi Admin Prodi UPW. Gambar panduan memakai data contoh; angka bulat pada gambar sesuai keterangan di bawahnya.</p>`;
+   <p class="small muted">Gambar panduan memakai data contoh. Nomor pada gambar sesuai daftar di bawahnya; arahkan kursor ke daftar untuk menyorot bagiannya, klik gambar untuk memperbesar.</p>`;
 }
-document.addEventListener("change", e => { if (e.target.id === "infoPeran") { S.infoPeran = e.target.value; render(); } });
+document.addEventListener("change", e => { if (e.target.id === "infoPeranPilih") { S.infoPeranLihat = e.target.value; S.infoTopik = null; render(); } });
+Object.assign(AKSI, {
+  infoBukaTopik(d) {
+    const t = PDN().topik.find(x => x.id === d.id); if (!t) return;
+    if (!PERAN_TOPIK(t, S.infoPeranLihat || peranAktif())) { const r = S.pengguna.peran.find(x => PERAN_TOPIK(t, x)); if (r) S.infoPeranLihat = r; }
+    S.view = "info"; S.infoTopik = t.id; S.laci = null; render();
+    setTimeout(() => { const el = $("topik-" + t.id); if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth", block: "start" }); } }, 30);
+  },
+  gbrBesar(d) { S.laci = { jenis: "gbrBesar", id: d.id }; render(); },
+  infoTanya() { const q = S.infoQ || ""; AKSI.mskBuka(); if (S.laci) { S.laci.jm = "Pertanyaan"; S.laci.judul = q.slice(0, 150); render(); } }
+});
+
 
 /* --- Masukan dan saran (v0.23.0) --- */
 const CHIP_MSK = { baru: "s-diajukan", ditinjau: "s-revisi", direncanakan: "s-revisi", selesai: "s-disetujui", ditolak: "s-ditolak" };

@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.26.0 — 15 Nov 2026 — Produksi
+- Tampilan Produksi diperbarui ke v0.26.0: halaman Info dengan 53 topik panduan per peran, 30 gambar asli bertanda, dan pencarian pintar.
+- Hanya tampilan yang berubah; server Produksi tetap v0.25.1 (deployment @6) dan data tidak tersentuh, sehingga tidak ada cadangan baru.
+  Rollback ke v0.25.2 cukup tampilan (tag v0.25.2).
+- Penyetuju: pemilik, di chat 15 Nov 2026: "Setuju tayang v0.26.0".
+
 ## v0.26.0 — 15 Nov 2026 — Uji Coba
 Permintaan pemilik: panduan lengkap di Info agar pengguna tidak perlu dijelaskan satu per satu.
 - **Info dan panduan** ditulis ulang: 53 topik dalam 7 kategori (dasar, kegiatan, mata kuliah dan dokumen dosen, akreditasi dan mutu, data prodi,
