@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.27.0 — 15 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.27.0 (server Apps Script Produksi deployment @7): saringan dan urutan daftar akun, rekap per angkatan/kelas,
+  status mahasiswa dengan alasan, bukti, dan riwayat, serta riwayat versi di Info.
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama ("Cadangan / sebelum v0.27.0 (struktur data 20 → 21)").
+- Rollback: v0.26.0 tetap bisa membaca data (tabel RiwayatStatusMhs diabaikan); tanpa pemulihan data.
+- Penyetuju: pemilik, di chat 15 Nov 2026: "Setuju tayang v0.27.0".
+
 ## v0.27.0 — 15 Nov 2026 — Uji Coba
 Ringkas: Penambahan saringan dan urutan pada daftar akun, rekap per angkatan dan kelas, ubah status mahasiswa dengan alasan dan bukti, serta riwayat versi di halaman Info.
 - **Daftar akun** (menu Pengguna): saring menurut jenis (mahasiswa, dosen, tendik, asesor; Super Admin), status akun (sudah aktif / belum aktivasi /
