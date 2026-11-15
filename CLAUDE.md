@@ -239,6 +239,13 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Unduhan: simpanBerkas → catatUnduhan() → kotak .unduh-pop di dalam header (ls "unduhan:<userId>"). Nama berkas pakai hariIniLokal(), bukan toISOString.
   PELAJARAN (lagi): Object.assign(AKSI, …) hanya boleh SETELAH const AKSI dideklarasikan; halaman macet "Memuat…" bila dilanggar.
 
+- v0.26.0 (15 Nov 2026, Uji Coba): panduan Info baru. ISI di alat/panduan-sumber.js (topik: id, kat, p "semua"|peran[], j, r, g, l, tips, kw,
+  terkait, mulai, menu) + alat/panduan-tanda.json → `node alat/panduan.mjs` menulis docs/uji/panduan.js (window.UPW_PANDUAN; jangan diubah langsung).
+  Gambar docs/uji/panduan/<id>.webp 1600 px. Membuat gambar baru: server lokal (tampilan Produksi: `node alat/tampilan.mjs produksi /api /tmp/upw-uji/webprod`
+  lalu ganti /tmp/upw-uji/web), viewport 1100x720, muat alat/uji/cap.js; capTanda(id, judul, butir) mencatat penanda (piksel viewport);
+  capUbin(0..1,0..1) + screenshot 4x (ambil satu screenshot kecil dulu sebelum ubin 0,0 — ubin pertama sering basi), salin ubin ke /tmp/upw-uji/web/ubin/<id>-<kb>.jpg,
+  capGabung(id) → WebP ke penerima terima.py (serve_forever) di 127.0.0.1:8799. Pencarian: cariPanduan() di aplikasi.js (akarKata, sinonim, jarak edit, awalan).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

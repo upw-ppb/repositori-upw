@@ -64,7 +64,7 @@ try { const L0 = ok("lab.simpan", { data: { nama: "Laboratorium GDS", jenis: "La
   ok("lab.log", { data: { saranaId: L0.sarana[0].id, tipe: "rawat", tgl: "2026-10-01", isi: "Servis berkala" } }, tAdmS); } catch (e) { console.log("lab:", e.message); }
 console.log("data contoh kegiatan siap");
 globalThis.permintaan = [];
-const TIPE = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml", ".webmanifest": "application/manifest+json" };
+const TIPE = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".webmanifest": "application/manifest+json" };
 http.createServer((req, res) => {
   if (req.method === "POST" && req.url === "/api") {
     let b = ""; req.on("data", c => b += c); req.on("end", () => {

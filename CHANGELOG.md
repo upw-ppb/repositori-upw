@@ -3,6 +3,22 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.26.0 — 15 Nov 2026 — Uji Coba
+Permintaan pemilik: panduan lengkap di Info agar pengguna tidak perlu dijelaskan satu per satu.
+- **Info dan panduan** ditulis ulang: 53 topik dalam 7 kategori (dasar, kegiatan, mata kuliah dan dokumen dosen, akreditasi dan mutu, data prodi,
+  pengelolaan, masalah umum). Setiap topik: ringkasan, siapa yang memakainya, langkah bernomor, hal yang perlu diketahui, tombol menuju menunya,
+  dan topik terkait. **Isi mengikuti peran**: mahasiswa, dosen, tendik, KPS, GKM, kepala lab, laboran, Admin Prodi, Super Admin, dan asesor
+  masing-masing melihat topik untuk perannya (pengguna berperan ganda bisa memilih peran panduan). Bagian **Mulai di sini** berisi topik terpenting per peran.
+- **30 gambar asli aplikasi** (data contoh) dengan penanda nomor, kotak, dan panah; daftar keterangan di bawah gambar menyorot bagiannya saat
+  disentuh kursor; klik gambar untuk memperbesar. Gambar tajam 1600 px (dua kali lipat) dalam format WebP rata-rata 73 KB, dan baru dimuat saat
+  topiknya dibuka sehingga halaman tetap ringan. Gambar lama (JPG buram) dihapus.
+- **Pencarian pintar tanpa AI**: saran muncul saat mengetik (tombol panah dan Enter bisa dipakai). Memahami pertanyaan sehari-hari ("kenapa saya
+  tidak bisa login"), imbuhan (mengunggah/unggahan → unggah), sinonim (upload, download, password, ttd, dll.), salah ketik ("pasword"), dan kata
+  yang belum selesai diketik ("upl"). Pertanyaan bernada masalah mengutamakan topik Masalah umum. Bila tidak ketemu: tombol kirim pertanyaan ke Admin Prodi.
+- Isi panduan disusun dari alat/panduan-sumber.js (teks) dan alat/panduan-tanda.json (posisi penanda) dengan `node alat/panduan.mjs`
+  (memeriksa gambar dan tautan antartopik); alat tangkap layar tajam di alat/uji/cap.js.
+- Tidak ada perubahan server maupun struktur data. Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.25.2 — 15 Nov 2026 — Produksi
 - Produksi diperbarui dari v0.25.0 ke v0.25.2 (tampilan) dengan server v0.25.1 (deployment @6): daftar lengkap dalam kotak bergulir (v0.25.1),
   tombol ← → dan kotak Unduhan seperti Chrome, tanggal lokal di nama berkas (v0.25.2).
