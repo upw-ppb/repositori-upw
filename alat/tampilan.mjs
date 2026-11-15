@@ -22,6 +22,7 @@ function riwayat() {
     const m = /^## (v\d+\.\d+\.\d+) — (.+?) — (.+)$/.exec(baris);
     if (m) { kini = { versi: m[1], tanggal: m[2], lingkungan: m[3], isi: [] }; bagian.push(kini); continue; }
     if (!kini || !baris.trim()) continue;
+    if (/^Ringkas:/.test(baris)) { kini.ringkas = baris.replace(/^Ringkas:\s*/, "").trim(); continue; } // ringkasan untuk Info › Tentang aplikasi
     // Baris lanjutan (tidak diawali "- ") disambung ke butir sebelumnya.
     if (!/^\s*- /.test(baris) && kini.isi.length) kini.isi[kini.isi.length - 1] += " " + baris.trim();
     else kini.isi.push(baris.replace(/\s+$/, ""));

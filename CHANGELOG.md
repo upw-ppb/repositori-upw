@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.27.0 — 15 Nov 2026 — Uji Coba
+Ringkas: Penambahan saringan dan urutan pada daftar akun, rekap per angkatan dan kelas, ubah status mahasiswa dengan alasan dan bukti, serta riwayat versi di halaman Info.
+- **Daftar akun** (menu Pengguna): saring menurut jenis (mahasiswa, dosen, tendik, asesor; Super Admin), status akun (sudah aktif / belum aktivasi /
+  nonaktif), angkatan, kelas, status mahasiswa, dan kelengkapan biodata; urutkan dengan klik judul kolom; unduh hasil saringan ke Excel.
+  **Rekap mahasiswa per angkatan dan kelas**: jumlah, sudah aktif, belum aktivasi, biodata belum lengkap, dan status mahasiswa; klik baris untuk menyaring.
+- **Status mahasiswa** (aktif, cuti, non-aktif, lulus, drop out, mengundurkan diri, mutasi, wafat): kolom sendiri di daftar akun dengan tombol
+  **Ubah status**; tanggal efektif, **alasan wajib**, dan **bukti** (unggah PDF/gambar ke Drive "Status Mahasiswa", atau tautan). Bisa untuk
+  **banyak mahasiswa sekaligus** (centang, lalu Ubah status N mahasiswa; mis. satu angkatan lulus dengan satu SK yudisium). **Riwayat status** per
+  mahasiswa tercatat (dari, ke, tanggal, alasan, oleh siapa, bukti). Sebelumnya status hanya bisa diubah lewat tombol "Data mhs" di ujung kanan
+  tabel tanpa alasan/bukti; tombol itu kini bernama "Angkatan & kelas".
+- **Riwayat versi di Info › Tentang aplikasi**: 10 pembaruan terakhir dengan ringkasan perubahan dalam bahasa sederhana (baris "Ringkas" di CHANGELOG).
+- Struktur data versi 21: tabel baru "RiwayatStatusMhs" (ditambahkan otomatis, cadangan dibuat lebih dulu). Versi lama tetap bisa membaca data;
+  rollback ke v0.26.0 aman tanpa pemulihan data (riwayat status diabaikan).
+- Uji: 542 + 44 uji server lulus (11 uji baru). Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.26.0 — 15 Nov 2026 — Produksi
 - Tampilan Produksi diperbarui ke v0.26.0: halaman Info dengan 53 topik panduan per peran, 30 gambar asli bertanda, dan pencarian pintar.
 - Hanya tampilan yang berubah; server Produksi tetap v0.25.1 (deployment @6) dan data tidak tersentuh, sehingga tidak ada cadangan baru.
@@ -10,6 +25,7 @@ Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CL
 - Penyetuju: pemilik, di chat 15 Nov 2026: "Setuju tayang v0.26.0".
 
 ## v0.26.0 — 15 Nov 2026 — Uji Coba
+Ringkas: Halaman Info baru: panduan lengkap sesuai peran dengan gambar asli bertanda, dan kolom pencarian yang memahami pertanyaan.
 Permintaan pemilik: panduan lengkap di Info agar pengguna tidak perlu dijelaskan satu per satu.
 - **Info dan panduan** ditulis ulang: 53 topik dalam 7 kategori (dasar, kegiatan, mata kuliah dan dokumen dosen, akreditasi dan mutu, data prodi,
   pengelolaan, masalah umum). Setiap topik: ringkasan, siapa yang memakainya, langkah bernomor, hal yang perlu diketahui, tombol menuju menunya,
@@ -33,6 +49,7 @@ Permintaan pemilik: panduan lengkap di Info agar pengguna tidak perlu dijelaskan
 - Penyetuju: pemilik, di chat 15 Nov 2026: "Setuju tayang v0.25.2".
 
 ## v0.25.2 — 15 Nov 2026 — Uji Coba
+Ringkas: Penambahan tombol kembali/maju dan kotak Unduhan di bilah atas; perbaikan tanggal pada nama berkas unduhan.
 Permintaan pemilik (seperti di Chrome, terutama untuk aplikasi terpasang yang tidak punya bilah alamat):
 - **Tombol ← dan →** di kiri bilah atas: kembali ke halaman sebelumnya dan maju lagi. Setiap pindah menu tercatat di riwayat, sehingga tombol
   mundur/maju pada mouse dan gestur geser trackpad juga bekerja. Tombol pudar bila tidak ada halaman sebelumnya/berikutnya.
@@ -44,6 +61,7 @@ Permintaan pemilik (seperti di Chrome, terutama untuk aplikasi terpasang yang ti
 - Tidak ada perubahan server maupun struktur data. Penyetuju: tidak diperlukan (Uji Coba).
 
 ## v0.25.1 — 15 Nov 2026 — Uji Coba
+Ringkas: Perbaikan pratinjau impor Excel dan daftar panjang lain: semua baris kini tampil dalam kotak yang bisa digulir.
 - Permintaan pemilik: daftar yang sebelumnya dipotong ("… dan N baris lainnya") kini ditampilkan **lengkap dalam kotak bergulir** dengan kepala
   tabel tetap terlihat:
   - pratinjau impor Excel (semua jenis impor): semua baris, kolom nomor baris, dan tahun masuk yang diambil dari NIM bila kolomnya kosong;
@@ -61,6 +79,7 @@ Permintaan pemilik (seperti di Chrome, terutama untuk aplikasi terpasang yang ti
 - Penyetuju: pemilik, di chat 15 Nov 2026: "Setuju tayang v0.25.0".
 
 ## v0.25.0 — 15 Nov 2026 — Uji Coba
+Ringkas: Penambahan panel Kesiapan akreditasi di Beranda, peran GKM dan Laporan GKM per semester; akun Super Admin tidak lagi terhitung sebagai data prodi.
 Permintaan pemilik (kesiapan akreditasi dan GKM):
 - **Kesiapan akreditasi di Beranda** (KPS, Admin Prodi, Super Admin, GKM): nilai simulasi dibanding target; jumlah butir rubrik belum dinilai,
   butir otomatis yang datanya belum ada, Tabel iLKPS yang masih kosong, dan dokumen Bank Dokumen yang belum ada; 3 kriteria terlemah; status
@@ -97,6 +116,7 @@ Permintaan pemilik (kesiapan akreditasi dan GKM):
 - Penyetuju: pemilik, di chat 14 Nov 2026: "Setuju tayang v0.24.0".
 
 ## v0.24.0 — 14 Nov 2026 — Uji Coba
+Ringkas: Penambahan foto profil untuk semua pengguna, menu Data Terkumpul, dan tombol Sumber data di Penilaian untuk memeriksa asal setiap skor.
 Permintaan pemilik (2 butir):
 - **Foto profil** untuk semua pengguna (menu Akun saya, atau klik nama di bawah menu): pilih foto JPG/PNG, bagian tengah dipotong persegi dan
   diperkecil otomatis di perangkat; bisa diganti atau dihapus. Tampil di bilah samping dan di Cari orang (yang belum punya foto tetap berinisial).
@@ -124,6 +144,7 @@ Permintaan pemilik (2 butir):
 - Penyetuju: pemilik, di chat 14 Nov 2026: "Setuju tayang v0.23.1".
 
 ## v0.23.1 — 14 Nov 2026 — Uji Coba
+Ringkas: Perubahan ikon aplikasi: gambar koper dan tulisan UPW diperbesar agar memenuhi kotak.
 - Ikon aplikasi diperbesar (permintaan pemilik): koper dan tulisan UPW kini memenuhi kotak biru ke atas-bawah dan kiri-kanan
   (sebelumnya banyak ruang kosong). Bentuk dan warna tetap konsep D. Kode pembuat ikon disimpan di alat/ikon.js.
 - Alat uji disimpan di proyek (alat/uji/, dijalankan dengan `bash alat/uji/jalankan.sh uji|server|langsung`) dan AGENTS.md dibuat
@@ -141,6 +162,7 @@ Permintaan pemilik (2 butir):
 - Penyetuju: pemilik, di chat 14 Nov 2026: "Setuju tayang v0.23.0".
 
 ## v0.23.0 — 14 Nov 2026 — Uji Coba
+Ringkas: Penambahan tombol Kirim masukan (masalah, saran, pertanyaan) dan menu Masukan untuk Admin; uji menyeluruh seluruh fitur.
 - Masukan dan saran (permintaan pemilik): tombol **Kirim masukan** di Info (juga bisa dibuka sebelum biodata lengkap). Isian: jenis (masalah/error,
   permintaan fitur, saran perbaikan, pertanyaan, lainnya), bagian aplikasi (otomatis terisi halaman terakhir), judul, uraian, lampiran gambar/PDF
   (maks 5 MB, disimpan di folder Drive "Masukan"). Versi aplikasi dan jenis perangkat tercatat otomatis. Pengguna melihat riwayat masukannya
@@ -155,11 +177,13 @@ Permintaan pemilik (2 butir):
 - Penyetuju: tidak diperlukan (Uji Coba).
 
 ## v0.22.1 — 14 Nov 2026 — Uji Coba
+Ringkas: Ikon aplikasi baru (koper arsip dengan tulisan UPW).
 - Ikon aplikasi baru (pilihan pemilik: konsep D "koper arsip" dengan tulisan UPW), biru #0A5188 dan emas dari logo Poltekpar Bali;
   ukuran 192, 512, maskable (Android), dan 180 (iPhone). Logo institusi Poltekpar Bali tetap dipakai di dalam aplikasi dan surat.
 - Tidak ada perubahan struktur data. Penyetuju: tidak diperlukan (Uji Coba).
 
 ## v0.22.0 — 14 Nov 2026 — Uji Coba
+Ringkas: Penambahan gambar panduan bernomor, ikon mata pada kata sandi, dan pintasan di ikon aplikasi; perbaikan persentase biodata dan tombol unggah ijazah.
 Catatan prodi lanjutan (7 butir):
 - Kolom Cari orang: petunjuk "Nama, Inisial, NIP atau bidang keahlian".
 - Biodata: persentase kini dari semua kolom isian (kolom "kosongkan bila belum/tidak ada" tidak dihitung), dengan keterangan terpisah
@@ -178,6 +202,7 @@ Catatan prodi lanjutan (7 butir):
 - Penyetuju: tidak diperlukan (Uji Coba).
 
 ## v0.21.0 — 14 Nov 2026 — Uji Coba
+Ringkas: Penambahan dokumen pendukung biodata dosen, riwayat keputusan KPS, penanda tangan selain KPS, menu Laboratorium, dan halaman Info; aplikasi lebih cepat.
 Catatan prodi tahap 3–5 (versi 0.19.0 dan 0.20.0 tidak dirilis terpisah):
 - Biodata dosen: bagian "Dokumen pendukung (opsional)": ijazah per jenjang yang diisi, sertifikat pendidik, sertifikat kompetensi/profesi
   (boleh lebih dari satu, masing-masing dengan nama) (catatan no. 10, 11). Pengingat di Beranda bila belum lengkap (no. 12).
@@ -202,6 +227,7 @@ Catatan prodi tahap 3–5 (versi 0.19.0 dan 0.20.0 tidak dirilis terpisah):
 - Penyetuju: tidak diperlukan (Uji Coba).
 
 ## v0.18.0 — 14 Nov 2026 — Uji Coba
+Ringkas: Penambahan impor dari Excel dengan templat, unduh daftar akun, dan status dosen (tugas belajar/pensiun).
 Catatan prodi tahap 2:
 - Impor dari Excel dengan templat yang bisa diunduh (catatan no. 1 dan 21): akun mahasiswa, akun dosen/tendik (Super Admin),
   biodata dosen/tendik massal (sel kosong tidak menghapus isian lama), kurikulum, dan lulusan. Templat berisi lembar Data, Contoh,
@@ -240,6 +266,7 @@ Perbaikan dari catatan prodi (tahap 1):
 - Penyetuju: pemilik, di chat 13 Nov 2026: "Setuju tayang v0.16.0" (sebelumnya "Setuju tayang", sebelum v0.16.0 dibuat).
 
 ## v0.16.0 — 13 Nov 2026 — Uji Coba
+Ringkas: Rilis Produksi pertama; aktivasi akun tanpa email sementara selama email kampus belum bisa terkirim.
 - Aktivasi tanpa email (sementara), karena email kampus belum bisa terkirim (DKIM ppb.ac.id belum dipasang):
   - Super Admin menyalakan/mematikannya di menu Pengguna › Aktivasi akun (bawaan: mati).
   - Selama menyala: pengguna baru mengganti kata sandi awal, menuliskan email, lalu langsung aktif (email ditandai "belum terverifikasi").

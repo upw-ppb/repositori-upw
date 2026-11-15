@@ -56,11 +56,13 @@ var SKEMA = {
   /* v0.24.0 */
   FotoProfil: ["userId", "foto", "kecil", "waktu", "dihapus"],
   /* v0.25.0 */
-  LaporanGkm: ["semester", "bagian", "lampiran", "status", "catatan", "riwayat", "diubah", "dikirimPada", "putusPada"]
+  LaporanGkm: ["semester", "bagian", "lampiran", "status", "catatan", "riwayat", "diubah", "dikirimPada", "putusPada"],
+  /* v0.27.0 */
+  RiwayatStatusMhs: ["id", "userId", "dari", "ke", "tanggal", "alasan", "bukti", "oleh", "waktu"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 20;
+var VERSI_SKEMA = 21;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {

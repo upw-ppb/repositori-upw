@@ -316,9 +316,12 @@ export const topik = [
 
   /* ---------------- KELOLA ---------------- */
   { id: "pengguna-admin", kat: "kelola", p: ADM, menu: "pengguna", mulai: ["admin", "superadmin"], j: "Mengelola akun mahasiswa", r: "Impor akun, ubah kelas/status, unduh daftar akun.",
-    g: ["impor-excel"], kw: "akun mahasiswa tambah mahasiswa kelas status mahasiswa lulus cuti",
+    g: ["impor-excel"], kw: "akun mahasiswa tambah mahasiswa kelas status mahasiswa lulus cuti mengundurkan diri drop out yudisium belum aktivasi saring urut rekap angkatan",
     l: ["Buka <b>Pengguna</b> → <b>Impor akun</b>: tempel \"NIM; Nama; kelas\" (angkatan dari 2 angka pertama NIM) atau pakai templat Excel.",
-      "Ubah kelas atau status mahasiswa (aktif, cuti, lulus, dst.) lewat tombol <b>Data mhs</b> di daftar akun.",
+      "Daftar akun bisa <b>disaring</b> (status akun, angkatan, kelas, status mahasiswa, biodata) dan <b>diurutkan</b> dengan klik judul kolom. <b>Rekap per angkatan dan kelas</b> menunjukkan siapa yang belum aktivasi atau biodatanya belum lengkap; klik barisnya untuk menyaring.",
+      "Ubah <b>status mahasiswa</b> (lulus, cuti, mengundurkan diri, dll.): tombol <b>Ubah status</b> pada baris mahasiswa, pilih status baru, tanggal efektif, tulis <b>alasan</b> (wajib), dan lampirkan <b>bukti</b> (PDF/gambar atau tautan). Riwayat perubahan tampil di laci yang sama.",
+      "Banyak sekaligus: centang beberapa mahasiswa (atau centang di judul kolom untuk semua yang tampil), lalu <b>Ubah status N mahasiswa</b>, mis. satu angkatan lulus dengan satu SK yudisium.",
+      "Tahun masuk dan kelas diubah lewat tombol <b>Angkatan & kelas</b>.",
       "<b>Unduh daftar akun (Excel)</b> untuk dibagikan ke mahasiswa (NIM sebagai kata sandi awal)."],
     tips: ["Admin Prodi hanya mengelola akun mahasiswa. Akun dosen/tendik dan peran diatur Super Admin."] },
   { id: "masukan-kelola", kat: "kelola", p: ADM, menu: "masukan", j: "Menanggapi masukan pengguna", r: "Baca, beri status, dan tanggapi masukan.",

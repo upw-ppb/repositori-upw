@@ -246,6 +246,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   capUbin(0..1,0..1) + screenshot 4x (ambil satu screenshot kecil dulu sebelum ubin 0,0 — ubin pertama sering basi), salin ubin ke /tmp/upw-uji/web/ubin/<id>-<kb>.jpg,
   capGabung(id) → WebP ke penerima terima.py (serve_forever) di 127.0.0.1:8799. Pencarian: cariPanduan() di aplikasi.js (akarKata, sinonim, jarak edit, awalan).
 
+- v0.27.0 (15 Nov 2026, Uji Coba): gas/StatusMhs.js — admin.statusMhs {userIds[], statusMhs, tanggal, alasan wajib, berkas|tautan} (banyak sekaligus,
+  bukti di Drive "Status Mahasiswa"), admin.riwayatStatusMhs, admin.buktiStatusMhs; tabel RiwayatStatusMhs (VERSI_SKEMA 21). admin.ubahMhs kini dipakai
+  tampilan hanya untuk angkatan & kelas. Daftar akun: hDaftarAkun() (S.pf saringan/urutan, rekapMhs(), S.pilihMhs). CHANGELOG: baris "Ringkas: …"
+  per versi (diparse tampilan.mjs → riwayat.json.ringkas) tampil di Info › Tentang aplikasi (10 terakhir ≤ versi berjalan). WAJIB tulis Ringkas tiap rilis.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
