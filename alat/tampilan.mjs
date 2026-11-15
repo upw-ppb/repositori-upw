@@ -49,7 +49,11 @@ if (perintah === "riwayat") {
   for (const f of fs.readdirSync(UJI)) {
     const asal = path.join(UJI, f);
     if (fs.statSync(asal).isFile()) fs.copyFileSync(asal, path.join(tujuan, f));
-    else if (fs.statSync(asal).isDirectory()) fs.cpSync(asal, path.join(tujuan, f), { recursive: true }); // mis. panduan/ (gambar panduan)
+    else if (fs.statSync(asal).isDirectory()) {
+      const t = path.join(tujuan, f);
+      if (fs.existsSync(t)) for (const x of fs.readdirSync(t)) if (!fs.existsSync(path.join(asal, x))) fs.rmSync(path.join(t, x), { recursive: true }); // berkas lama yang sudah dihapus di uji
+      fs.cpSync(asal, t, { recursive: true }); // mis. panduan/ (gambar panduan)
+    }
   }
   const ganti = (f, fn) => { const p = path.join(tujuan, f), a = fs.readFileSync(p, "utf8"), b = fn(a); if (a === b) throw new Error("Tidak ada perubahan pada " + f + " (pola berubah?)"); fs.writeFileSync(p, b); };
   fs.writeFileSync(path.join(tujuan, "konfig.js"), `/* Konfigurasi lingkungan Produksi. Dibuat oleh alat/tampilan.mjs dari docs/uji. */
