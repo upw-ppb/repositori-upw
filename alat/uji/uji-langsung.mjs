@@ -18,4 +18,6 @@ j = await panggil("sumber.butir", { butir: 45 }, t); c("sumber.butir 45 (Admin P
 j = await panggil("sumber.kegiatan", {}, t); c("Data Terkumpul tertutup untuk Admin Prodi", !j.ok && /izin/.test(j.galat), j);
 j = await panggil("kesiapan.data", {}, t); c("kesiapan.data (v0.25.0)", j.ok && j.prioritas && j.prioritas.length <= 5 && "tabelKosong" in j, j);
 j = await panggil("gkm.data", {}, t); c("gkm.data dibaca Admin Prodi (tanpa izin ubah)", j.ok && j.daftar.length === 6 && j.bolehUbah === false, j);
+j = await panggil("dp.data", {}, t); c("dp.data: tim per kelas (v0.28.0)", j.ok && j.tim.every(x => Array.isArray(x.daftarKelas) && "perKelas" in x), j.ok ? j.tim.slice(0, 2) : j);
+if (j.ok) console.log("  MK semester ini:", j.tim.length, "· kelas:", [...new Set(j.tim.flatMap(x => x.daftarKelas))].join(","), "· sudah punya tim:", j.tim.filter(x => x.anggota.length).length);
 await panggil("keluar", {}, t);

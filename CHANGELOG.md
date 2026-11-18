@@ -22,7 +22,7 @@ Permintaan pemilik: setiap mata kuliah punya dua kelas (A dan B) dengan pengajar
 - Panduan Info (Data Prodi, Mata Kuliah Saya) diperbarui.
 - Uji: 563 + 44 uji server lulus (21 uji baru di uji-v28-bagian.mjs; dua uji EWMP lama disesuaikan ke hitungan per kelas). Uji tampilan di server lokal
   (isi per kelas, pindah pilihan, validasi pengampu utama, isi permintaan terkirim, Portofolio MK, lebar ponsel) dan penjelajah 42 halaman: tanpa masalah.
-  Penyetuju: tidak diperlukan (Uji Coba).
+  Server Uji Coba: deployment @27 (ping versi 0.28.0; cek langsung lulus). Penyetuju: tidak diperlukan (Uji Coba).
 
 ## v0.27.0 — 15 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.27.0 (server Apps Script Produksi deployment @7): saringan dan urutan daftar akun, rekap per angkatan/kelas,
