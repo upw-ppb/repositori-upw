@@ -276,7 +276,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   KPS/GKM bukan PJ sendiri, ringkasTl() → info Penilaian, tugasTl() → Beranda) dan gas/Rapat.js (Rapat + PesertaRapat; JENIS_RAPAT terkait butir; terbit hanya KPS,
   kode "UND-YYMM-XXXXXXXX", cekUndangan() dipanggil aksiSuratCek; tugasRapat() → Beranda). VERSI_SKEMA 24. Tampilan: menu "rapat" (hRapat, laciRapat/laciRapatForm/
   laciTl/laciTlForm, kertasUndangan); isian formulir rapat disimpan ke S.laci.f saat diketik (salinIsianRapat sebelum render). Uji: alat/uji/uji-v31-bagian.mjs.
-  Rilis 2 (belum): risalah per agenda → keputusan jadi poin tindak lanjut, templat Word/PDF risalah, daftar hadir PDF, unggah pindaian, bukti ke Bank Dokumen.
+- v0.32.0 (18 Nov 2026, Uji Coba): Rilis 2 rapat. Rapat.risalah (JSON per agenda: pembahasan, keputusan {t,pj,tenggat,butir,tl}) dan Rapat.berkas
+  ({risalah, hadir}); VERSI_SKEMA 25. rapat.risalahSimpan (kelola) → rapat.risalahFinal (KPS, tgl ≤ hari ini; keputusan ber-PJ → TindakLanjut sumber "rapat");
+  rapat.berkas: pindaian risalah (hanya setelah final) disalin (makeCopy) ke slot Bank SLOT_RISALAH {iab "3-2", rtm "2-2", kurikulum "7-1", monev "23-1", survei "42-1"}.
+  Setelah risalah final undangan terkunci (risalahFinal()). Asesor: menu rapat, lihat rapat final. Tampilan: bagianRisalah(), laciRisalahForm, risalahDocx (UPW_DOCX),
+  kertasRisalah, kertasHadir. Uji: alat/uji/uji-v32-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

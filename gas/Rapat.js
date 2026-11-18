@@ -3,7 +3,10 @@
  * Agenda bisa diambil dari poin tindak lanjut yang masih terbuka dan dari butir Matriks; jenis rapat terkait butir instrumen (JENIS_RAPAT).
  * Peserta: dosen/tendik/mahasiswa per orang, mahasiswa per kelas (angkatan-kelas), dan tamu luar (nama + instansi; cukup lewat PDF).
  * Peserta berakun mendapat notifikasi di Beranda dan menjawab Hadir / Tidak hadir (tabel PesertaRapat). Perubahan atau pembatalan setelah terbit
- * memunculkan notifikasi lagi. Risalah dan daftar hadir menyusul (Rilis 2).
+ * memunculkan notifikasi lagi.
+ * v0.32.0 (Rilis 2): risalah per agenda (pembahasan + keputusan). Saat KPS memfinalkan risalah, setiap keputusan yang punya penanggung jawab menjadi poin
+ * tindak lanjut (sumber "rapat"). Pindaian risalah bertanda tangan dan daftar hadir diunggah ke Drive "Rapat"; pindaian risalah otomatis disalin sebagai versi
+ * baru di slot Bank Dokumen yang sesuai jenis rapat (SLOT_RISALAH). Asesor melihat rapat yang risalahnya sudah final (baca saja).
  */
 var PERAN_RAPAT_KELOLA = ["kps", "gkm", "admin", "superadmin"];
 var JENIS_RAPAT = [
@@ -17,14 +20,19 @@ var JENIS_RAPAT = [
   { k: "tl", l: "Rapat tindak lanjut", butir: [] },
   { k: "prodi", l: "Rapat prodi", butir: [] }];
 var STATUS_RAPAT = { draf: "Draf", terbit: "Terbit", batal: "Dibatalkan" };
+/** Slot Bank Dokumen (kunci "butir-indeks", nomor Lampiran 1) untuk pindaian risalah per jenis rapat. */
+var SLOT_RISALAH = { iab: "3-2", rtm: "2-2", kurikulum: "7-1", monev: "23-1", survei: "42-1" };
+var EKS_RAPAT = ["pdf", "jpg", "jpeg", "png", "docx"], BERKAS_RAPAT_MAKS = 10 * 1024 * 1024;
 
 function jenisRapatDef(k) { for (var i = 0; i < JENIS_RAPAT.length; i++) if (JENIS_RAPAT[i].k === k) return JENIS_RAPAT[i]; return null; }
 function rapatDari(r) {
   return { _r: r, id: r.id, jenis: teks(r.jenis), judul: teks(r.judul), agenda: jsonDari(r.agenda, []), tgl: teksTgl(r.tgl), jamMulai: teks(r.jamMulai), jamSelesai: teks(r.jamSelesai),
     tempat: teks(r.tempat), tautan: teks(r.tautan), pengantar: teks(r.pengantar), nomor: teks(r.nomor), peserta: jsonDari(r.peserta, { u: [], kelas: [], tamu: [] }),
     status: teks(r.status) || "draf", kode: teks(r.kode), tglSurat: teksTgl(r.tglSurat), kpsId: teks(r.kpsId), lampiran: jsonDari(r.lampiran, null),
-    riwayat: jsonDari(r.riwayat, []), oleh: teks(r.oleh), dibuat: r.dibuat ? new Date(r.dibuat).toISOString() : "" };
+    riwayat: jsonDari(r.riwayat, []), oleh: teks(r.oleh), dibuat: r.dibuat ? new Date(r.dibuat).toISOString() : "",
+    risalah: jsonDari(r.risalah, null), berkas: jsonDari(r.berkas, {}) || {} };
 }
+function risalahFinal(rp) { return !!(rp.risalah && rp.risalah.status === "final"); }
 function semuaRapat() { return semua("Rapat").filter(function (r) { return !r.dihapus; }).map(rapatDari); }
 function ambilRapat(id) {
   var r = cari("Rapat", function (x) { return x.id === String(id || "") && !x.dihapus; });
@@ -78,12 +86,19 @@ function rapatKeKlien(rp, p, idx, lengkap) {
   var o = { id: rp.id, jenis: rp.jenis, jenisL: j.l, butirJenis: j.butir, judul: rp.judul, tgl: rp.tgl, jamMulai: rp.jamMulai, jamSelesai: rp.jamSelesai, tempat: rp.tempat, tautan: rp.tautan,
     status: rp.status, statusL: STATUS_RAPAT[rp.status], kode: rp.kode, nomor: rp.nomor, tglSurat: rp.tglSurat, jumlahUndangan: baris.length + (rp.peserta.tamu || []).length,
     saya: saya ? { jawab: teks(saya.jawab), alasan: teks(saya.alasan), dibaca: !!saya.dibaca } : null,
-    bolehUbah: kelola && (rp.status === "draf" || (rp.status === "terbit" && punyaPeran(p, ["kps"]))), bolehTerbit: punyaPeran(p, ["kps"]) && rp.status === "draf" };
+    bolehUbah: kelola && (rp.status === "draf" || (rp.status === "terbit" && punyaPeran(p, ["kps"]) && !risalahFinal(rp))), bolehBatal: rp.status === "terbit" && punyaPeran(p, ["kps"]) && !risalahFinal(rp), bolehTerbit: punyaPeran(p, ["kps"]) && rp.status === "draf",
+    risalahStatus: rp.risalah ? rp.risalah.status : "", slotBank: SLOT_RISALAH[rp.jenis] ? namaSlotRisalah(rp.jenis) : "" };
   if (lengkap) {
     o.agenda = rp.agenda; o.pengantar = rp.pengantar; o.lampiran = rp.lampiran;
+    if (kelola || (rp.risalah && rp.risalah.status === "final")) o.risalah = rp.risalah;
+    o.berkas = {}; ["risalah", "hadir"].forEach(function (k) { var b = rp.berkas[k]; if (b) o.berkas[k] = b.t === "tautan" ? { t: "tautan", url: b.url, w: b.w } : { t: "file", nama: b.nama, ukuran: b.ukuran, w: b.w }; });
+    o.bolehRisalah = kelola && rp.status === "terbit" && (!rp.risalah || rp.risalah.status !== "final");
+    o.bolehFinal = punyaPeran(p, ["kps"]) && rp.status === "terbit" && !!rp.risalah && rp.risalah.status !== "final";
+    o.bolehUnggah = kelola && rp.status === "terbit";
     if (kelola) {
       o.peserta = rp.peserta;
-      o.rekap = { hadir: 0, tidak: 0, belum: 0, daftar: baris.map(function (x) { var u = idx.byId[x.userId]; return { nama: u ? u.nama : "(akun nonaktif)", unsur: unsurOrang(u), jawab: teks(x.jawab), alasan: teks(x.alasan) }; }) };
+      o.rekap = { hadir: 0, tidak: 0, belum: 0, daftar: baris.map(function (x) { var u = idx.byId[x.userId]; return { nama: u ? u.nama : "(akun nonaktif)", no: u ? u.username : "", unsur: unsurOrang(u), jawab: teks(x.jawab), alasan: teks(x.alasan) }; }) };
+      o.pegawai = idx.pegawai.map(function (q) { return { id: q.id, nama: q.nama, jenis: q.jenis }; }).sort(function (a, b) { return a.nama.localeCompare(b.nama); });
       o.rekap.daftar.forEach(function (x) { o.rekap[x.jawab === "hadir" ? "hadir" : x.jawab === "tidak" ? "tidak" : "belum"]++; });
       o.riwayat = rp.riwayat.map(function (h) { var x = idx.byId[h.o]; return { w: h.w, a: h.a, c: h.c || "", oleh: x ? x.nama : "" }; });
     }
@@ -92,6 +107,7 @@ function rapatKeKlien(rp, p, idx, lengkap) {
 }
 function bolehLihatRapat(p, rp) {
   if (punyaPeran(p, PERAN_RAPAT_KELOLA)) return true;
+  if (punyaPeran(p, ["asesor"]) && rp.risalah && rp.risalah.status === "final") return true;
   return rp.status !== "draf" && pesertaRapatBaris(rp.id).some(function (x) { return x.userId === p.id; });
 }
 /** Notifikasi undangan di Beranda (dipanggil dari aksiTugasSaya). */
@@ -184,6 +200,7 @@ function aksiRapatSimpan(d, token) {
     var rp = ambilRapat(x.id);
     if (rp.status === "batal") throw galat("Rapat yang dibatalkan tidak bisa diubah.");
     if (rp.status === "terbit" && !punyaPeran(p, ["kps"])) throw galat("Undangan yang sudah terbit hanya bisa diubah KPS.");
+    if (risalahFinal(rp)) throw galat("Risalah rapat ini sudah final; undangan tidak bisa diubah lagi.");
     var ubahan = barisRapat(o);
     if (rp.status === "terbit") {
       wajibLengkapRapat(o);
@@ -223,6 +240,7 @@ function aksiRapatBatal(d, token) {
   return kunciTulis(function () {
     var rp = ambilRapat(d.id);
     if (rp.status !== "terbit") throw galat("Hanya undangan yang sudah terbit yang bisa dibatalkan.");
+    if (risalahFinal(rp)) throw galat("Rapat ini sudah berlangsung dan risalahnya final; tidak bisa dibatalkan.");
     catatRiwayatRapat(rp, p, "batal", alasan);
     ubah("Rapat", rp._r, { status: "batal", riwayat: JSON.stringify(rp.riwayat), diubah: new Date() });
     semua("PesertaRapat").filter(function (x) { return x.rapatId === rp.id && x.dibaca; }).forEach(function (x) { ubah("PesertaRapat", x, { dibaca: "" }); });
@@ -285,4 +303,130 @@ function cekUndangan(kode) {
   var rp = rapatDari(r), l = rp.lampiran || {};
   return { sah: rp.status !== "draf", jenisSurat: "undangan", batal: rp.status === "batal", kode: kode, judul: rp.judul, tgl: rp.tgl, sampai: rp.tgl, tempat: rp.tempat || "Daring",
     tglSurat: rp.tglSurat, kps: l.kps ? l.kps.nama : "", jumlahUndangan: (l.daftar || []).length };
+}
+
+/* ---------- Rilis 2 (v0.32.0): risalah, pindaian, Bank Dokumen ---------- */
+
+function namaSlotRisalah(jenis) {
+  var k = SLOT_RISALAH[jenis]; if (!k) return "";
+  var a = k.split("-"); return "Butir " + a[0] + ": " + ((SLOT_BANK[a[0]] || [])[Number(a[1])] || "");
+}
+function bersihRisalah(x, rp, idx) {
+  x = x || {};
+  var jam = function (v) { v = teks(v).trim(); if (v && !/^([01]\d|2[0-3]):[0-5]\d$/.test(v)) throw galat("Jam ditulis HH:MM, misalnya 09:00."); return v; };
+  var ag = Array.isArray(x.agenda) ? x.agenda : [];
+  var o = { pimpinan: potong(x.pimpinan, 150).trim(), notulis: potong(x.notulis, 150).trim(), mulai: jam(x.mulai), selesai: jam(x.selesai),
+    jumlahHadir: x.jumlahHadir === "" || x.jumlahHadir === undefined || x.jumlahHadir === null ? "" : Math.max(0, Math.min(2000, Math.round(Number(x.jumlahHadir) || 0))),
+    lain: potong(x.lain, 3000).trim(),
+    agenda: rp.agenda.map(function (a, i) {
+      var g = ag[i] || {};
+      return { pembahasan: potong(g.pembahasan, 5000).trim(), keputusan: (Array.isArray(g.keputusan) ? g.keputusan : []).map(function (k) {
+        var pj = teks(k && k.pj), tg = teks(k && k.tenggat).trim();
+        if (pj && (!idx.byId[pj] || ["dosen", "tendik"].indexOf(idx.byId[pj].jenis) < 0)) throw galat("Penanggung jawab keputusan harus dosen/tendik.");
+        if (tg && !tanggalSah(tg)) throw galat("Tenggat keputusan tidak valid (YYYY-MM-DD).");
+        return { t: potong(k && k.t, 1000).trim(), pj: pj, tenggat: tg, butir: bersihButir(k && k.butir), tl: "" };
+      }).filter(function (k) { return k.t; }).slice(0, 20) };
+    }) };
+  return o;
+}
+/** Simpan draf risalah (KPS, Admin Prodi, GKM, Super Admin; notulis bisa siapa saja di antara mereka). */
+function aksiRapatRisalahSimpan(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_RAPAT_KELOLA);
+  var idx = indeksOrang();
+  return kunciTulis(function () {
+    var rp = ambilRapat(d.id);
+    if (rp.status !== "terbit") throw galat("Risalah hanya untuk rapat yang undangannya sudah terbit (bukan draf/batal).");
+    if (rp.risalah && rp.risalah.status === "final") throw galat("Risalah sudah final dan tidak bisa diubah.");
+    var o = bersihRisalah(d.risalah, rp, idx);
+    o.status = "draf"; o.oleh = p.id; o.diubah = new Date().toISOString();
+    ubah("Rapat", rp._r, { risalah: JSON.stringify(o), diubah: new Date() });
+    catat(p.id, "rapat.risalah", { id: rp.id });
+    return { risalah: o };
+  });
+}
+/** KPS memfinalkan risalah: keputusan berpenanggung jawab menjadi poin tindak lanjut (sumber rapat). Rapat harus sudah berlangsung. */
+function aksiRapatRisalahFinal(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["kps"]);
+  var idx = indeksOrang();
+  return kunciTulis(function () {
+    var rp = ambilRapat(d.id), r = rp.risalah;
+    if (rp.status !== "terbit") throw galat("Risalah hanya untuk rapat yang undangannya sudah terbit.");
+    if (!r) throw galat("Simpan risalah lebih dulu.");
+    if (r.status === "final") throw galat("Risalah sudah final.");
+    if (rp.tgl > hariIni()) throw galat("Rapat belum berlangsung. Risalah bisa difinalkan pada atau setelah tanggal rapat.");
+    if (!r.pimpinan || !r.notulis) throw galat("Isi pimpinan rapat dan notulis.");
+    if (!r.agenda.some(function (a) { return a.pembahasan; })) throw galat("Isi pembahasan minimal satu agenda.");
+    var kini = new Date(), baru = [], ref = potong(rp.judul + " (" + rp.tgl + ")", 100);
+    r.agenda.forEach(function (a, i) {
+      a.keputusan.forEach(function (k) {
+        if (!k.pj) return;
+        var id = "tl" + acak(10);
+        baru.push({ id: id, uraian: k.t, butir: JSON.stringify(k.butir.length ? k.butir : bersihButir((rp.agenda[i] || {}).butir)), sumber: "rapat", sumberRef: ref, pj: k.pj, tenggat: k.tenggat,
+          status: "belum", bukti: "", catatan: "", riwayat: JSON.stringify([{ w: kini.toISOString(), o: p.id, a: "buat", c: "Keputusan rapat " + ref }]), oleh: p.id, dibuat: kini, diubah: kini, dihapus: "" });
+        k.tl = id;
+      });
+    });
+    if (baru.length) tambahBanyak("TindakLanjut", baru);
+    r.status = "final"; r.finalOleh = p.id; r.finalPada = kini.toISOString();
+    catatRiwayatRapat(rp, p, "risalah_final", baru.length + " keputusan menjadi tindak lanjut");
+    ubah("Rapat", rp._r, { risalah: JSON.stringify(r), riwayat: JSON.stringify(rp.riwayat), diubah: kini });
+    catat(p.id, "rapat.risalahFinal", { id: rp.id, tl: baru.length });
+    return { tindakLanjut: baru.length };
+  });
+}
+/** Unggah pindaian: jenis "risalah" (risalah bertanda tangan; hanya setelah final; disalin ke Bank Dokumen bila ada slotnya) atau "hadir" (daftar hadir). */
+function aksiRapatBerkas(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_RAPAT_KELOLA);
+  var jenis = String(d.jenis || "");
+  if (["risalah", "hadir"].indexOf(jenis) < 0) throw galat("Jenis berkas tidak dikenal.");
+  var rp0 = ambilRapat(d.id);
+  if (rp0.status !== "terbit") throw galat("Berkas hanya untuk rapat yang undangannya sudah terbit.");
+  if (jenis === "risalah" && !(rp0.risalah && rp0.risalah.status === "final")) throw galat("Finalkan risalah lebih dulu, lalu unggah pindaian yang sudah ditandatangani.");
+  var w = new Date().toISOString(), entri, file = null, salinan = null;
+  if (d.tautan) {
+    var url = teks(d.tautan).trim();
+    if (!/^https:\/\/[^\s<>"]+$/.test(url) || url.length > 500) throw galat("Tautan harus diawali https:// dan tanpa spasi.");
+    entri = { t: "tautan", url: url, o: p.id, w: w };
+  } else if (d.berkas && d.berkas.isi) {
+    var nama = namaAman(d.berkas.nama), eks = (nama.split(".").pop() || "").toLowerCase();
+    if (EKS_RAPAT.indexOf(eks) < 0) throw galat("Berkas berupa PDF, gambar (JPG/PNG), atau Word.");
+    var bytes = Utilities.base64Decode(teks(d.berkas.isi));
+    if (bytes.length > BERKAS_RAPAT_MAKS) throw galat("Berkas maksimal 10 MB. Untuk berkas besar, pakai tautan Google Drive.");
+    if (!isiSesuai(eks, bytes)) throw galat("Isi berkas tidak sesuai dengan jenisnya (." + eks + ").");
+    var folder = folderAnak(folderAnak(DriveApp.getFolderById(prop("FOLDER_ID")), "Rapat"), namaAman(rp0.tgl + " " + rp0.judul).slice(0, 100));
+    file = folder.createFile(Utilities.newBlob(bytes, BUKTI_EKS[eks], (jenis === "risalah" ? "Risalah" : "Daftar hadir") + " - " + nama));
+    entri = { t: "file", fileId: file.getId(), nama: nama, mime: BUKTI_EKS[eks], ukuran: bytes.length, o: p.id, w: w };
+  } else throw galat("Pilih berkas atau isi tautan.");
+  try {
+    var hasil = kunciTulis(function () {
+      var rp = ambilRapat(rp0.id), lama = rp.berkas[jenis];
+      rp.berkas[jenis] = entri;
+      ubah("Rapat", rp._r, { berkas: JSON.stringify(rp.berkas), diubah: new Date() });
+      if (lama && lama.t === "file") try { DriveApp.getFileById(lama.fileId).setTrashed(true); } catch (e) {}
+      var bank = "";
+      if (jenis === "risalah" && SLOT_RISALAH[rp.jenis]) {
+        var s = ambilSlot(SLOT_RISALAH[rp.jenis]), ve = { id: Utilities.getUuid().slice(0, 8), berlaku: "", ket: potong("Risalah " + rp.judul + " (" + rp.tgl + "), otomatis dari menu Rapat", 200), o: p.id, w: w, rapat: rp.id };
+        if (entri.t === "file") {
+          salinan = DriveApp.getFileById(entri.fileId).makeCopy(namaAman(s.nama.slice(0, 60) + " - " + entri.nama), folderBank(s.butir));
+          Object.assign(ve, { t: "file", fileId: salinan.getId(), nama: entri.nama, mime: entri.mime, ukuran: entri.ukuran });
+        } else Object.assign(ve, { t: "tautan", url: entri.url });
+        if (s.versi.length < 20) { s.versi.push(ve); simpanSlot(s, {}, p); bank = namaSlotRisalah(rp.jenis); }
+      }
+      catat(p.id, "rapat.berkas", { id: rp.id, jenis: jenis, bank: bank });
+      return { bank: bank };
+    });
+    return hasil;
+  } catch (e) { if (file) try { file.setTrashed(true); } catch (_) {} if (salinan) try { salinan.setTrashed(true); } catch (_) {} throw e; }
+}
+function aksiRapatBerkasLihat(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_SAH);
+  var rp = ambilRapat(d.id), b = rp.berkas[String(d.jenis || "")];
+  if (!punyaPeran(p, PERAN_RAPAT_KELOLA) && !(punyaPeran(p, ["asesor"]) && rp.risalah && rp.risalah.status === "final")) throw galat("Anda tidak memiliki izin untuk melihat berkas ini.");
+  if (!b || b.t !== "file") throw galat("Berkas tidak ditemukan.");
+  if (typeof catatAsesor === "function") catatAsesor(p, "rapat.berkas", { id: rp.id, jenis: d.jenis });
+  return { nama: b.nama, mime: b.mime, isi: Utilities.base64Encode(DriveApp.getFileById(b.fileId).getBlob().getBytes()) };
 }

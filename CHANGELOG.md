@@ -3,6 +3,27 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.32.0 — 18 Nov 2026 — Uji Coba
+Ringkas: Risalah rapat per agenda (keputusan otomatis menjadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen.
+Rilis 2 dari 2 fitur Rapat & Tindak Lanjut (rencana disetujui pemilik 18 Nov 2026).
+- **Risalah** (detail rapat yang sudah terbit): pimpinan rapat, notulis, jam, jumlah hadir, **pembahasan dan keputusan per agenda** (penanggung jawab, tenggat,
+  butir Matriks), lain-lain. Disimpan sebagai draf oleh KPS, GKM, Admin Prodi, atau Super Admin. **KPS memfinalkan** pada atau setelah tanggal rapat: risalah terkunci,
+  dan setiap keputusan yang punya penanggung jawab **otomatis menjadi poin tindak lanjut** (sumber "Keputusan rapat"; butir dari keputusan atau dari agenda).
+  Keputusan tanpa penanggung jawab dicatat sebagai informasi. Setelah final, undangan tidak bisa diubah atau dibatalkan.
+- **Unduhan**: Templat risalah (Word, agenda terisi, sebelum risalah dibuat), Risalah (Word dan PDF), dan **Daftar hadir (PDF)** berisi peserta undangan
+  (dengan NIP/NIM), tamu, dan baris kosong, untuk ditandatangani.
+- **Pindaian**: risalah bertanda tangan (setelah final) dan daftar hadir, berupa PDF/JPG/PNG/Word atau tautan, di folder Drive "Rapat". Pindaian risalah rapat
+  IAB, tinjauan manajemen, evaluasi kurikulum, monev, dan tindak lanjut survei **otomatis disalin sebagai versi baru di Bank Dokumen** (butir 3, 2, 7, 23, 42);
+  versi lama di Bank tetap tersimpan.
+- **Asesor** dapat membuka menu Rapat (baca saja) untuk rapat yang risalahnya sudah final, beserta pindaiannya, dan tindak lanjut yang terverifikasi.
+- Panduan Info: topik baru "Risalah rapat, daftar hadir, dan bukti ke Bank Dokumen".
+- Struktur data versi 25: kolom baru di akhir tabel Rapat (risalah, berkas); ditambahkan otomatis, cadangan dibuat lebih dulu. Rollback ke v0.31.0 tanpa pemulihan
+  data (risalah dan berkas diabaikan; tindak lanjut hasil risalah tetap ada).
+- Uji: 654 + 44 uji server lulus (20 uji baru di uji-v32-bagian.mjs). Uji tampilan di server lokal (terbitkan undangan, tulis dan finalkan risalah, keputusan menjadi
+  tindak lanjut, templat dan risalah Word divalidasi, risalah dan daftar hadir PDF, unggah pindaian otomatis ke Bank Dokumen, tombol ubah/batal hilang setelah final)
+  dan penjelajah 60 halaman: tanpa masalah. Server Uji Coba: deployment @31 (cek langsung 15/15).
+  Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.31.0 — 18 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.31.0 (server Apps Script Produksi deployment @11, tampilan docs/): menu Rapat & Tindak Lanjut (undangan rapat KPS dengan surat PDF,
   notifikasi dan jawaban kehadiran; tindak lanjut sampai terverifikasi; tombol di Laporan GKM; ringkasan tindak lanjut di Penilaian).
