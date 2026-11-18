@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.30.0 — 18 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.30.0 (tampilan docs/ dan server Apps Script Produksi deployment @10, server hanya naik nomor versi): tombol (i) berisi definisi,
+  kriteria skor 4–0, rumus, petunjuk DED, dan keterangan Tabel iLKPS dari instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain.
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru; data tidak diubah oleh rilis ini. Rollback ke v0.29.0 cukup tampilan (tag v0.29.0)
+  dan deployment versi milik v0.29.0.
+- Penyetuju: pemilik, di chat 18 Nov 2026: "setuju tayang v0.30.0".
+
 ## v0.30.0 — 18 Nov 2026 — Uji Coba
 Ringkas: Tombol (i) di setiap bagian yang terkait instrumen LAMWisata: definisi, kriteria skor 4 sampai 0, rumus, petunjuk DED, dan saran.
 Permintaan pemilik: setiap instrumen yang punya keterangan/definisi diberi tombol (i), agar pengguna paham apa yang harus dipenuhi; ringkasan dan saran yang sudah ada tetap.
