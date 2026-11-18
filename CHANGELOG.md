@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.34.0 — 19 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.34.0 (tampilan docs/ dan server Apps Script Produksi deployment @14, server hanya naik nomor versi): kop surat Prodi UPW hanya di
+  halaman pertama surat tugas, undangan rapat, risalah, daftar hadir (PDF), serta risalah dan Laporan GKM (Word).
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru; data tidak diubah oleh rilis ini. Rollback ke v0.33.0 cukup tampilan (tag v0.33.0)
+  dan deployment versi milik v0.33.0 (@13).
+- Penyetuju: pemilik, di chat 19 Nov 2026: "setuju tayang v0.34.0".
+
 ## v0.34.0 — 19 Nov 2026 — Uji Coba
 Ringkas: Kop surat Prodi UPW (logo, nama prodi, alamat) hanya di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM.
 Permintaan pemilik 19 Nov 2026 (berkas "Kop Prodi UPW - Politeknik Pariwisata Bali Bahasa Indonesia [update 19 Nov 2026].docx"); rencana disetujui dengan
