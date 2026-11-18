@@ -3,6 +3,26 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.30.0 — 18 Nov 2026 — Uji Coba
+Ringkas: Tombol (i) di setiap bagian yang terkait instrumen LAMWisata: definisi, kriteria skor 4 sampai 0, rumus, petunjuk DED, dan saran.
+Permintaan pemilik: setiap instrumen yang punya keterangan/definisi diberi tombol (i), agar pengguna paham apa yang harus dipenuhi; ringkasan dan saran yang sudah ada tetap.
+- **Isi jendela (i)** (teks instrumen disalin apa adanya, dengan sumbernya): elemen dan indikator (definisi) menurut Matriks, **kriteria skor 4–0** per bagian (A, B, C, …),
+  rumus skor dan keterangan istilah (mis. MKKI, MKK, PMKI), catatan nomor butir; **petunjuk DED** butir terkait; **keterangan kolom Tabel iLKPS** dari DED; definisi
+  **jenis dosen** (DT, DTPT, DTPS, dosen tidak tetap, dosen industri/praktisi). Bagian "Yang sebaiknya dilakukan" memuat syarat skor 4 dan saran yang sudah ada.
+  Bisa berpindah ke tabel, petunjuk DED, atau butir terkait, lalu ← Kembali; tutup dengan ✕ atau Esc. Jendela (i) bisa dibuka di atas jendela lain (mis. nilai GKM).
+- **Letak tombol**: Penilaian (setiap butir, prioritas perbaikan, jendela nilai GKM), DED (butir dan butir Matriks terkait), Bank Dokumen (setiap butir),
+  Tabel iLKPS (setiap tabel), Data Prodi (setiap tab), Biodata (isian Status dosen), Mata Kuliah Saya, Laboratorium, Laporan GKM, dan Survei.
+  Tombol hanya muncul di halaman yang memang bisa dibuka peran itu.
+- **Penomoran**: aplikasi memakai nomor Lampiran 1 (bobot). Di tabel Matriks, butir 27 Lampiran 1 (rasio mahasiswa/DTPS) adalah bagian C butir 9, dan butir 28–84
+  Lampiran 1 = baris 27–83 tabel Matriks; jendela (i) menuliskan catatan ini. Baris SDG's (tanpa nomor) ditampilkan di butir 75 dengan catatan bahwa itu untuk prodi bidang kreatif.
+- Sumber teks: Matriks (PDF, dibaca per halaman dan dicocokkan kata per kata dengan versi Word) dan DED di folder OneDrive Akreditasi/LAMWisata.
+  Transkripsi di alat/instrumen/, dibangun dengan `node alat/instrumen.mjs` menjadi docs/uji/instrumen.js (193 KB, dimuat saat tombol (i) pertama kali ditekan, tersedia luring).
+- Panduan Info: topik baru "Tombol (i): definisi dan kriteria instrumen LAMWisata".
+- Tidak ada perubahan struktur data; server hanya naik nomor versi. Rollback cukup tampilan.
+- Uji: 592 + 44 uji server lulus (9 uji baru di uji-v30-bagian.mjs: kelengkapan 84 butir, skor 0–4, penomoran, rujukan tombol). Uji tampilan di server lokal (buka (i) di
+  Data Prodi, Penilaian, jendela GKM, Tabel iLKPS, Biodata; pindah dan kembali; Esc; lebar ponsel) dan penjelajah 42 halaman: tanpa masalah. Server Uji Coba: deployment @29 (cek langsung 12/12).
+  Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.29.0 — 18 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.29.0 (server Apps Script Produksi deployment @9, tampilan docs/): data dan bukti dosen praktisi (jabatan, pengalaman,
   memimpin tim, penerbit sertifikat, dasar kerja sama; unggah CV/ijazah/sertifikat/bukti jabatan/kerja sama), dan MK diampu TS-2 s.d. TS di Tabel 1–3.

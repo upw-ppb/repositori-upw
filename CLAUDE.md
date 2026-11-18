@@ -266,6 +266,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   dp.praktisiBukti / dp.praktisiBuktiLihat; folder Drive "Praktisi/<nama> (<id>)". praktisiSimpan menulis isian baru hanya bila dikirim.
   ampuTs: mk/sksPenuh = TS-2 s.d. TS (Tabel 1–3), mkTs = TS saja (Data dosen TS), sks EWMP = TS saja. Uji: alat/uji/uji-v29-bagian.mjs.
 
+- v0.30.0 (18 Nov 2026, Uji Coba): tombol (i) "Menurut instrumen". Data: docs/uji/instrumen.js (window.UPW_INSTRUMEN) DIBUAT OTOMATIS oleh `node alat/instrumen.mjs`
+  dari alat/instrumen/matriks-tabel.txt (transkripsi Matriks per BARIS TABEL; #n = nomor tabel), alat/instrumen/ded-tabel.json (keterangan kolom Tabel iLKPS dari DED),
+  gas/Matriks.js, gas/DedPetunjuk.js. Nomor Lampiran 1 (aplikasi) ↔ tabel Matriks: 1–26 sama, 27 = bagian C butir 9, 28–84 = tabel 27–83.
+  Tampilan: iBtn(ref) / iTombol(ref, teks), ref "b16" | "t2" | "d10" | "def:dosen" (dipisah koma), REF_DP per tab Data Prodi, laciInstr() di lapisan S.instr
+  (di atas S.laci). Halaman PDF bisa dirender ke JPG dengan PDFKit (swift) bila perlu membaca ulang instrumen. Uji: alat/uji/uji-v30-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
