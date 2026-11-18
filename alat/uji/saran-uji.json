@@ -1,0 +1,674 @@
+{
+ "_keterangan": "Kalimat sehari-hari prodi dan butir Matriks (nomor Lampiran 1) yang benar. Lulus bila salah satu butir harapan muncul di 3 saran teratas. Dipakai `node alat/saran.mjs --uji` dan uji otomatis. Bagian butirLain: kalimat dengan gaya berbeda yang sengaja tidak memakai frasa kamus (ukuran yang lebih jujur).",
+ "butir": [
+  {
+   "q": "Rapat evaluasi perkuliahan semester ganjil",
+   "n": [
+    23,
+    22
+   ]
+  },
+  {
+   "q": "Evaluasi pelaksanaan perkuliahan dan kehadiran dosen",
+   "n": [
+    22,
+    23
+   ]
+  },
+  {
+   "q": "Penyebaran kuesioner kepuasan mahasiswa terhadap layanan prodi",
+   "n": [
+    71
+   ]
+  },
+  {
+   "q": "Tindak lanjut hasil survei kepuasan mahasiswa",
+   "n": [
+    71
+   ]
+  },
+  {
+   "q": "Survei kepuasan pengguna alumni di hotel dan travel agent",
+   "n": [
+    42
+   ]
+  },
+  {
+   "q": "Pelaksanaan tracer study lulusan 2024",
+   "n": [
+    38
+   ]
+  },
+  {
+   "q": "Rapat dengan dewan penasihat industri",
+   "n": [
+    3
+   ]
+  },
+  {
+   "q": "Pertemuan tahunan IAB bersama ASITA",
+   "n": [
+    3
+   ]
+  },
+  {
+   "q": "Rapat tinjauan manajemen hasil audit mutu internal",
+   "n": [
+    2
+   ]
+  },
+  {
+   "q": "Tindak lanjut temuan AMI",
+   "n": [
+    2
+   ]
+  },
+  {
+   "q": "Penyusunan dokumen kebijakan dan manual SPMI",
+   "n": [
+    1
+   ]
+  },
+  {
+   "q": "Lokakarya peninjauan kurikulum bersama stakeholder",
+   "n": [
+    7
+   ]
+  },
+  {
+   "q": "Revisi capaian pembelajaran lulusan sesuai KKNI",
+   "n": [
+    7,
+    31
+   ]
+  },
+  {
+   "q": "Review dan revisi RPS mata kuliah",
+   "n": [
+    8
+   ]
+  },
+  {
+   "q": "RPS belum memuat rubrik penilaian",
+   "n": [
+    8,
+    25
+   ]
+  },
+  {
+   "q": "Penyusunan rubrik dan kontrak perkuliahan",
+   "n": [
+    25
+   ]
+  },
+  {
+   "q": "Validasi soal UAS",
+   "n": [
+    25
+   ]
+  },
+  {
+   "q": "Uji kompetensi tour leader oleh LSP",
+   "n": [
+    26
+   ]
+  },
+  {
+   "q": "Sertifikasi BNSP untuk mahasiswa semester 7",
+   "n": [
+    26
+   ]
+  },
+  {
+   "q": "Pelatihan dosen applied approach",
+   "n": [
+    30
+   ]
+  },
+  {
+   "q": "Dosen studi lanjut S3 ke luar negeri",
+   "n": [
+    11,
+    30
+   ]
+  },
+  {
+   "q": "Pengajuan kenaikan jabatan fungsional lektor kepala",
+   "n": [
+    15
+   ]
+  },
+  {
+   "q": "Dosen industri mengajar team teaching ticketing",
+   "n": [
+    16
+   ]
+  },
+  {
+   "q": "Pengadaan peralatan laboratorium ticketing",
+   "n": [
+    21,
+    69
+   ]
+  },
+  {
+   "q": "Perawatan lab tour and travel",
+   "n": [
+    21
+   ]
+  },
+  {
+   "q": "Kunjungan lapangan ke desa wisata Penglipuran",
+   "n": [
+    20
+   ]
+  },
+  {
+   "q": "Praktik kerja lapangan mahasiswa di biro perjalanan",
+   "n": [
+    24,
+    20
+   ]
+  },
+  {
+   "q": "Kuliah umum dari praktisi pariwisata",
+   "n": [
+    63,
+    16
+   ]
+  },
+  {
+   "q": "Webinar nasional himpunan mahasiswa",
+   "n": [
+    63
+   ]
+  },
+  {
+   "q": "Penelitian dosen bersama mahasiswa tentang wisata halal",
+   "n": [
+    46,
+    45
+   ]
+  },
+  {
+   "q": "Seleksi proposal hibah penelitian internal",
+   "n": [
+    44,
+    45
+   ]
+  },
+  {
+   "q": "Menyusun roadmap penelitian prodi",
+   "n": [
+    43
+   ]
+  },
+  {
+   "q": "Pengabdian masyarakat pendampingan desa wisata",
+   "n": [
+    53
+   ]
+  },
+  {
+   "q": "PkM dosen melibatkan mahasiswa di Karangasem",
+   "n": [
+    54,
+    53
+   ]
+  },
+  {
+   "q": "Publikasi artikel di jurnal terakreditasi Sinta",
+   "n": [
+    48
+   ]
+  },
+  {
+   "q": "Artikel dosen banyak disitasi di Google Scholar",
+   "n": [
+    50
+   ]
+  },
+  {
+   "q": "Pendaftaran hak cipta modul ajar",
+   "n": [
+    57,
+    47
+   ]
+  },
+  {
+   "q": "Dosen menjadi narasumber di Dinas Pariwisata",
+   "n": [
+    72,
+    57
+   ]
+  },
+  {
+   "q": "Dosen menjadi keynote speaker konferensi internasional",
+   "n": [
+    72
+   ]
+  },
+  {
+   "q": "Penandatanganan MoU dengan biro perjalanan",
+   "n": [
+    59
+   ]
+  },
+  {
+   "q": "Evaluasi kepuasan mitra kerja sama",
+   "n": [
+    73
+   ]
+  },
+  {
+   "q": "Mahasiswa juara lomba paket wisata tingkat nasional",
+   "n": [
+    32
+   ]
+  },
+  {
+   "q": "Juara futsal antar kampus",
+   "n": [
+    33
+   ]
+  },
+  {
+   "q": "Analisis rata-rata IPK lulusan",
+   "n": [
+    34
+   ]
+  },
+  {
+   "q": "Banyak mahasiswa terlambat lulus",
+   "n": [
+    36,
+    35
+   ]
+  },
+  {
+   "q": "Mahasiswa mengundurkan diri dan drop out",
+   "n": [
+    37
+   ]
+  },
+  {
+   "q": "Waktu tunggu alumni mendapat pekerjaan pertama",
+   "n": [
+    39
+   ]
+  },
+  {
+   "q": "Alumni bekerja tidak sesuai bidang",
+   "n": [
+    40
+   ]
+  },
+  {
+   "q": "Promosi penerimaan mahasiswa baru ke SMA",
+   "n": [
+    64
+   ]
+  },
+  {
+   "q": "Pembagian beasiswa KIP kuliah",
+   "n": [
+    64,
+    65
+   ]
+  },
+  {
+   "q": "Layanan bimbingan konseling dan karier mahasiswa",
+   "n": [
+    65
+   ]
+  },
+  {
+   "q": "Penyusunan anggaran prodi tahun depan",
+   "n": [
+    70,
+    66
+   ]
+  },
+  {
+   "q": "Realisasi dana penelitian dosen",
+   "n": [
+    67
+   ]
+  },
+  {
+   "q": "Penyusunan renstra dan visi misi prodi",
+   "n": [
+    74
+   ]
+  },
+  {
+   "q": "Penerapan kode etik pariwisata dunia di kegiatan mahasiswa",
+   "n": [
+    75
+   ]
+  },
+  {
+   "q": "Laporan kinerja tahunan prodi",
+   "n": [
+    77
+   ]
+  },
+  {
+   "q": "Analisis SWOT program studi",
+   "n": [
+    82
+   ]
+  },
+  {
+   "q": "Survei kepuasan dosen dan tendik terhadap manajemen",
+   "n": [
+    78
+   ]
+  },
+  {
+   "q": "Pelatihan laboran dan tenaga kependidikan",
+   "n": [
+    18
+   ]
+  },
+  {
+   "q": "Beban kerja dosen BKD semester ini",
+   "n": [
+    29
+   ]
+  },
+  {
+   "q": "Pembagian dosen pembimbing tugas akhir",
+   "n": [
+    28
+   ]
+  },
+  {
+   "q": "Penyusunan SOP layanan akademik",
+   "n": [
+    62
+   ]
+  },
+  {
+   "q": "Penanganan pengaduan dan pelanggaran etika akademik",
+   "n": [
+    60
+   ]
+  },
+  {
+   "q": "Pengembangan sistem informasi akademik",
+   "n": [
+    61
+   ]
+  },
+  {
+   "q": "Pembelajaran daring melalui LMS",
+   "n": [
+    22
+   ]
+  },
+  {
+   "q": "Rekap kehadiran mahasiswa dan dosen per pertemuan",
+   "n": [
+    22,
+    23
+   ]
+  },
+  {
+   "q": "Pengukuran ketercapaian CPL",
+   "n": [
+    31
+   ]
+  },
+  {
+   "q": "Rasio dosen dan mahasiswa aktif",
+   "n": [
+    27
+   ]
+  },
+  {
+   "q": "Produk paket wisata mahasiswa dipakai mitra",
+   "n": [
+    49
+   ]
+  },
+  {
+   "q": "Indikator kinerja tambahan prodi",
+   "n": [
+    79
+   ]
+  }
+ ],
+ "jenis": [
+  {
+   "q": "Seminar hasil penelitian dosen",
+   "k": [
+    "penelitian",
+    "publikasi"
+   ]
+  },
+  {
+   "q": "Pendampingan UMKM desa wisata",
+   "k": [
+    "pkm"
+   ]
+  },
+  {
+   "q": "Juara 1 lomba business plan",
+   "k": [
+    "prestasi_a"
+   ]
+  },
+  {
+   "q": "Juara bulu tangkis",
+   "k": [
+    "prestasi_n"
+   ]
+  },
+  {
+   "q": "Rapat IAB 2026",
+   "k": [
+    "iab"
+   ]
+  },
+  {
+   "q": "Audit mutu internal prodi",
+   "k": [
+    "ppepp"
+   ]
+  },
+  {
+   "q": "Penandatanganan MoU dengan hotel",
+   "k": [
+    "kerjasama"
+   ]
+  },
+  {
+   "q": "Kuliah tamu dari GM travel agent",
+   "k": [
+    "kuliahtamu",
+    "suasana"
+   ]
+  },
+  {
+   "q": "Workshop review kurikulum",
+   "k": [
+    "kurikulum"
+   ]
+  },
+  {
+   "q": "Magang mahasiswa di Kementerian Pariwisata",
+   "k": [
+    "mbkm"
+   ]
+  },
+  {
+   "q": "Uji kompetensi tour guide",
+   "k": [
+    "sertifikasi"
+   ]
+  },
+  {
+   "q": "Pelatihan dosen di luar negeri",
+   "k": [
+    "pengembangan"
+   ]
+  },
+  {
+   "q": "Dosen jadi narasumber pelatihan pemandu wisata",
+   "k": [
+    "kepakaran",
+    "rekognisi"
+   ]
+  },
+  {
+   "q": "Pendaftaran HKI hak cipta buku ajar",
+   "k": [
+    "hki"
+   ]
+  },
+  {
+   "q": "Studi banding ke prodi pariwisata UGM",
+   "k": [
+    "benchmark"
+   ]
+  }
+ ],
+ "butirLain": [
+  {
+   "q": "Bagaimana kalau kita bahas hasil angket mahasiswa soal cara dosen mengajar",
+   "n": [
+    71,
+    23,
+    22
+   ]
+  },
+  {
+   "q": "Ngecek apakah materi kuliah sudah sesuai rencana semester",
+   "n": [
+    22,
+    8,
+    23
+   ]
+  },
+  {
+   "q": "Mengundang perwakilan perusahaan travel untuk memberi masukan kurikulum",
+   "n": [
+    3,
+    7
+   ]
+  },
+  {
+   "q": "Ada keluhan mahasiswa soal nilai yang tidak transparan",
+   "n": [
+    25,
+    60
+   ]
+  },
+  {
+   "q": "Persiapan dosen mengikuti sertifikasi kompetensi tour leader",
+   "n": [
+    14
+   ]
+  },
+  {
+   "q": "Bantuan dana untuk dosen yang meneliti",
+   "n": [
+    67,
+    45
+   ]
+  },
+  {
+   "q": "Rencana menambah satu dosen tetap baru",
+   "n": [
+    9,
+    10
+   ]
+  },
+  {
+   "q": "Mahasiswa butuh tempat praktik yang lebih banyak di luar kampus",
+   "n": [
+    20,
+    24
+   ]
+  },
+  {
+   "q": "Ruang kelas kurang proyektor dan AC rusak",
+   "n": [
+    19
+   ]
+  },
+  {
+   "q": "Mengirim data alumni yang sudah bekerja",
+   "n": [
+    38,
+    39,
+    41
+   ]
+  },
+  {
+   "q": "Menghubungi atasan alumni untuk menilai kinerja lulusan",
+   "n": [
+    42
+   ]
+  },
+  {
+   "q": "Dosen menulis buku ajar ber ISBN",
+   "n": [
+    57
+   ]
+  },
+  {
+   "q": "Membuat aplikasi pencatatan data prodi",
+   "n": [
+    61
+   ]
+  },
+  {
+   "q": "Kegiatan bersih pantai bersama masyarakat pesisir",
+   "n": [
+    53
+   ]
+  },
+  {
+   "q": "Mahasiswa menang lomba debat bahasa Inggris",
+   "n": [
+    32
+   ]
+  },
+  {
+   "q": "Perjanjian kerja sama dengan Kementerian Pariwisata untuk magang",
+   "n": [
+    59,
+    6
+   ]
+  },
+  {
+   "q": "Menentukan program prioritas tahun depan berdasarkan analisis",
+   "n": [
+    83,
+    82
+   ]
+  },
+  {
+   "q": "Menjamin program tetap berjalan walau dana terbatas",
+   "n": [
+    84,
+    70
+   ]
+  },
+  {
+   "q": "Menyusun laporan pemantauan mutu untuk dikirim ke pusat penjaminan mutu",
+   "n": [
+    4,
+    1
+   ]
+  },
+  {
+   "q": "Prodi ingin akreditasi internasional UNWTO",
+   "n": [
+    5
+   ]
+  }
+ ]
+}

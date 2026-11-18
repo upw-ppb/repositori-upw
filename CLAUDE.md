@@ -281,6 +281,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   rapat.berkas: pindaian risalah (hanya setelah final) disalin (makeCopy) ke slot Bank SLOT_RISALAH {iab "3-2", rtm "2-2", kurikulum "7-1", monev "23-1", survei "42-1"}.
   Setelah risalah final undangan terkunci (risalahFinal()). Asesor: menu rapat, lihat rapat final. Tampilan: bagianRisalah(), laciRisalahForm, risalahDocx (UPW_DOCX),
   kertasRisalah, kertasHadir. Uji: alat/uji/uji-v32-bagian.mjs.
+- v0.33.0 (18 Nov 2026, Uji Coba): saran butir/jenis tanpa AI. docs/uji/saran.js DIBUAT OTOMATIS oleh `node alat/saran.mjs [--uji]` dari instrumen.js,
+  alat/instrumen/kamus-butir.json (frasa per butir + _sinonim; tambah istilah di sini bila saran meleset), gas/Jenis.js, petaJenisButir. Mesin: alat/saran-mesin.js
+  (UPW_SARAN.butir/jenis/butirJenis). Tampilan: muatSaran() (malas), htmlSaran(jenis, teks, kecuali), isian data-saran + data-saran-out (kotak diperbarui tanpa render),
+  AKSI.saranPilih. Set uji alat/uji/saran-uji.json (disalin jalankan.sh, *.json). Uji: alat/uji/uji-v33-bagian.mjs (ambang ≥90%).
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

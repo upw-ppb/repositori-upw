@@ -1,0 +1,998 @@
+{
+ "_keterangan": "Kamus istilah sehari-hari prodi → butir Matriks (nomor Lampiran 1, seperti di Penilaian). Dipakai mesin saran butir (alat/saran.mjs). Tambahkan frasa yang sering dipakai prodi; frasa lebih dari satu kata mendapat nilai lebih tinggi bila muncul utuh.",
+ "_sinonim": [
+  [
+   "pembelajaran",
+   "perkuliahan",
+   "kuliah",
+   "pengajaran",
+   "belajar mengajar",
+   "kbm",
+   "mengajar",
+   "kelas"
+  ],
+  [
+   "monev",
+   "monitoring",
+   "pemantauan",
+   "evaluasi"
+  ],
+  [
+   "survei",
+   "survey",
+   "kuesioner",
+   "angket",
+   "questionnaire"
+  ],
+  [
+   "kepuasan",
+   "puas",
+   "kepuasaan"
+  ],
+  [
+   "dosen",
+   "pengajar",
+   "dtps",
+   "tenaga pendidik"
+  ],
+  [
+   "tendik",
+   "tenaga kependidikan",
+   "staf administrasi",
+   "pegawai administrasi"
+  ],
+  [
+   "mahasiswa",
+   "mhs",
+   "siswa",
+   "peserta didik",
+   "taruna"
+  ],
+  [
+   "lulusan",
+   "alumni",
+   "wisudawan"
+  ],
+  [
+   "pengguna lulusan",
+   "pemberi kerja",
+   "employer",
+   "atasan alumni"
+  ],
+  [
+   "rapat",
+   "pertemuan",
+   "meeting",
+   "diskusi",
+   "forum"
+  ],
+  [
+   "kerja sama",
+   "kerjasama",
+   "mou",
+   "moa",
+   "pks",
+   "perjanjian kerja sama",
+   "kemitraan",
+   "mitra"
+  ],
+  [
+   "industri",
+   "dudi",
+   "dunia usaha",
+   "dunia industri",
+   "biro perjalanan",
+   "travel agent",
+   "hotel",
+   "perusahaan"
+  ],
+  [
+   "penelitian",
+   "riset",
+   "research",
+   "kajian"
+  ],
+  [
+   "pkm",
+   "pengabdian",
+   "pengabdian kepada masyarakat",
+   "abdimas",
+   "pengmas"
+  ],
+  [
+   "publikasi",
+   "jurnal",
+   "artikel",
+   "prosiding",
+   "paper"
+  ],
+  [
+   "kurikulum",
+   "kurikuler",
+   "obe"
+  ],
+  [
+   "rps",
+   "rencana pembelajaran semester",
+   "silabus"
+  ],
+  [
+   "sertifikasi",
+   "sertifikat",
+   "uji kompetensi",
+   "lsp",
+   "bnsp"
+  ],
+  [
+   "laboratorium",
+   "lab",
+   "studio"
+  ],
+  [
+   "sarana",
+   "prasarana",
+   "fasilitas",
+   "gedung",
+   "ruang kelas",
+   "peralatan"
+  ],
+  [
+   "renstra",
+   "rencana strategis",
+   "roadmap",
+   "peta jalan"
+  ],
+  [
+   "spmi",
+   "penjaminan mutu",
+   "sistem penjaminan mutu internal",
+   "mutu internal"
+  ],
+  [
+   "ami",
+   "audit mutu internal",
+   "audit internal",
+   "audit"
+  ],
+  [
+   "tracer",
+   "tracer study",
+   "penelusuran lulusan",
+   "pelacakan alumni"
+  ],
+  [
+   "anggaran",
+   "dana",
+   "biaya",
+   "keuangan",
+   "rkat",
+   "pendanaan"
+  ],
+  [
+   "prestasi",
+   "juara",
+   "lomba",
+   "kompetisi",
+   "medali",
+   "penghargaan"
+  ],
+  [
+   "magang",
+   "internship",
+   "on the job training",
+   "ojt"
+  ],
+  [
+   "tugas akhir",
+   "ta",
+   "skripsi",
+   "proyek akhir",
+   "laporan akhir"
+  ],
+  [
+   "sosialisasi",
+   "penyuluhan"
+  ],
+  [
+   "pelatihan",
+   "workshop",
+   "lokakarya",
+   "bimtek",
+   "training"
+  ],
+  [
+   "tindak lanjut",
+   "tindaklanjut",
+   "follow up",
+   "perbaikan"
+  ],
+  [
+   "pkl",
+   "praktik kerja lapangan",
+   "praktek kerja lapangan",
+   "kerja praktik"
+  ]
+ ],
+ "1": [
+  "spmi",
+  "dokumen spmi",
+  "kebijakan spmi",
+  "manual spmi",
+  "standar spmi",
+  "formulir spmi",
+  "gugus penjaminan mutu",
+  "unit penjaminan mutu",
+  "sk gkm",
+  "benchmarking mutu",
+  "external benchmarking"
+ ],
+ "2": [
+  "ppepp",
+  "siklus ppepp",
+  "penetapan standar",
+  "pelaksanaan standar",
+  "evaluasi pemenuhan standar",
+  "pengendalian standar",
+  "peningkatan standar",
+  "audit mutu internal",
+  "ami",
+  "rapat tinjauan manajemen",
+  "rtm",
+  "tinjauan manajemen",
+  "temuan audit",
+  "tindak lanjut audit",
+  "tindak lanjut temuan"
+ ],
+ "3": [
+  "industry advisory board",
+  "advisory board",
+  "iab",
+  "dewan penasihat industri",
+  "dewan penasehat",
+  "rapat iab",
+  "konsultasi industri",
+  "masukan industri",
+  "rapat dengan mitra industri",
+  "pertemuan dengan asita",
+  "asita"
+ ],
+ "4": [
+  "laporan spmi",
+  "laporan implementasi spmi",
+  "laporan penjaminan mutu",
+  "laporan mutu tahunan",
+  "pelaporan pddikti",
+  "pddikti",
+  "laporan ami"
+ ],
+ "5": [
+  "akreditasi internasional",
+  "sertifikasi internasional",
+  "iso",
+  "iso 9001",
+  "unwto tedqual",
+  "tedqual",
+  "akreditasi lembaga lain",
+  "sertifikasi mutu institusi",
+  "pengakuan mutu"
+ ],
+ "6": [
+  "kebijakan kurikulum",
+  "pedoman kurikulum",
+  "kurikulum obe",
+  "outcome based education",
+  "anti korupsi",
+  "pendidikan anti korupsi",
+  "kewirausahaan",
+  "dual system",
+  "teaching industry",
+  "teaching factory",
+  "magang kementerian",
+  "belajar di luar prodi",
+  "mbkm"
+ ],
+ "7": [
+  "evaluasi kurikulum",
+  "peninjauan kurikulum",
+  "revisi kurikulum",
+  "lokakarya kurikulum",
+  "workshop kurikulum",
+  "penyusunan kurikulum",
+  "cpl",
+  "capaian pembelajaran lulusan",
+  "profil lulusan",
+  "kkni",
+  "skkni",
+  "peta kurikulum",
+  "struktur kurikulum",
+  "review kurikulum",
+  "pemutakhiran kurikulum"
+ ],
+ "8": [
+  "rps",
+  "rencana pembelajaran semester",
+  "penyusunan rps",
+  "review rps",
+  "revisi rps",
+  "peninjauan rps",
+  "silabus",
+  "bahan kajian",
+  "kedalaman materi",
+  "keluasan materi",
+  "kesesuaian rps"
+ ],
+ "9": [
+  "renstra sdm",
+  "rencana pengembangan sdm",
+  "analisis kebutuhan dosen",
+  "kebutuhan tendik",
+  "rekrutmen dosen",
+  "formasi dosen",
+  "rasio dosen mahasiswa"
+ ],
+ "10": [
+  "jumlah dosen tetap",
+  "kecukupan dosen",
+  "dosen tetap prodi",
+  "dtps",
+  "homebase dosen"
+ ],
+ "11": [
+  "dosen doktor",
+  "dosen s3",
+  "studi lanjut s3",
+  "pendidikan doktor",
+  "gelar doktor"
+ ],
+ "12": [
+  "latar belakang pendidikan dosen",
+  "pendidikan dasar dosen",
+  "ijazah s1 dosen",
+  "kesesuaian pendidikan dosen"
+ ],
+ "13": [
+  "linearitas",
+  "linieritas",
+  "linier",
+  "pendidikan linier",
+  "bidang ilmu dosen"
+ ],
+ "14": [
+  "sertifikat kompetensi dosen",
+  "sertifikasi dosen",
+  "sertifikasi profesi dosen",
+  "dosen bersertifikat",
+  "lsp dosen",
+  "asesor kompetensi"
+ ],
+ "15": [
+  "jabatan fungsional",
+  "jabatan akademik",
+  "jafung",
+  "lektor",
+  "lektor kepala",
+  "guru besar",
+  "kenaikan pangkat dosen",
+  "asisten ahli"
+ ],
+ "16": [
+  "dosen praktisi",
+  "praktisi",
+  "dosen industri",
+  "dosen tamu dari industri",
+  "team teaching praktisi",
+  "pengajar dari industri",
+  "gm hotel mengajar"
+ ],
+ "17": [
+  "dosen tidak tetap",
+  "dosen luar biasa",
+  "dosen ldb",
+  "dosen dari kampus lain",
+  "dosen agama"
+ ],
+ "18": [
+  "tendik",
+  "tenaga kependidikan",
+  "laboran",
+  "pustakawan",
+  "teknisi",
+  "sertifikat laboran",
+  "pelatihan tendik"
+ ],
+ "19": [
+  "sarana prasarana",
+  "fasilitas",
+  "ruang kelas",
+  "gedung",
+  "perpustakaan",
+  "peralatan",
+  "pengadaan alat",
+  "perbaikan fasilitas",
+  "aksesibilitas"
+ ],
+ "20": [
+  "praktik lapangan",
+  "kunjungan lapangan",
+  "field trip",
+  "study tour",
+  "destinasi wisata",
+  "desa wisata",
+  "lokasi praktik",
+  "unit usaha",
+  "lab lapangan",
+  "pkl"
+ ],
+ "21": [
+  "laboratorium",
+  "lab tiket",
+  "lab ticketing",
+  "lab tour",
+  "lab perjalanan",
+  "lab bahasa",
+  "lab komputer",
+  "perawatan lab",
+  "pemakaian lab",
+  "jadwal lab",
+  "lab manajerial"
+ ],
+ "22": [
+  "proses pembelajaran",
+  "pelaksanaan perkuliahan",
+  "interaksi dosen mahasiswa",
+  "pembelajaran daring",
+  "pembelajaran luring",
+  "lms",
+  "elearning",
+  "e learning",
+  "hybrid",
+  "metode pembelajaran",
+  "pembelajaran berbasis riset",
+  "case method",
+  "project based learning",
+  "pjbl",
+  "kehadiran dosen",
+  "presensi kuliah",
+  "jurnal perkuliahan",
+  "pemantauan kesesuaian rps",
+  "evaluasi perkuliahan",
+  "jadwal kuliah"
+ ],
+ "23": [
+  "monev pembelajaran",
+  "monitoring evaluasi pembelajaran",
+  "evaluasi perkuliahan",
+  "evaluasi proses pembelajaran",
+  "monev perkuliahan",
+  "evaluasi dosen oleh mahasiswa",
+  "edom",
+  "evaluasi beban belajar",
+  "monev tengah semester",
+  "monev akhir semester",
+  "rapat evaluasi perkuliahan"
+ ],
+ "24": [
+  "pembelajaran praktik",
+  "praktikum",
+  "jam praktik",
+  "sks praktik",
+  "praktik studio",
+  "kkn",
+  "pkl",
+  "praktik kerja lapangan",
+  "pkl di industri"
+ ],
+ "25": [
+  "penilaian pembelajaran",
+  "rubrik",
+  "rubrik penilaian",
+  "portofolio penilaian",
+  "kontrak kuliah",
+  "soal ujian",
+  "uts",
+  "uas",
+  "ujian",
+  "nilai mahasiswa",
+  "teknik penilaian",
+  "instrumen penilaian",
+  "validasi soal",
+  "remedial"
+ ],
+ "26": [
+  "uji kompetensi",
+  "sertifikasi mahasiswa",
+  "sertifikat kompetensi mahasiswa",
+  "lsp p1",
+  "bnsp",
+  "skema sertifikasi",
+  "toefl",
+  "toeic",
+  "sertifikat tour leader",
+  "sertifikat tour guide",
+  "pemandu wisata",
+  "sertifikat amadeus",
+  "sertifikat galileo",
+  "sabre"
+ ],
+ "27": [
+  "rasio mahasiswa dosen",
+  "jumlah mahasiswa aktif",
+  "student body",
+  "rasio dosen"
+ ],
+ "28": [
+  "pembimbing tugas akhir",
+  "bimbingan tugas akhir",
+  "pembimbing utama",
+  "bimbingan skripsi",
+  "beban bimbingan",
+  "sidang tugas akhir",
+  "ujian tugas akhir"
+ ],
+ "29": [
+  "ewmp",
+  "beban kerja dosen",
+  "bkd",
+  "sks mengajar",
+  "jam mengajar",
+  "tugas tambahan dosen",
+  "pembagian tugas mengajar",
+  "jadwal mengajar dosen",
+  "distribusi mata kuliah",
+  "pembagian mata kuliah"
+ ],
+ "30": [
+  "pengembangan dosen",
+  "pelatihan dosen",
+  "studi lanjut",
+  "magang dosen",
+  "workshop dosen",
+  "pekerti",
+  "applied approach",
+  "seminar dosen",
+  "rencana pengembangan dosen",
+  "dosen magang"
+ ],
+ "31": [
+  "analisis cpl",
+  "pemenuhan cpl",
+  "ketercapaian cpl",
+  "capaian pembelajaran",
+  "pengukuran cpl",
+  "obe assessment"
+ ],
+ "32": [
+  "prestasi akademik",
+  "lomba akademik",
+  "lomba karya tulis",
+  "olimpiade",
+  "debat bahasa inggris",
+  "business plan",
+  "lomba paket wisata",
+  "lomba itinerary",
+  "lomba ilmiah"
+ ],
+ "33": [
+  "prestasi nonakademik",
+  "lomba olahraga",
+  "lomba seni",
+  "tari",
+  "paduan suara",
+  "porseni",
+  "juara olahraga",
+  "lomba futsal"
+ ],
+ "34": [
+  "ipk",
+  "ipk lulusan",
+  "indeks prestasi kumulatif",
+  "yudisium"
+ ],
+ "35": [
+  "masa studi",
+  "lama studi",
+  "rata rata masa studi"
+ ],
+ "36": [
+  "lulus tepat waktu",
+  "kelulusan tepat waktu",
+  "tepat waktu"
+ ],
+ "37": [
+  "keberhasilan studi",
+  "angka putus kuliah",
+  "drop out",
+  "mahasiswa mengundurkan diri",
+  "retensi mahasiswa"
+ ],
+ "38": [
+  "tracer study",
+  "penelusuran lulusan",
+  "kuesioner alumni",
+  "survei alumni",
+  "pelacakan lulusan",
+  "data alumni"
+ ],
+ "39": [
+  "waktu tunggu",
+  "masa tunggu kerja",
+  "pekerjaan pertama",
+  "lulusan bekerja"
+ ],
+ "40": [
+  "kesesuaian bidang kerja",
+  "relevansi pekerjaan alumni",
+  "bidang kerja lulusan"
+ ],
+ "41": [
+  "tempat kerja lulusan",
+  "alumni bekerja di perusahaan multinasional",
+  "alumni wirausaha",
+  "tingkat tempat kerja"
+ ],
+ "42": [
+  "kepuasan pengguna lulusan",
+  "survei pengguna lulusan",
+  "survei pengguna alumni",
+  "kuesioner pengguna lulusan",
+  "tindak lanjut kepuasan pengguna",
+  "employer satisfaction"
+ ],
+ "43": [
+  "renstra penelitian",
+  "roadmap penelitian",
+  "peta jalan penelitian",
+  "pedoman penelitian",
+  "rencana induk penelitian",
+  "rip"
+ ],
+ "44": [
+  "proses penelitian",
+  "seleksi proposal penelitian",
+  "review proposal penelitian",
+  "reviewer penelitian",
+  "monev penelitian",
+  "berita acara monev penelitian",
+  "seminar hasil penelitian"
+ ],
+ "45": [
+  "penelitian dosen",
+  "hibah penelitian",
+  "penelitian dtps",
+  "penelitian internal",
+  "penelitian mandiri",
+  "penelitian kompetitif"
+ ],
+ "46": [
+  "penelitian melibatkan mahasiswa",
+  "penelitian bersama mahasiswa",
+  "asisten peneliti mahasiswa",
+  "tugas akhir dari penelitian dosen"
+ ],
+ "47": [
+  "analisis luaran penelitian",
+  "luaran penelitian",
+  "hki penelitian",
+  "realisasi dana riset",
+  "ketercapaian luaran penelitian"
+ ],
+ "48": [
+  "publikasi dosen",
+  "artikel jurnal",
+  "jurnal sinta",
+  "jurnal internasional",
+  "jurnal bereputasi",
+  "scopus",
+  "seminar nasional",
+  "seminar internasional",
+  "prosiding",
+  "presentasi ilmiah",
+  "conference"
+ ],
+ "49": [
+  "produk mahasiswa diadopsi",
+  "produk jasa mahasiswa",
+  "paket wisata mahasiswa dipakai",
+  "karya mahasiswa diadopsi industri",
+  "aplikasi mahasiswa dipakai"
+ ],
+ "50": [
+  "sitasi",
+  "artikel disitasi",
+  "jumlah sitasi",
+  "h index",
+  "google scholar"
+ ],
+ "51": [
+  "renstra pkm",
+  "roadmap pkm",
+  "peta jalan pkm",
+  "pedoman pkm",
+  "pedoman pengabdian"
+ ],
+ "52": [
+  "proses pkm",
+  "seleksi proposal pkm",
+  "reviewer pkm",
+  "monev pkm",
+  "berita acara monev pkm",
+  "layanan kepakaran"
+ ],
+ "53": [
+  "pkm dosen",
+  "pengabdian dosen",
+  "hibah pkm",
+  "pendampingan desa wisata",
+  "pelatihan masyarakat",
+  "penyuluhan",
+  "pemberdayaan masyarakat",
+  "pengabdian kepada masyarakat"
+ ],
+ "54": [
+  "pkm melibatkan mahasiswa",
+  "pengabdian bersama mahasiswa",
+  "mahasiswa ikut pkm"
+ ],
+ "55": [
+  "analisis luaran pkm",
+  "luaran pkm",
+  "rekognisi pkm",
+  "dampak pkm"
+ ],
+ "56": [
+  "publikasi pkm",
+  "artikel pengabdian",
+  "jurnal pengabdian",
+  "media massa pkm"
+ ],
+ "57": [
+  "pengakuan kepakaran",
+  "kepakaran dosen",
+  "narasumber",
+  "konsultan",
+  "tenaga ahli",
+  "hki",
+  "hak cipta",
+  "paten",
+  "buku ber isbn",
+  "book chapter",
+  "teknologi tepat guna"
+ ],
+ "58": [
+  "statuta",
+  "struktur organisasi",
+  "sotk",
+  "tata kelola",
+  "tata pamong",
+  "tugas pokok dan fungsi",
+  "tupoksi",
+  "organ prodi"
+ ],
+ "59": [
+  "kerja sama",
+  "mou",
+  "moa",
+  "pks",
+  "perjanjian kerja sama",
+  "mitra kerja sama",
+  "kerja sama pendidikan",
+  "kerja sama penelitian",
+  "kerja sama pkm",
+  "kerja sama internasional",
+  "penandatanganan mou"
+ ],
+ "60": [
+  "pengawasan",
+  "mitigasi risiko",
+  "manajemen risiko",
+  "register risiko",
+  "pengaduan",
+  "keluhan",
+  "etika akademik",
+  "plagiarisme",
+  "anti korupsi",
+  "spi",
+  "satuan pengawas internal",
+  "whistleblowing"
+ ],
+ "61": [
+  "sistem informasi",
+  "pengelolaan data",
+  "siakad",
+  "pddikti",
+  "data akademik",
+  "keamanan data",
+  "website prodi",
+  "keterbukaan informasi"
+ ],
+ "62": [
+  "posac",
+  "planning organizing staffing leading controlling",
+  "pedoman pengelolaan",
+  "sop",
+  "standar operasional prosedur",
+  "manajemen prodi",
+  "pengelolaan prodi"
+ ],
+ "63": [
+  "suasana akademik",
+  "kuliah umum",
+  "kuliah tamu",
+  "studium generale",
+  "guest lecture",
+  "seminar ilmiah",
+  "bedah buku",
+  "himpunan mahasiswa",
+  "hmj",
+  "diskusi ilmiah",
+  "webinar"
+ ],
+ "64": [
+  "penerimaan mahasiswa baru",
+  "pmb",
+  "seleksi mahasiswa baru",
+  "promosi prodi",
+  "afirmasi",
+  "beasiswa kip",
+  "kip kuliah",
+  "rpl",
+  "rekognisi pembelajaran lampau",
+  "animo pendaftar",
+  "pendaftar"
+ ],
+ "65": [
+  "layanan kemahasiswaan",
+  "bimbingan konseling",
+  "layanan karier",
+  "pusat karier",
+  "kewirausahaan mahasiswa",
+  "inkubator bisnis",
+  "beasiswa",
+  "layanan kesehatan",
+  "ukm",
+  "minat bakat",
+  "penalaran"
+ ],
+ "66": [
+  "biaya operasional pendidikan",
+  "bop",
+  "dana operasional",
+  "biaya per mahasiswa"
+ ],
+ "67": [
+  "dana penelitian",
+  "anggaran penelitian",
+  "hibah penelitian"
+ ],
+ "68": [
+  "dana pkm",
+  "anggaran pkm",
+  "dana pengabdian"
+ ],
+ "69": [
+  "realisasi investasi",
+  "investasi sarana",
+  "investasi sdm",
+  "belanja modal",
+  "pengadaan"
+ ],
+ "70": [
+  "kecukupan dana",
+  "laporan keuangan",
+  "rkat",
+  "anggaran prodi",
+  "sumber pendanaan",
+  "proyeksi anggaran"
+ ],
+ "71": [
+  "kepuasan mahasiswa",
+  "survei kepuasan mahasiswa",
+  "kuesioner kepuasan mahasiswa",
+  "edom",
+  "evaluasi layanan oleh mahasiswa",
+  "tindak lanjut kepuasan mahasiswa",
+  "reliability responsiveness assurance empathy tangible"
+ ],
+ "72": [
+  "rekognisi dosen",
+  "visiting lecturer",
+  "visiting scholar",
+  "keynote speaker",
+  "invited speaker",
+  "editor jurnal",
+  "reviewer jurnal",
+  "mitra bestari",
+  "staf ahli",
+  "penghargaan dosen"
+ ],
+ "73": [
+  "evaluasi kerja sama",
+  "kepuasan mitra",
+  "manfaat kerja sama",
+  "keberlanjutan kerja sama",
+  "survei kepuasan mitra",
+  "monev kerja sama"
+ ],
+ "74": [
+  "diferensiasi misi",
+  "visi misi",
+  "renstra prodi",
+  "renstra upps",
+  "rencana strategis prodi",
+  "rencana jangka panjang",
+  "rencana operasional",
+  "renop",
+  "peta pengembangan"
+ ],
+ "75": [
+  "gcet",
+  "global code of ethics",
+  "kode etik pariwisata",
+  "kode etik kepariwisataan dunia",
+  "pariwisata berkelanjutan",
+  "sustainable tourism",
+  "sdgs",
+  "etika pariwisata"
+ ],
+ "76": [
+  "strategi pencapaian",
+  "strategi prodi",
+  "rencana aksi",
+  "action plan",
+  "pemantauan strategi"
+ ],
+ "77": [
+  "evaluasi capaian kinerja",
+  "laporan kinerja",
+  "capaian kinerja",
+  "iku",
+  "indikator kinerja utama",
+  "lakip",
+  "laporan tahunan",
+  "evaluasi kinerja prodi",
+  "rapat evaluasi kinerja"
+ ],
+ "78": [
+  "kepuasan pemangku kepentingan",
+  "survei kepuasan dosen",
+  "survei kepuasan tendik",
+  "survei kepuasan mitra",
+  "kepuasan layanan manajemen",
+  "survei kepuasan stakeholder"
+ ],
+ "79": [
+  "indikator kinerja tambahan",
+  "ikt",
+  "indikator tambahan",
+  "daya saing internasional"
+ ],
+ "80": [
+  "profil upps",
+  "profil prodi",
+  "sejarah prodi",
+  "profil jurusan"
+ ],
+ "81": [
+  "analisis capaian kinerja",
+  "analisis kinerja",
+  "akar masalah",
+  "konsistensi data"
+ ],
+ "82": [
+  "swot",
+  "analisis swot",
+  "kekuatan kelemahan peluang ancaman",
+  "analisis lingkungan"
+ ],
+ "83": [
+  "program pengembangan",
+  "prioritas program",
+  "rencana pengembangan prodi"
+ ],
+ "84": [
+  "program keberlanjutan",
+  "keberlanjutan program",
+  "sustainability program",
+  "alokasi sumber daya"
+ ]
+}

@@ -3,6 +3,27 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.33.0 — 18 Nov 2026 — Uji Coba
+Ringkas: Saran butir Matriks otomatis (tanpa AI) saat mengetik agenda rapat, tindak lanjut, keputusan risalah, dokumen Bank, dan judul kegiatan, serta kotak Cari butir di Penilaian.
+Permintaan pemilik 18 Nov 2026 (banyak pengguna tidak paham butir); rencana disetujui: "Setuju, kerjakan".
+- **Saran butir** muncul di bawah isian saat mengetik: agenda undangan rapat, uraian tindak lanjut, keputusan risalah, dan nama dokumen tambahan di Bank Dokumen
+  (hanya butir yang punya slot Bank). Setiap saran menampilkan kata yang cocok (arahkan kursor) dan tombol (i). Butir yang sudah dipilih tidak disarankan lagi;
+  butir agenda bisa dilepas (×).
+- **Kegiatan**: judul kegiatan → saran jenis kegiatan (hanya jenis yang boleh untuk peran pengguna); di bawah pilihan jenis tampil butir Matriks yang memakai jenis itu.
+  Pencari jenis lama tetap ada.
+- **Penilaian**: kotak baru **Cari butir** dengan kata sehari-hari; "Lihat di tabel" melompat ke baris butir.
+- Cara kerja: docs/uji/saran.js dibuat oleh `node alat/saran.mjs` dari teks instrumen (instrumen.js), kamus istilah prodi (alat/instrumen/kamus-butir.json,
+  bisa ditambah), daftar jenis kegiatan, dan peta jenis → butir server. Tanpa AI, tanpa internet, berjalan di browser; dimuat saat pertama kali dibutuhkan.
+- **Ketepatan (apa adanya)**: 70/70 kalimat uji (100%) benar di 3 saran teratas, 68/70 (97%) di urutan pertama; 20/20 kalimat bergaya lain tanpa frasa kamus;
+  jenis kegiatan 15/15. CATATAN JUJUR: kalimat uji ditulis oleh penyusun kamus yang sama, jadi angka nyata dengan kalimat pengguna kemungkinan lebih rendah.
+  Saran bisa keliru; pengguna tetap memeriksa dengan (i). Kalimat yang meleset bisa diperbaiki dengan menambah istilah di kamus.
+- Panduan Info: topik baru "Saran butir Matriks otomatis".
+- Struktur data TIDAK berubah (server hanya naik nomor versi). Rollback ke v0.32.0 tanpa pemulihan data.
+- Uji: 663 + 44 uji server lulus (9 uji baru di uji-v33-bagian.mjs, termasuk ambang ketepatan ≥ 90%). Uji tampilan di server lokal: Cari butir dan lompat ke baris,
+  agenda undangan (pilih, lepas ×), tindak lanjut, keputusan risalah, Bank Dokumen tambahan (pilihan butir dan penanggung jawab tetap), judul kegiatan → jenis;
+  penjelajah 58 halaman/laci tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.32.0 — 18 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.32.0 (server Apps Script Produksi deployment @12, tampilan docs/): risalah rapat per agenda (keputusan menjadi tindak lanjut),
   templat Word, risalah Word/PDF, daftar hadir PDF, pindaian risalah dan daftar hadir, salinan otomatis ke Bank Dokumen, akses baca asesor untuk rapat final.
