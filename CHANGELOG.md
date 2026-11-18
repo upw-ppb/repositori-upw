@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.33.0 — 19 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.33.0 (tampilan docs/ dan server Apps Script Produksi deployment @13, server hanya naik nomor versi): saran butir Matriks otomatis
+  (tanpa AI) di agenda undangan rapat, tindak lanjut, keputusan risalah, dokumen tambahan Bank Dokumen, dan judul kegiatan (saran jenis), serta kotak Cari butir di Penilaian.
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru; data tidak diubah oleh rilis ini. Rollback ke v0.32.0 cukup tampilan (tag v0.32.0)
+  dan deployment versi milik v0.32.0 (@12).
+- Penyetuju: pemilik, di chat 19 Nov 2026: "setuju tayang v0.33.0".
+
 ## v0.33.0 — 18 Nov 2026 — Uji Coba
 Ringkas: Saran butir Matriks otomatis (tanpa AI) saat mengetik agenda rapat, tindak lanjut, keputusan risalah, dokumen Bank, dan judul kegiatan, serta kotak Cari butir di Penilaian.
 Permintaan pemilik 18 Nov 2026 (banyak pengguna tidak paham butir); rencana disetujui: "Setuju, kerjakan".
