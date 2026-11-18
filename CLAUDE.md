@@ -9,8 +9,13 @@ sebelum menayangkan ke Produksi, dan jangan pernah mengetik kata sandi atas nama
 ## Dokumen acuan
 - Rancangan aplikasi (Claude Docs): https://claude.ai/artifact/W4zXNRq8xCk6kQ6y5HKMvo
 - Panduan persiapan (Claude Docs): https://claude.ai/artifact/K8gBRVdwqQS9WGfhuugKSc
-- Instrumen LAMWisata (DED, Matriks D4 Unggul, Tabel iLKPS): folder Downloads pemilik,
-  "LAMWISATA_IAPS 1.0 Status Terakreditasi Unggul Program Sarjana Terapan".
+- Instrumen LAMWisata (DED, Matriks D4 Unggul, Tabel iLKPS) — DIPINDAH pemilik 18 Nov 2026 dari Downloads ke OneDrive:
+  "~/Library/CloudStorage/OneDrive-Personal/Poltekpar Bali/Prodi UPW/Akreditasi/LAMWisata/" (tautan berbagi OneDrive-nya JANGAN
+  ditulis di repo: repositori publik). Isi: sub-folder
+  "LAMWISATA_IAPS 1.0 Status Terakreditasi Unggul Program Sarjana Terapan" (DED_Vokasi_Unggul .pdf/_Word.docx, Vokasi_Matriks_D4_Akreditasi_Unggul
+  .pdf/_Word.docx, Tabel iLKPS_Lamwisata.xlsx), plus di folder induk: Tabel iLKPS_Lamwisata_21_Oktober_2026.xlsx (format sama; beberapa angka contoh
+  di Tabel 1), Diagram Alir Proses Akreditasi Unggul Program Studi 040526.pdf, Tujuan LAMWISATA.pdf. Baca langsung dari folder lokal ini
+  (alat/uji/baca-docx.py, baca-xlsx.py dengan python3 -I); sebutan "Downloads/..." di catatan lama = folder ini.
 - Logo: aset/logo-poltekpar-bali.png (asal: artifact "Aset Logo Poltekpar Bali").
 
 ## Alat uji (disimpan di proyek sejak 14 Nov 2026)
