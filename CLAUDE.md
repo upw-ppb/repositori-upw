@@ -285,6 +285,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   alat/instrumen/kamus-butir.json (frasa per butir + _sinonim; tambah istilah di sini bila saran meleset), gas/Jenis.js, petaJenisButir. Mesin: alat/saran-mesin.js
   (UPW_SARAN.butir/jenis/butirJenis). Tampilan: muatSaran() (malas), htmlSaran(jenis, teks, kecuali), isian data-saran + data-saran-out (kotak diperbarui tanpa render),
   AKSI.saranPilih. Set uji alat/uji/saran-uji.json (disalin jalankan.sh, *.json). Uji: alat/uji/uji-v33-bagian.mjs (ambang ≥90%).
+- v0.34.0 (19 Nov 2026, Uji Coba): kop surat prodi HANYA halaman pertama. Sumber kop: "~/Library/CloudStorage/OneDrive-Personal/Poltekpar Bali/Prodi UPW/
+  Sekretaris Prodi/Surat Menyurat/Kop Prodi UPW - Politeknik Pariwisata Bali Bahasa Indonesia [update 19 Nov 2026].docx" (bila kop diperbarui: ubah KOP di aplikasi.js
+  + logo-kop.jpg). PDF: kopHtml() di kertas pertama (kertasSurat/Undangan/Risalah/Hadir), cetakSurat menambah @page :first{margin-top:1cm} bila berkop dan
+  menunggu gambar termuat. Word: UPW_DOCX blob({kop: await kopWord()}) → header "first" + titlePg (risalahDocx, gkmWord). TANPA kop: Portofolio (keputusan
+  pemilik), DED, iLKPS. Cek cetak PDF sungguhan: Chrome headless --print-to-pdf file:///… + PDFKit (swift) → PNG. Uji: alat/uji/uji-v34-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

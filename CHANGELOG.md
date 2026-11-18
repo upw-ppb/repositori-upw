@@ -3,6 +3,24 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.34.0 — 19 Nov 2026 — Uji Coba
+Ringkas: Kop surat Prodi UPW (logo, nama prodi, alamat) hanya di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM.
+Permintaan pemilik 19 Nov 2026 (berkas "Kop Prodi UPW - Politeknik Pariwisata Bali Bahasa Indonesia [update 19 Nov 2026].docx"); rencana disetujui dengan
+perubahan: "Portofolio tanpa kop".
+- **PDF** (cetak dari browser): surat pengantar/tugas kegiatan, undangan rapat, risalah rapat, daftar hadir. Kop ada di isi halaman pertama, jadi tidak berulang
+  walaupun surat bersambung; halaman lampiran (daftar peserta/undangan) tanpa kop. Halaman pertama memakai margin atas 1 cm. Di PDF, baris alamat/telepon/laman
+  9 pt (10 pt tidak muat satu baris di samping logo).
+- **Word**: risalah/templat risalah dan Laporan GKM memakai pengaturan Word "Halaman pertama berbeda" (kop di kepala halaman pertama saja; nomor halaman tetap
+  di semua halaman). Kop Word 10 pt seperti berkas asli.
+- **Tanpa kop** (disengaja): Portofolio Saya (keputusan pemilik), DED (format LAMWisata), Tabel iLKPS dan ekspor Excel/ZIP.
+- Baris "Program Studi Usaha Perjalanan Wisata · Politeknik Pariwisata Bali" di bawah judul risalah dan Laporan GKM dihapus karena sudah ada di kop.
+- Logo kop dari berkas Word Sekretaris Prodi (aset/logo-kop-ppb.jpg, docs/uji/logo-kop.jpg).
+- Struktur data dan server tidak berubah (server hanya naik nomor versi). Rollback ke v0.33.0 tanpa pemulihan data.
+- Uji: 672 + 44 uji server lulus (9 uji baru di uji-v34-bagian.mjs). Uji tampilan di server lokal: undangan PDF (kop di halaman 1, lampiran tanpa kop),
+  cetak PDF sungguhan dengan Chrome untuk dokumen 5 halaman (kop hanya di halaman 1, logo utuh, alamat satu baris), unduhan Word risalah dan Laporan GKM
+  berisi kop halaman pertama; penjelajah 58 halaman/laci tanpa masalah. Word hanya dicek dengan pratinjau Mac (belum dibuka di Microsoft Word).
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.33.0 — 19 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.33.0 (tampilan docs/ dan server Apps Script Produksi deployment @13, server hanya naik nomor versi): saran butir Matriks otomatis
   (tanpa AI) di agenda undangan rapat, tindak lanjut, keputusan risalah, dokumen tambahan Bank Dokumen, dan judul kegiatan (saran jenis), serta kotak Cari butir di Penilaian.
