@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.28.0 — 18 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.28.0 (server Apps Script Produksi deployment @8, tampilan docs/): tim pengajar per kelas (sama untuk semua kelas
+  atau berbeda untuk kelas A/B), EWMP dihitung per kelas yang diajar, Portofolio MK mengenali pengampu utama setiap kelas.
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama setelah pembaruan ("Cadangan / sebelum v0.28.0 (struktur data 21 → 22)").
+- Rollback: v0.27.0 tetap bisa membaca data tanpa pemulihan; tim yang diisi per kelas akan tampil kurang tepat di versi lama sampai v0.28.0 dipasang lagi.
+- Penyetuju: pemilik, di chat 18 Nov 2026: "setuju tayang v0.28.0".
+
 ## v0.28.0 — 18 Nov 2026 — Uji Coba
 Ringkas: Tim pengajar kini bisa diisi per kelas: sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B.
 Permintaan pemilik: setiap mata kuliah punya dua kelas (A dan B) dengan pengajar yang bisa sama atau berbeda; sebelumnya hanya bisa satu tim.
