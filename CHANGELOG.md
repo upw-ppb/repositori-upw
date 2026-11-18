@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.29.0 — 18 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.29.0 (server Apps Script Produksi deployment @9, tampilan docs/): data dan bukti dosen praktisi (jabatan, pengalaman,
+  memimpin tim, penerbit sertifikat, dasar kerja sama; unggah CV/ijazah/sertifikat/bukti jabatan/kerja sama), dan MK diampu TS-2 s.d. TS di Tabel 1–3.
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama setelah pembaruan ("Cadangan / sebelum v0.29.0 (struktur data 22 → 23)").
+- Rollback: v0.28.0 tetap bisa membaca data tanpa pemulihan; isian dan bukti praktisi baru tidak tampil di versi lama.
+- Penyetuju: pemilik, di chat 18 Nov 2026: "setuju tayang v0.29.0".
+
 ## v0.29.0 — 18 Nov 2026 — Uji Coba
 Ringkas: Data dan bukti dosen praktisi sesuai syarat LAMWisata, serta mata kuliah yang diampu di Tabel 1–3 kini mencakup TS-2 sampai TS.
 Permintaan pemilik, setelah instrumen dibaca ulang (Matriks butir 16 dan DED Tabel 2–3):

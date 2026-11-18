@@ -352,7 +352,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}${panelKesiapan()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -1342,11 +1342,18 @@ function hDprodi() {
      ${ub ? `<div class="row">${tombol("dpTimSalin", "Salin dari " + D.salinDari, "")}</div>` : ""}`;
   }
   if (S.dpTab === "praktisi") {
+    const nSlot = (D.slotBuktiPraktisi || []).length;
     isi = `<p class="small muted">Dosen industri/praktisi yang mengajar dalam tim pengajar (Tabel 2). Praktisi tidak perlu akun aplikasi.</p>
+     <div class="callout"><b>Kriteria LAMWisata (Matriks butir 16):</b> karyawan atau pemilik usaha dengan pengalaman kerja sesuai bidang prodi, dinilai dari
+      <b>portofolio dan latar belakang pendidikan</b>: pengalaman kerja <b>minimal 5 tahun</b> dan/atau <b>pernah memimpin tim</b>; direkrut melalui
+      <b>kerja sama</b> dengan perusahaan/industri. Simpan buktinya (CV, ijazah, sertifikat, bukti jabatan, dokumen kerja sama) lewat tombol ${ub ? "Ubah" : "Lihat"}.</div>
      ${ub ? `<div class="row">${tombol("dpPrakBaru", "+ Tambah praktisi", "primary")}</div>` : ""}
-     <div class="tbl-wrap"><table><thead><tr><th>Nama</th><th>Perusahaan/industri</th><th>Pendidikan</th><th>Bidang keahlian</th><th>Sertifikat</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
-     ${D.praktisi.map(x => `<tr><td>${esc(x.nama)}${x.nidk ? `<br><span class="mono small muted">NIDK ${esc(x.nidk)}</span>` : ""}</td><td class="small">${esc(x.perusahaan)}</td><td class="small">${esc(x.pendidikan || "–")}</td><td class="small">${esc(x.bidang || "–")}</td><td class="small">${esc(x.sertifikat || "–")}</td>
-       ${ub ? `<td><button class="btn sm" data-act="dpPrakUbah" data-id="${x.id}">Ubah</button></td>` : ""}</tr>`).join("") || `<tr><td colspan="6"><div class="empty">Belum ada praktisi.</div></td></tr>`}</tbody></table></div>`;
+     <div class="tbl-wrap"><table><thead><tr><th>Nama</th><th>Perusahaan/industri</th><th>Jabatan &amp; pengalaman</th><th>Pendidikan</th><th>Bidang keahlian</th><th>Sertifikat</th><th>Kriteria</th><th>Bukti</th><th></th></tr></thead><tbody>
+     ${D.praktisi.map(x => { const nb = Object.keys(x.bukti || {}).length; return `<tr><td>${esc(x.nama)}${x.nidk ? `<br><span class="mono small muted">NIDK ${esc(x.nidk)}</span>` : ""}</td><td class="small">${esc(x.perusahaan)}</td>
+       <td class="small">${esc(x.jabatan || "–")}${x.pengalaman !== "" && x.pengalaman !== undefined ? `<br><span class="muted">${esc(String(x.pengalaman).replace(".", ","))} tahun</span>` : ""}${x.memimpinTim ? `<br><span class="muted">memimpin tim</span>` : ""}</td>
+       <td class="small">${esc(x.pendidikan || "–")}</td><td class="small">${esc(x.bidang || "–")}</td><td class="small">${esc(x.sertifikat || "–")}${x.penerbit ? `<br><span class="muted">${esc(x.penerbit)}</span>` : ""}</td>
+       <td>${x.memenuhi ? '<span class="chip s-disetujui">Memenuhi</span>' : '<span class="chip s-revisi">Lengkapi</span>'}</td><td class="small num">${nb}/${nSlot}</td>
+       <td><button class="btn sm" data-act="dpPrakUbah" data-id="${x.id}">${ub ? "Ubah" : "Lihat"}</button></td></tr>`; }).join("") || `<tr><td colspan="9"><div class="empty">Belum ada praktisi.</div></td></tr>`}</tbody></table></div>`;
   }
   if (S.dpTab === "dosents") {
     const th = new Date().getFullYear(), pil = []; for (let a = th; a >= 2018; a--) pil.push(a);
@@ -1416,14 +1423,53 @@ document.addEventListener("change", e => {
   }
 });
 function laciPraktisi() {
-  const x = S.laci.x || {};
-  const f = (id, k, l, ph, req) => `<div class="field"><label for="${id}">${l}${req ? wajib : ""}</label><input id="${id}" type="text" value="${esc(x[k] || "")}" placeholder="${esc(ph)}"></div>`;
-  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Praktisi" style="width:min(560px,100%)">
-   <div class="dh"><h2>${x.id ? "Ubah praktisi" : "Tambah praktisi"}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
-   ${f("prNama", "nama", "Nama lengkap dengan gelar", "Contoh: Made Wirawan, S.Par.", 1)}${f("prPer", "perusahaan", "Perusahaan / industri", "Contoh: PT Bali Tour Nusantara", 1)}
+  const D = S.dp, x = S.laci.x || {}, ub = D.bolehUbah, dis = S.sibuk ? "disabled" : "";
+  const f = (id, k, l, ph, req, extra) => `<div class="field"><label for="${id}">${l}${req && ub ? wajib : ""}</label><input id="${id}" type="text" value="${esc(x[k] === undefined || x[k] === null ? "" : String(x[k]))}" placeholder="${esc(ph)}" ${ub ? "" : "disabled"} ${extra || ""}></div>`;
+  const B = x.bukti || {}, tSlot = S.laci.tautSlot;
+  const baris = s0 => { const e = B[s0.k];
+    const status = !e ? '<span class="chip s-revisi">Belum ada</span>' : e.t === "tautan" ? `<a href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">Buka tautan</a>`
+      : `<button class="lnk" data-act="dpPrakLihat" data-slot="${s0.k}">${esc(e.nama)}</button> <span class="muted">${ukuranT(e.ukuran || 0)}</span>`;
+    return `<div style="padding:8px 0;border-top:1px solid var(--line)"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><b class="small">${esc(s0.l)}</b><span class="small">${status}</span></div>
+      ${ub ? `<div class="row small" style="flex-wrap:wrap;gap:6px;margin-top:6px"><label class="btn sm" ${S.sibuk ? 'aria-disabled="true"' : ""}>${e ? "Ganti dengan file" : "Unggah file"}<input type="file" data-pfile="${s0.k}" accept=".pdf,.jpg,.jpeg,.png" hidden ${dis}></label>
+        <button class="btn sm" data-act="dpPrakTautan" data-slot="${s0.k}" ${dis}>${e ? "Ganti dengan tautan" : "Tempel tautan"}</button>${e ? `<button class="btn sm bad" data-act="dpPrakBuktiHapus" data-slot="${s0.k}" ${dis}>Hapus</button>` : ""}</div>
+        ${tSlot === s0.k ? `<div class="row" style="gap:6px;margin-top:6px"><input id="prTaut" type="url" placeholder="https://drive.google.com/…" aria-label="Tautan ${esc(s0.l)}" style="flex:1"><button class="btn sm primary" data-act="dpPrakTautanSimpan" data-slot="${s0.k}" ${dis}>Simpan tautan</button></div>` : ""}` : ""}</div>`; };
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Praktisi" style="width:min(600px,100%)">
+   <div class="dh"><h2>${!ub ? "Data praktisi" : x.id ? "Ubah praktisi" : "Tambah praktisi"}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   ${f("prNama", "nama", "Nama lengkap dengan gelar", "Contoh: Made Wirawan, S.Par.", 1)}${f("prPer", "perusahaan", "Perusahaan / industri asal", "Contoh: PT Bali Tour Nusantara", 1)}
+   <div class="grid g2" style="gap:10px">${f("prJab", "jabatan", "Jabatan di perusahaan", "Contoh: General Manager; Owner")}${f("prPeng", "pengalaman", "Lama pengalaman kerja sesuai bidang (tahun)", "Contoh: 12", 0, 'inputmode="decimal"')}</div>
+   <label class="row small" style="gap:8px;margin:-4px 0 10px"><input id="prPimpin" type="checkbox" ${x.memimpinTim ? "checked" : ""} ${ub ? "" : "disabled"} style="width:auto"> Pernah memimpin tim di tempat kerjanya (mis. manajer, kepala divisi, pemilik usaha)</label>
    <div class="grid g2" style="gap:10px">${f("prNidk", "nidk", "NIDK (bila ada)", "")}${f("prPend", "pendidikan", "Pendidikan tertinggi", "Contoh: S1 Pariwisata")}</div>
-   ${f("prBid", "bidang", "Bidang keahlian", "Contoh: Tour operation; Ticketing")}${f("prSert", "sertifikat", "Sertifikat profesi/kompetensi/industri", "Contoh: Tour Leader – LSP Pariwisata (BNSP), 2022")}
-   ${galatHtml()}<div class="row" style="justify-content:space-between;margin-top:auto">${x.id ? tombol("dpPrakHapus", "Hapus", "bad") : "<span></span>"}${tombol("dpPrakSimpan", "Simpan")}</div></div></div>`;
+   ${f("prBid", "bidang", "Bidang keahlian (sesuai pendidikan tertinggi)", "Contoh: Tour operation; Ticketing")}
+   <div class="grid g2" style="gap:10px">${f("prSert", "sertifikat", "Sertifikat profesi/kompetensi/industri", "Contoh: Tour Leader, 2022")}${f("prPen", "penerbit", "Lembaga penerbit sertifikat", "Contoh: LSP Pariwisata (BNSP)")}</div>
+   ${f("prKs", "kerjaSama", "Dasar kerja sama / penugasan", "Contoh: PKS No. 12/PPB/2026 dengan PT Bali Tour Nusantara")}
+   <span class="hint">${x.pengalaman !== undefined && x.pengalaman !== "" && Number(x.pengalaman) >= 5 || x.memimpinTim ? "✓ Memenuhi kriteria Matriks butir 16 (pengalaman ≥ 5 tahun dan/atau memimpin tim)." : "Kriteria Matriks butir 16: pengalaman kerja ≥ 5 tahun sesuai bidang dan/atau pernah memimpin tim."}</span>
+   ${ub ? `<div class="row" style="justify-content:space-between;margin:10px 0">${x.id ? tombol("dpPrakHapus", "Hapus", "bad") : "<span></span>"}${tombol("dpPrakSimpan", "Simpan")}</div>` : ""}
+   ${galatHtml()}
+   <h3 style="margin:14px 0 4px;font-size:.95rem">Bukti</h3>
+   ${x.id ? `<p class="small muted" style="margin:0 0 4px">PDF atau gambar (JPG/PNG), maks. 10 MB, atau tautan Google Drive. Disimpan di folder Drive "Praktisi".</p>${(D.slotBuktiPraktisi || []).map(baris).join("")}`
+     : `<p class="small muted">Simpan data praktisi dulu, lalu unggah buktinya di sini.</p>`}
+   </div></div>`;
+}
+const PR_ISIAN = { prNama: "nama", prPer: "perusahaan", prJab: "jabatan", prPeng: "pengalaman", prNidk: "nidk", prPend: "pendidikan", prBid: "bidang", prSert: "sertifikat", prPen: "penerbit", prKs: "kerjaSama" };
+// Isian laci praktisi disimpan ke state saat diketik (unggah bukti menggambar ulang laci).
+document.addEventListener("input", e => { const k = PR_ISIAN[e.target.id]; if (k && S.laci && S.laci.jenis === "praktisi") { S.laci.x = S.laci.x || {}; S.laci.x[k] = e.target.value; } });
+document.addEventListener("change", e => {
+  const t = e.target; if (!S.laci || S.laci.jenis !== "praktisi") return;
+  if (t.id === "prPimpin") { S.laci.x = S.laci.x || {}; S.laci.x.memimpinTim = t.checked; return; }
+  if (!t.dataset || !t.dataset.pfile || !S.laci.x || !S.laci.x.id) return;
+  const f = t.files && t.files[0], slot = t.dataset.pfile; t.value = "";
+  if (!f) return;
+  if (f.size > 10 * 1024 * 1024) { toast("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai Tautan."); return; }
+  bacaBase64(f).then(isi => buktiPraktisi({ slot, berkas: { nama: f.name, isi } }, "Bukti terunggah."), err => toast(err.message));
+});
+function buktiPraktisi(o, pesan) {
+  const id = S.laci.x.id;
+  jalankan(async () => {
+    const j = await api("dp.praktisiBukti", Object.assign({ id }, o));
+    if (S.laci && S.laci.x && S.laci.x.id === id) { S.laci.x.bukti = j.bukti; S.laci.tautSlot = null; }
+    const p = S.dp && S.dp.praktisi.find(y => y.id === id); if (p) p.bukti = j.bukti;
+    S.ilkps = null; toast(pesan);
+  });
 }
 const angkaId = v => String(v || "").trim().replace(",", ".");
 function pecahImpor(teks) {
@@ -1477,11 +1523,35 @@ Object.assign(AKSI, {
     jalankan(async () => { const j = await api("dp.timSalin", { semester: S.dp.semester }); S.dpSmt = S.dp.semester; S.dp = null; S.ilkps = null; toast(j.disalin ? `${j.disalin} tim disalin dari ${j.dari}.` : `Tidak ada tim yang perlu disalin dari ${j.dari}.`); });
   },
   dpPrakBaru() { S.laci = { jenis: "praktisi" }; S.galat = ""; render(); fokus("prNama"); },
-  dpPrakUbah(d) { S.laci = { jenis: "praktisi", x: S.dp.praktisi.find(x => x.id === d.id) }; S.galat = ""; render(); },
+  dpPrakUbah(d) { S.laci = { jenis: "praktisi", x: Object.assign({}, S.dp.praktisi.find(x => x.id === d.id)) }; S.galat = ""; render(); },
   dpPrakSimpan() {
-    const data = { id: S.laci.x ? S.laci.x.id : undefined, nama: $("prNama").value, perusahaan: $("prPer").value, nidk: $("prNidk").value, pendidikan: $("prPend").value, bidang: $("prBid").value, sertifikat: $("prSert").value };
+    const data = { id: S.laci.x ? S.laci.x.id : undefined, nama: $("prNama").value, perusahaan: $("prPer").value, nidk: $("prNidk").value, pendidikan: $("prPend").value, bidang: $("prBid").value, sertifikat: $("prSert").value,
+      jabatan: $("prJab").value, pengalaman: angkaId($("prPeng").value), memimpinTim: $("prPimpin").checked, penerbit: $("prPen").value, kerjaSama: $("prKs").value };
     S.laci.x = Object.assign({}, S.laci.x || {}, data);
-    jalankan(async () => { await api("dp.praktisiSimpan", { data }); S.laci = null; S.dp = null; S.ilkps = null; toast("Praktisi tersimpan."); });
+    const baru = !data.id;
+    jalankan(async () => {
+      await api("dp.praktisiSimpan", { data }); S.ilkps = null;
+      S.dp = await api("dp.data", { semester: S.dp.semester, ta: S.dp.ta });
+      // Praktisi baru: laci tetap terbuka agar bukti bisa langsung diunggah.
+      const p = baru ? S.dp.praktisi.filter(y => y.nama === data.nama.trim() && y.perusahaan === data.perusahaan.trim()).pop() : null;
+      if (p) { S.laci = { jenis: "praktisi", x: p }; toast("Praktisi tersimpan. Unggah buktinya di bagian Bukti."); }
+      else { S.laci = null; toast("Praktisi tersimpan."); }
+    });
+  },
+  dpPrakTautan(d) { S.laci.tautSlot = S.laci.tautSlot === d.slot ? null : d.slot; render(); fokus("prTaut"); },
+  dpPrakTautanSimpan(d) {
+    const url = $("prTaut").value.trim();
+    if (!/^https:\/\//.test(url)) { S.galat = "Tautan harus diawali https://"; render(); return; }
+    buktiPraktisi({ slot: d.slot, tautan: url }, "Tautan bukti tersimpan.");
+  },
+  dpPrakBuktiHapus(d) {
+    if (!confirm("Hapus bukti ini? File dipindahkan ke sampah Drive.")) return;
+    buktiPraktisi({ slot: d.slot, hapus: true }, "Bukti dihapus.");
+  },
+  async dpPrakLihat(d) {
+    const w = window.open("", "_blank");
+    try { const j = await api("dp.praktisiBuktiLihat", { id: S.laci.x.id, slot: d.slot }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w) w.location.href = URL.createObjectURL(blob); else simpanBerkas(blob, j.nama); }
+    catch (e) { if (w) w.close(); toast(e.message); }
   },
   dpPrakHapus() {
     if (!confirm("Hapus praktisi ini? Tim pengajar yang memuatnya akan menampilkan '(praktisi dihapus)'.")) return;
