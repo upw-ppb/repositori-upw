@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const AKAR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { kategori, sinonim, topik } = await import(path.join(AKAR, "alat/panduan-sumber.js"));
 const tanda = JSON.parse(fs.readFileSync(path.join(AKAR, "alat/panduan-tanda.json"), "utf8"));
-const MENU = ["beranda", "kegiatan", "kps", "verif", "ttd", "porto", "ilkps", "dprodi", "setuju", "survei", "penilaian", "ded", "mk", "bank", "versi", "lab", "masukan", "data", "gkm", "biodata", "cari", "pengguna", "log", "akun"];
+const MENU = ["beranda", "kegiatan", "kps", "verif", "ttd", "porto", "ilkps", "dprodi", "setuju", "survei", "penilaian", "ded", "mk", "bank", "versi", "lab", "masukan", "data", "gkm", "rapat", "biodata", "cari", "pengguna", "log", "akun"];
 const galat = [], id = new Set(topik.map(t => t.id)), dipakai = new Set();
 if (id.size !== topik.length) galat.push("id topik ganda");
 for (const t of topik) {

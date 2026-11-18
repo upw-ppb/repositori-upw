@@ -386,6 +386,7 @@ function aksiKpsPutuskan(d, token) {
 /** Cek keaslian surat dari kode verifikasi (tanpa login). Hanya data umum, tanpa daftar nama. */
 function aksiSuratCek(d) {
   var kode = String(d.kode || "").trim().toUpperCase();
+  if (/^UND-\d{4}-[0-9A-F]{8}$/.test(kode)) return cekUndangan(kode); // v0.31.0: undangan rapat
   if (!/^UPW-\d{4}-[0-9A-F]{8}$/.test(kode)) return { sah: false };
   var r = cari("Kegiatan", function (x) { return x.kodeSurat === kode; });
   if (!r || r.dihapus || r.st !== "terbit") return { sah: false };

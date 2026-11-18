@@ -20,4 +20,7 @@ j = await panggil("kesiapan.data", {}, t); c("kesiapan.data (v0.25.0)", j.ok && 
 j = await panggil("gkm.data", {}, t); c("gkm.data dibaca Admin Prodi (tanpa izin ubah)", j.ok && j.daftar.length === 6 && j.bolehUbah === false, j);
 j = await panggil("dp.data", {}, t); c("dp.data: tim per kelas (v0.28.0)", j.ok && j.tim.every(x => Array.isArray(x.daftarKelas) && "perKelas" in x), j.ok ? j.tim.slice(0, 2) : j);
 if (j.ok) console.log("  MK semester ini:", j.tim.length, "· kelas:", [...new Set(j.tim.flatMap(x => x.daftarKelas))].join(","), "· sudah punya tim:", j.tim.filter(x => x.anggota.length).length);
+j = await panggil("tl.daftar", {}, t); c("tl.daftar (v0.31.0)", j.ok && Array.isArray(j.tl) && j.kelola === true, j);
+j = await panggil("rapat.daftar", {}, t); c("rapat.daftar (v0.31.0)", j.ok && Array.isArray(j.rapat) && j.kelola === true, j);
+j = await panggil("rapat.ref", {}, t); c("rapat.ref: 9 jenis rapat", j.ok && j.jenis.length === 9, j);
 await panggil("keluar", {}, t);

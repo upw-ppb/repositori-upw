@@ -310,6 +310,8 @@ function aksiTugasSaya(d, token) {
   var p = penggunaDariToken(token);
   var hasil = { tugas: [], verifikasi: 0, kps: 0 }, g = tugasGkm(p); // v0.25.0: pengingat GKM
   Object.keys(g).forEach(function (k) { hasil[k] = g[k]; });
+  var tr = tugasRapat(p), tt = tugasTl(p); // v0.31.0: undangan rapat dan tindak lanjut
+  hasil.undangan = tr.undangan; hasil.tlSaya = tt.tlSaya; hasil.tlVerif = tt.tlVerif;
   if (!punyaPeran(p, PERAN_KEGIATAN)) return hasil;
   var idx = indeksOrang(), set = pengaturanSurat(), kini = hariIni();
   semuaKegiatan().forEach(function (k) {

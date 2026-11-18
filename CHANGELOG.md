@@ -3,6 +3,29 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.31.0 — 18 Nov 2026 — Uji Coba
+Ringkas: Menu baru Rapat & Tindak Lanjut: undangan rapat dari KPS dengan surat PDF dan notifikasi peserta, serta daftar tindak lanjut sampai terverifikasi.
+Permintaan pemilik (Rilis 1 dari 2; rencana disetujui di chat 18 Nov 2026): rapat dan tindak lanjutnya terdata sesuai siklus PPEPP. Dasar instrumen (nomor Lampiran 1):
+butir 2 (PPEPP), 3 (IAB: pertemuan minimal setahun sekali dengan dokumentasi), 7 (evaluasi kurikulum bersama pemangku kepentingan), 8, 22–23 (monev ditindaklanjuti),
+25, 42/71 (analisis dan tindak lanjut kepuasan), 76–78. Instrumen tidak menyebut "risalah rapat" secara harfiah; yang dinilai adalah bukti sahih dan tindak lanjutnya.
+- **Tindak lanjut**: poin berisi uraian, butir Matriks, sumber (temuan GKM, keputusan rapat, survei, Penilaian, audit, lainnya), penanggung jawab (dosen/tendik), tenggat.
+  Status Belum → Berjalan → Selesai (wajib keterangan dan bukti berkas/tautan; berkas di folder Drive "Tindak Lanjut") → Terverifikasi oleh KPS atau GKM
+  (bukan penanggung jawabnya sendiri); bisa dikembalikan dengan catatan. Riwayat setiap perubahan tercatat. Poin lewat tenggat ditandai merah.
+  Penanggung jawab melihat poinnya di Beranda; KPS/GKM melihat jumlah yang menunggu verifikasi. Laporan GKM: tombol "Jadikan poin tindak lanjut" di bagian Rekomendasi.
+  Keterangan butir di Penilaian menampilkan jumlah tindak lanjut terverifikasi dan yang belum tuntas.
+- **Undangan rapat**: KPS menerbitkan; Admin Prodi dan GKM boleh menyiapkan draf. Jenis rapat terkait butir (IAB 3, tinjauan manajemen 2, kurikulum 7, RPS 8,
+  monev 22–23, survei 42/71, kinerja 77, tindak lanjut, rapat prodi). Agenda bisa diambil dari tindak lanjut terbuka dan dari butir Matriks (syarat skor 4 ikut).
+  Tempat dan/atau tautan daring. Peserta: dosen, tendik, mahasiswa per kelas atau per orang, dan tamu luar (nama + instansi, lewat PDF).
+  **Surat PDF** (nomor surat opsional, daftar undangan terlampir, tanda tangan KPS, kode verifikasi UND-… dan QR; cek keaslian di halaman cek surat).
+  Peserta berakun mendapat **notifikasi di Beranda** dan menjawab **Hadir / Tidak hadir** (alasan wajib bila tidak); rekap jawaban untuk pengelola.
+  KPS bisa mengubah undangan yang sudah terbit (surat diperbarui, peserta diberi tahu ulang) atau membatalkan dengan alasan.
+- Panduan Info: topik baru "Undangan rapat (KPS)" dan "Tindak lanjut". Risalah, templat Word, daftar hadir, dan bukti otomatis ke Bank Dokumen menyusul di Rilis 2.
+- Struktur data versi 24: tabel baru TindakLanjut, Rapat, PesertaRapat (ditambahkan otomatis, cadangan dibuat lebih dulu). Versi lama tetap bisa membaca data
+  (tabel baru diabaikan); rollback ke v0.30.0 tanpa pemulihan data.
+- Uji: 634 + 44 uji server lulus (42 uji baru di uji-v31-bagian.mjs). Uji tampilan di server lokal (buat tindak lanjut, susun dan terbitkan undangan dengan agenda dari
+  tindak lanjut dan butir, peserta per orang/kelas/tamu, surat PDF, notifikasi dan jawaban mahasiswa, tombol di Laporan GKM, cek keaslian, lebar ponsel) dan penjelajah
+  50 halaman: tanpa masalah. Server Uji Coba: deployment @30 (cek langsung 15/15). Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.30.0 — 18 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.30.0 (tampilan docs/ dan server Apps Script Produksi deployment @10, server hanya naik nomor versi): tombol (i) berisi definisi,
   kriteria skor 4–0, rumus, petunjuk DED, dan keterangan Tabel iLKPS dari instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain.

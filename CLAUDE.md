@@ -272,6 +272,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Tampilan: iBtn(ref) / iTombol(ref, teks), ref "b16" | "t2" | "d10" | "def:dosen" (dipisah koma), REF_DP per tab Data Prodi, laciInstr() di lapisan S.instr
   (di atas S.laci). Halaman PDF bisa dirender ke JPG dengan PDFKit (swift) bila perlu membaca ulang instrumen. Uji: alat/uji/uji-v30-bagian.mjs.
 
+- v0.31.0 (18 Nov 2026, Uji Coba): Rapat & Tindak Lanjut (Rilis 1 dari 2). gas/TindakLanjut.js (TindakLanjut: status belum/berjalan/selesai/terverifikasi, verifikasi
+  KPS/GKM bukan PJ sendiri, ringkasTl() → info Penilaian, tugasTl() → Beranda) dan gas/Rapat.js (Rapat + PesertaRapat; JENIS_RAPAT terkait butir; terbit hanya KPS,
+  kode "UND-YYMM-XXXXXXXX", cekUndangan() dipanggil aksiSuratCek; tugasRapat() → Beranda). VERSI_SKEMA 24. Tampilan: menu "rapat" (hRapat, laciRapat/laciRapatForm/
+  laciTl/laciTlForm, kertasUndangan); isian formulir rapat disimpan ke S.laci.f saat diketik (salinIsianRapat sebelum render). Uji: alat/uji/uji-v31-bagian.mjs.
+  Rilis 2 (belum): risalah per agenda → keputusan jadi poin tindak lanjut, templat Word/PDF risalah, daftar hadir PDF, unggah pindaian, bukti ke Bank Dokumen.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

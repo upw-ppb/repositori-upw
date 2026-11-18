@@ -14,7 +14,7 @@ window.jelajah = async function () {
     if (window.__kons.length) { masalah.push(konteks + ": konsol → " + window.__kons.join(" | ")); window.__kons.length = 0; }
     dicek.push(konteks);
   };
-  const TAB = ["dpTab", "kpsTab", "dedTab", "ttdTab", "dirTabBtn", "svTab"], BUKA = ["bukaKeg", "bankBuka", "mkpBuka", "dedBuka", "mskDetail", "labUbah", "sdBuka", "dpMkUbah", "dpTimAtur", "dpPrakUbah", "lihatBio", "laciMhs", "laciPeran", "gpmBuka", "svHasil", "dbBuka"];
+  const TAB = ["dpTab", "kpsTab", "dedTab", "ttdTab", "dirTabBtn", "svTab", "rapatTab"], BUKA = ["bukaKeg", "bankBuka", "mkpBuka", "dedBuka", "mskDetail", "labUbah", "sdBuka", "dpMkUbah", "dpTimAtur", "dpPrakUbah", "lihatBio", "laciMhs", "laciPeran", "gpmBuka", "svHasil", "dbBuka", "rapatBuka", "tlBuka"];
   const peranSel = document.getElementById("peranSel"), daftarPeran = peranSel ? [...peranSel.options].map(o => o.value) : [null];
   for (const pr of daftarPeran) {
     if (pr && peranSel) { const s = document.getElementById("peranSel"); s.value = pr; s.dispatchEvent(new Event("change", { bubbles: true })); await tunggu(800); }
