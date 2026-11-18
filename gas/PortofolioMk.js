@@ -2,7 +2,7 @@
  * Portofolio Mata Kuliah (v0.14.0): kelengkapan dokumen per MK per semester, diisi tim pengajar yang ditetapkan Admin (Data Prodi).
  * Data pendukung butir 8 (RPS), 22 (proses pembelajaran), dan 25 (penilaian).
  * Satu baris PortofolioMk per (semester, kodeMk); kolom isi = JSON:
- *   rps | kontrak | rubrik : { t: "file"|"tautan", fileId, nama, mime, ukuran, url, o, w }   — hanya pengampu utama (anggota[0])
+ *   rps | kontrak | rubrik : { t: "file"|"tautan", fileId, nama, mime, ukuran, url, o, w }   — hanya pengampu utama (v0.28.0: pengampu utama setiap kelas)
  *   metode                 : { v: [metode...], lain: "", o, w }                                 — hanya pengampu utama
  *   integ                  : [{ id, teks, o, w }]                                               — setiap dosen anggota tim
  *   interaksi              : [{ id, t, fileId, nama, mime, ukuran, url, ket, o, w }]            — setiap dosen anggota tim
@@ -48,16 +48,19 @@ function adaKomp(isi, k) {
 /** MK dengan tim pada semester itu (dasar persentase). */
 function mkBertim(smt) {
   var tim = timSemester(smt), mks = semuaMk();
-  return mks.filter(function (m) { return tim[m.kode] && tim[m.kode].anggota.length; }).map(function (m) { return { mk: m, anggota: tim[m.kode].anggota }; });
+  return mks.filter(function (m) { return tim[m.kode] && tim[m.kode].anggota.length; }).map(function (m) { return { mk: m, anggota: tim[m.kode].anggota, utama: tim[m.kode].utama }; });
 }
-function peranTim(anggota, userId) {
+/** v0.28.0: utama = daftar userId pengampu utama (tim per kelas bisa punya pengampu utama berbeda); tanpa daftar → anggota[0]. */
+function peranTim(anggota, userId, utama) {
   var i = -1; anggota.forEach(function (a, j) { if (i < 0 && a.t === "u" && a.id === userId) i = j; });
-  return i < 0 ? "" : i === 0 ? "utama" : "anggota";
+  if (i < 0) return "";
+  if (Array.isArray(utama) && utama.length) return utama.indexOf(userId) >= 0 ? "utama" : "anggota";
+  return i === 0 ? "utama" : "anggota";
 }
-function namaAnggota(anggota, idx, prak) {
-  return anggota.map(function (a) {
-    if (a.t === "p") { var x = prak[a.id]; return { t: "p", id: a.id, nama: x ? x.nama : "(praktisi)" }; }
-    var o = idx.byId[a.id]; return { t: "u", id: a.id, nama: o ? o.nama : "(dosen)" };
+function namaAnggota(anggota, idx, prak, utama) {
+  return anggota.map(function (a, i) {
+    if (a.t === "p") { var x = prak[a.id]; return { t: "p", id: a.id, nama: x ? x.nama : "(praktisi)", utama: false }; }
+    var o = idx.byId[a.id]; return { t: "u", id: a.id, nama: o ? o.nama : "(dosen)", utama: Array.isArray(utama) && utama.length ? utama.indexOf(a.id) >= 0 : i === 0 };
   });
 }
 function petaPraktisi() { var m = {}; semuaPraktisi().forEach(function (x) { m[x.id] = x; }); return m; }
@@ -97,11 +100,11 @@ function entriKeKlien(e, idx) {
   return x;
 }
 function mkpKeKlien(x, smt, isi, p, idx, prak) {
-  var per = peranTim(x.anggota, p.id), buka = smtTerbuka(smt);
+  var per = peranTim(x.anggota, p.id, x.utama), buka = smtTerbuka(smt);
   var s = isi || {};
   return {
     semester: smt, labelSemester: labelSmt(smt), kode: x.mk.kode, nama: x.mk.nama, sks: sksMk(x.mk), sksPraktik: x.mk.sksPraktik, smtMk: x.mk.semester,
-    tim: namaAnggota(x.anggota, idx, prak), peran: per, buka: buka,
+    tim: namaAnggota(x.anggota, idx, prak, x.utama), peran: per, buka: buka,
     bolehUtama: buka && per === "utama", bolehAnggota: buka && !!per,
     rps: entriKeKlien(s.rps, idx), kontrak: entriKeKlien(s.kontrak, idx), rubrik: entriKeKlien(s.rubrik, idx),
     metode: s.metode ? { v: s.metode.v || [], lain: s.metode.lain || "", oleh: (idx.byId[s.metode.o] || {}).nama || "", w: s.metode.w || "" } : { v: [], lain: "" },
@@ -124,7 +127,7 @@ function aksiMkpSaya(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["dosen"]);
   var smt = semesterSah(d.semester || semesterInfo().kode), isi = semuaMkpSemester(smt), idx = indeksOrang(), prak = petaPraktisi();
-  var mk = mkBertim(smt).filter(function (x) { return peranTim(x.anggota, p.id); }).map(function (x) {
+  var mk = mkBertim(smt).filter(function (x) { return peranTim(x.anggota, p.id, x.utama); }).map(function (x) {
     return mkpKeKlien(x, smt, isi[x.mk.kode] ? isi[x.mk.kode].isi : null, p, idx, prak);
   });
   return Object.assign({ semester: smt, labelSemester: labelSmt(smt), mk: mk }, refMkp());
@@ -141,7 +144,7 @@ function aksiMkpRekap(d, token) {
 function ambilMkp(smt, kode, p, perluUbah) {
   var x = mkBertim(smt).filter(function (y) { return y.mk.kode === kode; })[0];
   if (!x) throw galat("Mata kuliah ini belum punya tim pengajar pada " + labelSmt(smt) + ".");
-  var per = peranTim(x.anggota, p.id);
+  var per = peranTim(x.anggota, p.id, x.utama);
   if (!per && !punyaPeran(p, PERAN_MKP_REKAP)) throw galat("Anda bukan anggota tim pengajar mata kuliah ini.");
   if (perluUbah) {
     if (!per) throw galat("Hanya anggota tim pengajar yang mengisi portofolio mata kuliah.");
@@ -296,6 +299,6 @@ function aksiMkpLihat(d, token) {
 function mkpBelumRps(p) {
   if (!punyaPeran(p, ["dosen"])) return [];
   var smt = semesterInfo().kode, isi = semuaMkpSemester(smt);
-  return mkBertim(smt).filter(function (x) { return peranTim(x.anggota, p.id) === "utama" && !(isi[x.mk.kode] && isi[x.mk.kode].isi.rps); })
+  return mkBertim(smt).filter(function (x) { return peranTim(x.anggota, p.id, x.utama) === "utama" && !(isi[x.mk.kode] && isi[x.mk.kode].isi.rps); })
     .map(function (x) { return { kode: x.mk.kode, nama: x.mk.nama, semester: smt }; });
 }

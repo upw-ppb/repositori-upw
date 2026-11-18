@@ -218,7 +218,7 @@ export const topik = [
       "<b>Pengampu utama</b>: unggah RPS terbaru, kontrak kuliah, rubrik/portofolio penilaian, dan pilih metode pembelajaran.",
       "<b>Semua anggota tim</b>: tambah catatan integrasi penelitian/PkM dan bukti pembelajaran (tautan LMS, foto sesi).",
       "Tekan <b>Lengkapi</b> (pengampu utama) atau <b>Tambah bagian saya</b> (anggota)."],
-    tips: ["Tim pengajar ditetapkan Admin Prodi di Data Prodi › Tim pengajar. Bila mata kuliah Anda tidak muncul, hubungi Admin Prodi."] },
+    tips: ["Tim pengajar ditetapkan Admin Prodi di Data Prodi › Tim pengajar. Bila mata kuliah Anda tidak muncul, hubungi Admin Prodi.", "Bila pengajar kelas A dan kelas B berbeda, pengampu utama setiap kelas sama-sama bisa mengisi RPS, kontrak, rubrik, dan metode (satu portofolio per mata kuliah)."] },
   { id: "ttd", kat: "akademik", p: ["kps", "dosen"], menu: "ttd", j: "Menyiapkan tanda tangan untuk surat", r: "KPS (dan dosen yang ditunjuk) menyimpan tanda tangan sekali.",
     kw: "tanda tangan digital ttd surat gambar tanda tangan",
     l: ["Buka <b>Tanda Tangan</b>.", "Pilih <b>Gambar langsung</b> (tanda tangani kotak putih dengan mouse/jari) atau <b>Unggah gambar</b> (tanda tangan di kertas putih; latar putih dibuang otomatis).",
@@ -294,9 +294,9 @@ export const topik = [
 
   /* ---------------- DATA PRODI ---------------- */
   { id: "dprodi", kat: "data", p: ["admin", "superadmin", "kps", "gkm"], menu: "dprodi", mulai: ["admin"], j: "Data Prodi: kurikulum, tim pengajar, dosen, lulusan",
-    r: "Sumber Tabel iLKPS 1–10 dan 21.", g: ["dprodi"], kw: "kurikulum mata kuliah tim pengajar praktisi data dosen ts status dosen tugas belajar",
+    r: "Sumber Tabel iLKPS 1–10 dan 21.", g: ["dprodi"], kw: "kurikulum mata kuliah tim pengajar per kelas kelas a kelas b praktisi data dosen ts status dosen tugas belajar",
     l: ["Buka <b>Data Prodi</b>. Tab <b>Kurikulum</b>: tambah satu per satu atau <b>Impor</b> (tempel dari Excel atau unggah templat).",
-      "Tab <b>Tim pengajar</b>: tetapkan pengampu utama dan anggota per semester; <b>Salin dari</b> semester yang sama tahun lalu.",
+      "Tab <b>Tim pengajar</b>: tetapkan pengampu utama dan anggota per semester, <b>sama untuk semua kelas</b> atau <b>berbeda per kelas</b> (kelas A, kelas B); <b>Salin dari</b> semester yang sama tahun lalu.",
       "Tab <b>Data dosen TS</b>: EWMP dan kesesuaian per tahun akademik. Tab <b>Status dosen</b>: tugas belajar atau pensiun.",
       "Tab <b>Dokumen dosen</b>: kelengkapan ijazah/sertifikat dan tombol <b>Ingatkan</b>.",
       "Tab <b>Lulusan</b>, <b>PMB</b>, <b>Keuangan</b>: isi untuk Tabel 8–10 dan 21."],

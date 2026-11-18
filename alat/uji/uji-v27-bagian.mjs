@@ -23,5 +23,5 @@ export function jalankan({ g, cek, ok, salah, tKps, tDsn, tAdm, tM, tSA }) {
   cek("bukti file bisa dibuka Admin", b.mime === "application/pdf" && b.isi);
   cek("mahasiswa berstatus Lulus tidak dihitung aktif di Penilaian", ok("penilaian.data", {}, tSA).ringkas.NM >= 0);
   ok("admin.statusMhs", { userIds: [m.id, m2.id], statusMhs: "A", alasan: "Kembali aktif untuk uji lanjutan" }, tAdm);
-  cek("migrasi: RiwayatStatusMhs; SKEMA_VERSI 21", g.sheets.RiwayatStatusMhs && g.props.SKEMA_VERSI === "21");
+  cek("migrasi: RiwayatStatusMhs; SKEMA_VERSI ≥ 21", g.sheets.RiwayatStatusMhs && Number(g.props.SKEMA_VERSI) >= 21);
 }

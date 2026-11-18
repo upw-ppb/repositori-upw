@@ -3,6 +3,27 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.28.0 — 18 Nov 2026 — Uji Coba
+Ringkas: Tim pengajar kini bisa diisi per kelas: sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B.
+Permintaan pemilik: setiap mata kuliah punya dua kelas (A dan B) dengan pengajar yang bisa sama atau berbeda; sebelumnya hanya bisa satu tim.
+- **Data Prodi › Tim pengajar**: di jendela Tetapkan/Ubah tim ada pilihan **Sama untuk semua kelas** (seperti sebelumnya) atau **Berbeda per kelas**.
+  Per kelas: setiap kelas punya pengampu utama sendiri dan maksimal 3 orang (termasuk praktisi); kelas yang belum ditetapkan boleh dikosongkan.
+  Saat pindah pilihan, isian yang sudah dipilih ikut terbawa. Daftar tim menampilkan pengajar per kelas ("Kelas A …", "Kelas B …").
+  Daftar kelas diambil dari kelas mahasiswa angkatan yang mengambil mata kuliah itu (bila belum ada: kelas mahasiswa aktif; bawaan A dan B).
+- **Salin dari semester lalu** ikut menyalin tim per kelas.
+- **EWMP (Data dosen TS, Tabel 6)**: sks dihitung per kelas yang diajar (disetujui pemilik): dosen yang mengajar kelas A dan B mendapat dua kali
+  bagian sks. Tim "sama untuk semua kelas" (termasuk data lama) dihitung untuk setiap kelas mata kuliah itu, sehingga angka EWMP data lama bisa naik.
+  Mata kuliah yang diampu (Tabel 1–3) dan bobot sks praktisi (Tabel 2) tetap dihitung sekali per mata kuliah.
+- **Portofolio Mata Kuliah**: tetap satu per mata kuliah per semester; bila pengampu utama kelas A dan B berbeda, keduanya berperan **utama**
+  (boleh mengisi RPS, kontrak, rubrik, metode) dan ditandai "(utama)" di daftar tim.
+- Struktur data versi 22: kolom baru "kelas" di akhir tabel TimPengajar (ditambahkan otomatis, cadangan dibuat lebih dulu). Data lama (kelas kosong)
+  dibaca sebagai "sama untuk semua kelas". Rollback ke v0.27.0 tetap bisa membaca data tanpa pemulihan, tetapi tim per kelas akan tampil sebagai
+  beberapa tim untuk satu mata kuliah (yang terbaca hanya salah satunya) sampai v0.28.0 dipasang lagi.
+- Panduan Info (Data Prodi, Mata Kuliah Saya) diperbarui.
+- Uji: 563 + 44 uji server lulus (21 uji baru di uji-v28-bagian.mjs; dua uji EWMP lama disesuaikan ke hitungan per kelas). Uji tampilan di server lokal
+  (isi per kelas, pindah pilihan, validasi pengampu utama, isi permintaan terkirim, Portofolio MK, lebar ponsel) dan penjelajah 42 halaman: tanpa masalah.
+  Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.27.0 — 15 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.27.0 (server Apps Script Produksi deployment @7): saringan dan urutan daftar akun, rekap per angkatan/kelas,
   status mahasiswa dengan alasan, bukti, dan riwayat, serta riwayat versi di Info.

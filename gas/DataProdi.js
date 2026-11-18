@@ -1,7 +1,7 @@
 /**
  * Data Prodi (v0.8.0): kurikulum, tim pengajar per semester, dosen industri/praktisi, dan data dosen per TS (EWMP).
  * Sumber Tabel iLKPS 1–6. Diubah oleh Admin Prodi / Super Admin; KPS dapat melihat.
- * - Tim pengajar berlaku satu semester (kode semester "2025-1" = Ganjil 2025/2026, "2025-2" = Genap 2025/2026);
+ * - Tim pengajar berlaku satu semester (v0.28.0: sama untuk semua kelas, atau berbeda per kelas A/B — kolom TimPengajar.kelas) (kode semester "2025-1" = Ganjil 2025/2026, "2025-2" = Genap 2025/2026);
  *   anggota[0] = pengampu utama; maks. 3 orang termasuk praktisi. Anggota: {t:"u", id: userId dosen} | {t:"p", id: id praktisi}.
  * - EWMP pendidikan di PS dihitung dari tim pengajar TS (sks MK dibagi rata ke dosen dalam tim), bisa ditimpa Admin.
  */
@@ -28,10 +28,54 @@ function praktisiDari(r) {
     bidang: teks(r.bidang), sertifikat: teks(r.sertifikat) };
 }
 function semuaPraktisi() { return semua("Praktisi").filter(function (r) { return !r.dihapus; }).map(praktisiDari).sort(function (a, b) { return a.nama.localeCompare(b.nama); }); }
+/**
+ * Tim pengajar satu semester per MK (v0.28.0: per kelas). Baris kelas "" = sama untuk semua kelas (juga data sebelum v0.28.0);
+ * baris kelas "A", "B", … = tim kelas itu. Hasil per MK: kelas {"" | "A": anggota[]}, perKelas, anggota = gabungan semua kelas
+ * (pengampu utama tiap kelas lebih dulu), utama = userId pengampu utama (bisa lebih dari satu bila berbeda per kelas).
+ */
 function timSemester(kode) {
   var m = {};
-  semua("TimPengajar").filter(function (r) { return String(r.semester) === kode; }).forEach(function (r) { m[teks(r.kodeMk)] = { _r: r, anggota: jsonDari(r.anggota, []) }; });
+  semua("TimPengajar").filter(function (r) { return String(r.semester) === kode; }).forEach(function (r) {
+    var kd = teks(r.kodeMk), x = m[kd] = m[kd] || { _r: r, baris: [], kelas: {} };
+    x.baris.push(r); x.kelas[String(r.kelas || "").trim().toUpperCase()] = jsonDari(r.anggota, []);
+  });
+  Object.keys(m).forEach(function (kd) {
+    var x = m[kd], kls = Object.keys(x.kelas).sort(), ada = {}, utama = [], lain = [];
+    if (x.kelas[""] !== undefined && kls.length > 1) { kls = [""]; }   // baris lama "semua kelas" bersama baris per kelas: tidak terjadi lewat aksi; "" menang
+    x.perKelas = kls.length > 0 && kls[0] !== "";
+    if (!x.perKelas) { var semuaK = x.kelas[""]; x.kelas = { "": semuaK }; }
+    kls.forEach(function (k) {
+      (x.kelas[k] || []).forEach(function (a, i) {
+        if (i === 0 && a.t === "u" && utama.indexOf(a.id) < 0) utama.push(a.id);
+      });
+    });
+    kls.forEach(function (k) { (x.kelas[k] || []).forEach(function (a) { if (!ada[a.id]) { ada[a.id] = a; lain.push(a); } }); });
+    x.utama = utama;
+    x.anggota = lain.filter(function (a) { return utama.indexOf(a.id) >= 0; }).sort(function (a, b) { return utama.indexOf(a.id) - utama.indexOf(b.id); })
+      .concat(lain.filter(function (a) { return utama.indexOf(a.id) < 0; }));
+  });
   return m;
+}
+/** Peta tahun masuk → daftar huruf kelas mahasiswa (semua status), dan daftar kelas mahasiswa aktif. */
+function petaKelasAngkatan() {
+  var per = {}, aktif = {};
+  semua("Pengguna").forEach(function (p) {
+    if (peranDari(p).indexOf("mahasiswa") < 0) return;
+    var k = String(p.kelas || "").trim().toUpperCase(), th = Number(p.masuk) || 0;
+    if (!k) return;
+    if (th) { per[th] = per[th] || {}; per[th][k] = 1; }
+    if (String(p.statusMhs || "A") === "A" && p.status !== "nonaktif") aktif[k] = 1;
+  });
+  var o = { angkatan: {}, aktif: Object.keys(aktif).sort() };
+  Object.keys(per).forEach(function (th) { o.angkatan[th] = Object.keys(per[th]).sort(); });
+  if (!o.aktif.length) o.aktif = ["A", "B"];
+  return o;
+}
+/** Kelas yang mengambil MK semester smtMk pada kode semester smt ("2025-1"): kelas angkatan itu, bila belum ada → kelas mahasiswa aktif. */
+function kelasTimMk(smt, smtMk, peta) {
+  peta = peta || petaKelasAngkatan();
+  var masuk = Number(String(smt).slice(0, 4)) - Math.floor((Math.max(1, Number(smtMk) || 1) - 1) / 2);
+  return (peta.angkatan[masuk] && peta.angkatan[masuk].length) ? peta.angkatan[masuk] : peta.aktif;
 }
 function dosenTs(ta) {
   var m = {};
@@ -55,16 +99,21 @@ var STATUS_TETAP = ["Dosen tetap program studi (DTPS)", "Dosen tetap PT di luar 
 function ampuTs(ts, mks) {
   var hasil = {}, byKode = {};
   mks.forEach(function (m) { byKode[m.kode] = m; });
+  var peta = petaKelasAngkatan();
   [kodeSmt(ts, true), kodeSmt(ts, false)].forEach(function (smt) {
     var tim = timSemester(smt);
     Object.keys(tim).forEach(function (kd) {
       var m = byKode[kd]; if (!m) return;
-      var ang = tim[kd].anggota, dosen = ang.filter(function (a) { return a.t === "u"; });
-      ang.forEach(function (a) {
+      // v0.28.0: sks EWMP dihitung per kelas yang diajar (tim "semua kelas" = dikali jumlah kelas MK itu).
+      var x = tim[kd], kali = x.perKelas ? 1 : kelasTimMk(smt, m.semester, peta).length;
+      x.anggota.forEach(function (a) {
         var h = hasil[a.id] = hasil[a.id] || { mk: [], sks: 0, sksPenuh: 0 };
         if (h.mk.indexOf(m.kode + " " + m.nama) < 0) h.mk.push(m.kode + " " + m.nama);
         h.sksPenuh += sksMk(m);
-        if (a.t === "u") h.sks += sksMk(m) / dosen.length;
+      });
+      Object.keys(x.kelas).forEach(function (k) {
+        var ang = x.kelas[k] || [], dosen = ang.filter(function (a) { return a.t === "u"; });
+        dosen.forEach(function (a) { hasil[a.id].sks += sksMk(m) * kali / dosen.length; });
       });
     });
   });
@@ -78,7 +127,7 @@ function aksiDpData(d, token) {
   wajibPeran(p, PERAN_DP_LIHAT);
   var s = semesterInfo(), smt = String(d.semester || kodeSmt(s.awal, s.ganjil));
   if (!/^\d{4}-[12]$/.test(smt)) throw galat("Semester tidak valid.");
-  var ta = Number(d.ta) || tsAwal(), mks = semuaMk(), tim = timSemester(smt), dts = dosenTs(ta), ampu = ampuTs(ta, mks);
+  var ta = Number(d.ta) || tsAwal(), mks = semuaMk(), tim = timSemester(smt), dts = dosenTs(ta), ampu = ampuTs(ta, mks), petaK = petaKelasAngkatan();
   // Semester berikutnya (untuk persiapan) sampai 10 semester ke belakang.
   var pilihanSmt = [], kk = s.ganjil ? kodeSmt(s.awal, false) : kodeSmt(s.awal + 1, true);
   for (var i = 0; i < 11; i++) { pilihanSmt.push(kk); kk = /-1$/.test(kk) ? kodeSmt(Number(kk.slice(0, 4)) - 1, false) : kodeSmt(Number(kk.slice(0, 4)), true); }
@@ -90,7 +139,11 @@ function aksiDpData(d, token) {
     praktisi: semuaPraktisi().map(function (x) { delete x._r; return x; }),
     dosen: daftarDosen().map(function (x) { return { id: x.id, nama: x.nama, inisial: x.inisial, status: x.status }; }),
     semester: smt, labelSemester: labelSmt(smt), pilihanSemester: pilihanSmt.map(function (k) { return { kode: k, label: labelSmt(k) }; }),
-    tim: semua_.filter(function (m) { return m.semester % 2 === (ganjil ? 1 : 0); }).map(function (m) { return { kode: m.kode, nama: m.nama, sks: m.sks, anggota: tim[m.kode] ? tim[m.kode].anggota : [] }; }),
+    tim: semua_.filter(function (m) { return m.semester % 2 === (ganjil ? 1 : 0); }).map(function (m) {
+      var x = tim[m.kode];
+      return { kode: m.kode, nama: m.nama, sks: m.sks, smtMk: m.semester, anggota: x ? x.anggota : [], utama: x ? x.utama : [],
+        perKelas: x ? x.perKelas : false, kelas: x ? x.kelas : {}, daftarKelas: kelasTimMk(smt, m.semester, petaK) };
+    }),
     salinDari: labelSmt(kodeSmt(Number(smt.slice(0, 4)) - 1, ganjil)),
     ta: ta, labelTa: labelTa(ta),
     dosenTs: daftarDosen().filter(function (x) { return x.status !== "Dosen industri / praktisi"; }).map(function (x) {
@@ -186,16 +239,39 @@ function aksiDpTimSimpan(d, token) {
   var dosen = {}, prak = {};
   daftarDosen().forEach(function (x) { dosen[x.id] = 1; });
   semuaPraktisi().forEach(function (x) { prak[x.id] = 1; });
-  var ang = (Array.isArray(d.anggota) ? d.anggota : []).filter(function (a) { return a && a.id; }).map(function (a) { return { t: a.t === "p" ? "p" : "u", id: String(a.id) }; });
-  var unik = {}; ang = ang.filter(function (a) { if (unik[a.id]) return false; unik[a.id] = 1; return true; });
-  if (ang.length > 3) throw galat("Tim pengajar maksimal 3 orang, termasuk praktisi.");
-  ang.forEach(function (a) { if (a.t === "u" ? !dosen[a.id] : !prak[a.id]) throw galat("Ada anggota tim yang tidak ditemukan."); });
-  if (ang.length && ang[0].t !== "u") throw galat("Pengampu utama harus dosen (bukan praktisi).");
+  function bersihTim(daftar, label) {
+    var ang = (Array.isArray(daftar) ? daftar : []).filter(function (a) { return a && a.id; }).map(function (a) { return { t: a.t === "p" ? "p" : "u", id: String(a.id) }; });
+    var unik = {}; ang = ang.filter(function (a) { if (unik[a.id]) return false; unik[a.id] = 1; return true; });
+    if (ang.length > 3) throw galat("Tim pengajar" + label + " maksimal 3 orang, termasuk praktisi.");
+    ang.forEach(function (a) { if (a.t === "u" ? !dosen[a.id] : !prak[a.id]) throw galat("Ada anggota tim" + label + " yang tidak ditemukan."); });
+    if (ang.length && ang[0].t !== "u") throw galat("Pengampu utama" + label + " harus dosen (bukan praktisi).");
+    return ang;
+  }
+  // v0.28.0: d.perKelas = { A: anggota[], B: anggota[] } → tim berbeda per kelas; tanpa perKelas = sama untuk semua kelas (seperti sebelumnya).
+  var tulis = [];
+  if (d.perKelas && typeof d.perKelas === "object" && !Array.isArray(d.perKelas)) {
+    Object.keys(d.perKelas).forEach(function (k) {
+      var kk = String(k).trim().toUpperCase();
+      if (!/^[A-Z0-9]{1,3}$/.test(kk)) throw galat("Kelas tidak valid: " + k);
+      var ang = bersihTim(d.perKelas[k], " kelas " + kk);
+      if (ang.length) tulis.push({ kelas: kk, ang: ang });
+    });
+    tulis.sort(function (a, b) { return a.kelas.localeCompare(b.kelas); });
+  } else {
+    var ang0 = bersihTim(d.anggota, "");
+    if (ang0.length) tulis.push({ kelas: "", ang: ang0 });
+  }
   return kunciTulis(function () {
-    var r = cari("TimPengajar", function (x) { return String(x.semester) === smt && teks(x.kodeMk) === kode; });
-    var o = { semester: smt, kodeMk: kode, anggota: JSON.stringify(ang), diubah: new Date(), oleh: p.id };
-    if (r) ubah("TimPengajar", r, o); else tambah("TimPengajar", o);
-    catat(p.id, "dp.tim", { semester: smt, kode: kode, n: ang.length });
+    var lama = semua("TimPengajar").filter(function (x) { return String(x.semester) === smt && teks(x.kodeMk) === kode; });
+    // Baris pertama diperbarui (urutan sheet tetap), sisanya dihapus dari bawah, lalu kelas tambahan ditambahkan.
+    var oDari = function (t) { return { semester: smt, kodeMk: kode, anggota: JSON.stringify(t.ang), diubah: new Date(), oleh: p.id, kelas: t.kelas }; };
+    lama.slice(tulis.length ? 1 : 0).sort(function (a, b) { return b._baris - a._baris; }).forEach(function (r) { hapusBaris("TimPengajar", r); });
+    if (tulis.length && lama.length) {
+      var r0 = semua("TimPengajar").filter(function (x) { return String(x.semester) === smt && teks(x.kodeMk) === kode; })[0];
+      ubah("TimPengajar", r0, oDari(tulis[0]));
+    } else if (tulis.length) tambah("TimPengajar", oDari(tulis[0]));
+    tulis.slice(1).forEach(function (t) { tambah("TimPengajar", oDari(t)); });
+    catat(p.id, "dp.tim", { semester: smt, kode: kode, n: tulis.reduce(function (n, t) { return n + t.ang.length; }, 0), kelas: tulis.map(function (t) { return t.kelas || "semua"; }).join(",") });
     return {};
   });
 }
@@ -211,7 +287,11 @@ function aksiDpTimSalin(d, token) {
     semuaMk().forEach(function (m) { mks[m.kode] = 1; });
     Object.keys(asal).forEach(function (kd) {
       if (kini[kd] || !mks[kd] || !asal[kd].anggota.length) return;
-      tambah("TimPengajar", { semester: smt, kodeMk: kd, anggota: JSON.stringify(asal[kd].anggota), diubah: new Date(), oleh: p.id }); n++;
+      Object.keys(asal[kd].kelas).sort().forEach(function (k) {
+        var ang = asal[kd].kelas[k] || [];
+        if (ang.length) tambah("TimPengajar", { semester: smt, kodeMk: kd, anggota: JSON.stringify(ang), diubah: new Date(), oleh: p.id, kelas: k });
+      });
+      n++;
     });
     catat(p.id, "dp.timSalin", { dari: dari, ke: smt, n: n });
     return { disalin: n, dari: labelSmt(dari) };

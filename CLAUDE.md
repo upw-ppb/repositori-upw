@@ -251,6 +251,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   tampilan hanya untuk angkatan & kelas. Daftar akun: hDaftarAkun() (S.pf saringan/urutan, rekapMhs(), S.pilihMhs). CHANGELOG: baris "Ringkas: …"
   per versi (diparse tampilan.mjs → riwayat.json.ringkas) tampil di Info › Tentang aplikasi (10 terakhir ≤ versi berjalan). WAJIB tulis Ringkas tiap rilis.
 
+- v0.28.0 (18 Nov 2026, Uji Coba): tim pengajar per kelas. TimPengajar.kelas (VERSI_SKEMA 22): "" = sama untuk semua kelas (juga data lama),
+  "A"/"B" = tim kelas itu. timSemester() → {kelas, perKelas, anggota (gabungan, utama dulu), utama[]}; dp.timSimpan {anggota} atau {perKelas:{A:[],B:[]}}.
+  kelasTimMk(smt, smtMk) = kelas angkatan yang mengambil MK (fallback kelas mhs aktif, lalu A,B). EWMP per kelas (tim "semua kelas" × jumlah kelas;
+  disetujui pemilik). Portofolio MK: peranTim(anggota, userId, utama[]) — pengampu utama tiap kelas = "utama". Laci tim memakai data-tpk/data-tpi
+  (data-timk/timi milik tabel tim DED!). Uji: alat/uji/uji-v28-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
