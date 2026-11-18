@@ -294,9 +294,10 @@ export const topik = [
 
   /* ---------------- DATA PRODI ---------------- */
   { id: "dprodi", kat: "data", p: ["admin", "superadmin", "kps", "gkm"], menu: "dprodi", mulai: ["admin"], j: "Data Prodi: kurikulum, tim pengajar, dosen, lulusan",
-    r: "Sumber Tabel iLKPS 1–10 dan 21.", g: ["dprodi"], kw: "kurikulum mata kuliah tim pengajar per kelas kelas a kelas b praktisi data dosen ts status dosen tugas belajar",
+    r: "Sumber Tabel iLKPS 1–10 dan 21.", g: ["dprodi"], kw: "kurikulum mata kuliah tim pengajar per kelas kelas a kelas b praktisi dosen industri bukti praktisi cv ijazah sertifikat kerja sama data dosen ts status dosen tugas belajar",
     l: ["Buka <b>Data Prodi</b>. Tab <b>Kurikulum</b>: tambah satu per satu atau <b>Impor</b> (tempel dari Excel atau unggah templat).",
       "Tab <b>Tim pengajar</b>: tetapkan pengampu utama dan anggota per semester, <b>sama untuk semua kelas</b> atau <b>berbeda per kelas</b> (kelas A, kelas B); <b>Salin dari</b> semester yang sama tahun lalu.",
+      "Tab <b>Praktisi</b>: data dosen industri (jabatan, lama pengalaman, memimpin tim, sertifikat dan penerbitnya, dasar kerja sama) dan <b>bukti</b> (CV, ijazah, sertifikat, bukti jabatan, dokumen kerja sama). Kolom <b>Kriteria</b> menunjukkan apakah syarat Matriks butir 16 terpenuhi (pengalaman ≥ 5 tahun dan/atau memimpin tim).",
       "Tab <b>Data dosen TS</b>: EWMP dan kesesuaian per tahun akademik. Tab <b>Status dosen</b>: tugas belajar atau pensiun.",
       "Tab <b>Dokumen dosen</b>: kelengkapan ijazah/sertifikat dan tombol <b>Ingatkan</b>.",
       "Tab <b>Lulusan</b>, <b>PMB</b>, <b>Keuangan</b>: isi untuk Tabel 8–10 dan 21."],

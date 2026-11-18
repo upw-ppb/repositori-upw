@@ -3,6 +3,24 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.29.0 — 18 Nov 2026 — Uji Coba
+Ringkas: Data dan bukti dosen praktisi sesuai syarat LAMWisata, serta mata kuliah yang diampu di Tabel 1–3 kini mencakup TS-2 sampai TS.
+Permintaan pemilik, setelah instrumen dibaca ulang (Matriks butir 16 dan DED Tabel 2–3):
+- **Data Prodi › Praktisi**: isian baru **jabatan**, **lama pengalaman kerja** (tahun), **pernah memimpin tim**, **lembaga penerbit sertifikat**, dan
+  **dasar kerja sama/penugasan**. Kolom **Kriteria** menunjukkan "Memenuhi" bila pengalaman ≥ 5 tahun dan/atau memimpin tim (Matriks butir 16).
+- **Bukti praktisi** (PDF/JPG/PNG maks. 10 MB, atau tautan): CV/portofolio, ijazah pendidikan tertinggi, sertifikat, bukti jabatan/surat keterangan kerja,
+  dokumen kerja sama/surat penugasan. Disimpan di folder Drive "Praktisi/<nama>"; bukti yang diganti/dihapus pindah ke sampah Drive.
+  Admin Prodi dan Super Admin mengubah; KPS dan GKM bisa melihat (tombol Lihat). Praktisi baru: jendela tetap terbuka setelah Simpan agar bukti bisa langsung diunggah.
+- **Tabel 2**: kolom sertifikat ditulis bersama lembaga penerbitnya, misalnya "Tour Leader (BNSP)" (DED Tabel 2 catatan 4).
+- **Perbaikan Tabel 1, 2, 3**: "mata kuliah yang diampu" kini diambil dari tim pengajar **TS-2 s.d. TS** (DED), sebelumnya hanya TS. Bobot sks Tabel 2 = jumlah sks
+  MK itu (tiap MK sekali). EWMP (Tabel 6) dan Data dosen TS tetap memakai TS saja. PMKI (butir 16) tidak berubah.
+- Struktur data versi 23: kolom baru di akhir tabel Praktisi (jabatan, pengalaman, memimpinTim, penerbit, kerjaSama, bukti); ditambahkan otomatis, cadangan dibuat lebih dulu.
+  Rollback ke v0.28.0 tetap bisa membaca data tanpa pemulihan (kolom baru diabaikan; menyimpan praktisi di versi lama tidak menghapus isian baru).
+- Panduan Info (Data Prodi) diperbarui.
+- Uji: 583 + 44 uji server lulus (20 uji baru di uji-v29-bagian.mjs). Uji tampilan di server lokal (tambah praktisi, unggah CV, tautan, buka bukti, isian tidak hilang
+  saat unggah, tampilan baca-saja KPS, lebar ponsel) dan penjelajah 52 halaman: tanpa masalah. Server Uji Coba: deployment @28 (cek langsung 12/12).
+  Penyetuju: tidak diperlukan (Uji Coba).
+
 ## v0.28.0 — 18 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.28.0 (server Apps Script Produksi deployment @8, tampilan docs/): tim pengajar per kelas (sama untuk semua kelas
   atau berbeda untuk kelas A/B), EWMP dihitung per kelas yang diajar, Portofolio MK mengenali pengampu utama setiap kelas.

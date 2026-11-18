@@ -262,6 +262,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   disetujui pemilik). Portofolio MK: peranTim(anggota, userId, utama[]) — pengampu utama tiap kelas = "utama". Laci tim memakai data-tpk/data-tpi
   (data-timk/timi milik tabel tim DED!). Uji: alat/uji/uji-v28-bagian.mjs.
 
+- v0.29.0 (18 Nov 2026, Uji Coba): Praktisi + jabatan, pengalaman, memimpinTim, penerbit, kerjaSama, bukti (JSON per SLOT_BUKTI_PRAKTISI; VERSI_SKEMA 23);
+  dp.praktisiBukti / dp.praktisiBuktiLihat; folder Drive "Praktisi/<nama> (<id>)". praktisiSimpan menulis isian baru hanya bila dikirim.
+  ampuTs: mk/sksPenuh = TS-2 s.d. TS (Tabel 1–3), mkTs = TS saja (Data dosen TS), sks EWMP = TS saja. Uji: alat/uji/uji-v29-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

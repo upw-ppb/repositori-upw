@@ -8,7 +8,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   const smt = "2030-1", tim = s => ok("dp.data", { semester: s || smt }, tAdm).tim.find(t => t.kode === "UPW981");
   const baris = s => (g.sheets.TimPengajar || []).slice(1).filter(r => String(r[0]) === (s || smt) && r[1] === "UPW981");
   const iKelas = (g.sheets.TimPengajar || [[]])[0].indexOf("kelas");
-  cek("migrasi: kolom kelas di akhir TimPengajar; SKEMA_VERSI 22", iKelas === (g.sheets.TimPengajar[0].length - 1) && g.props.SKEMA_VERSI === "22");
+  cek("migrasi: kolom kelas di akhir TimPengajar; SKEMA_VERSI ≥ 22", iKelas === (g.sheets.TimPengajar[0].length - 1) && Number(g.props.SKEMA_VERSI) >= 22);
   let t = tim();
   cek("MK tanpa tim: belum per kelas, daftar kelas A dan B", t.anggota.length === 0 && t.perKelas === false && t.daftarKelas.join() === "A,B", t);
 

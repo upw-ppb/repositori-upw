@@ -23,10 +23,31 @@ function mkDari(r) {
 }
 function semuaMk() { return semua("MataKuliah").filter(function (r) { return !r.dihapus; }).map(mkDari).sort(function (a, b) { return a.semester - b.semester || a.kode.localeCompare(b.kode); }); }
 function sksMk(m) { return m.sksKuliah + m.sksSeminar + m.sksPraktik; }
+/**
+ * v0.29.0: data praktisi sesuai Matriks butir 16 dan DED Tabel 2: jabatan, lama pengalaman (tahun), memimpin tim, lembaga penerbit sertifikat,
+ * dasar kerja sama, dan bukti (CV/portofolio, ijazah, sertifikat, bukti jabatan, dokumen kerja sama) di folder Drive "Praktisi".
+ */
+var SLOT_BUKTI_PRAKTISI = [
+  { k: "cv", l: "CV / portofolio (pengalaman kerja)" }, { k: "ijazah", l: "Ijazah pendidikan tertinggi" },
+  { k: "sertifikat", l: "Sertifikat profesi/kompetensi" }, { k: "jabatan", l: "Bukti jabatan / surat keterangan kerja" },
+  { k: "kerjasama", l: "Dokumen kerja sama / surat penugasan mengajar" }
+];
+var BUKTI_PRAKTISI_MAKS = 10 * 1024 * 1024;
 function praktisiDari(r) {
+  var b = jsonDari(r.bukti, {}) || {}, peng = r.pengalaman === "" || r.pengalaman === undefined || r.pengalaman === null ? "" : angka(r.pengalaman);
   return { _r: r, id: r.id, nama: teks(r.nama), nidk: teks(r.nidk), perusahaan: teks(r.perusahaan), pendidikan: teks(r.pendidikan),
-    bidang: teks(r.bidang), sertifikat: teks(r.sertifikat) };
+    bidang: teks(r.bidang), sertifikat: teks(r.sertifikat),
+    jabatan: teks(r.jabatan), pengalaman: peng, memimpinTim: ya(r.memimpinTim), penerbit: teks(r.penerbit), kerjaSama: teks(r.kerjaSama), _bukti: b };
 }
+/** Bukti praktisi untuk tampilan (tanpa fileId). */
+function buktiPraktisiKeKlien(b) {
+  var o = {};
+  SLOT_BUKTI_PRAKTISI.forEach(function (s) { var e = b[s.k]; if (e) o[s.k] = e.t === "tautan" ? { t: "tautan", url: e.url, w: e.w || "" } : { t: "file", nama: e.nama, ukuran: e.ukuran, w: e.w || "" }; });
+  return o;
+}
+/** Kriteria Matriks butir 16: pengalaman kerja ≥ 5 tahun sesuai bidang dan/atau pernah memimpin tim. */
+function praktisiMemenuhi(x) { return (x.pengalaman !== "" && x.pengalaman >= 5) || !!x.memimpinTim; }
+function sertifikatPraktisi(x) { return x.sertifikat + (x.sertifikat && x.penerbit ? " (" + x.penerbit + ")" : !x.sertifikat && x.penerbit ? x.penerbit : ""); }
 function semuaPraktisi() { return semua("Praktisi").filter(function (r) { return !r.dihapus; }).map(praktisiDari).sort(function (a, b) { return a.nama.localeCompare(b.nama); }); }
 /**
  * Tim pengajar satu semester per MK (v0.28.0: per kelas). Baris kelas "" = sama untuk semua kelas (juga data sebelum v0.28.0);
@@ -95,10 +116,28 @@ function daftarDosen() {
 }
 var STATUS_TETAP = ["Dosen tetap program studi (DTPS)", "Dosen tetap PT di luar program studi"];
 
-/** MK yang diampu per anggota (userId / id praktisi) pada semester-semester TS, beserta bagian sks untuk EWMP. */
+/**
+ * MK yang diampu per anggota (userId / id praktisi), beserta bagian sks untuk EWMP.
+ * v0.29.0: mk = MK diampu TS-2 s.d. TS (DED Tabel 1 kolom 7, Tabel 2 kolom 8, Tabel 3 kolom 9), sksPenuh = jumlah sks MK itu (tiap MK sekali);
+ * mkTs = MK diampu pada TS saja (Data dosen TS); sks EWMP tetap TS saja (Tabel 6 "pada saat TS").
+ */
 function ampuTs(ts, mks) {
   var hasil = {}, byKode = {};
   mks.forEach(function (m) { byKode[m.kode] = m; });
+  var lab = function (m) { return m.kode + " " + m.nama; };
+  for (var th = ts - 2; th <= ts; th++) {
+    [kodeSmt(th, true), kodeSmt(th, false)].forEach(function (smt) {
+      var tim = timSemester(smt);
+      Object.keys(tim).forEach(function (kd) {
+        var m = byKode[kd]; if (!m) return;
+        tim[kd].anggota.forEach(function (a) {
+          var h = hasil[a.id] = hasil[a.id] || { mk: [], mkTs: [], sks: 0, sksPenuh: 0 };
+          if (h.mk.indexOf(lab(m)) < 0) { h.mk.push(lab(m)); h.sksPenuh += sksMk(m); }
+          if (th === ts && h.mkTs.indexOf(lab(m)) < 0) h.mkTs.push(lab(m));
+        });
+      });
+    });
+  }
   var peta = petaKelasAngkatan();
   [kodeSmt(ts, true), kodeSmt(ts, false)].forEach(function (smt) {
     var tim = timSemester(smt);
@@ -106,11 +145,6 @@ function ampuTs(ts, mks) {
       var m = byKode[kd]; if (!m) return;
       // v0.28.0: sks EWMP dihitung per kelas yang diajar (tim "semua kelas" = dikali jumlah kelas MK itu).
       var x = tim[kd], kali = x.perKelas ? 1 : kelasTimMk(smt, m.semester, peta).length;
-      x.anggota.forEach(function (a) {
-        var h = hasil[a.id] = hasil[a.id] || { mk: [], sks: 0, sksPenuh: 0 };
-        if (h.mk.indexOf(m.kode + " " + m.nama) < 0) h.mk.push(m.kode + " " + m.nama);
-        h.sksPenuh += sksMk(m);
-      });
       Object.keys(x.kelas).forEach(function (k) {
         var ang = x.kelas[k] || [], dosen = ang.filter(function (a) { return a.t === "u"; });
         dosen.forEach(function (a) { hasil[a.id].sks += sksMk(m) * kali / dosen.length; });
@@ -136,7 +170,8 @@ function aksiDpData(d, token) {
   return {
     bolehUbah: punyaPeran(p, PERAN_DP_UBAH),
     mk: semua_, jamPerSks: JAM_PER_SKS,
-    praktisi: semuaPraktisi().map(function (x) { delete x._r; return x; }),
+    praktisi: semuaPraktisi().map(function (x) { var b = x._bukti; delete x._r; delete x._bukti; x.bukti = buktiPraktisiKeKlien(b); x.memenuhi = praktisiMemenuhi(x); return x; }),
+    slotBuktiPraktisi: SLOT_BUKTI_PRAKTISI,
     dosen: daftarDosen().map(function (x) { return { id: x.id, nama: x.nama, inisial: x.inisial, status: x.status }; }),
     semester: smt, labelSemester: labelSmt(smt), pilihanSemester: pilihanSmt.map(function (k) { return { kode: k, label: labelSmt(k) }; }),
     tim: semua_.filter(function (m) { return m.semester % 2 === (ganjil ? 1 : 0); }).map(function (m) {
@@ -147,8 +182,8 @@ function aksiDpData(d, token) {
     salinDari: labelSmt(kodeSmt(Number(smt.slice(0, 4)) - 1, ganjil)),
     ta: ta, labelTa: labelTa(ta),
     dosenTs: daftarDosen().filter(function (x) { return x.status !== "Dosen industri / praktisi"; }).map(function (x) {
-      var r = dts[x.id] || {}, a2 = ampu[x.id] || { sks: 0, mk: [] };
-      return { id: x.id, nama: x.nama, status: x.status, sksPsHitung: Math.round(a2.sks * 100) / 100, mk: a2.mk,
+      var r = dts[x.id] || {}, a2 = ampu[x.id] || { sks: 0, mkTs: [] };
+      return { id: x.id, nama: x.nama, status: x.status, sksPsHitung: Math.round(a2.sks * 100) / 100, mk: a2.mkTs,
         ps: r.ps === "" || r.ps === undefined ? "" : angka(r.ps), psLain: angka(r.psLain), luarPt: angka(r.luarPt), penelitian: angka(r.penelitian),
         pkm: angka(r.pkm), tambahan: angka(r.tambahan), sesuai: teks(r.sesuai), dasarSesuai: teks(r.dasarSesuai), linier: teks(r.linier) };
     })
@@ -208,6 +243,16 @@ function aksiDpPraktisiSimpan(d, token) {
     pendidikan: potong(x.pendidikan, 100).trim(), bidang: potong(x.bidang, 200).trim(), sertifikat: potong(x.sertifikat, 300).trim(), diubah: new Date() };
   if (!o.nama) throw galat("Nama praktisi wajib diisi.");
   if (!o.perusahaan) throw galat("Isi perusahaan/industri asal praktisi.");
+  // v0.29.0: isian tambahan hanya ditulis bila dikirim (tampilan lama tetap bisa menyimpan tanpa menghapusnya).
+  if ("jabatan" in x) o.jabatan = potong(x.jabatan, 200).trim();
+  if ("penerbit" in x) o.penerbit = potong(x.penerbit, 200).trim();
+  if ("kerjaSama" in x) o.kerjaSama = potong(x.kerjaSama, 300).trim();
+  if ("memimpinTim" in x) o.memimpinTim = x.memimpinTim ? "Ya" : "";
+  if ("pengalaman" in x) {
+    var pg = teks(x.pengalaman).trim().replace(",", ".");
+    if (pg !== "" && !(/^\d{1,2}(\.\d)?$/.test(pg) && Number(pg) <= 60)) throw galat("Lama pengalaman kerja diisi angka tahun (0–60).");
+    o.pengalaman = pg === "" ? "" : Number(pg);
+  }
   return kunciTulis(function () {
     var r = x.id ? cari("Praktisi", function (y) { return y.id === x.id && !y.dihapus; }) : null;
     if (x.id && !r) throw galat("Praktisi tidak ditemukan.");
@@ -226,6 +271,51 @@ function aksiDpPraktisiHapus(d, token) {
     catat(p.id, "dp.praktisiHapus", { id: d.id });
     return {};
   });
+}
+/** Unggah / tautkan / hapus bukti praktisi: d = { id, slot, berkas: {nama, isi} | tautan | hapus: true }. Bukti lama dibuang ke sampah Drive. */
+function aksiDpPraktisiBukti(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_DP_UBAH);
+  var slot = String(d.slot || "");
+  if (!SLOT_BUKTI_PRAKTISI.some(function (s) { return s.k === slot; })) throw galat("Jenis bukti tidak dikenal.");
+  var r0 = cari("Praktisi", function (y) { return y.id === String(d.id || "") && !y.dihapus; });
+  if (!r0) throw galat("Praktisi tidak ditemukan.");
+  var baru = null, file = null, w = new Date().toISOString();
+  if (d.hapus) baru = null;
+  else if (d.tautan) {
+    var url = teks(d.tautan).trim();
+    if (!/^https:\/\/[^\s<>"]+$/.test(url) || url.length > 500) throw galat("Tautan bukti harus diawali https:// dan tanpa spasi.");
+    baru = { t: "tautan", url: url, o: p.id, w: w };
+  } else if (d.berkas && d.berkas.isi) {
+    var nama = namaAman(d.berkas.nama), eks = (nama.split(".").pop() || "").toLowerCase();
+    if (["pdf", "jpg", "jpeg", "png"].indexOf(eks) < 0) throw galat("Bukti berupa PDF atau gambar (JPG/PNG).");
+    var bytes = Utilities.base64Decode(teks(d.berkas.isi));
+    if (bytes.length > BUKTI_PRAKTISI_MAKS) throw galat("Bukti maksimal 10 MB. Untuk berkas besar, pakai tautan Google Drive.");
+    if (!isiSesuai(eks, bytes)) throw galat("Isi berkas tidak sesuai dengan jenisnya (." + eks + ").");
+    file = folderAnak(folderAnak(DriveApp.getFolderById(prop("FOLDER_ID")), "Praktisi"), namaAman(teks(r0.nama)) + " (" + r0.id + ")")
+      .createFile(Utilities.newBlob(bytes, BUKTI_EKS[eks], slot + " - " + nama));
+    baru = { t: "file", fileId: file.getId(), nama: nama, mime: BUKTI_EKS[eks], ukuran: bytes.length, o: p.id, w: w };
+  } else throw galat("Pilih berkas atau isi tautan bukti.");
+  try {
+    return kunciTulis(function () {
+      var r = cari("Praktisi", function (y) { return y.id === r0.id && !y.dihapus; });
+      if (!r) throw galat("Praktisi tidak ditemukan.");
+      var b = jsonDari(r.bukti, {}) || {}, lama = b[slot];
+      if (baru) b[slot] = baru; else delete b[slot];
+      ubah("Praktisi", r, { bukti: JSON.stringify(b), diubah: new Date() });
+      if (lama && lama.t === "file") try { DriveApp.getFileById(lama.fileId).setTrashed(true); } catch (e) {}
+      catat(p.id, "dp.praktisiBukti", { id: r.id, slot: slot, t: baru ? baru.t : "hapus" });
+      return { bukti: buktiPraktisiKeKlien(b) };
+    });
+  } catch (e) { if (file) try { file.setTrashed(true); } catch (_) {} throw e; }
+}
+function aksiDpPraktisiBuktiLihat(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_DP_LIHAT);
+  var r = cari("Praktisi", function (y) { return y.id === String(d.id || "") && !y.dihapus; }), b = r ? (jsonDari(r.bukti, {}) || {})[String(d.slot || "")] : null;
+  if (!b || b.t !== "file") throw galat("Bukti tidak ditemukan.");
+  catat(p.id, "dp.praktisiBuktiLihat", { id: r.id, slot: d.slot });
+  return { nama: b.nama, mime: b.mime, isi: Utilities.base64Encode(DriveApp.getFileById(b.fileId).getBlob().getBytes()) };
 }
 
 function aksiDpTimSimpan(d, token) {
@@ -331,20 +421,20 @@ function tabelDosen(ts) {
     baris: tetap.map(function (x, i) { var r = dts[x.id] || {}; return [i + 1, x.nama, x.nidn, x.pendS1, x.pendS2, x.pendS3, x.pddikti === "Ya" ? "V" : "", x.bidang,
       x.status === STATUS_TETAP[0] ? "V" : "", x.jabfung, x.serdos, x.sertKomp, mkDari_(x.id), teks(r.sesuai) === "Ya" ? "V" : "", x.mkLain]; }),
     akun: tetap.map(function (x) { return x.id; }),
-    catatan: "Sumber: biodata dosen (status dosen tetap) dan tim pengajar semester TS. Kesesuaian bidang keahlian diisi Admin di Data Prodi › Data dosen TS." +
+    catatan: "Sumber: biodata dosen (status dosen tetap) dan tim pengajar TS-2 s.d. TS (mata kuliah yang diampu). Kesesuaian bidang keahlian diisi Admin di Data Prodi › Data dosen TS." +
       (kosongStatus ? " " + kosongStatus + " akun dosen belum mengisi status dosen di biodata." : "") });
   var industri = dosen.filter(function (x) { return x.status === "Dosen industri / praktisi"; });
-  var b2 = prak.map(function (x) { var a = ampu[x.id] || { mk: [], sksPenuh: 0 }; return [x.nama, x.nidk, x.perusahaan, x.pendidikan, x.bidang, x.sertifikat, a.mk.join("; "), a.sksPenuh]; })
+  var b2 = prak.map(function (x) { var a = ampu[x.id] || { mk: [], sksPenuh: 0 }; return [x.nama, x.nidk, x.perusahaan, x.pendidikan, x.bidang, sertifikatPraktisi(x), a.mk.join("; "), a.sksPenuh]; })
     .concat(industri.map(function (x) { var a = ampu[x.id] || { mk: [], sksPenuh: 0 }; return [x.nama, x.nidn, "", x.pendS3 ? "S3" : x.pendS2 ? "S2" : x.pendS1 ? "S1/D4" : "", x.bidang, x.sertKomp, a.mk.join("; "), a.sksPenuh]; }));
   T.push({ kode: "2", judul: "Tabel 2) Dosen Industri/Praktisi", bentuk: "daftar",
     kolom: ["No.", "Nama Dosen Industri/Praktisi", "NIDK", "Perusahaan/Industri", "Pendidikan Tertinggi", "Bidang Keahlian", "Sertifikat Profesi/Kompetensi/Industri", "Mata Kuliah yang Diampu", "Bobot Kredit (sks)"],
-    baris: b2.map(function (r, i) { return [i + 1].concat(r); }), catatan: "Sumber: Data Prodi › Praktisi dan tim pengajar semester TS (bobot = jumlah sks MK yang diampu)." });
+    baris: b2.map(function (r, i) { return [i + 1].concat(r); }), catatan: "Sumber: Data Prodi › Praktisi dan tim pengajar TS-2 s.d. TS (bobot = jumlah sks MK yang diampu, tiap MK sekali). Sertifikat ditulis dengan lembaga penerbitnya." });
   var tt = dosen.filter(function (x) { return x.status === "Dosen tidak tetap"; });
   T.push({ kode: "3", judul: "Tabel 3) Dosen Tidak Tetap", bentuk: "daftar",
     kolom: ["No.", "Nama Dosen", "NIDN/NIDK", "Pendidikan Pasca Sarjana", "Bidang Keahlian", "Jabatan Akademik", "Sertifikat Pendidik Profesional",
       "Sertifikat Kompetensi/Profesi/Industri", "Mata Kuliah yang Diampu pada PS yang Diakreditasi", "Kesesuaian Bidang Keahlian dengan Mata Kuliah yang Diampu"],
     baris: tt.map(function (x, i) { var r = dts[x.id] || {}; return [i + 1, x.nama, x.nidn, [x.pendS2, x.pendS3].filter(String).join("; "), x.bidang, x.jabfung, x.serdos, x.sertKomp, mkDari_(x.id), teks(r.sesuai) === "Ya" ? "V" : ""]; }),
-    akun: tt.map(function (x) { return x.id; }), catatan: "Sumber: biodata dosen berstatus dosen tidak tetap." });
+    akun: tt.map(function (x) { return x.id; }), catatan: "Sumber: biodata dosen berstatus dosen tidak tetap; mata kuliah yang diampu dari tim pengajar TS-2 s.d. TS." });
   T.push({ kode: "4", judul: "Tabel 4) Kurikulum, Capaian Pembelajaran, dan Rencana Pembelajaran", bentuk: "daftar",
     kolom: ["No.", "Semester", "Kode Mata Kuliah", "Nama Mata Kuliah", "Mata Kuliah Kompetensi", "Kuliah/Responsi/Tutorial (sks)", "Seminar (sks)",
       "Praktikum/Praktik/Praktik Lapangan (sks)", "Konversi Kredit ke Jam", "CPL: Sikap", "CPL: Pengetahuan", "CPL: Keterampilan Umum", "CPL: Keterampilan Khusus",
