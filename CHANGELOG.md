@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.32.0 — 18 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.32.0 (server Apps Script Produksi deployment @12, tampilan docs/): risalah rapat per agenda (keputusan menjadi tindak lanjut),
+  templat Word, risalah Word/PDF, daftar hadir PDF, pindaian risalah dan daftar hadir, salinan otomatis ke Bank Dokumen, akses baca asesor untuk rapat final.
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama setelah pembaruan ("Cadangan / sebelum v0.32.0 (struktur data 24 → 25)").
+- Rollback: v0.31.0 tetap bisa membaca data tanpa pemulihan (kolom risalah dan berkas diabaikan; tindak lanjut hasil risalah tetap ada).
+- Penyetuju: pemilik, di chat 18 Nov 2026: "setuju tayang v0.32.0".
+
 ## v0.32.0 — 18 Nov 2026 — Uji Coba
 Ringkas: Risalah rapat per agenda (keputusan otomatis menjadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen.
 Rilis 2 dari 2 fitur Rapat & Tindak Lanjut (rencana disetujui pemilik 18 Nov 2026).
