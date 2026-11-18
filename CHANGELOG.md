@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.31.0 — 18 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.31.0 (server Apps Script Produksi deployment @11, tampilan docs/): menu Rapat & Tindak Lanjut (undangan rapat KPS dengan surat PDF,
+  notifikasi dan jawaban kehadiran; tindak lanjut sampai terverifikasi; tombol di Laporan GKM; ringkasan tindak lanjut di Penilaian).
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama setelah pembaruan ("Cadangan / sebelum v0.31.0 (struktur data 23 → 24)").
+- Rollback: v0.30.0 tetap bisa membaca data tanpa pemulihan (tabel TindakLanjut, Rapat, PesertaRapat diabaikan).
+- Penyetuju: pemilik, di chat 18 Nov 2026: "setuju tayang v0.31.0".
+
 ## v0.31.0 — 18 Nov 2026 — Uji Coba
 Ringkas: Menu baru Rapat & Tindak Lanjut: undangan rapat dari KPS dengan surat PDF dan notifikasi peserta, serta daftar tindak lanjut sampai terverifikasi.
 Permintaan pemilik (Rilis 1 dari 2; rencana disetujui di chat 18 Nov 2026): rapat dan tindak lanjutnya terdata sesuai siklus PPEPP. Dasar instrumen (nomor Lampiran 1):
