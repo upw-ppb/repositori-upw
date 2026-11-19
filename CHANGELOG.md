@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.36.1 — 19 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.36.1 (tampilan docs/ dan server Apps Script Produksi deployment @17, server hanya naik nomor versi): templat tim pengajar dengan
+  baris kelas A dan B per mata kuliah, daftar dosen/praktisi selalu terbaru.
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru. Rollback ke v0.36.0 cukup tampilan (tag v0.36.0) dan deployment @16.
+- Penyetuju: pemilik, di chat 19 Nov 2026: "Setuju Tayangkan v0.36.1".
+
 ## v0.36.1 — 19 Nov 2026 — Uji Coba
 Ringkas: Templat Excel tim pengajar lebih mudah diisi: setiap mata kuliah selalu dua baris (kelas A dan B), dan daftar dosen/praktisi selalu yang terbaru.
 Permintaan pemilik 19 Nov 2026 (bersama "Setuju Tayangkan v0.36.0").
