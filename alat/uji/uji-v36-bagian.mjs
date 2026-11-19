@@ -31,4 +31,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm }) {
   const app = fs.readFileSync("web/aplikasi.js", "utf8");
   cek("tampilan: centang di formulir MK, MK bertanda tidak masuk templat tim/beban SKS dan ditolak saat impor",
     /cek\("mkTanpa"/.test(app) && /D\.tim\.filter\(t => !t\.tanpaTim\)\.forEach/.test(app) && /mk\[kode\]\.tanpaTim\) \{ masalah\.push/.test(app) && /Tanpa pengampu \(magang\/TA\)/.test(app));
+  cek("v0.36.1 templat: setiap MK baris kelas A dan B; daftar dosen/praktisi diambil ulang saat unduh dan unggah; dua baris sama → tim semua kelas",
+    /const kelasTemplat = t => \[\.\.\.new Set\(\["A", "B", \.\.\.kelasTim\(t\)\]\)\]/.test(app) && /templat: async \(\) => \{ await segarkanDpTim\(\)/.test(app)
+    && /periksa: async \(X, lembar\) => \{ await segarkanDpTim\(\)/.test(app) && /sama \? \{ kodeMk: g\.kode, anggota: keAng/.test(app));
 }

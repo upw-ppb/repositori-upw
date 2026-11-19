@@ -3,6 +3,20 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.36.1 — 19 Nov 2026 — Uji Coba
+Ringkas: Templat Excel tim pengajar lebih mudah diisi: setiap mata kuliah selalu dua baris (kelas A dan B), dan daftar dosen/praktisi selalu yang terbaru.
+Permintaan pemilik 19 Nov 2026 (bersama "Setuju Tayangkan v0.36.0").
+- Templat: setiap MK (kecuali yang ditandai tanpa pengampu) selalu punya baris **kelas A** dan **kelas B** (ditambah kelas lain bila sudah ada). Tim yang sama
+  untuk semua kelas diisi di kedua baris. Kolom "Kelas (A / B)". Beban SKS dihitung per baris kelas.
+- Unggah: bila semua baris kelas MK terisi sama persis dan sama dengan kelas yang mengambil MK, disimpan sebagai tim "sama untuk semua kelas" (tampilan tetap rapi,
+  hitungan EWMP sama). Bila berbeda, disimpan per kelas. Kelas yang dikosongkan = belum punya pengampu. Templat lama (baris tanpa kelas) tetap diterima.
+- Daftar nama: data tim, dosen, dan praktisi diambil ulang dari server setiap kali templat diunduh dan setiap kali berkas diunggah, sehingga dosen (akun baru) atau
+  praktisi (tab Praktisi) yang baru ditambahkan langsung tercantum di daftar pilihan dan Beban SKS.
+- Server hanya naik nomor versi; struktur data tidak berubah. Rollback ke v0.36.0 tanpa pemulihan data.
+- Uji: 697 + 44 uji server lulus. Uji tampilan di server lokal: praktisi baru ditambahkan setelah halaman terbuka → langsung tercantum di templat; setiap MK dua baris
+  A/B; unggah A=B pada MK berkelas A dan B → "semua kelas"; A≠B → per kelas; B kosong → "Belum ditetapkan"; penjelajah 48 halaman/laci tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.36.0 — 19 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.36.0 (tampilan docs/ dan server Apps Script Produksi deployment @16): penanda "tanpa dosen pengampu" untuk MK Magang dan Tugas Akhir
   (kurikulum, tim pengajar, templat Excel tim).

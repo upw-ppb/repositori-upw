@@ -297,6 +297,8 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - v0.36.0 (19 Nov 2026, Uji Coba): MataKuliah.tanpaTim (VERSI_SKEMA 26; migrasi menandai MK lama yang cocok POLA_TANPA_TIM). timSemester() mengabaikan tim MK
   bertanda (semua hitungan); siapkanTim menolak; bersihMk: tanpaTim tidak dikirim → nilai lama tetap, MK baru ditebak dari nama. Tampilan: centang mkTanpa
   (otomatis untuk MK baru), selTim/tab tim/templatTim/periksaImporTim. Uji: alat/uji/uji-v36-bagian.mjs.
+- v0.36.1 (19 Nov 2026, Uji Coba): templat tim selalu baris kelas A dan B (kelasTemplat), segarkanDpTim() sebelum unduh dan saat periksa unggahan (nama terbaru);
+  baris kelas sama persis dan = kelasTim(MK) → disimpan sebagai tim "sama untuk semua kelas".
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
