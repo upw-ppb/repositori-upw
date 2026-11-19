@@ -20,8 +20,11 @@ function labelSmt(kode) { var m = /^(\d{4})-([12])$/.exec(kode); return m ? (m[2
 function mkDari(r) {
   return { _r: r, id: r.id, kode: teks(r.kode), nama: teks(r.nama), semester: Number(r.semester) || 0, kompetensi: ya(r.kompetensi),
     sksKuliah: angka(r.sksKuliah), sksSeminar: angka(r.sksSeminar), sksPraktik: angka(r.sksPraktik),
-    cplSikap: ya(r.cplSikap), cplPengetahuan: ya(r.cplPengetahuan), cplKu: ya(r.cplKu), cplKk: ya(r.cplKk), rps: teks(r.rps), unit: teks(r.unit) || "Prodi UPW" };
+    cplSikap: ya(r.cplSikap), cplPengetahuan: ya(r.cplPengetahuan), cplKu: ya(r.cplKu), cplKk: ya(r.cplKk), rps: teks(r.rps), unit: teks(r.unit) || "Prodi UPW",
+    tanpaTim: ya(r.tanpaTim) };
 }
+/** v0.36.0: MK yang biasanya tanpa dosen pengampu (mahasiswa langsung ke industri / ke pembimbing masing-masing). Dipakai sebagai nilai awal penanda tanpaTim. */
+var POLA_TANPA_TIM = /magang|tugas akhir|skripsi|praktik kerja lapang|praktek kerja lapang|\bpkl\b|internship|on the job training|\bojt\b/i;
 function semuaMk() { return semua("MataKuliah").filter(function (r) { return !r.dihapus; }).map(mkDari).sort(function (a, b) { return a.semester - b.semester || a.kode.localeCompare(b.kode); }); }
 function sksMk(m) { return m.sksKuliah + m.sksSeminar + m.sksPraktik; }
 /**
@@ -56,8 +59,9 @@ function semuaPraktisi() { return semua("Praktisi").filter(function (r) { return
  * (pengampu utama tiap kelas lebih dulu), utama = userId pengampu utama (bisa lebih dari satu bila berbeda per kelas).
  */
 function timSemester(kode) {
-  var m = {};
-  semua("TimPengajar").filter(function (r) { return String(r.semester) === kode; }).forEach(function (r) {
+  var m = {}, tanpa = {};
+  semuaMk().forEach(function (x) { if (x.tanpaTim) tanpa[x.kode] = 1; });   // v0.36.0: tim pada MK bertanda "tanpa dosen pengampu" diabaikan di semua hitungan
+  semua("TimPengajar").filter(function (r) { return String(r.semester) === kode && !tanpa[teks(r.kodeMk)]; }).forEach(function (r) {
     var kd = teks(r.kodeMk), x = m[kd] = m[kd] || { _r: r, baris: [], kelas: {} };
     x.baris.push(r); x.kelas[String(r.kelas || "").trim().toUpperCase()] = jsonDari(r.anggota, []);
   });
@@ -178,7 +182,7 @@ function aksiDpData(d, token) {
     semester: smt, labelSemester: labelSmt(smt), pilihanSemester: pilihanSmt.map(function (k) { return { kode: k, label: labelSmt(k) }; }),
     tim: semua_.filter(function (m) { return m.semester % 2 === (ganjil ? 1 : 0); }).map(function (m) {
       var x = tim[m.kode];
-      return { kode: m.kode, nama: m.nama, sks: m.sks, smtMk: m.semester, anggota: x ? x.anggota : [], utama: x ? x.utama : [],
+      return { kode: m.kode, nama: m.nama, sks: m.sks, smtMk: m.semester, tanpaTim: m.tanpaTim, anggota: x ? x.anggota : [], utama: x ? x.utama : [],
         perKelas: x ? x.perKelas : false, kelas: x ? x.kelas : {}, daftarKelas: kelasTimMk(smt, m.semester, petaK) };
     }),
     salinDari: labelSmt(kodeSmt(Number(smt.slice(0, 4)) - 1, ganjil)),
@@ -202,6 +206,8 @@ function bersihMk(x) {
   var o = { kode: kode, nama: nama, semester: smt, kompetensi: ya(x.kompetensi), sksKuliah: angka(x.sksKuliah, 24), sksSeminar: angka(x.sksSeminar, 24),
     sksPraktik: angka(x.sksPraktik, 24), cplSikap: ya(x.cplSikap), cplPengetahuan: ya(x.cplPengetahuan), cplKu: ya(x.cplKu), cplKk: ya(x.cplKk),
     rps: potong(x.rps, 300).trim(), unit: potong(x.unit, 100).trim() || "Prodi UPW" };
+  // v0.36.0: penanda "tanpa dosen pengampu". Tidak dikirim (mis. templat kurikulum lama) → nilai lama dipertahankan; MK baru → ditebak dari nama.
+  if (x.tanpaTim !== undefined && x.tanpaTim !== null && String(x.tanpaTim).trim() !== "") o.tanpaTim = ya(x.tanpaTim);
   if (o.sksKuliah + o.sksSeminar + o.sksPraktik <= 0) throw galat("Isi bobot sks (" + kode + ").");
   if (o.rps && !/^https:\/\//.test(o.rps) && o.rps !== "Ada") throw galat("Dokumen RPS: isi tautan https:// atau tulis Ada (" + kode + ").");
   return o;
@@ -220,7 +226,7 @@ function aksiDpMkSimpan(d, token) {
       if (lamaKode !== o.kode && ada[o.kode]) throw galat("Kode " + o.kode + " sudah dipakai mata kuliah lain.");
       o.diubah = new Date();
       if (r) { ubah("MataKuliah", r, o); ubahN++; }
-      else { o.id = "m" + acak(10); o.dihapus = ""; tambah("MataKuliah", o); ada[o.kode] = true; baru++; }
+      else { if (o.tanpaTim === undefined) o.tanpaTim = POLA_TANPA_TIM.test(o.nama); o.id = "m" + acak(10); o.dihapus = ""; tambah("MataKuliah", o); ada[o.kode] = true; baru++; }
     });
     catat(p.id, "dp.mk", { baru: baru, ubah: ubahN });
     return { baru: baru, diubah: ubahN };
@@ -340,6 +346,7 @@ function rujukanTim() {
 function siapkanTim(smt, d, ruj) {
   var kode = teks(d.kodeMk), mk = ruj.mk[kode];
   if (!mk) throw galat("Mata kuliah tidak ditemukan.");
+  if (mk.tanpaTim) throw galat("Mata kuliah ini ditandai tanpa dosen pengampu (magang/tugas akhir). Ubah penandanya di Kurikulum bila perlu tim.");
   if ((mk.semester % 2 === 1) !== /-1$/.test(smt)) throw galat("Mata kuliah semester " + mk.semester + " tidak ditawarkan di " + labelSmt(smt) + ".");
   var dosen = ruj.dosen, prak = ruj.prak;
   function bersihTim(daftar, label) {

@@ -25,7 +25,7 @@ var SKEMA = {
   DokumenPribadi: ["id", "userId", "nama", "jenis", "tahun", "t", "fileId", "namaFile", "mime", "ukuran", "url", "dibuat", "dihapus"],
   /* v0.8.0 */
   MataKuliah: ["id", "kode", "nama", "semester", "kompetensi", "sksKuliah", "sksSeminar", "sksPraktik", "cplSikap", "cplPengetahuan", "cplKu", "cplKk",
-               "rps", "unit", "diubah", "dihapus"],
+               "rps", "unit", "diubah", "dihapus", /* v0.36.0 */ "tanpaTim"],
   Praktisi: ["id", "nama", "nidk", "perusahaan", "pendidikan", "bidang", "sertifikat", "diubah", "dihapus",
              /* v0.29.0 */ "jabatan", "pengalaman", "memimpinTim", "penerbit", "kerjaSama", "bukti"],
   TimPengajar: ["semester", "kodeMk", "anggota", "diubah", "oleh", /* v0.28.0 */ "kelas"],
@@ -68,7 +68,7 @@ var SKEMA = {
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 25;
+var VERSI_SKEMA = 26;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
@@ -214,6 +214,10 @@ function pastikanSkema() {
 
 /** Pengisian data untuk kolom baru. */
 function migrasiData(dari) {
+  if (dari < 26 && dari > 0) {
+    // v0.36.0: MK bernama Magang / Tugas Akhir / Skripsi / PKL ditandai "tanpa dosen pengampu" (keputusan pemilik 19 Nov 2026). Admin bisa mengubahnya di Kurikulum.
+    semua("MataKuliah").forEach(function (r) { if (!r.dihapus && String(r.tanpaTim) === "" && POLA_TANPA_TIM.test(String(r.nama || ""))) ubah("MataKuliah", r, { tanpaTim: true }); });
+  }
   if (dari < 4) {
     var ada4 = semua("Pengaturan").map(function (x) { return x.kunci; });
     if (ada4.indexOf("hariLibur") < 0) tambah("Pengaturan", { kunci: "hariLibur", nilai: "2026-12-25, 2027-01-01",

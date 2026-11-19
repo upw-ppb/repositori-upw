@@ -3,6 +3,27 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.36.0 — 19 Nov 2026 — Uji Coba
+Ringkas: Penanda "tanpa dosen pengampu" untuk mata kuliah Magang dan Tugas Akhir: tidak perlu tim pengajar dan tidak masuk templat maupun beban SKS.
+Keputusan pemilik 19 Nov 2026 ("Setuju, kerjakan"): Magang (mahasiswa langsung ke industri) dan Tugas Akhir (langsung ke pembimbing) tidak memiliki dosen pengampu.
+- **Kurikulum**: centang "Tanpa dosen pengampu (magang / tugas akhir)" di formulir MK; otomatis tercentang untuk MK baru bernama Magang, Tugas Akhir, Skripsi,
+  PKL/Praktik Kerja Lapangan, Internship, OJT. Label "tanpa pengampu" di tabel kurikulum. Templat impor kurikulum mendapat kolom "Tanpa dosen pengampu" (kosong =
+  MK lama tidak diubah, MK baru ditebak dari nama). Yang bisa mengubah tetap Admin Prodi dan Super Admin.
+- **Tim pengajar**: MK bertanda tampil "Tanpa pengampu (magang/TA)", tanpa tombol tim, tidak dihitung di "x dari y MK sudah punya tim". Tim yang terlanjur ada
+  pada MK bertanda diabaikan di Tabel 1–3, EWMP, Portofolio MK, dan PMKI (data tidak dihapus; muncul lagi bila penanda dilepas). Ubah tim dan impor Excel menolak MK bertanda.
+- **Templat Excel tim**: MK bertanda tidak masuk lembar Data dan Beban SKS; disebut di lembar Petunjuk.
+- **Pembaruan data**: MK lama bernama Magang/Tugas Akhir/Skripsi/PKL ditandai otomatis saat struktur data diperbarui (cadangan dibuat lebih dulu); Admin bisa
+  melepas penandanya di Kurikulum.
+- Jawaban standar (instrumen LAMWisata): tidak ada tabel iLKPS khusus magang; magang menjadi bukti butir 6 (aspek kebijakan kurikulum "magang di kementerian/
+  lembaga dan industri"), butir 24 (sks magang di kolom praktik → PJP), butir 59/73 (PKS dengan tempat magang), dan butir 79 (contoh IKT: magang luar negeri).
+  Mahasiswa melaporkan magang lewat Kegiatan jenis "Magang / MBKM" (surat penerimaan, laporan magang, konversi nilai). Tugas akhir: butir 28/Tabel 5 dari kegiatan
+  "Bimbingan tugas akhir". Panduan Info topik Data Prodi diperbarui.
+- Struktur data versi 26: kolom baru tanpaTim di akhir tabel MataKuliah. Rollback ke v0.35.0 tanpa pemulihan data (kolom diabaikan; tim MK magang/TA lama
+  akan terhitung lagi bila ada).
+- Uji: 696 + 44 uji server lulus (10 uji baru di uji-v36-bagian.mjs, termasuk migrasi 25 → 26). Uji tampilan di server lokal: MK "Magang Industri" otomatis
+  bertanda, tab Tim menampilkan "Tanpa pengampu" dan hitungan "2 dari 3 … · 1 tanpa pengampu", templat Excel tanpa MK itu; penjelajah 48 halaman/laci tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.35.0 — 19 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.35.0 (tampilan docs/ dan server Apps Script Produksi deployment @15): templat Excel tim pengajar per semester dengan lembar Beban SKS
   per dosen otomatis; unduh dan unggah hanya KPS dan Admin Prodi.

@@ -294,6 +294,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   kps/admin). gas/DataProdi.js: rujukanTim/siapkanTim/tulisTim dipakai dp.timSimpan dan dp.timImpor. Tampilan: JENIS_IMPOR.tim (hook templat/periksa/kirim(b, X)),
   templatTim() (lembar Data/Beban SKS/Mata kuliah/Petunjuk dengan tanda [smt:YYYY-S]; rumus + nilai awal), periksaImporTim(). zip.js: sel {f, v}, pilihan {ref},
   sel kosong dilewati, calcPr fullCalcOnLoad. Beban SKS = SKS × (jumlah kelas bila Kelas kosong, atau 1) ÷ jumlah orang. Uji: alat/uji/uji-v35-bagian.mjs.
+- v0.36.0 (19 Nov 2026, Uji Coba): MataKuliah.tanpaTim (VERSI_SKEMA 26; migrasi menandai MK lama yang cocok POLA_TANPA_TIM). timSemester() mengabaikan tim MK
+  bertanda (semua hitungan); siapkanTim menolak; bersihMk: tanpaTim tidak dikirim → nilai lama tetap, MK baru ditebak dari nama. Tampilan: centang mkTanpa
+  (otomatis untuk MK baru), selTim/tab tim/templatTim/periksaImporTim. Uji: alat/uji/uji-v36-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
