@@ -25,6 +25,19 @@ export async function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tSA })
   cek("MK yang tidak ada di berkas tidak diubah", c.anggota.length === 1 && c.anggota[0].id === d3);
   j = ok("dp.timImpor", { semester: smt, daftar: [{ kodeMk: "UPW951", anggota: [{ t: "p", id: pr.id }, { t: "u", id: dsn }] }, { kodeMk: "UPW952", anggota: [{ t: "u", id: d3 }] }] }, tAdm);
   cek("Admin Prodi: pengampu utama praktisi ditolak (tim lama tetap); per kelas → semua kelas berhasil", j.disimpan === 1 && /harus dosen/.test(j.dilewati[0].alasan) && tim("UPW951").anggota.length === 3 && !tim("UPW952").perKelas && tim("UPW952").anggota[0].id === d3);
+  // Permintaan pemilik saat menyetujui tayang: unggah templat berulang MENGGANTI pengajar, tidak menambah baris/MK/kelas.
+  const barisSmt = () => (g.sheets.TimPengajar || []).slice(1).filter(r => String(r[0]) === smt && /^UPW95/.test(String(r[1])));
+  const ulang = [{ kodeMk: "UPW951", anggota: [{ t: "u", id: d2 }] }, { kodeMk: "UPW952", perKelas: { A: [{ t: "u", id: dsn }, { t: "u", id: d3 }], B: [{ t: "u", id: d3 }] } }, { kodeMk: "UPW953", anggota: [{ t: "u", id: dsn }, { t: "u", id: d2 }] }];
+  ok("dp.timImpor", { semester: smt, daftar: ulang }, tKps);
+  const n1 = barisSmt().length, tm1 = ok("dp.data", { semester: smt }, tAdm).tim.filter(t => /^UPW95/.test(t.kode)).length;
+  ok("dp.timImpor", { semester: smt, daftar: ulang }, tAdm); ok("dp.timImpor", { semester: smt, daftar: ulang }, tKps);
+  const n2 = barisSmt().length;
+  ok("dp.timImpor", { semester: smt, daftar: [{ kodeMk: "UPW951", anggota: [{ t: "u", id: d3 }, { t: "u", id: dsn }] }, { kodeMk: "UPW952", perKelas: { A: [{ t: "u", id: d2 }], B: [{ t: "u", id: dsn }] } }, { kodeMk: "UPW953", anggota: [{ t: "u", id: d3 }] }] }, tKps);
+  const n3 = barisSmt().length, D3 = ok("dp.data", { semester: smt }, tAdm).tim;
+  cek("unggah ulang 3× templat sama: jumlah baris tim tetap (" + n1 + " → " + n2 + "), tidak bertambah", n1 === 4 && n2 === n1, [n1, n2]);
+  cek("unggah templat dengan pengajar berbeda: baris tetap, pengajar berganti; jumlah MK dan kelas sama", n3 === n1 && D3.filter(t => /^UPW95/.test(t.kode)).length === tm1
+    && D3.find(t => t.kode === "UPW951").anggota.map(x => x.id).join() === [d3, dsn].join() && D3.find(t => t.kode === "UPW952").kelas.A.map(x => x.id).join() === d2
+    && D3.find(t => t.kode === "UPW952").kelas.B[0].id === dsn && D3.find(t => t.kode === "UPW953").anggota.map(x => x.id).join() === d3);
   cek("dp.timSimpan tetap seperti sebelumnya (KPS tidak bisa Ubah tim)", /izin/.test(salah("dp.timSimpan", { semester: smt, kodeMk: "UPW953", anggota: [{ t: "u", id: dsn }] }, tKps)));
   // Pembuat Excel: rumus, sel kosong, daftar pilihan dari rentang, hitung ulang saat dibuka.
   const w = {}; const ctx = { window: w, Blob, TextEncoder, TextDecoder, Uint8Array, DataView, Date, Math, String, Array, Object, JSON, Number }; vm.createContext(ctx);

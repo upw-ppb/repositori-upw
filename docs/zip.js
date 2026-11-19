@@ -1,6 +1,8 @@
 /* Penulis ZIP (tanpa kompresi) dan Excel .xlsx sederhana untuk ekspor portofolio. Ditulis sendiri; tanpa pustaka luar.
    UPW_ZIP.zip([{ nama, data: Uint8Array|string }]) → Blob (application/zip)
-   UPW_ZIP.xlsx([{ nama: "Lembar", baris: [[sel, ...], ...] }]) → Blob; baris pertama dicetak tebal; angka tetap angka. */
+   UPW_ZIP.xlsx([{ nama: "Lembar", baris: [[sel, ...], ...] }]) → Blob; baris pertama dicetak tebal; angka tetap angka.
+   v0.35.0: sel {f: "rumus tanpa =", v: hasil awal} = rumus (dihitung ulang saat dibuka: calcPr fullCalcOnLoad); sel kosong ("" / null) tidak ditulis;
+   pilihan[i] boleh {ref: "'Lembar'!$A$2:$A$50"} = daftar pilihan dari rentang sel (tanpa batas 255 karakter); lebar: [lebar kolom] opsional. */
 (function () {
 "use strict";
 const TABEL = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
@@ -36,10 +38,16 @@ const kolom = n => { let s = ""; n++; while (n) { const r = (n - 1) % 26; s = St
 const NS = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"', KEP = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
 function lembar(baris, o = {}) {
   const teks = o.teks || [], pilihan = o.pilihan || {};
-  const lebar = [];
-  baris.forEach(r => r.forEach((v, i) => { lebar[i] = Math.min(60, Math.max(lebar[i] || 8, String(v ?? "").length + 2)); }));
+  const lebar = (o.lebar || []).slice();
+  if (!o.lebar) baris.forEach(r => r.forEach((v, i) => { lebar[i] = Math.min(60, Math.max(lebar[i] || 8, (v && typeof v === "object" ? 10 : String(v ?? "").length) + 2)); }));
   const isi = baris.map((r, y) => `<row r="${y + 1}">${r.map((v, x) => {
     const ref = kolom(x) + (y + 1), s = y === 0 ? ' s="1"' : "";
+    if (v === null || v === undefined || v === "") return "";
+    if (typeof v === "object" && v.f) { // rumus; v.v = hasil awal (tampil di Tampilan Terproteksi Excel / pratinjau sebelum dihitung ulang)
+      if (typeof v.v === "number" && isFinite(v.v)) return `<c r="${ref}"${s}><f>${xml(v.f)}</f><v>${v.v}</v></c>`;
+      if (v.v !== undefined && v.v !== null) return `<c r="${ref}"${s} t="str"><f>${xml(v.f)}</f><v>${xml(v.v)}</v></c>`;
+      return `<c r="${ref}"${s}><f>${xml(v.f)}</f></c>`;
+    }
     if (typeof v === "number" && isFinite(v)) return `<c r="${ref}"${s}><v>${v}</v></c>`;
     return `<c r="${ref}" t="inlineStr"${s}><is><t xml:space="preserve">${xml(v)}</t></is></c>`;
   }).join("")}</row>`).join("");
@@ -47,8 +55,8 @@ function lembar(baris, o = {}) {
     + (lebar.length ? `<cols>${lebar.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"${teks.includes(i) ? ' style="2"' : ""}/>`).join("")}</cols>` : "")
     + `<sheetData>${isi}</sheetData>`
     + (() => { // daftar pilihan (dropdown) untuk kolom berpilihan, bila muat dalam batas Excel (255 karakter, tanpa koma)
-      const v = Object.entries(pilihan).filter(([, l]) => l && l.length && l.every(x => !String(x).includes(",")) && l.join(",").length < 250);
-      return v.length ? `<dataValidations count="${v.length}">${v.map(([i, l]) => `<dataValidation type="list" allowBlank="1" showErrorMessage="0" sqref="${kolom(+i)}2:${kolom(+i)}1000"><formula1>"${xml(l.join(","))}"</formula1></dataValidation>`).join("")}</dataValidations>` : "";
+      const v = Object.entries(pilihan).filter(([, l]) => l && (l.ref || (l.length && l.every(x => !String(x).includes(",")) && l.join(",").length < 250)));
+      return v.length ? `<dataValidations count="${v.length}">${v.map(([i, l]) => `<dataValidation type="list" allowBlank="1" showErrorMessage="0" sqref="${kolom(+i)}2:${kolom(+i)}1000"><formula1>${l.ref ? xml(l.ref) : `"${xml(l.join(","))}"`}</formula1></dataValidation>`).join("")}</dataValidations>` : "";
     })()
     + `</worksheet>`;
 }
@@ -57,7 +65,7 @@ function xlsx(daftar) {
   const f = [
     { nama: "[Content_Types].xml", data: `${KEP}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${daftar.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>` },
     { nama: "_rels/.rels", data: `${KEP}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>` },
-    { nama: "xl/workbook.xml", data: `${KEP}<workbook ${NS} xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${nama.map((n, i) => `<sheet name="${xml(n)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets></workbook>` },
+    { nama: "xl/workbook.xml", data: `${KEP}<workbook ${NS} xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${nama.map((n, i) => `<sheet name="${xml(n)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>` },
     { nama: "xl/_rels/workbook.xml.rels", data: `${KEP}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${daftar.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("")}<Relationship Id="rId${daftar.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>` },
     { nama: "xl/styles.xml", data: `${KEP}<styleSheet ${NS}><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>` }
   ].concat(daftar.map((l, i) => ({ nama: `xl/worksheets/sheet${i + 1}.xml`, data: lembar(l.baris, l) })));

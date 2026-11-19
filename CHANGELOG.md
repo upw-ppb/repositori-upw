@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.35.0 — 19 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.35.0 (tampilan docs/ dan server Apps Script Produksi deployment @15): templat Excel tim pengajar per semester dengan lembar Beban SKS
+  per dosen otomatis; unduh dan unggah hanya KPS dan Admin Prodi.
+- Sebelum tayang, atas permintaan pemilik, ditambah uji: unggah templat yang sama 3× tidak menambah baris tim (4 → 4), dan unggah templat dengan pengajar berbeda
+  hanya mengganti pengajar (jumlah MK dan kelas tetap). Total 686 + 44 uji lulus. Kode aplikasi sama dengan v0.35.0 Uji Coba.
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru. Rollback ke v0.34.0 cukup tampilan (tag v0.34.0) dan deployment @14.
+- Penyetuju: pemilik, di chat 19 Nov 2026: "Setuju Tayangkan v0.35.0".
+
 ## v0.35.0 — 19 Nov 2026 — Uji Coba
 Ringkas: Templat Excel tim pengajar per semester (unduh, isi, unggah) dengan lembar Beban SKS per dosen yang terhitung otomatis; hanya KPS dan Admin Prodi.
 Permintaan pemilik 19 Nov 2026; rencana disetujui ("Setuju Kerjakan") dengan tambahan: hanya KPS dan Admin Prodi, dan rumus SKS per dosen di templat.
