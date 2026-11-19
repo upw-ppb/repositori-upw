@@ -27,7 +27,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm }) {
   MK.slice(1).forEach(r => { if (["UPW965", "UPW966", "UPW963"].includes(r[1])) r[iT] = ""; });
   g.props.SKEMA_VERSI = "25";
   ok("dp.data", { semester: smt }, tAdm);
-  cek("migrasi 25 → 26: MK lama bernama PKL/Magang ditandai otomatis, MK biasa tidak; versi kembali 26", mk("UPW965").tanpaTim && mk("UPW966").tanpaTim && !mk("UPW963").tanpaTim && g.props.SKEMA_VERSI === "26");
+  cek("migrasi 25 → 26: MK lama bernama PKL/Magang ditandai otomatis, MK biasa tidak; versi naik lagi ke versi terbaru", mk("UPW965").tanpaTim && mk("UPW966").tanpaTim && !mk("UPW963").tanpaTim && Number(g.props.SKEMA_VERSI) >= 26);
   const app = fs.readFileSync("web/aplikasi.js", "utf8");
   cek("tampilan: centang di formulir MK, MK bertanda tidak masuk templat tim/beban SKS dan ditolak saat impor",
     /cek\("mkTanpa"/.test(app) && /D\.tim\.filter\(t => !t\.tanpaTim\)\.forEach/.test(app) && /mk\[kode\]\.tanpaTim\) \{ masalah\.push/.test(app) && /Tanpa pengampu \(magang\/TA\)/.test(app));

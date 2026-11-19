@@ -13,7 +13,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tSA }) {
   cek("tersimpan dan terbaca kembali sama persis", j.ada && j.gambar === png() && j.cara === "gambar");
   const f = Object.values(g.files).find(x => /^ttd-t/.test(x.nama || ""));
   const asli = Buffer.from(png().split(",")[1], "base64");
-  cek("berkas di Drive (folder Tanda Tangan) tersandi, bukan PNG", f && f.folder.nama === "Tanda Tangan" && Buffer.from(f.isi.map(b => b & 255)).compare(asli) !== 0 && (f.isi[0] & 255) !== 0x89);
+  cek("berkas di Drive (folder Tanda Tangan) tersandi, bukan PNG", f && f.folder.nama === "Tanda Tangan" && Buffer.from(f.isi.map(b => b & 255)).compare(asli) !== 0 && Buffer.from(f.isi.slice(0, 8).map(b => b & 255)).compare(asli.subarray(0, 8)) !== 0); // v0.37.0: 8 byte (dulu 1 byte → gagal acak 1/256)
   cek("kunci sandi di Script Properties, tidak di sheet", g.props.KUNCI_TTD && !JSON.stringify(g.sheets.TandaTangan).includes(g.props.KUNCI_TTD));
   // surat baru disetujui → memakai tanda tangan
   const k = ok("kegiatan.simpan", { peran: "dosen", kirim: true, data: { jenis: "kepakaran", judul: "Narasumber lokakarya", tgl: "2026-12-15", tingkat: "Lokal/Wilayah", perluST: true,

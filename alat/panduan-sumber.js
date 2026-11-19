@@ -370,10 +370,11 @@ export const topik = [
 
   /* ---------------- KELOLA ---------------- */
   { id: "pengguna-admin", kat: "kelola", p: ADM, menu: "pengguna", mulai: ["admin", "superadmin"], j: "Mengelola akun mahasiswa", r: "Impor akun, ubah kelas/status, unduh daftar akun.",
-    g: ["impor-excel"], kw: "akun mahasiswa tambah mahasiswa kelas status mahasiswa lulus cuti mengundurkan diri drop out yudisium belum aktivasi saring urut rekap angkatan",
+    g: ["impor-excel"], kw: "edit status perbaiki status salah sk salah unggah koreksi status akun mahasiswa tambah mahasiswa kelas status mahasiswa lulus cuti mengundurkan diri drop out yudisium belum aktivasi saring urut rekap angkatan",
     l: ["Buka <b>Pengguna</b> → <b>Impor akun</b>: tempel \"NIM; Nama; kelas\" (angkatan dari 2 angka pertama NIM) atau pakai templat Excel.",
       "Daftar akun bisa <b>disaring</b> (status akun, angkatan, kelas, status mahasiswa, biodata) dan <b>diurutkan</b> dengan klik judul kolom. <b>Rekap per angkatan dan kelas</b> menunjukkan siapa yang belum aktivasi atau biodatanya belum lengkap; klik barisnya untuk menyaring.",
       "Ubah <b>status mahasiswa</b> (lulus, cuti, mengundurkan diri, dll.): tombol <b>Ubah status</b> pada baris mahasiswa, pilih status baru, tanggal efektif, tulis <b>alasan</b> (wajib), dan lampirkan <b>bukti</b> (PDF/gambar atau tautan). Riwayat perubahan tampil di laci yang sama.",
+      "<b>Salah unggah SK atau salah isi?</b> Di <b>Riwayat status</b> tekan <b>Edit</b> pada baris itu: ganti/hapus bukti, perbaiki tanggal dan alasan, atau (khusus perubahan terakhir) status tujuan. <b>Alasan perbaikan</b> wajib; perbaikan tercatat di Log dan di riwayat. Untuk perubahan banyak mahasiswa sekaligus, perbaikan bisa diterapkan ke semuanya.",
       "Banyak sekaligus: centang beberapa mahasiswa (atau centang di judul kolom untuk semua yang tampil), lalu <b>Ubah status N mahasiswa</b>, mis. satu angkatan lulus dengan satu SK yudisium.",
       "Tahun masuk dan kelas diubah lewat tombol <b>Angkatan & kelas</b>.",
       "<b>Unduh daftar akun (Excel)</b> untuk dibagikan ke mahasiswa (NIM sebagai kata sandi awal)."],

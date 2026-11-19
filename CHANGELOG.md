@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.37.0 — 19 Nov 2026 — Uji Coba
+Ringkas: Tombol Edit pada riwayat status mahasiswa untuk mengganti SK yang salah unggah, memperbaiki tanggal, alasan, atau status; setiap perbaikan tercatat di Log.
+Permintaan pemilik 19 Nov 2026 (kasus: Aktif → Drop out dengan SK yang salah diunggah); rencana disetujui: "Setuju, kerjakan".
+- Pengguna › Ubah status (satu mahasiswa) › Riwayat status: tombol **Edit** per baris (Admin Prodi dan Super Admin). Bisa memperbaiki bukti (ganti file, ganti tautan,
+  hapus), tanggal efektif, alasan, dan status tujuan (HANYA perubahan terakhir mahasiswa itu; status akun ikut diperbarui). Alasan perbaikan wajib.
+- Perubahan yang dibuat bersamaan untuk banyak mahasiswa: perbaikan bukti/tanggal/alasan bisa diterapkan ke semuanya (tercentang otomatis); status tujuan hanya
+  untuk mahasiswa yang dibuka.
+- Pencatatan: Log aksi "admin.statusMhsKoreksi" (siapa, kapan, bagian yang diubah, alasan); kolom koreksi di riwayat menyimpan nilai sebelumnya; riwayat
+  menampilkan "Diperbaiki N×" dan daftar perbaikan. File bukti lama yang tidak dipakai riwayat lain dipindah ke Sampah Google Drive (dapat dipulihkan ±30 hari).
+- Struktur data versi 27: kolom koreksi di akhir tabel RiwayatStatusMhs (cadangan otomatis lebih dulu). Rollback ke v0.36.1 tanpa pemulihan data (kolom diabaikan;
+  perbaikan yang sudah tersimpan tetap berlaku).
+- Uji: 707 + 44 uji server lulus (10 uji baru di uji-v37-bagian.mjs). Uji tampilan di server lokal: ubah status Aktif → Drop out dengan "SK salah.pdf", lalu Edit →
+  ganti file "SK benar.pdf" dengan alasan perbaikan; riwayat menampilkan SK benar dan "Diperbaiki 1×"; penjelajah 48 halaman/laci tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.36.1 — 19 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.36.1 (tampilan docs/ dan server Apps Script Produksi deployment @17, server hanya naik nomor versi): templat tim pengajar dengan
   baris kelas A dan B per mata kuliah, daftar dosen/praktisi selalu terbaru.

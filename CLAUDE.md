@@ -299,6 +299,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   (otomatis untuk MK baru), selTim/tab tim/templatTim/periksaImporTim. Uji: alat/uji/uji-v36-bagian.mjs.
 - v0.36.1 (19 Nov 2026, Uji Coba): templat tim selalu baris kelas A dan B (kelasTemplat), segarkanDpTim() sebelum unduh dan saat periksa unggahan (nama terbaru);
   baris kelas sama persis dan = kelasTim(MK) → disimpan sebagai tim "sama untuk semua kelas".
+- v0.37.0 (19 Nov 2026, Uji Coba): admin.statusMhsKoreksi (gas/StatusMhs.js; buktiStatusDari dipakai bersama; kelompokStatus = pelaku + waktu sama). RiwayatStatusMhs.koreksi
+  (JSON {waktu, oleh, alasan, ubah[], sebelum}; VERSI_SKEMA 27). Riwayat: terakhir, sebatch, koreksi. Tampilan: laci "statusMhsEdit" (smEdit/smeSimpan/smeKembali).
+  Uji: alat/uji/uji-v37-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
