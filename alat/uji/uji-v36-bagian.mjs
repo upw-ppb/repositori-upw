@@ -4,7 +4,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm }) {
   console.log("47. Mata kuliah tanpa dosen pengampu (magang / tugas akhir)");
   const dsn = ID("199001152015041001"), smt = "2032-2", MK = g.sheets.MataKuliah;
   const iT = MK[0].indexOf("tanpaTim");
-  cek("migrasi: kolom tanpaTim di akhir MataKuliah; SKEMA_VERSI ≥ 26", iT === MK[0].length - 1 && Number(g.props.SKEMA_VERSI) >= 26);
+  cek("migrasi: kolom tanpaTim di MataKuliah (sesudah kolom lama); SKEMA_VERSI ≥ 26", iT === MK[0].indexOf("dihapus") + 1 && Number(g.props.SKEMA_VERSI) >= 26);
   ok("dp.mkSimpan", { daftar: [{ kode: "UPW961", nama: "Magang Industri Perjalanan", semester: 6, sksPraktik: 20 }, { kode: "UPW962", nama: "Tugas Akhir", semester: 8, sksPraktik: 6 },
     { kode: "UPW963", nama: "Perencanaan Perjalanan", semester: 6, sksKuliah: 3 }, { kode: "UPW964", nama: "Skripsi Terapan", semester: 8, sksPraktik: 6, tanpaTim: "Tidak" }] }, tAdm);
   const mk = k => ok("dp.data", { semester: smt }, tAdm).mk.find(m => m.kode === k);
@@ -32,6 +32,6 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm }) {
   cek("tampilan: centang di formulir MK, MK bertanda tidak masuk templat tim/beban SKS dan ditolak saat impor",
     /cek\("mkTanpa"/.test(app) && /D\.tim\.filter\(t => !t\.tanpaTim\)\.forEach/.test(app) && /mk\[kode\]\.tanpaTim\) \{ masalah\.push/.test(app) && /Tanpa pengampu \(magang\/TA\)/.test(app));
   cek("v0.36.1 templat: setiap MK baris kelas A dan B; daftar dosen/praktisi diambil ulang saat unduh dan unggah; dua baris sama → tim semua kelas",
-    /const kelasTemplat = t => \[\.\.\.new Set\(\["A", "B", \.\.\.kelasTim\(t\)\]\)\]/.test(app) && /templat: async \(\) => \{ await segarkanDpTim\(\)/.test(app)
+    /const kelasTemplat = t => berkel\(t\) \? kelasTim\(t\) : \[\.\.\.new Set\(\["A", "B", \.\.\.kelasTim\(t\)\]\)\]/.test(app) && /templat: async \(\) => \{ await segarkanDpTim\(\)/.test(app)
     && /periksa: async \(X, lembar\) => \{ await segarkanDpTim\(\)/.test(app) && /sama \? \{ kodeMk: g\.kode, anggota: keAng/.test(app));
 }

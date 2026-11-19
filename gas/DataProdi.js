@@ -21,8 +21,35 @@ function mkDari(r) {
   return { _r: r, id: r.id, kode: teks(r.kode), nama: teks(r.nama), semester: Number(r.semester) || 0, kompetensi: ya(r.kompetensi),
     sksKuliah: angka(r.sksKuliah), sksSeminar: angka(r.sksSeminar), sksPraktik: angka(r.sksPraktik),
     cplSikap: ya(r.cplSikap), cplPengetahuan: ya(r.cplPengetahuan), cplKu: ya(r.cplKu), cplKk: ya(r.cplKk), rps: teks(r.rps), unit: teks(r.unit) || "Prodi UPW",
-    tanpaTim: ya(r.tanpaTim) };
+    tanpaTim: ya(r.tanpaTim), kelompok: (jsonDari(r.kelompok, []) || []).filter(function (g) { return g && g.n; }) };
 }
+/**
+ * v0.38.0: MK pilihan dengan KELOMPOK PARALEL (mis. Bahasa Asing Pilihan: Jepang / Jerman / Perancis). Satu MK di kurikulum (SKS kurikulum tetap),
+ * tetapi setiap kelas dipecah menjadi kelompok yang diajar dosen berbeda. MataKuliah.kelompok = JSON [{n: "Jepang", kode: "231041217"}, …].
+ * Tim disimpan per "KELAS/KELOMPOK" (kolom TimPengajar.kelas, mis. "A/JEPANG"); setiap kelompok dihitung satu kelas utuh (SKS penuh, dibagi hanya
+ * di antara anggota kelompok itu). Teks isian kurikulum: "Jepang (231041217), Jerman (231041215), Perancis (231041216)".
+ */
+function bersihKelompok(v) {
+  if (v === undefined || v === null) return undefined;
+  var l = Array.isArray(v) ? v : String(v).split(/[,;\n]+/);
+  var hasil = [], ada = {};
+  l.forEach(function (x) {
+    var n, kode;
+    if (x && typeof x === "object") { n = teks(x.n).trim(); kode = teks(x.kode).trim(); }
+    else { var m = /^\s*([^()]+?)\s*(?:\(\s*([^)]*?)\s*\))?\s*$/.exec(String(x)); if (!m) return; n = m[1].trim(); kode = (m[2] || "").trim(); }
+    if (!n) return;
+    if (n.length > 30 || /[\/]/.test(n)) throw galat("Nama kelompok paralel maksimal 30 huruf, tanpa garis miring: " + n);
+    if (kode && !/^[A-Za-z0-9.\-]{2,20}$/.test(kode)) throw galat("Kode MK kelompok " + n + " tidak valid: " + kode);
+    var k = n.toUpperCase(); if (ada[k]) throw galat("Nama kelompok ganda: " + n); ada[k] = 1;
+    hasil.push({ n: n, kode: kode.toUpperCase() });
+  });
+  if (hasil.length === 1) throw galat("Kelompok paralel minimal 2 (mis. Jepang, Jerman, Perancis). Kosongkan bila MK ini bukan MK pilihan.");
+  if (hasil.length > 6) throw galat("Kelompok paralel maksimal 6.");
+  return hasil;
+}
+/** Kunci tim per kelompok: "A/JEPANG". */
+function kunciKelompok(kelas, n) { return String(kelas).toUpperCase() + "/" + String(n).toUpperCase(); }
+function kelompokDariKunci(k) { var i = String(k).indexOf("/"); return i < 0 ? "" : String(k).slice(i + 1); }
 /** v0.36.0: MK yang biasanya tanpa dosen pengampu (mahasiswa langsung ke industri / ke pembimbing masing-masing). Dipakai sebagai nilai awal penanda tanpaTim. */
 var POLA_TANPA_TIM = /magang|tugas akhir|skripsi|praktik kerja lapang|praktek kerja lapang|\bpkl\b|internship|on the job training|\bojt\b/i;
 function semuaMk() { return semua("MataKuliah").filter(function (r) { return !r.dihapus; }).map(mkDari).sort(function (a, b) { return a.semester - b.semester || a.kode.localeCompare(b.kode); }); }
@@ -59,9 +86,11 @@ function semuaPraktisi() { return semua("Praktisi").filter(function (r) { return
  * (pengampu utama tiap kelas lebih dulu), utama = userId pengampu utama (bisa lebih dari satu bila berbeda per kelas).
  */
 function timSemester(kode) {
-  var m = {}, tanpa = {};
-  semuaMk().forEach(function (x) { if (x.tanpaTim) tanpa[x.kode] = 1; });   // v0.36.0: tim pada MK bertanda "tanpa dosen pengampu" diabaikan di semua hitungan
-  semua("TimPengajar").filter(function (r) { return String(r.semester) === kode && !tanpa[teks(r.kodeMk)]; }).forEach(function (r) {
+  var m = {}, tanpa = {}, berkel = {};
+  semuaMk().forEach(function (x) { if (x.tanpaTim) tanpa[x.kode] = 1; if (x.kelompok.length) berkel[x.kode] = 1; });   // v0.36.0: tim pada MK bertanda "tanpa dosen pengampu" diabaikan di semua hitungan
+  // v0.38.0: MK berkelompok paralel hanya memakai baris "KELAS/KELOMPOK"; MK biasa mengabaikan baris berkelompok (mis. setelah kelompok dihapus dari kurikulum).
+  semua("TimPengajar").filter(function (r) { var kd = teks(r.kodeMk), kel = String(r.kelas || "").indexOf("/") >= 0;
+    return String(r.semester) === kode && !tanpa[kd] && (berkel[kd] ? kel : !kel); }).forEach(function (r) {
     var kd = teks(r.kodeMk), x = m[kd] = m[kd] || { _r: r, baris: [], kelas: {} };
     x.baris.push(r); x.kelas[String(r.kelas || "").trim().toUpperCase()] = jsonDari(r.anggota, []);
   });
@@ -182,7 +211,7 @@ function aksiDpData(d, token) {
     semester: smt, labelSemester: labelSmt(smt), pilihanSemester: pilihanSmt.map(function (k) { return { kode: k, label: labelSmt(k) }; }),
     tim: semua_.filter(function (m) { return m.semester % 2 === (ganjil ? 1 : 0); }).map(function (m) {
       var x = tim[m.kode];
-      return { kode: m.kode, nama: m.nama, sks: m.sks, smtMk: m.semester, tanpaTim: m.tanpaTim, anggota: x ? x.anggota : [], utama: x ? x.utama : [],
+      return { kode: m.kode, nama: m.nama, sks: m.sks, smtMk: m.semester, tanpaTim: m.tanpaTim, kelompok: m.kelompok, anggota: x ? x.anggota : [], utama: x ? x.utama : [],
         perKelas: x ? x.perKelas : false, kelas: x ? x.kelas : {}, daftarKelas: kelasTimMk(smt, m.semester, petaK) };
     }),
     salinDari: labelSmt(kodeSmt(Number(smt.slice(0, 4)) - 1, ganjil)),
@@ -208,6 +237,10 @@ function bersihMk(x) {
     rps: potong(x.rps, 300).trim(), unit: potong(x.unit, 100).trim() || "Prodi UPW" };
   // v0.36.0: penanda "tanpa dosen pengampu". Tidak dikirim (mis. templat kurikulum lama) → nilai lama dipertahankan; MK baru → ditebak dari nama.
   if (x.tanpaTim !== undefined && x.tanpaTim !== null && String(x.tanpaTim).trim() !== "") o.tanpaTim = ya(x.tanpaTim);
+  // v0.38.0: kelompok paralel; tidak dikirim (templat kurikulum lama) → nilai lama tetap.
+  var kel = bersihKelompok(x.kelompok);
+  if (kel !== undefined) o.kelompok = kel.length ? JSON.stringify(kel) : "";
+  if (kel && kel.length && (o.tanpaTim === true)) throw galat("MK " + kode + " tidak bisa sekaligus tanpa pengampu dan berkelompok paralel.");
   if (o.sksKuliah + o.sksSeminar + o.sksPraktik <= 0) throw galat("Isi bobot sks (" + kode + ").");
   if (o.rps && !/^https:\/\//.test(o.rps) && o.rps !== "Ada") throw galat("Dokumen RPS: isi tautan https:// atau tulis Ada (" + kode + ").");
   return o;
@@ -360,14 +393,19 @@ function siapkanTim(smt, d, ruj) {
   // v0.28.0: d.perKelas = { A: anggota[], B: anggota[] } → tim berbeda per kelas; tanpa perKelas = sama untuk semua kelas (seperti sebelumnya).
   var tulis = [];
   if (d.perKelas && typeof d.perKelas === "object" && !Array.isArray(d.perKelas)) {
+    var kelMk = {}; (mk.kelompok || []).forEach(function (g) { kelMk[g.n.toUpperCase()] = g.n; });
     Object.keys(d.perKelas).forEach(function (k) {
-      var kk = String(k).trim().toUpperCase();
-      if (!/^[A-Z0-9]{1,3}$/.test(kk)) throw galat("Kelas tidak valid: " + k);
+      var kk = String(k).trim().toUpperCase(), bagian = kk.split("/");
+      if (mk.kelompok && mk.kelompok.length) {
+        // v0.38.0: MK berkelompok → kunci "KELAS/KELOMPOK" dengan kelompok yang terdaftar di kurikulum.
+        if (bagian.length !== 2 || !/^[A-Z0-9]{1,3}$/.test(bagian[0]) || !kelMk[bagian[1]]) throw galat("Kelompok tidak valid untuk " + mk.kode + ": " + k + " (pilihan: " + mk.kelompok.map(function (g) { return g.n; }).join(", ") + ").");
+      } else if (!/^[A-Z0-9]{1,3}$/.test(kk)) throw galat("Kelas tidak valid: " + k);
       var ang = bersihTim(d.perKelas[k], " kelas " + kk);
       if (ang.length) tulis.push({ kelas: kk, ang: ang });
     });
     tulis.sort(function (a, b) { return a.kelas.localeCompare(b.kelas); });
   } else {
+    if (mk.kelompok && mk.kelompok.length && Array.isArray(d.anggota) && d.anggota.length) throw galat("Mata kuliah " + mk.kode + " berkelompok paralel (" + mk.kelompok.map(function (g) { return g.n; }).join(", ") + "): tetapkan pengampu per kelas dan kelompok.");
     var ang0 = bersihTim(d.anggota, "");
     if (ang0.length) tulis.push({ kelas: "", ang: ang0 });
   }

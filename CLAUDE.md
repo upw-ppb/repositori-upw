@@ -302,6 +302,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - v0.37.0 (19 Nov 2026, Uji Coba): admin.statusMhsKoreksi (gas/StatusMhs.js; buktiStatusDari dipakai bersama; kelompokStatus = pelaku + waktu sama). RiwayatStatusMhs.koreksi
   (JSON {waktu, oleh, alasan, ubah[], sebelum}; VERSI_SKEMA 27). Riwayat: terakhir, sebatch, koreksi. Tampilan: laci "statusMhsEdit" (smEdit/smeSimpan/smeKembali).
   Uji: alat/uji/uji-v37-bagian.mjs.
+- v0.38.0 (20 Nov 2026, Uji Coba): kelompok paralel. MataKuliah.kelompok JSON [{n, kode}] (VERSI_SKEMA 28; bersihKelompok menerima teks "Jepang (kode), …").
+  Tim MK berkelompok di TimPengajar.kelas "A/JEPANG" (kunciKelompok/kelompokDariKunci); timSemester: MK berkelompok hanya baris ber-"/", MK biasa tanpa "/".
+  Portofolio: isi.kel[KELOMPOK] untuk komponen u (kelompokSasaran, adaKompMk). Tampilan: berkel(t), kelasTim/labelKunciTim/teksKunciTim, viewMkp()+mkpKel.
+  Kode MK bahasa pilihan dari pemilik: Dasar 231041217/215/216, Lanjutan 231041228/226/227. Uji: alat/uji/uji-v38-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

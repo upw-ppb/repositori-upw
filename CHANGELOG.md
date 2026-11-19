@@ -3,6 +3,27 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.38.0 — 20 Nov 2026 — Uji Coba
+Ringkas: MK pilihan dengan kelompok paralel (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas dan kelompok, SKS penuh per kelompok, Portofolio MK per kelompok.
+Permintaan pemilik 20 Nov 2026; kelompok dibentuk per kelas (pilihan a); rencana disetujui: "Setuju, Kerjakan". Kode MK per bahasa dari pemilik: Dasar 231041217 /
+231041215 / 231041216, Lanjutan 231041228 / 231041226 / 231041227 (pasangan bahasa–kode diisi Admin Prodi di Kurikulum).
+- **Kurikulum**: isian "Kelompok paralel (MK pilihan)", mis. "Jepang (231041217), Jerman (231041215), Perancis (231041216)". MK tetap satu (SKS kurikulum tetap);
+  kelompok dan kodenya tampil di tabel kurikulum. Templat impor kurikulum mendapat kolom kelompok (kosong = MK lama tidak diubah).
+- **Tim pengajar**: MK berkelompok punya baris per kelas × kelompok (Kelas A · Jepang, A · Jerman, A · Perancis, B · …); tim "sama untuk semua kelas" ditolak untuk MK ini.
+  Templat Excel: kolom Kelas berisi "A/Jepang" dst. (dropdown), Beban SKS dihitung per kelompok.
+- **SKS / EWMP**: setiap kelompok dihitung satu kelas utuh: pengampu tunggal mendapat SKS penuh (contoh 2 SKS × kelompok Jepang kelas A dan B = 4 SKS); SKS dibagi
+  hanya di antara anggota kelompok yang sama. Ketiga dosen tercatat mengampu MK itu (Tabel 1–3).
+- **Portofolio MK**: RPS, kontrak kuliah, rubrik, dan metode diisi per kelompok oleh pengampu utama kelompok itu (pilih kelompok di laci); integrasi penelitian/PkM
+  dan bukti pembelajaran tetap per MK. Komponen dianggap lengkap bila semua kelompok terisi.
+- Kelompok dihapus dari kurikulum → tim kelompok diabaikan (data tidak dihapus).
+- Struktur data versi 28: kolom kelompok di akhir tabel MataKuliah (cadangan otomatis lebih dulu). Tim kelompok disimpan di kolom kelas yang ada ("A/JEPANG").
+  Rollback ke v0.37.0 tanpa pemulihan data (kelompok tampil sebagai kelas "A/JEPANG"; RPS per kelompok tidak terlihat tetapi tidak hilang).
+- Perbaikan saat uji tampilan: formulir MK macet saat menyimpan isian kelompok (teks belum menjadi daftar) — diperbaiki sebelum rilis.
+- Uji: 723 + 44 uji server lulus (16 uji baru di uji-v38-bagian.mjs). Uji tampilan di server lokal: tambah MK dengan 3 kelompok, Ubah tim 6 kelompok, templat Excel
+  (2 SKS penuh per kelompok), unggah templat (kelompok tak dikenal ditolak, "A / Perancis" diterima), Portofolio MK dosen: unggah RPS Jepang, kelompok lain terkunci;
+  penjelajah Admin 48 dan dosen 38 halaman/laci tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.37.0 — 19 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.37.0 (tampilan docs/ dan server Apps Script Produksi deployment @18): tombol Edit pada riwayat status mahasiswa (ganti SK yang salah,
   perbaiki tanggal/alasan/status; alasan perbaikan wajib; tercatat di Log).
