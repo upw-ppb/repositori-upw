@@ -3,6 +3,16 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.39.0 — 20 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.39.0 (tampilan docs/ dan server Apps Script Produksi deployment @19), sekaligus memuat v0.38.0: MK pilihan dengan kelompok paralel
+  (Bahasa Asing Pilihan: tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok), peserta kelas (otomatis/diatur/dibagi per kelompok,
+  termasuk Excel), menu Mata Kuliah Saya untuk mahasiswa, dan pembagian SKS tim ke semua anggota termasuk praktisi (EWMP).
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama setelah pembaruan ("Cadangan / sebelum v0.39.0 (struktur data 27 → 29)").
+- Rollback: v0.37.0 tetap bisa membaca data tanpa pemulihan (kolom kelompok dan tabel PesertaKelas diabaikan; EWMP kembali ke aturan lama).
+- Langkah Admin Prodi setelah tayang: isi kelompok paralel kedua MK Bahasa Asing Pilihan (Dasar 231041217/215/216, Lanjutan 231041228/226/227), tetapkan pengampu
+  per kelompok, bagi mahasiswa ke kelompok.
+- Penyetuju: pemilik, di chat 20 Nov 2026: "setuju tayang v0.39.0".
+
 ## v0.39.0 — 20 Nov 2026 — Uji Coba
 Ringkas: Peserta kelas (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa termasuk lewat Excel) dan menu Mata Kuliah Saya untuk mahasiswa; SKS tim dibagi ke semua anggota termasuk praktisi.
 Permintaan pemilik 20 Nov 2026 (peserta kelas; mahasiswa tahu diajar siapa; tandai peserta per individu untuk bahasa asing pilihan) dan keputusan "semua dibagi"
