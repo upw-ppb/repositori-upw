@@ -3,6 +3,28 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.35.0 — 19 Nov 2026 — Uji Coba
+Ringkas: Templat Excel tim pengajar per semester (unduh, isi, unggah) dengan lembar Beban SKS per dosen yang terhitung otomatis; hanya KPS dan Admin Prodi.
+Permintaan pemilik 19 Nov 2026; rencana disetujui ("Setuju Kerjakan") dengan tambahan: hanya KPS dan Admin Prodi, dan rumus SKS per dosen di templat.
+- **Data Prodi › Tim pengajar**: panel **Impor dari Excel** (hanya tampil bila peran aktif KPS atau Admin Prodi; server juga menolak peran lain, termasuk Super Admin).
+  Tombol **Ubah tim** tidak berubah (Admin Prodi dan Super Admin).
+- **Templat** per semester, sudah terisi semua MK semester itu dan tim yang ada. Lembar: **Data** (Kode MK, Kelas, Pengampu utama, Anggota 2–3; nama dipilih dari
+  daftar; Nama MK, SKS, Jumlah kelas, SKS per orang otomatis), **Beban SKS** (jumlah MK-kelas dan total SKS tiap dosen/praktisi), **Mata kuliah**, **Petunjuk**.
+- **Rumus beban SKS**: SKS per orang = SKS MK × (jumlah kelas yang mengambil MK bila kolom Kelas kosong, atau 1 untuk baris satu kelas) ÷ jumlah orang di tim.
+  Dosen tunggal = SKS penuh (2 SKS → 2); team teaching dibagi rata (3 SKS, 3 orang → 1 SKS per orang). Praktisi dalam tim ikut membagi SKS (tercantum di Beban SKS
+  sebagai Praktisi). Aturan "per kelas" sama dengan EWMP yang disetujui di v0.28.0. Rumus dihitung ulang saat berkas dibuka; nilai awal sudah terisi agar tampil
+  juga di Tampilan Terproteksi Excel.
+- **Unggah**: pratinjau semua baris; masalah ditampilkan per baris (kode bukan MK semester itu, nama tidak ada di daftar, pengampu utama praktisi, nama/kelas
+  ganda, campuran baris tanpa kelas dan per kelas). Berkas semester lain ditolak. Mata kuliah tanpa nama tidak diubah; MK bermasalah dilewati, yang lain tersimpan.
+- Server: aksi baru dp.timImpor (aturan pemeriksaan sama dengan dp.timSimpan; kode pemeriksaan dipakai bersama). Pembuat Excel (zip.js): sel rumus, daftar pilihan
+  dari rentang sel lembar lain (tanpa batas 255 karakter), sel kosong tidak ditulis.
+- Struktur data TIDAK berubah. Rollback ke v0.34.0 tanpa pemulihan data.
+- Uji: 684 + 44 uji server lulus (12 uji baru di uji-v35-bagian.mjs). Uji tampilan di server lokal: templat diunduh dan diperiksa (rumus, daftar pilihan, nilai
+  awal Beban SKS: contoh 3 SKS tunggal + 3 SKS × 2 kelas ÷ 2 orang = 6 SKS), unggah berkas terisi (3 baris bermasalah dilewati, 2 MK tersimpan, termasuk per kelas),
+  berkas semester lain ditolak, KPS melihat panel tanpa tombol Ubah tim; penjelajah 48 halaman/laci (Admin Prodi) tanpa masalah. Rumus belum dibuka di Microsoft
+  Excel/Google Sheets asli (dicek lewat isi berkas dan pratinjau Mac).
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.34.0 — 19 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.34.0 (tampilan docs/ dan server Apps Script Produksi deployment @14, server hanya naik nomor versi): kop surat Prodi UPW hanya di
   halaman pertama surat tugas, undangan rapat, risalah, daftar hadir (PDF), serta risalah dan Laporan GKM (Word).

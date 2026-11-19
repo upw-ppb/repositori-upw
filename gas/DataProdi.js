@@ -7,6 +7,7 @@
  */
 var PERAN_DP_UBAH = ["admin", "superadmin"];
 var PERAN_DP_LIHAT = ["admin", "superadmin", "kps", "gkm"];
+var PERAN_TIM_IMPOR = ["kps", "admin"];   // v0.35.0: unduh templat dan impor tim pengajar dari Excel (keputusan pemilik: hanya KPS dan Admin Prodi)
 var JAM_PER_SKS = 45; // Permendikbudristek 53/2023: 1 sks = 45 jam per semester
 
 function angka(v, maks) { var n = Number(String(v === undefined || v === null ? "" : v).replace(",", ".")); return isFinite(n) && n >= 0 && n <= (maks || 1000) ? Math.round(n * 100) / 100 : 0; }
@@ -169,6 +170,7 @@ function aksiDpData(d, token) {
   var semua_ = mks.map(function (m) { var x = Object.assign({}, m); delete x._r; x.sks = sksMk(m); return x; });
   return {
     bolehUbah: punyaPeran(p, PERAN_DP_UBAH),
+    bolehImporTim: punyaPeran(p, PERAN_TIM_IMPOR),
     mk: semua_, jamPerSks: JAM_PER_SKS,
     praktisi: semuaPraktisi().map(function (x) { var b = x._bukti; delete x._r; delete x._bukti; x.bukti = buktiPraktisiKeKlien(b); x.memenuhi = praktisiMemenuhi(x); return x; }),
     slotBuktiPraktisi: SLOT_BUKTI_PRAKTISI,
@@ -321,14 +323,25 @@ function aksiDpPraktisiBuktiLihat(d, token) {
 function aksiDpTimSimpan(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_DP_UBAH);
-  var smt = String(d.semester || ""), kode = teks(d.kodeMk);
+  var smt = String(d.semester || "");
   if (!/^\d{4}-[12]$/.test(smt)) throw galat("Semester tidak valid.");
-  var mk = semuaMk().filter(function (m) { return m.kode === kode; })[0];
+  var tulis = siapkanTim(smt, d, rujukanTim());
+  return kunciTulis(function () { tulisTim(p, smt, teks(d.kodeMk), tulis); return {}; });
+}
+/** Daftar dosen, praktisi, dan MK untuk memeriksa tim (dipakai simpan satu MK dan impor Excel). */
+function rujukanTim() {
+  var r = { dosen: {}, prak: {}, mk: {} };
+  daftarDosen().forEach(function (x) { r.dosen[x.id] = 1; });
+  semuaPraktisi().forEach(function (x) { r.prak[x.id] = 1; });
+  semuaMk().forEach(function (m) { r.mk[m.kode] = m; });
+  return r;
+}
+/** Periksa tim satu MK (d.kodeMk + d.anggota, atau d.perKelas {A: [], B: []}) → daftar baris yang akan ditulis [{kelas, ang}]. */
+function siapkanTim(smt, d, ruj) {
+  var kode = teks(d.kodeMk), mk = ruj.mk[kode];
   if (!mk) throw galat("Mata kuliah tidak ditemukan.");
   if ((mk.semester % 2 === 1) !== /-1$/.test(smt)) throw galat("Mata kuliah semester " + mk.semester + " tidak ditawarkan di " + labelSmt(smt) + ".");
-  var dosen = {}, prak = {};
-  daftarDosen().forEach(function (x) { dosen[x.id] = 1; });
-  semuaPraktisi().forEach(function (x) { prak[x.id] = 1; });
+  var dosen = ruj.dosen, prak = ruj.prak;
   function bersihTim(daftar, label) {
     var ang = (Array.isArray(daftar) ? daftar : []).filter(function (a) { return a && a.id; }).map(function (a) { return { t: a.t === "p" ? "p" : "u", id: String(a.id) }; });
     var unik = {}; ang = ang.filter(function (a) { if (unik[a.id]) return false; unik[a.id] = 1; return true; });
@@ -351,7 +364,10 @@ function aksiDpTimSimpan(d, token) {
     var ang0 = bersihTim(d.anggota, "");
     if (ang0.length) tulis.push({ kelas: "", ang: ang0 });
   }
-  return kunciTulis(function () {
+  return tulis;
+}
+/** Tulis tim satu MK (di dalam kunciTulis). */
+function tulisTim(p, smt, kode, tulis) {
     var lama = semua("TimPengajar").filter(function (x) { return String(x.semester) === smt && teks(x.kodeMk) === kode; });
     // Baris pertama diperbarui (urutan sheet tetap), sisanya dihapus dari bawah, lalu kelas tambahan ditambahkan.
     var oDari = function (t) { return { semester: smt, kodeMk: kode, anggota: JSON.stringify(t.ang), diubah: new Date(), oleh: p.id, kelas: t.kelas }; };
@@ -362,7 +378,34 @@ function aksiDpTimSimpan(d, token) {
     } else if (tulis.length) tambah("TimPengajar", oDari(tulis[0]));
     tulis.slice(1).forEach(function (t) { tambah("TimPengajar", oDari(t)); });
     catat(p.id, "dp.tim", { semester: smt, kode: kode, n: tulis.reduce(function (n, t) { return n + t.ang.length; }, 0), kelas: tulis.map(function (t) { return t.kelas || "semua"; }).join(",") });
-    return {};
+}
+/**
+ * v0.35.0: impor tim pengajar dari templat Excel (HANYA KPS dan Admin Prodi; permintaan pemilik 19 Nov 2026).
+ * d.semester, d.daftar = [{kodeMk, anggota} | {kodeMk, perKelas}] (nama sudah dicocokkan tampilan menjadi id). Aturan sama dengan dp.timSimpan.
+ * MK yang tidak ada di daftar tidak diubah; MK yang tidak lolos pemeriksaan dilewati (dilaporkan), yang lain tetap tersimpan.
+ */
+function aksiDpTimImpor(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_TIM_IMPOR);
+  var smt = String(d.semester || ""), daftar = Array.isArray(d.daftar) ? d.daftar : [];
+  if (!/^\d{4}-[12]$/.test(smt)) throw galat("Semester tidak valid.");
+  if (!daftar.length) throw galat("Tidak ada tim untuk diimpor.");
+  if (daftar.length > 200) throw galat("Maksimal 200 mata kuliah per impor.");
+  var ruj = rujukanTim(), siap = [], lewati = [], dobel = {};
+  daftar.forEach(function (x, i) {
+    var kode = teks(x && x.kodeMk);
+    try {
+      if (dobel[kode]) throw galat("Mata kuliah muncul lebih dari sekali di berkas.");
+      dobel[kode] = 1;
+      var t = siapkanTim(smt, x, ruj);
+      if (!t.length) throw galat("Tim kosong (tidak diubah).");
+      siap.push({ kode: kode, tulis: t });
+    } catch (e) { lewati.push({ baris: i + 1, nip: kode, alasan: e.message }); }
+  });
+  return kunciTulis(function () {
+    siap.forEach(function (x) { tulisTim(p, smt, x.kode, x.tulis); });
+    catat(p.id, "dp.timImpor", { semester: smt, disimpan: siap.length, dilewati: lewati.length });
+    return { disimpan: siap.length, dilewati: lewati };
   });
 }
 /** Salin tim dari semester yang sama tahun lalu ke MK yang belum punya tim. */

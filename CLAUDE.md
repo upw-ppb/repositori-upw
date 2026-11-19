@@ -290,6 +290,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   + logo-kop.jpg). PDF: kopHtml() di kertas pertama (kertasSurat/Undangan/Risalah/Hadir), cetakSurat menambah @page :first{margin-top:1cm} bila berkop dan
   menunggu gambar termuat. Word: UPW_DOCX blob({kop: await kopWord()}) → header "first" + titlePg (risalahDocx, gkmWord). TANPA kop: Portofolio (keputusan
   pemilik), DED, iLKPS. Cek cetak PDF sungguhan: Chrome headless --print-to-pdf file:///… + PDFKit (swift) → PNG. Uji: alat/uji/uji-v34-bagian.mjs.
+- v0.35.0 (19 Nov 2026, Uji Coba): impor tim pengajar dari Excel, HANYA KPS dan Admin Prodi (PERAN_TIM_IMPOR; dp.data.bolehImporTim; panel tampil bila peranAktif()
+  kps/admin). gas/DataProdi.js: rujukanTim/siapkanTim/tulisTim dipakai dp.timSimpan dan dp.timImpor. Tampilan: JENIS_IMPOR.tim (hook templat/periksa/kirim(b, X)),
+  templatTim() (lembar Data/Beban SKS/Mata kuliah/Petunjuk dengan tanda [smt:YYYY-S]; rumus + nilai awal), periksaImporTim(). zip.js: sel {f, v}, pilihan {ref},
+  sel kosong dilewati, calcPr fullCalcOnLoad. Beban SKS = SKS × (jumlah kelas bila Kelas kosong, atau 1) ÷ jumlah orang. Uji: alat/uji/uji-v35-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
