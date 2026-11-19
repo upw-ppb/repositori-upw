@@ -3,7 +3,7 @@
  * Sumber Tabel iLKPS 1–6. Diubah oleh Admin Prodi / Super Admin; KPS dapat melihat.
  * - Tim pengajar berlaku satu semester (v0.28.0: sama untuk semua kelas, atau berbeda per kelas A/B — kolom TimPengajar.kelas) (kode semester "2025-1" = Ganjil 2025/2026, "2025-2" = Genap 2025/2026);
  *   anggota[0] = pengampu utama; maks. 3 orang termasuk praktisi. Anggota: {t:"u", id: userId dosen} | {t:"p", id: id praktisi}.
- * - EWMP pendidikan di PS dihitung dari tim pengajar TS (sks MK dibagi rata ke dosen dalam tim), bisa ditimpa Admin.
+ * - EWMP pendidikan di PS dihitung dari tim pengajar TS (sks MK dibagi rata ke semua anggota tim, termasuk praktisi — v0.39.0), bisa ditimpa Admin.
  */
 var PERAN_DP_UBAH = ["admin", "superadmin"];
 var PERAN_DP_LIHAT = ["admin", "superadmin", "kps", "gkm"];
@@ -180,8 +180,9 @@ function ampuTs(ts, mks) {
       // v0.28.0: sks EWMP dihitung per kelas yang diajar (tim "semua kelas" = dikali jumlah kelas MK itu).
       var x = tim[kd], kali = x.perKelas ? 1 : kelasTimMk(smt, m.semester, peta).length;
       Object.keys(x.kelas).forEach(function (k) {
+        // v0.39.0 (keputusan pemilik 20 Nov 2026, "semua dibagi"): SKS dibagi rata ke SEMUA anggota tim, termasuk praktisi (sama dengan Beban SKS di templat).
         var ang = x.kelas[k] || [], dosen = ang.filter(function (a) { return a.t === "u"; });
-        dosen.forEach(function (a) { hasil[a.id].sks += sksMk(m) * kali / dosen.length; });
+        dosen.forEach(function (a) { hasil[a.id].sks += sksMk(m) * kali / ang.length; });
       });
     });
   });

@@ -306,6 +306,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Tim MK berkelompok di TimPengajar.kelas "A/JEPANG" (kunciKelompok/kelompokDariKunci); timSemester: MK berkelompok hanya baris ber-"/", MK biasa tanpa "/".
   Portofolio: isi.kel[KELOMPOK] untuk komponen u (kelompokSasaran, adaKompMk). Tampilan: berkel(t), kelasTim/labelKunciTim/teksKunciTim, viewMkp()+mkpKel.
   Kode MK bahasa pilihan dari pemilik: Dasar 231041217/215/216, Lanjutan 231041228/226/227. Uji: alat/uji/uji-v38-bagian.mjs.
+- v0.39.0 (20 Nov 2026, Uji Coba): gas/PesertaKelas.js — tabel PesertaKelas (semester, kodeMk, kunci, userIds; VERSI_SKEMA 29); peserta.data/simpan/bagi (atur: kps, admin),
+  mhs.mkSaya (menu "mkm"). MK biasa: otomatis = mhs aktif angkatanMk() kelas itu, baris tersimpan menggantikan; MK berkelompok: hanya baris tersimpan. EWMP (ampuTs):
+  SKS ÷ SEMUA anggota tim termasuk praktisi (keputusan pemilik "semua dibagi"). Tampilan: laciPeserta (psbagi/pspilih, templatPeserta [peserta:smt:kode]), hMkMhs.
+  Uji: alat/uji/uji-v39-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

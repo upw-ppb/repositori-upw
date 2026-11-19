@@ -37,7 +37,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   cek("salin dari Ganjil 2025/2026 ke Ganjil 2026/2027", j.disalin === 2 && j.dari === "Ganjil 2025/2026" && ok("dp.timSalin", { semester: "2026-1" }, tAdm).disalin === 0);
   ok("dp.dosenTsSimpan", { ta: 2025, data: { userId: dsn, psLain: 2, penelitian: 3, pkm: 1, tambahan: 2, sesuai: "Ya" } }, tAdm);
   const dt = ok("dp.data", { ta: 2025 }, tAdm).dosenTs.find(x => x.id === dsn);
-  cek("data dosen TS: sks PS terhitung dari tim (v0.28.0 per kelas: (3/2 + 3) × 2 kelas = 9) dan MK diampu", dt.sksPsHitung === 9 && dt.mk.length === 2 && dt.penelitian === 3 && dt.sesuai === "Ya", dt);
+  cek("data dosen TS: sks PS terhitung dari tim (v0.39.0 praktisi ikut membagi: (3/2 + 3/2) × 2 kelas = 6) dan MK diampu", dt.sksPsHitung === 6 && dt.mk.length === 2 && dt.penelitian === 3 && dt.sesuai === "Ya", dt);
   // biodata: isian baru mkLain tersimpan di kolom akhir
   const bs = ok("biodata.saya", {}, tDsn).biodata, isi = { ...bs.data, mkLain: "Bahasa Inggris Pariwisata (Prodi Perhotelan)" };
   ok("biodata.simpan", { data: isi }, tDsn);
@@ -61,7 +61,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   const r5 = T["5"].baris.find(r => r[1].startsWith("Gede Arya"));
   cek("Tabel 5: 2 mhs UPW di TS, 3 mhs prodi lain di TS-1; pendamping tidak dihitung", r5[4] === 2 && r5[3] === 0 && r5[7] === 3 && r5[5] === 0.67 && r5[9] === 1 && r5[10] === 1.67, r5);
   const r6 = T["6"].baris.find(r => r[1].startsWith("Gede Arya"));
-  cek("Tabel 6: PS 9 (2 kelas) + 2 + 3 + 1 + 2 = 17; rata-rata 8,5", r6[2] === "V" && r6[3] === 9 && r6[9] === 17 && r6[10] === 8.5, r6);
+  cek("Tabel 6: PS 6 (2 kelas, praktisi ikut membagi) + 2 + 3 + 1 + 2 = 14; rata-rata 7", r6[2] === "V" && r6[3] === 6 && r6[9] === 14 && r6[10] === 7, r6);
   ok("dp.dosenTsSimpan", { ta: 2025, data: { userId: dsn, ps: 6, psLain: 2, penelitian: 3, pkm: 1, tambahan: 2, sesuai: "Ya" } }, tAdm);
   cek("Tabel 6: nilai PS ditimpa Admin dipakai", ok("ilkps.data", { ts: 2025 }, tAdm).tabel.find(t => t.kode === "6").baris.find(r => r[1].startsWith("Gede Arya"))[3] === 6);
   ok("dp.mkHapus", { kode: "UPW301" }, tAdm);

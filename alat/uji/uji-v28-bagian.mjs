@@ -30,7 +30,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   // EWMP TS 2030: sks per kelas yang diajar.
   let DT = ok("dp.data", { semester: smt, ta: 2030 }, tAdm).dosenTs;
   const sks = id => (DT.find(x => x.id === id) || {}).sksPsHitung;
-  cek("EWMP per kelas: dosen di kelas A (3/2) dan B (3/2) = 3; d2 utama B = 1,5; d3 kelas A = 1,5", sks(dsn) === 3 && sks(d2) === 1.5 && sks(d3) === 1.5, DT.map(x => [x.nama, x.sksPsHitung]));
+  cek("EWMP per kelas (v0.39.0: praktisi ikut membagi): dosen di kelas A (3/2) dan B (3/3) = 2,5; d2 utama B = 1; d3 kelas A = 1,5", sks(dsn) === 2.5 && sks(d2) === 1 && sks(d3) === 1.5, DT.map(x => [x.nama, x.sksPsHitung]));
   cek("MK diampu tercantum sekali walau mengajar dua kelas", DT.find(x => x.id === dsn).mk.filter(m => /UPW981/.test(m)).length === 1);
 
   // Hanya satu kelas diisi → kelas lain belum ada tim.

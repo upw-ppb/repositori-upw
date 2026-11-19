@@ -18,7 +18,7 @@ const S = { token: ls.get("token"), pengguna: null, peran: ls.get("peran"), view
   ref: null, keg: null, kegLingkup: "saya", kegQ: "", antrean: null, form: null, formSt: "", cek: { kode: "", hasil: null },
   tugas: null, verif: null, ttd: null, ttdTab: "gambar", ttdTmp: null, ttdSurat: {}, porto: null, dokForm: null, ilkps: null, ilkpsTab: "1", ilkpsTs: null, bukaSetelahMasuk: null,
   dp: null, dpTab: "kurikulum", dpSmt: null, dpTa: null, dpImpor: false, asesor: null, setuju: null, setujuQ: "", lul: null, lulTa: null, lulImpor: false,
-  sv: null, svForm: null, svSaya: null, svPub: null, nilai: null, nilaiTs: null, nilaiF: "", ded: null, dedTab: "narasi", dedF: "" };
+  mkm: null, mkmSmt: "", sv: null, svForm: null, svSaya: null, svPub: null, nilai: null, nilaiTs: null, nilaiF: "", ded: null, dedTab: "narasi", dedF: "" };
 /** Keadaan awal; dipakai untuk membersihkan SEMUA data saat keluar/sesi berakhir agar akun berikutnya tidak melihat data akun sebelumnya (v0.15.0). */
 const S_AWAL = JSON.stringify(S), TETAP_S = ["token", "peran", "layar", "akt", "lupa", "cek"];
 function bersihkanData() {
@@ -86,8 +86,9 @@ const I = {
   rapat: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h6"/><path d="M15 15l1.5 1.5L19 14"/>',
   data: '<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V12"/>'
 };
+I.mkm = I.mk; // v0.39.0: Mata Kuliah Saya untuk mahasiswa
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", bank: "Bank Dokumen", versi: "Riwayat Versi", lab: "Laboratorium", masukan: "Masukan", data: "Data Terkumpul", gkm: "Laporan GKM", rapat: "Rapat & Tindak Lanjut", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", mkm: "Mata Kuliah Saya", bank: "Bank Dokumen", versi: "Riwayat Versi", lab: "Laboratorium", masukan: "Masukan", data: "Data Terkumpul", gkm: "Laporan GKM", rapat: "Rapat & Tindak Lanjut", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -102,6 +103,7 @@ function menu() {
   if (PERAN_KEG.includes(p)) m.push("kegiatan");
   if (u.peran.some(r => PERAN_KEG.includes(r))) m.push("porto");
   if (u.peran.includes("dosen")) m.push("mk");
+  if (p === "mahasiswa") m.push("mkm"); // v0.39.0: MK yang diikuti + dosen pengajar
   if (["admin", "superadmin", "kps", "gkm"].includes(p)) m.push("penilaian", "ded", "bank", "ilkps", "dprodi", "survei", "gkm"); // v0.25.0: GKM
   if (["kps", "gkm", "admin", "superadmin", "dosen", "tendik", "kalab", "laboran"].includes(p)) m.push("rapat"); // v0.31.0: Rapat & Tindak Lanjut
   if (p === "superadmin") m.push("data"); // v0.24.0: Data Terkumpul
@@ -265,6 +267,7 @@ function halaman() {
   if (S.view === "penilaian") return hPenilaian();
   if (S.view === "ded") return hDed();
   if (S.view === "mk") return hMk();
+  if (S.view === "mkm") return hMkMhs();
   if (S.view === "bank") return hBank();
   if (S.view === "lab") return hLab();
   if (S.view === "info") return hInfo();
@@ -356,7 +359,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}${panelKesiapan()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.38.0: <b>MK pilihan dengan kelompok paralel</b> (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok. v0.37.0: tombol <b>Edit</b> pada riwayat status mahasiswa (ganti SK yang salah, perbaiki tanggal/alasan/status; tercatat di Log). v0.36.1: templat tim pengajar selalu berisi <b>baris kelas A dan B</b> per mata kuliah, dan daftar nama selalu terbaru. v0.36.0: penanda <b>tanpa dosen pengampu</b> untuk Magang dan Tugas Akhir di Kurikulum. v0.35.0: <b>templat Excel tim pengajar</b> (KPS dan Admin Prodi) dengan hitungan <b>beban SKS per dosen</b> otomatis. v0.34.0: <b>kop surat prodi</b> di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM. v0.33.0: <b>saran butir Matriks otomatis</b> saat mengetik agenda rapat, tindak lanjut, keputusan risalah, nama dokumen Bank, dan judul kegiatan, serta kotak <b>Cari butir</b> di Penilaian. v0.32.0: <b>risalah rapat</b> per agenda (keputusan otomatis jadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen. v0.31.0: menu <b>Rapat &amp; Tindak Lanjut</b>: undangan rapat dari KPS (surat PDF bertanda tangan, notifikasi dan jawaban kehadiran peserta) dan daftar tindak lanjut sampai terverifikasi. v0.30.0: tombol <b>i</b> berisi definisi dan kriteria skor instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain. v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.39.0: <b>peserta kelas</b> (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa; juga lewat Excel), menu <b>Mata Kuliah Saya</b> untuk mahasiswa (MK dan dosen pengajar); SKS dibagi ke semua anggota tim termasuk praktisi. v0.38.0: <b>MK pilihan dengan kelompok paralel</b> (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok. v0.37.0: tombol <b>Edit</b> pada riwayat status mahasiswa (ganti SK yang salah, perbaiki tanggal/alasan/status; tercatat di Log). v0.36.1: templat tim pengajar selalu berisi <b>baris kelas A dan B</b> per mata kuliah, dan daftar nama selalu terbaru. v0.36.0: penanda <b>tanpa dosen pengampu</b> untuk Magang dan Tugas Akhir di Kurikulum. v0.35.0: <b>templat Excel tim pengajar</b> (KPS dan Admin Prodi) dengan hitungan <b>beban SKS per dosen</b> otomatis. v0.34.0: <b>kop surat prodi</b> di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM. v0.33.0: <b>saran butir Matriks otomatis</b> saat mengetik agenda rapat, tindak lanjut, keputusan risalah, nama dokumen Bank, dan judul kegiatan, serta kotak <b>Cari butir</b> di Penilaian. v0.32.0: <b>risalah rapat</b> per agenda (keputusan otomatis jadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen. v0.31.0: menu <b>Rapat &amp; Tindak Lanjut</b>: undangan rapat dari KPS (surat PDF bertanda tangan, notifikasi dan jawaban kehadiran peserta) dan daftar tindak lanjut sampai terverifikasi. v0.30.0: tombol <b>i</b> berisi definisi dan kriteria skor instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain. v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -496,6 +499,7 @@ function laci() {
   if (L.jenis === "surat") return laciSurat();
   if (L.jenis === "akred") return laciAkred();
   if (L.jenis === "mk") return laciMk();
+  if (L.jenis === "peserta") return laciPeserta();
   if (L.jenis === "tim") return laciTim();
   if (L.jenis === "rapat") return laciRapat();
   if (L.jenis === "rapatForm") return laciRapatForm();
@@ -1385,9 +1389,10 @@ function hDprodi() {
       <span class="small num">${isiN} dari ${perluTim} mata kuliah ${/-1$/.test(D.semester) ? "ganjil" : "genap"} sudah punya tim${nTanpa ? ` · ${nTanpa} tanpa pengampu (magang/TA)` : ""}</span></div>
      <div class="callout">Tim pengajar berlaku <b>satu semester</b>: satu <b>pengampu utama</b> (dosen) dan maksimal 3 orang per tim, termasuk praktisi. Tim bisa <b>sama untuk semua kelas</b> atau <b>berbeda per kelas</b> (kelas A, kelas B). Data ini mengisi kolom mata kuliah yang diampu (Tabel 1–3) dan EWMP (Tabel 6; sks dihitung per kelas yang diajar).</div>
      ${D.bolehImporTim && ["kps", "admin"].includes(peranAktif()) ? panelImporExcel("tim") : ""}
-     <div class="tbl-wrap"><table><thead><tr><th>Kode</th><th>Mata kuliah</th><th>Sks</th><th>Tim pengajar ${esc(D.labelSemester)}</th>${ub ? "<th></th>" : ""}</tr></thead><tbody>
+     <div class="tbl-wrap"><table><thead><tr><th>Kode</th><th>Mata kuliah</th><th>Sks</th><th>Tim pengajar ${esc(D.labelSemester)}</th>${ub ? "<th></th>" : ""}<th></th></tr></thead><tbody>
      ${D.tim.map(t => `<tr><td class="mono">${esc(t.kode)}</td><td>${esc(t.nama)}</td><td class="num">${t.sks}</td><td class="small">${selTim(t)}</td>
-       ${ub ? `<td>${t.tanpaTim ? "" : `<button class="btn sm" data-act="dpTimAtur" data-kode="${esc(t.kode)}">${t.anggota.length ? "Ubah tim" : "Tetapkan tim"}</button>`}</td>` : ""}</tr>`).join("") || `<tr><td colspan="5"><div class="empty">Belum ada mata kuliah ${/-1$/.test(D.semester) ? "semester ganjil" : "semester genap"} di kurikulum.</div></td></tr>`}</tbody></table></div>
+       ${ub ? `<td>${t.tanpaTim ? "" : `<button class="btn sm" data-act="dpTimAtur" data-kode="${esc(t.kode)}">${t.anggota.length ? "Ubah tim" : "Tetapkan tim"}</button>`}</td>` : ""}
+       <td>${t.tanpaTim ? "" : `<button class="btn sm" data-act="pesertaBuka" data-s="${esc(D.semester)}" data-kode="${esc(t.kode)}">Peserta</button>`}</td></tr>`).join("") || `<tr><td colspan="5"><div class="empty">Belum ada mata kuliah ${/-1$/.test(D.semester) ? "semester ganjil" : "semester genap"} di kurikulum.</div></td></tr>`}</tbody></table></div>
      ${ub ? `<div class="row">${tombol("dpTimSalin", "Salin dari " + D.salinDari, "")}</div>` : ""}`;
   }
   if (S.dpTab === "praktisi") {
@@ -1888,6 +1893,135 @@ function formTautanMkp(komp, ket) {
    <div class="row">${tombol("mkpSimpanTautan", "Simpan tautan", "primary sm")}<button class="btn sm" data-act="mkpTautan" data-komp="">Batal</button></div>
    <span class="hint">Pastikan tautan bisa dibuka oleh akun prodi (upw@ppb.ac.id) atau siapa saja dengan tautan.</span></div>`;
 }
+/* ---------- Peserta kelas (v0.39.0) ----------
+   Admin Prodi/KPS mengatur peserta (MK biasa: otomatis per kelas, bisa disesuaikan per orang; MK berkelompok: mahasiswa dibagi ke kelompok,
+   juga lewat templat Excel). Dosen tim melihat daftar peserta; mahasiswa melihat MK-nya dan dosen pengajar di menu Mata Kuliah Saya. */
+const labelKunciPs = (P, k) => labelKunciTim({ kelompok: P.kelompok }, k);
+function laciPeserta() {
+  const L = S.laci, P = L.p, dis = S.sibuk ? "disabled" : "";
+  if (!P) return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Peserta kelas"><div class="dh"><h2>Peserta kelas</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div><div class="memuat">Memuat peserta…</div></div></div>`;
+  const berkel = (P.kelompok || []).length > 0, dosen = l => l.length ? l.map(d => esc(namaPendek(d.nama)) + (d.praktisi ? " (praktisi)" : "")).join(", ") : '<span class="muted">pengajar belum ditetapkan</span>';
+  const orang = x => `${esc(x.nama)} <span class="mono muted">${esc(x.nim)}</span>${x.masuk !== P.angkatan ? ` <span class="tag">angkatan ${esc(x.masuk || "–")}</span>` : ""}`;
+  const tambah = (tujuan) => P.boleh ? `<div class="field" style="margin-top:6px"><label for="psTambah_${esc(tujuan)}" class="small">Tambah mahasiswa angkatan lain (mis. mengulang): ketik NIM</label>
+     <div class="row" style="gap:6px"><input id="psTambah_${esc(tujuan)}" list="psLain" type="search" placeholder="NIM atau nama" style="flex:1"><button class="btn sm" data-act="psTambah" data-t="${esc(tujuan)}" ${dis}>Tambah</button></div></div>` : "";
+  let isi;
+  if (berkel) {
+    const kelasL = [...new Set(P.kunci.map(k => k.k.split("/")[0]))];
+    const nilai = id => L.bagi[id] !== undefined ? L.bagi[id] : (P.kunci.find(k => k.peserta.some(x => x.id === id)) || {}).k || "";
+    const daftarKelas = kl => { const ids = new Set(P.kandidat.filter(x => x.kelas === kl && x.masuk === P.angkatan).map(x => x.id));
+      P.kunci.filter(k => k.k.startsWith(kl + "/")).forEach(k => k.peserta.forEach(x => ids.add(x.id))); (L.tambahan[kl] || []).forEach(id => ids.add(id));
+      return [...ids].map(id => P.kandidat.find(x => x.id === id) || P.lainnya.find(x => x.id === id)).filter(Boolean).sort((a, b) => a.nama.localeCompare(b.nama)); };
+    isi = `<div class="callout small">MK pilihan: setiap mahasiswa masuk <b>satu kelompok</b>. Pilih kelompok per mahasiswa${P.boleh ? ", atau isi lewat templat Excel," : ""} lalu tekan <b>Simpan pembagian</b>. Mahasiswa tanpa kelompok belum melihat dosennya di menu Mata Kuliah Saya.</div>
+      ${P.boleh ? `<div class="row small" style="flex-wrap:wrap"><button class="btn sm" data-act="psTemplat" ${dis}>Unduh templat Excel</button><label class="btn sm" ${S.sibuk ? 'aria-disabled="true"' : ""}>Unggah berkas Excel<input type="file" id="psBerkas" accept=".xlsx" hidden ${dis}></label></div>` : ""}
+      ${L.pesan ? `<div class="auto small">${esc(L.pesan)}</div>` : ""}
+      ${kelasL.map(kl => { const ds = daftarKelas(kl), kk = P.kunci.filter(k => k.k.startsWith(kl + "/"));
+        return `<section class="card" style="padding:12px;margin:0 0 10px"><h3 style="margin:0 0 6px;font-size:.95rem">Kelas ${esc(kl)}</h3>
+        <div class="small muted" style="margin-bottom:6px">${kk.map(k => `<div><b>${esc(labelKunciPs(P, k.k).replace(/^Kelas \S+ · /, ""))}</b>: ${ds.filter(x => nilai(x.id) === k.k).length} mahasiswa · ${dosen(k.dosen)}</div>`).join("")}<div>Belum dibagi: ${ds.filter(x => !nilai(x.id)).length}</div></div>
+        <div class="tbl-wrap gulir"><table><thead><tr><th>Mahasiswa</th><th>Kelompok</th></tr></thead><tbody>${ds.map(x => `<tr><td class="small">${orang(x)}</td><td>${P.boleh
+          ? `<select data-psbagi="${x.id}" aria-label="Kelompok ${esc(x.nama)}" style="width:auto"><option value="">– belum –</option>${kk.map(k => `<option value="${esc(k.k)}" ${nilai(x.id) === k.k ? "selected" : ""}>${esc(labelKunciPs(P, k.k).replace(/^Kelas \S+ · /, ""))}</option>`).join("")}</select>`
+          : esc(nilai(x.id) ? labelKunciPs(P, nilai(x.id)).replace(/^Kelas \S+ · /, "") : "–")}</td></tr>`).join("") || '<tr><td colspan="2" class="small muted">Belum ada mahasiswa aktif di kelas ini.</td></tr>'}</tbody></table></div>
+        ${tambah(kl)}</section>`; }).join("")}
+      ${P.boleh ? `<div class="row" style="justify-content:flex-end">${tombol("psBagiSimpan", "Simpan pembagian")}</div>` : ""}`;
+  } else {
+    isi = `<div class="callout small">Peserta otomatis = mahasiswa aktif angkatan ${esc(P.angkatan)} di kelas itu. ${P.boleh ? "Tekan <b>Atur</b> untuk menyesuaikan per orang (mis. mahasiswa mengulang atau pindah kelas)." : ""}</div>
+      ${P.kunci.map(k => { const atur = L.atur === k.k;
+        if (atur) { const pilih = L.pilih, ds = [...new Set([...P.kandidat.map(x => x.id), ...k.peserta.map(x => x.id), ...(L.tambahan[k.k] || [])])].map(id => P.kandidat.find(x => x.id === id) || P.lainnya.find(x => x.id === id)).filter(Boolean)
+            .sort((a, b) => (a.kelas === k.k ? 0 : 1) - (b.kelas === k.k ? 0 : 1) || a.nama.localeCompare(b.nama));
+          return `<section class="card" style="padding:12px;margin:0 0 10px"><h3 style="margin:0 0 6px;font-size:.95rem">Kelas ${esc(k.k)} · atur peserta</h3>
+            <div class="classgrid gulir">${ds.map(x => `<label><input type="checkbox" data-pspilih="${x.id}" ${pilih[x.id] ? "checked" : ""}><span>${orang(x)} <span class="muted">kelas ${esc(x.kelas || "–")}</span></span></label>`).join("")}</div>
+            ${tambah(k.k)}<div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn sm" data-act="psAturBatal" ${dis}>Batal</button>${tombol("psAturSimpan", "Simpan peserta kelas " + k.k, "primary sm")}</div></section>`; }
+        return `<section class="card" style="padding:12px;margin:0 0 10px"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h3 style="margin:0;font-size:.95rem">Kelas ${esc(k.k)} · ${k.peserta.length} mahasiswa <span class="tag">${k.sumber === "diatur" ? "diatur" : "otomatis"}</span></h3>
+          ${P.boleh ? `<span class="row" style="gap:6px">${k.sumber === "diatur" ? `<button class="btn sm" data-act="psOtomatis" data-k="${esc(k.k)}" ${dis}>Kembalikan otomatis</button>` : ""}<button class="btn sm" data-act="psAtur" data-k="${esc(k.k)}" ${dis}>Atur</button></span>` : ""}</div>
+          <div class="small muted">Pengajar: ${dosen(k.dosen)}</div>
+          <details class="small" style="margin-top:4px"><summary>Daftar peserta</summary><ol style="margin:4px 0 0 18px">${k.peserta.map(x => `<li>${orang(x)}</li>`).join("") || "<li class='muted'>Belum ada</li>"}</ol></details></section>`; }).join("")}`;
+  }
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Peserta kelas" style="width:min(680px,100%)">
+   <div class="dh"><h2>Peserta · ${esc(P.kode)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <p class="small">${esc(P.nama)} · ${P.sks} sks · <b>${esc(P.labelSemester)}</b> · angkatan ${esc(P.angkatan)}${berkel ? ` · kelompok ${esc(P.kelompok.map(g => g.n).join(", "))}` : ""}</p>
+   ${galatHtml()}${isi}
+   <datalist id="psLain">${(P.lainnya || []).map(x => `<option value="${esc(x.nim)}">${esc(x.nama)} · angkatan ${esc(x.masuk || "–")} kelas ${esc(x.kelas || "–")}</option>`).join("")}</datalist></div></div>`;
+}
+document.addEventListener("change", e => {
+  const t = e.target; if (!S.laci || S.laci.jenis !== "peserta") return;
+  if (t.dataset && t.dataset.psbagi) { S.laci.bagi[t.dataset.psbagi] = t.value; render(); return; }
+  if (t.dataset && t.dataset.pspilih) { S.laci.pilih[t.dataset.pspilih] = t.checked; return; }
+  if (t.id === "psBerkas" && t.files[0]) { const f = t.files[0]; t.value = ""; bacaTemplatPeserta(f).catch(err => toast(err.message)); }
+});
+async function muatPeserta(smt, kode) { const p = await api("peserta.data", { semester: smt, kodeMk: kode }); if (S.laci && S.laci.jenis === "peserta") { S.laci.p = p; render(); } }
+function templatPeserta() {
+  const P = S.laci.p, L = S.laci, tag = "[peserta:" + P.semester + ":" + P.kode + "]";
+  const nilai = id => L.bagi[id] !== undefined ? L.bagi[id] : (P.kunci.find(k => k.peserta.some(x => x.id === id)) || {}).k || "";
+  const nk = k => k ? k.split("/")[1] : "", namaK = g => (P.kelompok.find(x => x.n.toUpperCase() === g) || {}).n || g;
+  const ids = new Set(P.kandidat.filter(x => x.masuk === P.angkatan).map(x => x.id)); P.kunci.forEach(k => k.peserta.forEach(x => ids.add(x.id)));
+  const baris = [...ids].map(id => P.kandidat.find(x => x.id === id)).filter(Boolean).sort((a, b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama))
+    .map(x => [x.nim, x.nama, x.kelas, nilai(x.id) ? namaK(nk(nilai(x.id))) : ""]);
+  return UPW_ZIP.xlsx([{ nama: "Data", baris: [["NIM [nim]", "Nama [nama]", "Kelas [kelas]", "Kelompok [kelompok]"]].concat(baris), teks: [0], pilihan: { 3: P.kelompok.map(g => g.n) }, lebar: [14, 40, 8, 16] },
+    { nama: "Petunjuk", baris: [["Bagian", "Keterangan", ""], ["Mata kuliah", P.kode + " " + P.nama + " · " + P.labelSemester, tag],
+      ["Cara mengisi", "Pilih kelompok (" + P.kelompok.map(g => g.n).join(" / ") + ") untuk setiap mahasiswa di kolom Kelompok. Kosongkan bila belum memilih. Jangan mengubah NIM dan baris judul.", ""],
+      ["Mengunggah", "Simpan sebagai .xlsx lalu unggah di aplikasi (Peserta MK ini), periksa, lalu tekan Simpan pembagian. Kelas diambil dari data akun mahasiswa.", ""]], lebar: [14, 100, 30] }]);
+}
+async function bacaTemplatPeserta(f) {
+  const P = S.laci.p, L = S.laci, lembar = await UPW_ZIP.bacaXlsx(await f.arrayBuffer());
+  const pt = lembar.find(l => /^petunjuk$/i.test(l.nama)), tag = pt ? pt.baris.flat().map(v => /\[peserta:(\d{4}-[12]):([^\]]+)\]/.exec(String(v || ""))).find(Boolean) : null;
+  if (!tag) throw new Error("Berkas ini bukan templat peserta dari aplikasi. Unduh templat dari tombol Unduh templat Excel.");
+  if (tag[1] !== P.semester || tag[2] !== P.kode) throw new Error(`Berkas ini untuk ${tag[2]} semester ${labelSmtTampil(tag[1])}, bukan ${P.kode} ${P.labelSemester}.`);
+  const D = lembar.find(l => /^data$/i.test(l.nama)); if (!D) throw new Error("Lembar Data tidak ditemukan.");
+  const kep = D.baris[0].map(v => (/\[(\w+)\]/.exec(String(v || "")) || [])[1]), iN = kep.indexOf("nim"), iK = kep.indexOf("kelompok");
+  const semuaOrang = P.kandidat.concat(P.lainnya), masalah = []; let n = 0;
+  D.baris.slice(1).forEach((r, i) => {
+    const nim = String(r[iN] ?? "").trim(); if (!nim) return;
+    const x = semuaOrang.find(y => y.nim === nim); if (!x) { masalah.push(`Baris ${i + 2}: NIM ${nim} tidak ditemukan (bukan mahasiswa aktif).`); return; }
+    const g = String(r[iK] ?? "").trim();
+    if (!g) { L.bagi[x.id] = ""; n++; return; }
+    const kel = P.kelompok.find(y => y.n.toLowerCase() === g.toLowerCase()); if (!kel) { masalah.push(`Baris ${i + 2}: kelompok "${g}" tidak dikenal (${P.kelompok.map(y => y.n).join(", ")}).`); return; }
+    const k = (x.kelas || "A").toUpperCase() + "/" + kel.n.toUpperCase();
+    if (!P.kunci.some(z => z.k === k)) { masalah.push(`Baris ${i + 2}: kelas ${x.kelas || "–"} tidak dikenal untuk MK ini.`); return; }
+    L.bagi[x.id] = k; if (x.masuk !== P.angkatan) { L.tambahan[x.kelas] = L.tambahan[x.kelas] || []; L.tambahan[x.kelas].push(x.id); } n++;
+  });
+  L.pesan = `Berkas ${f.name}: ${n} mahasiswa terbaca${masalah.length ? `, ${masalah.length} dilewati: ` + masalah.slice(0, 5).map(m => m.replace(/\.$/, "")).join("; ") + (masalah.length > 5 ? "; …" : "") : ""}. Periksa, lalu tekan Simpan pembagian.`;
+  render();
+}
+Object.assign(AKSI, {
+  pesertaBuka(d) { S.laci = { jenis: "peserta", s: d.s, kode: d.kode, p: null, bagi: {}, pilih: {}, atur: "", tambahan: {}, pesan: "" }; S.galat = ""; render(); muatPeserta(d.s, d.kode).catch(e => { S.laci = null; toast(e.message); render(); }); },
+  psAtur(d) { const L = S.laci, k = L.p.kunci.find(x => x.k === d.k); L.atur = d.k; L.pilih = {}; k.peserta.forEach(x => { L.pilih[x.id] = true; }); render(); },
+  psAturBatal() { S.laci.atur = ""; render(); },
+  psTambah(d) {
+    const L = S.laci, P = L.p, v = String(($("psTambah_" + d.t) || {}).value || "").trim().toLowerCase();
+    const x = P.lainnya.concat(P.kandidat).find(y => y.nim.toLowerCase() === v || y.nama.toLowerCase() === v);
+    if (!x) { toast("Mahasiswa tidak ditemukan. Ketik NIM lengkap dari daftar."); return; }
+    L.tambahan[d.t] = L.tambahan[d.t] || []; if (!L.tambahan[d.t].includes(x.id)) L.tambahan[d.t].push(x.id);
+    if (L.atur) L.pilih[x.id] = true; render();
+  },
+  psAturSimpan() {
+    const L = S.laci, ids = Object.keys(L.pilih).filter(id => L.pilih[id]);
+    jalankan(async () => { L.p = await api("peserta.simpan", { semester: L.p.semester, kodeMk: L.p.kode, kunci: L.atur, userIds: ids }); L.atur = ""; L.tambahan = {}; toast("Peserta tersimpan."); });
+  },
+  psOtomatis(d) {
+    if (!confirm("Kembalikan peserta kelas " + d.k + " ke daftar otomatis (seluruh mahasiswa aktif kelas itu)?")) return;
+    const L = S.laci; jalankan(async () => { L.p = await api("peserta.simpan", { semester: L.p.semester, kodeMk: L.p.kode, kunci: d.k, otomatis: true }); toast("Peserta kembali otomatis."); });
+  },
+  psBagiSimpan() {
+    const L = S.laci; if (!Object.keys(L.bagi).length) { toast("Belum ada perubahan."); return; }
+    jalankan(async () => { L.p = await api("peserta.bagi", { semester: L.p.semester, kodeMk: L.p.kode, bagi: L.bagi }); L.bagi = {}; L.tambahan = {}; L.pesan = ""; toast("Pembagian kelompok tersimpan."); });
+  },
+  psTemplat() { try { const P = S.laci.p; simpanBerkas(templatPeserta(), `Peserta ${P.kode} ${P.labelSemester.replace("/", "-")}.xlsx`); } catch (e) { toast(e.message); } },
+  mkmSmt(d) { S.mkm = null; S.mkmSmt = d.s; render(); }
+});
+/** Mahasiswa: Mata Kuliah Saya (v0.39.0). */
+function hMkMhs() {
+  if (!S.mkm) { sekali("mkm", async () => { S.mkm = await api("mhs.mkSaya", { semester: S.mkmSmt || undefined }); render(); }); return `<div class="memuat">Memuat mata kuliah…</div>`; }
+  const D = S.mkm, dosen = l => l.map(x => `${esc(x.nama)}${x.praktisi ? ' <span class="muted">(praktisi)</span>' : x.utama ? ' <span class="muted">(pengampu utama)</span>' : ""}`).join("<br>");
+  return `<div class="head"><div><h1>Mata Kuliah Saya</h1><p>Mata kuliah yang Anda ikuti dan dosen pengajarnya.</p></div>
+    <label class="row small" style="gap:6px"><b>Semester</b><select id="mkmSmt" style="width:auto">${D.pilihanSemester.map(x => `<option value="${x.kode}" ${x.kode === D.semester ? "selected" : ""}>${esc(x.label)}</option>`).join("")}</select></label></div>
+   ${D.mk.length ? `<div class="grid g2">${D.mk.map(m => `<article class="panel" style="display:flex;flex-direction:column;gap:6px">
+      <b>${esc(m.kelompok && m.kelompok.kode ? m.kelompok.kode : m.kode)} · ${esc(m.nama)}</b>
+      <div class="small muted">${m.sks} sks · semester ${m.smtMk} · kelas ${esc(m.kelas || "–")}${m.kelompok ? ` · kelompok <b>${esc(m.kelompok.n)}</b>` : ""}</div>
+      ${m.tanpaTim ? `<div class="small">Tanpa dosen pengampu (magang/tugas akhir): Anda dibimbing pembimbing masing-masing.</div>`
+        : m.belumDibagi ? `<div class="small"><span class="chip s-revisi">Kelompok belum ditentukan</span> Pilihan: ${esc(m.pilihanKelompok.join(", "))}. Hubungi Admin Prodi bila Anda sudah memilih.</div>`
+        : m.dosen.length ? `<div class="small"><b>Dosen pengajar</b><br>${dosen(m.dosen)}</div>` : `<div class="small muted">Dosen pengajar belum ditetapkan.</div>`}</article>`).join("")}</div>`
+    : `<div class="empty">Belum ada mata kuliah untuk ${esc(D.labelSemester)}. Pastikan tahun masuk dan kelas di akun Anda sudah benar.</div>`}`;
+}
+document.addEventListener("change", e => { if (e.target.id === "mkmSmt") AKSI.mkmSmt({ s: e.target.value }); });
 /** v0.38.0: MK berkelompok paralel → isian pengampu utama (RPS, kontrak, rubrik, metode) dilihat/diisi per kelompok yang dipilih (S.laci.kel). */
 function viewMkp() {
   const x = S.laci.x, kl = x.kelompok || [];
@@ -1930,6 +2064,7 @@ function laciMkp() {
    ${G ? `<div class="picker"><b>Kelompok paralel</b><span class="hint">MK pilihan: RPS, kontrak kuliah, rubrik, dan metode diisi per kelompok oleh pengampu utama kelompok itu. Integrasi penelitian/PkM dan bukti pembelajaran diisi bersama.</span>
      <div class="seg" role="group" style="flex-wrap:wrap">${x0.kelompok.map(g => `<button data-act="mkpKel" data-k="${esc(g.k)}" aria-pressed="${g.k === G.k}">${esc(g.n)}${g.kode ? ` <span class="mono small">${esc(g.kode)}</span>` : ""} · ${g.lengkap.length}/4${g.boleh ? " · Anda" : ""}</button>`).join("")}</div>
      <span class="small muted">Pengampu utama ${esc(G.n)}: ${G.utama.length ? G.utama.map(n => esc(namaPendek(n))).join(", ") : "belum ditetapkan"}</span></div>` : ""}
+   <div class="row"><button class="btn sm" data-act="pesertaBuka" data-s="${esc(x.semester)}" data-kode="${esc(x.kode)}">Lihat peserta kelas</button></div>
    ${x0.komp.map(blok).join("")}
    ${x.kuliahTamu && x.kuliahTamu.length ? `<div class="picker"><h3 style="margin:0">Kuliah tamu tercatat</h3>${x.kuliahTamu.map(k => `<div class="item" style="cursor:pointer" data-act="bukaKeg" data-id="${k.id}"><div class="body"><div class="title">${esc(k.judul)}</div><div class="meta"><span>${esc(tglPendek(k.tgl))}</span></div></div></div>`).join("")}</div>` : ""}
   </div></div>`;

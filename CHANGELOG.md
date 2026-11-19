@@ -3,6 +3,26 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.39.0 — 20 Nov 2026 — Uji Coba
+Ringkas: Peserta kelas (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa termasuk lewat Excel) dan menu Mata Kuliah Saya untuk mahasiswa; SKS tim dibagi ke semua anggota termasuk praktisi.
+Permintaan pemilik 20 Nov 2026 (peserta kelas; mahasiswa tahu diajar siapa; tandai peserta per individu untuk bahasa asing pilihan) dan keputusan "semua dibagi"
+(kebiasaan kampus: SKS team teaching dibagi ke semua anggota tim, termasuk praktisi).
+- **Peserta kelas** (Data Prodi › Tim pengajar › tombol **Peserta**; mengatur: Admin Prodi dan KPS; melihat: juga Super Admin, GKM, dan dosen tim):
+  MK biasa → peserta otomatis = mahasiswa aktif angkatan yang mengambil MK di kelas itu; **Atur** untuk menyesuaikan per orang (mis. mengulang, pindah kelas),
+  **Kembalikan otomatis**. MK berkelompok → setiap mahasiswa dipilih kelompoknya (satu kelompok per MK), atau **Unduh templat Excel** (NIM, Nama, Kelas, Kelompok
+  dari daftar) → isi → **Unggah** → **Simpan pembagian**. Mahasiswa angkatan lain bisa ditambahkan (ketik NIM). Tercatat di Log.
+- **Mata Kuliah Saya (mahasiswa)**: menu baru; MK per semester dengan kelas/kelompok (kode MK kelompok) dan dosen pengajar (pengampu utama, praktisi ditandai);
+  MK berkelompok yang belum dibagi tampil "Kelompok belum ditentukan"; MK magang/TA tampil tanpa dosen pengampu.
+- **Dosen**: di laci Portofolio MK ada tombol **Lihat peserta kelas** (baca saja).
+- **EWMP**: SKS tim dibagi rata ke SEMUA anggota tim termasuk praktisi (sebelumnya hanya dosen), sama dengan lembar Beban SKS di templat Excel.
+  Akibat: EWMP dosen yang satu tim dengan praktisi menjadi lebih kecil daripada sebelumnya.
+- Struktur data versi 29: tabel baru PesertaKelas (cadangan otomatis lebih dulu). Rollback ke v0.38.0 tanpa pemulihan data (tabel peserta diabaikan;
+  EWMP kembali ke aturan lama).
+- Uji: 736 + 44 uji server lulus (13 uji baru di uji-v39-bagian.mjs; 3 uji lama disesuaikan dengan aturan pembagian SKS baru). Uji tampilan di server lokal:
+  pembagian kelompok lewat layar dan Excel (NIM tak dikenal dilewati), Mata Kuliah Saya mahasiswa (kelompok Jepang dan dosennya), peserta dilihat dosen tanpa
+  hak ubah; penjelajah Admin 48, dosen, dan mahasiswa 11 halaman/laci tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.38.0 — 20 Nov 2026 — Uji Coba
 Ringkas: MK pilihan dengan kelompok paralel (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas dan kelompok, SKS penuh per kelompok, Portofolio MK per kelompok.
 Permintaan pemilik 20 Nov 2026; kelompok dibentuk per kelas (pilihan a); rencana disetujui: "Setuju, Kerjakan". Kode MK per bahasa dari pemilik: Dasar 231041217 /

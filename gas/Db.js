@@ -64,11 +64,13 @@ var SKEMA = {
   TindakLanjut: ["id", "uraian", "butir", "sumber", "sumberRef", "pj", "tenggat", "status", "bukti", "catatan", "riwayat", "oleh", "dibuat", "diubah", "dihapus"],
   Rapat: ["id", "jenis", "judul", "agenda", "tgl", "jamMulai", "jamSelesai", "tempat", "tautan", "pengantar", "nomor", "peserta", "status", "kode", "tglSurat",
           "kpsId", "lampiran", "riwayat", "oleh", "dibuat", "diubah", "dihapus", /* v0.32.0 */ "risalah", "berkas"],
-  PesertaRapat: ["rapatId", "userId", "jawab", "alasan", "waktu", "dibaca"]
+  PesertaRapat: ["rapatId", "userId", "jawab", "alasan", "waktu", "dibaca"],
+  /* v0.39.0 */
+  PesertaKelas: ["semester", "kodeMk", "kunci", "userIds", "oleh", "diubah"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 28;
+var VERSI_SKEMA = 29;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
