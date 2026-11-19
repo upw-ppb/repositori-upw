@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.37.0 — 19 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.37.0 (tampilan docs/ dan server Apps Script Produksi deployment @18): tombol Edit pada riwayat status mahasiswa (ganti SK yang salah,
+  perbaiki tanggal/alasan/status; alasan perbaikan wajib; tercatat di Log).
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama setelah pembaruan ("Cadangan / sebelum v0.37.0 (struktur data 26 → 27)").
+- Rollback: v0.36.1 tetap bisa membaca data tanpa pemulihan (kolom koreksi diabaikan).
+- Penyetuju: pemilik, di chat 19 Nov 2026: "setuju tayang v0.37.0".
+
 ## v0.37.0 — 19 Nov 2026 — Uji Coba
 Ringkas: Tombol Edit pada riwayat status mahasiswa untuk mengganti SK yang salah unggah, memperbaiki tanggal, alasan, atau status; setiap perbaikan tercatat di Log.
 Permintaan pemilik 19 Nov 2026 (kasus: Aktif → Drop out dengan SK yang salah diunggah); rencana disetujui: "Setuju, kerjakan".
