@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.36.0 — 19 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.36.0 (tampilan docs/ dan server Apps Script Produksi deployment @16): penanda "tanpa dosen pengampu" untuk MK Magang dan Tugas Akhir
+  (kurikulum, tim pengajar, templat Excel tim).
+- Cadangan: dibuat otomatis oleh server pada permintaan pertama setelah pembaruan ("Cadangan / sebelum v0.36.0 (struktur data 25 → 26)"); MK bernama Magang/Tugas
+  Akhir/Skripsi/PKL ditandai otomatis saat itu.
+- Rollback: v0.35.0 tetap bisa membaca data tanpa pemulihan (kolom tanpaTim diabaikan).
+- Penyetuju: pemilik, di chat 19 Nov 2026: "Setuju Tayangkan v0.36.0".
+
 ## v0.36.0 — 19 Nov 2026 — Uji Coba
 Ringkas: Penanda "tanpa dosen pengampu" untuk mata kuliah Magang dan Tugas Akhir: tidak perlu tim pengajar dan tidak masuk templat maupun beban SKS.
 Keputusan pemilik 19 Nov 2026 ("Setuju, kerjakan"): Magang (mahasiswa langsung ke industri) dan Tugas Akhir (langsung ke pembimbing) tidak memiliki dosen pengampu.
