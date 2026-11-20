@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.42.0 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.42.0 (tampilan docs/ dan server Apps Script Produksi deployment @24): templat RPS terisi otomatis, pembaca RPS Word dengan
+  pemeriksaan butir 8, saran metode dari RPS, 68 CPL prodi, CPL Tabel 4 dan kolom Kurikulum dari RPS, Otorisasi templat RPS.
+- Struktur data berubah (tabel baru RpsData, VERSI_SKEMA 30): server mencadangkan spreadsheet lalu menambah tabel otomatis pada permintaan pertama.
+  Rollback ke v0.41.0 (tag v0.41.0 + deployment @23) tidak perlu pemulihan data: versi lama mengabaikan tabel RpsData.
+- Setelah tayang: Admin Prodi mengisi nama dan NIP Ketua Jurusan di Data Prodi › Kurikulum › Otorisasi templat RPS.
+- Penyetuju: pemilik, di chat 20 Nov 2026: "setuju tayang v0.42.0" (login clasp diperbarui pemilik sebelum dikirim, 21 Nov 2026).
+
 ## v0.42.0 — 20 Nov 2026 — Uji Coba
 Ringkas: Templat RPS Word terisi otomatis dari data aplikasi, RPS Word yang diunggah dibaca dan diperiksa menurut butir 8, saran metode dari RPS, dan CPL Tabel 4 terisi otomatis.
 Disetujui pemilik 20 Nov 2026 ("Setuju, Kerjakan Tahap 1"), dengan berkas CPL Prodi UPW Kurikulum MRA-TP 2023 dan RPS Praktik Desain dan Media Digital sebagai acuan format.

@@ -74,15 +74,15 @@ function xlsx(daftar) {
 /* ---------- Pembaca .xlsx (v0.18.0) ----------
    bacaXlsx(ArrayBuffer) → Promise<[{ nama, baris: [[nilai, ...], ...] }]>. Mendukung berkas dari Excel/Google Sheets/LibreOffice
    (ZIP tersimpan atau terkompresi deflate; dibuka dengan DecompressionStream bawaan browser). Nilai: teks atau angka. */
-async function bukaZip(buf) {
+async function bukaZip(buf, jenis = "Excel (.xlsx)") {
   const u = new Uint8Array(buf), d = new DataView(buf), hasil = {};
   let e = -1;
   for (let i = u.length - 22; i >= Math.max(0, u.length - 65557); i--) if (d.getUint32(i, true) === 0x06054b50) { e = i; break; }
-  if (e < 0) throw new Error("Berkas bukan Excel (.xlsx) yang sah.");
+  if (e < 0) throw new Error(`Berkas bukan ${jenis} yang sah.`);
   let p = d.getUint32(e + 16, true);
   const n = d.getUint16(e + 10, true), dek = new TextDecoder();
   for (let k = 0; k < n; k++) {
-    if (d.getUint32(p, true) !== 0x02014b50) throw new Error("Berkas Excel rusak.");
+    if (d.getUint32(p, true) !== 0x02014b50) throw new Error(`Berkas ${jenis} rusak.`);
     const metode = d.getUint16(p + 10, true), besar = d.getUint32(p + 20, true), nl = d.getUint16(p + 28, true), el = d.getUint16(p + 30, true), cl = d.getUint16(p + 32, true), lok = d.getUint32(p + 42, true);
     const nama = dek.decode(u.subarray(p + 46, p + 46 + nl));
     hasil[nama] = { metode, besar, awal: lok + 30 + d.getUint16(lok + 26, true) + d.getUint16(lok + 28, true) };
@@ -92,7 +92,7 @@ async function bukaZip(buf) {
     const f = hasil[nama]; if (!f) return null;
     const data = u.subarray(f.awal, f.awal + f.besar);
     if (f.metode === 0) return dek.decode(data);
-    if (f.metode !== 8) throw new Error("Format kompresi Excel tidak didukung.");
+    if (f.metode !== 8) throw new Error(`Format kompresi ${jenis} tidak didukung.`);
     const aliran = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
     return await new Response(aliran).text();
   };
@@ -127,5 +127,5 @@ async function bacaXlsx(buf) {
   }
   return out;
 }
-window.UPW_ZIP = { zip, xlsx, crc32, bacaXlsx };
+window.UPW_ZIP = { zip, xlsx, crc32, bacaXlsx, buka: bukaZip };
 })();
