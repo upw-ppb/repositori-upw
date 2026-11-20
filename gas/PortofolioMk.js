@@ -149,7 +149,7 @@ function infoMkpTs(ts) {
 function entriKeKlien(e, idx) {
   if (!e) return null;
   var o = idx.byId[e.o], x = { t: e.t, nama: e.nama || "", ukuran: e.ukuran || 0, url: e.t === "tautan" ? e.url : "", ket: e.ket || "", teks: e.teks || "",
-    id: e.id || "", o: e.o, oleh: o ? o.nama : "", w: e.w || "", ttd: e.ttd || null };
+    id: e.id || "", o: e.o, oleh: o ? o.nama : "", w: e.w || "", ttd: e.ttd || null, keg: e.keg || "", kj: e.kj || "", kjn: e.kjn || "" };
   return x;
 }
 function metodeKeKlien(m, idx) { return m ? { v: m.v || [], lain: m.lain || "", oleh: (idx.byId[m.o] || {}).nama || "", w: m.w || "" } : { v: [], lain: "" }; }
@@ -365,12 +365,18 @@ function aksiMkpInteg(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["dosen"]);
   var smt = semesterSah(d.semester), kode = teks(d.kode), x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, null, true);
-  var t = potong(d.teks, 1000).trim();
+  var t = potong(d.teks, 1000).trim(), keg = null;
   if (t.length < 15) throw galat("Tuliskan bentuk integrasinya (minimal 15 huruf), misalnya data penelitian apa yang dipakai mahasiswa.");
+  if (d.keg) {   // v0.44.0: tautan ke kegiatan penelitian/PkM tim (bukti SN Dikti Penelitian/PkM, butir 22 C–D)
+    keg = semuaKegiatan().filter(function (k) { return k.id === String(d.keg); })[0];
+    if (!keg || JENIS_INTEG.indexOf(keg.jenis) < 0) throw galat("Kegiatan penelitian/PkM tidak ditemukan.");
+  }
   ubahMkp(smt, kode, p, function (s) {
     var w = wadahUnit(s, u.k);
     if (w.integ.length >= MAKS_DAFTAR_MKP) throw galat("Maksimal " + MAKS_DAFTAR_MKP + " catatan integrasi per kelas.");
-    w.integ.push({ id: idAcak(), teks: t, o: p.id, w: new Date().toISOString() });
+    var e = { id: idAcak(), teks: t, o: p.id, w: new Date().toISOString() };
+    if (keg) { e.keg = keg.id; e.kj = keg.judul; e.kjn = keg.jenis; }
+    w.integ.push(e);
   });
   catat(p.id, "mkp.integ", { semester: smt, kode: kode, kelas: u.k });
   return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
@@ -508,4 +514,26 @@ function aksiMkpTtd(d, token) {
   });
   catat(p.id, "mkp.ttd", { semester: smt, kode: kode, komp: k, kelas: u.k, ttd: Object.keys(v).filter(function (z) { return v[z]; }).join(",") });
   return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
+}
+
+/* ---------- v0.44.0: saran integrasi penelitian/PkM (butir 22 C–D) ---------- */
+var JENIS_INTEG = ["penelitian", "pkm", "publikasi"];
+/** Penelitian, PkM, dan publikasi 5 tahun terakhir yang melibatkan dosen tim kelas ini (bukan draf/ditolak). Pencocokan dengan isi RPS dilakukan di tampilan. */
+function aksiMkpSaranInteg(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_MKP_REKAP.concat(["dosen"]));
+  var smt = semesterSah(d.semester), kode = teks(d.kode), x = ambilMkp(smt, kode, p, false), u = unitSasaran(x, d, p, null, false);
+  var idx = indeksOrang(), tim = u.ang.filter(function (a) { return a.t === "u"; }).map(function (a) { return a.id; });
+  var batas = String(Number(smt.slice(0, 4)) - 5) + "-01-01";
+  var h = semuaKegiatan().filter(function (k) {
+    if (JENIS_INTEG.indexOf(k.jenis) < 0 || k.status === "ditolak" || k.status === "draf" || k.st === "draf_aju") return false;
+    if (k.tgl && k.tgl < batas) return false;
+    return tim.indexOf(k.olehId) >= 0 || k.pegawai.some(function (id) { return tim.indexOf(id) >= 0; });
+  }).map(function (k) {
+    var orang = [k.olehId].concat(k.pegawai).filter(function (id, i, a) { return tim.indexOf(id) >= 0 && a.indexOf(id) === i; }).map(function (id) { return (idx.byId[id] || {}).nama || ""; });
+    var isi = []; Object.keys(k.isian || {}).forEach(function (q) { var v = k.isian[q]; if (typeof v === "string" && v.length < 300 && !/dana|rp/i.test(q)) isi.push(v); });
+    return { id: k.id, jenis: k.jenis, jenisLabel: (jenisDef(k.jenis) || {}).l || k.jenis, judul: k.judul, tgl: k.tgl, status: k.status, dosen: orang, ket: [k.ket, k.aktivitas, k.tempat].concat(isi).filter(String).join(" · ").slice(0, 600) };
+  });
+  h.sort(function (a, b) { return String(b.tgl).localeCompare(String(a.tgl)); });
+  return { semester: smt, kode: kode, kunci: u.k, kegiatan: h.slice(0, 80) };
 }

@@ -333,6 +333,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   (skalaNilai(t) → skala). rps.js: mediaLogo/kopTabel/paket (dipakai bersama), kontrak(R,D,logo), rubrik(R,D,logo), portoXlsx(R,D,peserta) → UPW_ZIP.xlsx. Tampilan: ttdMkpHtml,
   bacaRpsSumber (data-mfile="rpsSumber"), bagianTemplatNilai + AKSI.mkpTemplat (refTemplat cache S.laci.refT). Keterangan "siapa yang bisa melihat" tidak ditulis lagi di tampilan
   (keputusan pemilik), kecuali jaminan privasi biodata dan tanda tangan. Uji: alat/uji/uji-v43-bagian.mjs.
+- v0.44.0 (21 Nov 2026, Uji Coba): Tahap 3. CONTOH_MKP + contohMkpHtml(k) (di kepala setiap blok laci), docs/uji/contoh-mkp.json (contoh RPS + isian kontrak; dibuat sekali dari
+  RPS Praktik Desain dan Media Digital, nama pejabat dihapus) → AKSI.mkpContoh (buat/kontrak(R,D,logo,I)/rubrik(…,{hanyaBerubrik})/portoXlsx). porto[].rubrik = [{k, l[4], b}].
+  gas/PortofolioMk.js: JENIS_INTEG, aksi mkp.saranInteg; mkp.integ menerima d.keg (entri keg/kj/kjn). Tampilan: saranIntegHtml (kataInteg + akarKata, STOP_INTEG),
+  integPakai/integLepas, renderJagaInteg (jaga teks catatan). Uji: alat/uji/uji-v44-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

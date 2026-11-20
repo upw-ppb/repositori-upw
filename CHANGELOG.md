@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.44.0 — 21 Nov 2026 — Uji Coba
+Ringkas: Contoh dan templat di setiap bagian Portofolio MK, serta saran penelitian/PkM tim yang cocok dengan RPS untuk catatan integrasi (tertaut ke kegiatannya).
+Tahap 3 dari rencana RPS (pemilik: "Tahap 3", 21 Nov 2026), mengacu butir 8, 22 (A, C, D, E), dan 25.
+- **Contoh di setiap bagian** (RPS, kontrak kuliah, rubrik, metode, integrasi penelitian/PkM, bukti pembelajaran): penjelasan isian yang diharapkan sesuai butir Matriks dan contoh
+  kalimat. RPS, kontrak, dan rubrik punya tombol unduh contoh lengkap; rubrik juga contoh lembar portofolio penilaian (Excel).
+- **Contoh lengkap** (docs/uji/contoh-mkp.json) dari RPS Praktik Desain dan Media Digital Prodi UPW dengan kekurangan yang sudah diperbaiki (waktu per pertemuan, bobot UTS 15%,
+  nomor referensi) dan tanpa nama/NIP pejabat; lolos pemeriksaan butir 8. Kontrak contoh berisi isian lengkap; rubrik contoh berisi deskripsi kinerja untuk 3 penilaian.
+- **Saran integrasi penelitian/PkM** (aksi mkp.saranInteg): penelitian, PkM, dan publikasi 5 tahun terakhir yang melibatkan dosen tim kelas itu (tanpa draf/ditolak), diurutkan
+  menurut kecocokan kata dengan RPS kelas itu (tanpa AI). Tombol "Pakai" mengisi kerangka catatan (pertemuan, kegiatan mahasiswa, hasil, penilaian) dan menautkan kegiatannya;
+  catatan integrasi menyimpan tautan (keg, judul, jenis) dan menampilkannya.
+- Templat kontrak dan rubrik kini menerima isian tambahan (dipakai contoh). Tidak ada tabel/kolom baru; rollback ke v0.43.1 tanpa pemulihan data.
+- Uji: 809 + 44 uji server lulus (10 uji baru di uji-v44-bagian.mjs). Uji tampilan: dosen mencari saran (publikasi dan penelitian tim tampil), Pakai → catatan tertaut tersimpan;
+  keempat contoh terunduh (contoh RPS tanpa temuan wajib); penjelajah tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.43.1 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.43.1 (tampilan docs/ dan server Apps Script Produksi deployment @25), termasuk isi v0.43.0: templat kontrak kuliah, rubrik, dan lembar
   portofolio penilaian terisi dari RPS; RPS resmi PDF + Word sumber; catatan tanda tangan; kualifikasi/jenjang dan jam sajian otomatis; keterangan urutan pengisian.
