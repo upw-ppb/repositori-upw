@@ -321,6 +321,13 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - v0.41.0 (20 Nov 2026, Uji Coba): unduh ZIP Portofolio MK. gas/PortofolioMk.js: mkp.daftarZip {semester, kode?, kunci?} (unitTampakZip = hak lihat sama dengan
   mkpKeKlien; catat "mkp.zip") dan mkp.ambilZip {semester, item[{kode,kunci,komp,id}]} (berhenti setelah MKP_ZIP_BATCH 8 MB; hasil[] per item ok/galat; selesai = jumlah diproses).
   Tampilan: buatZipMkp/lembarZipMkp/teksCatatanMkp, AKSI.mkpZip (data-s, data-kode?, data-kunci?); tombol di isiMkpRekap dan laciMkp. Uji: alat/uji/uji-v41-bagian.mjs.
+- v0.42.0 (20 Nov 2026, Uji Coba): RPS Tahap 1. gas/Cpl.js (CPL_PRODI 68, UNSUR_CPL; dibuat dari "~/…/Prodi UPW/Kurikulum/Kurikulum 2023 MRA-TP/CPL Prodi UPW
+  Kurikulum MRA-TP 2023.xlsx"). gas/Rps.js: tabel RpsData (VERSI_SKEMA 30; semester, kodeMk, kunci "A,B", fileId, data JSON ≤ 48000), rpsTerakhirPerMk, unsurCplRps
+  (→ Tabel 4 + dp.data mk.rpsBaca), aksi mkp.rpsRef (bahan templat), rps.otorisasi (Pengaturan rpsOtorisasi; simpan: admin/superadmin). mkp.unggah komp rps menerima
+  d.rps (hasil baca) → simpanRpsData; mkp.detail: kelas[].rpsBaca (cocok fileId) + cplProdi. docs/uji/rps.js (dimuat malas, muatRps): UPW_RPS.kosong/buat (Word sendiri,
+  lanskap, logo docs/uji/templat/logo-*.png)/baca (regex XML, jalan di Node)/periksa/saranMetode. Teks "[ … ]" = petunjuk (dianggap kosong). Contoh RPS acuan:
+  "~/…/Dosen/Perkuliahan/Kelas/2026-2027/Praktik Desain dan Media Digital/RPS Praktik Desain dan Media Digital.docx" (ada tanda tangan: JANGAN disalin ke repo).
+  Rencana: Tahap 2 v0.43.0 templat kontrak kuliah + rubrik (butir 25), Tahap 3 v0.44.0 saran penelitian/PkM + contoh/templat tiap isian. Uji: alat/uji/uji-v42-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

@@ -208,7 +208,10 @@ function aksiDpData(d, token) {
   var pilihanSmt = [], kk = s.ganjil ? kodeSmt(s.awal, false) : kodeSmt(s.awal + 1, true);
   for (var i = 0; i < 11; i++) { pilihanSmt.push(kk); kk = /-1$/.test(kk) ? kodeSmt(Number(kk.slice(0, 4)) - 1, false) : kodeSmt(Number(kk.slice(0, 4)), true); }
   var ganjil = /-1$/.test(smt), bolehLihatNip = punyaPeran(p, PERAN_TIM_IMPOR);
-  var semua_ = mks.map(function (m) { var x = Object.assign({}, m); delete x._r; x.sks = sksMk(m); return x; });
+  var rpsAkhir = rpsTerakhirPerMk();   // v0.42.0: unsur CPL dan RPS dari RPS Word terbaca terakhir
+  var semua_ = mks.map(function (m) { var x = Object.assign({}, m); delete x._r; x.sks = sksMk(m);
+    var rp = rpsAkhir[m.kode]; if (rp) { x.rpsBaca = { semester: rp.semester, label: labelSmt(rp.semester), unsur: Object.keys(unsurCplRps(rp.data)) }; }
+    return x; });
   return {
     bolehUbah: punyaPeran(p, PERAN_DP_UBAH),
     bolehImporTim: punyaPeran(p, PERAN_TIM_IMPOR),
@@ -531,12 +534,14 @@ function tabelDosen(ts) {
       "Sertifikat Kompetensi/Profesi/Industri", "Mata Kuliah yang Diampu pada PS yang Diakreditasi", "Kesesuaian Bidang Keahlian dengan Mata Kuliah yang Diampu"],
     baris: tt.map(function (x, i) { var r = dts[x.id] || {}; return [i + 1, x.nama, x.nidn, [x.pendS2, x.pendS3].filter(String).join("; "), x.bidang, x.jabfung, x.serdos, x.sertKomp, mkDari_(x.id), teks(r.sesuai) === "Ya" ? "V" : ""]; }),
     akun: tt.map(function (x) { return x.id; }), catatan: "Sumber: biodata dosen berstatus dosen tidak tetap; mata kuliah yang diampu dari tim pengajar TS-2 s.d. TS." });
+  var rpsTs = rpsTerakhirPerMk(ts + "-2");   // v0.42.0: unsur CPL dari RPS terbaca terakhir s.d. akhir TS
   T.push({ kode: "4", judul: "Tabel 4) Kurikulum, Capaian Pembelajaran, dan Rencana Pembelajaran", bentuk: "daftar",
     kolom: ["No.", "Semester", "Kode Mata Kuliah", "Nama Mata Kuliah", "Mata Kuliah Kompetensi", "Kuliah/Responsi/Tutorial (sks)", "Seminar (sks)",
       "Praktikum/Praktik/Praktik Lapangan (sks)", "Konversi Kredit ke Jam", "CPL: Sikap", "CPL: Pengetahuan", "CPL: Keterampilan Umum", "CPL: Keterampilan Khusus",
       "Dokumen Rencana Pembelajaran", "Unit Penyelenggara"],
-    baris: mks.map(function (m, i) { return [i + 1, m.semester, kodeTabelMk(m), m.nama, m.kompetensi ? "V" : "", m.sksKuliah, m.sksSeminar, m.sksPraktik, sksMk(m) * JAM_PER_SKS,
-      m.cplSikap ? "V" : "", m.cplPengetahuan ? "V" : "", m.cplKu ? "V" : "", m.cplKk ? "V" : "", m.rps, m.unit]; }),
+    baris: mks.map(function (m, i) { var rp = rpsTs[m.kode], u = rp ? unsurCplRps(rp.data) : {};
+      return [i + 1, m.semester, kodeTabelMk(m), m.nama, m.kompetensi ? "V" : "", m.sksKuliah, m.sksSeminar, m.sksPraktik, sksMk(m) * JAM_PER_SKS,
+      m.cplSikap || u.S ? "V" : "", m.cplPengetahuan || u.P ? "V" : "", m.cplKu || u.KU ? "V" : "", m.cplKk || u.KK ? "V" : "", m.rps || (rp ? "RPS " + labelSmt(rp.semester) : ""), m.unit]; }),
     catatan: "Konversi jam = total sks × " + JAM_PER_SKS + " jam/semester (Permendikbudristek 53/2023). MK pilihan berkelompok ditulis dengan semua kode kelompoknya (dihitung satu MK). Total " + mks.reduce(function (s, m) { return s + sksMk(m); }, 0) + " sks, " +
       mks.reduce(function (s, m) { return s + m.sksPraktik; }, 0) + " sks praktik." });
   // Tabel 5: pembimbing utama TA, dari kegiatan "bimbingan" yang disetujui.

@@ -213,7 +213,7 @@ export const topik = [
 
   /* ---------------- AKADEMIK ---------------- */
   { id: "mk-saya", kat: "akademik", p: DOS, menu: "mk", mulai: ["dosen"], j: "Mata Kuliah Saya (portofolio mata kuliah per kelas)",
-    r: "Unggah RPS, kontrak, rubrik, metode, dan bukti pembelajaran untuk setiap kelas yang Anda ajar.", g: ["mk-saya"], kw: "rps kontrak kuliah rubrik metode pembelajaran portofolio mk per kelas kelas a kelas b unduh zip bukti",
+    r: "Unggah RPS, kontrak, rubrik, metode, dan bukti pembelajaran untuk setiap kelas yang Anda ajar.", g: ["mk-saya"], kw: "rps kontrak kuliah rubrik metode pembelajaran portofolio mk per kelas kelas a kelas b unduh zip bukti templat rps cpl cpmk sub-cpmk periksa rps",
     l: ["Buka <b>Mata Kuliah Saya</b>, pilih semester. Setiap <b>kelas</b> yang Anda ajar punya kartu sendiri (mis. UPW201 · Kelas A dan UPW201 · Kelas B), juga bila Anda mengajar keduanya.",
       "<b>Pengampu utama</b> kelas itu: unggah kontrak kuliah, rubrik/portofolio penilaian, dan pilih metode pembelajaran untuk kelas tersebut. Dokumen yang sama boleh diunggah lagi di kelas lain.",
       "<b>RPS</b> adalah dokumen mata kuliah: cukup sekali untuk kelas-kelas dengan tim pengajar yang sama; bila pengajar kelas berbeda, setiap kelas mengunggah RPS-nya sendiri.",
@@ -221,6 +221,8 @@ export const topik = [
       "Tekan <b>Lengkapi</b> (pengampu utama) atau <b>Tambah bagian saya</b> (anggota). Tombol <b>Lihat peserta kelas</b> menampilkan mahasiswa kelas Anda."],
     tips: ["Isian setiap kelas hanya terlihat oleh tim kelas itu. Admin Prodi, KPS, dan GKM melihat semua kelas untuk rekap.",
       "Mata kuliah dihitung lengkap untuk butir 8, 22, dan 25 bila semua kelasnya lengkap.",
+      "<b>Templat RPS</b>: di bagian RPS tekan <b>Unduh templat RPS (terisi)</b>, pilih CPL prodi yang dibebankan, lalu unduh. Identitas MK, dosen pengampu, otorisasi KPS dan Ketua Jurusan, dan waktu per pertemuan sudah terisi; semester berikutnya isi RPS terakhir ikut terisi. Isi bagian bertanda [ … ].",
+      "Unggah RPS dalam format <b>Word (.docx)</b>: aplikasi membaca CPL, CPMK, Sub-CPMK, metode, waktu, dan bobot, lalu menampilkan <b>Pemeriksaan butir 8</b> (mis. waktu kosong, bobot tidak 100%, kode CPL tidak dikenal) dan <b>Saran dari RPS</b> di bagian Metode pembelajaran (tombol Centang sesuai RPS). RPS PDF tetap diterima tetapi tidak dibaca otomatis.",
       "Tombol <b>Unduh Kelas … (ZIP)</b> di laci mata kuliah mengunduh semua bukti kelas itu (RPS, kontrak, rubrik, bukti pembelajaran, ditambah berkas Catatan dan tautan serta Daftar isi Excel).",
       "Tim pengajar ditetapkan Admin Prodi/KPS di Data Prodi › Tim pengajar. Bila mata kuliah Anda tidak muncul, hubungi Admin Prodi."] },
   { id: "ttd", kat: "akademik", p: ["kps", "dosen"], menu: "ttd", j: "Menyiapkan tanda tangan untuk surat", r: "KPS (dan dosen yang ditunjuk) menyimpan tanda tangan sekali.",
@@ -363,6 +365,7 @@ export const topik = [
       "Tab <b>Dokumen dosen</b>: kelengkapan ijazah/sertifikat dan tombol <b>Ingatkan</b>.",
       "Tab <b>Lulusan</b>, <b>PMB</b>, <b>Keuangan</b>: isi untuk Tabel 8–10 dan 21."],
     tips: ["Mengubah data: Admin Prodi dan Super Admin. KPS dan GKM hanya melihat (GKM juga bisa mengingatkan dosen).",
+      "Tab <b>Kurikulum</b> › <b>Otorisasi templat RPS</b> (Admin Prodi): nama dan NIP Ketua Jurusan, KPS (kosong = akun berperan KPS), dan labor division untuk templat RPS. Kolom CPL dan RPS terisi otomatis dari RPS Word yang diunggah dosen (juga Tabel 4 iLKPS).",
       "Tab <b>Portofolio MK</b>: tombol <b>Unduh semua bukti (ZIP)</b> menyusun satu ZIP per semester berisi folder per mata kuliah dan per kelas, Daftar isi.xlsx (status setiap kelas), dan Catatan dan tautan.txt (metode, integrasi, tautan). RPS bersama disalin ke setiap kelas yang memakainya. Untuk satu mata kuliah saja, buka mata kuliahnya lalu pilih Unduh semua kelas (ZIP). Untuk semester berukuran ratusan MB, pakai laptop.",
       "Nama di templat tim boleh diketik (tidak harus dari daftar): nama lengkap dengan/tanpa gelar, inisial, NIP, atau minimal 2 kata nama. Nama yang dicocokkan otomatis ditandai di pratinjau (kolom Terbaca sebagai); bila cocok dengan lebih dari satu orang, baris ditandai untuk diperbaiki. Pratinjau juga menampilkan beban SKS per orang.",
       "Impor tim pengajar dari Excel: hanya KPS dan Admin Prodi. Beban SKS di templat: dosen tunggal mendapat SKS penuh; team teaching membagi SKS rata (3 SKS untuk 3 orang = 1 SKS per orang); tim untuk semua kelas dihitung untuk setiap kelas yang mengambil MK.",

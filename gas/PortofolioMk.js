@@ -231,6 +231,13 @@ function aksiMkpDetail(d, token) {
     var s = semesterInfo(keTanggal(k.tgl)); if (s.awal !== a || s.ganjil !== ganjil) return false;
     return JSON.stringify(k.isian || {}).toUpperCase().indexOf(kode.toUpperCase()) >= 0;
   }).map(function (k) { return { id: k.id, judul: k.judul, tgl: k.tgl, status: k.status }; });
+  // v0.42.0: hasil baca RPS Word per kelas (dicocokkan dengan file RPS yang berlaku).
+  var peta = petaRpsFile(), s0 = r ? r.isi : {};
+  unitKelas(x).forEach(function (u) {
+    var e = isiUnit(s0, u).rps, k = (hasil.kelas || []).filter(function (v) { return v.k === u.k; })[0];
+    if (k) k.rpsBaca = e && e.t === "file" && peta[e.fileId] ? { data: peta[e.fileId].data, semester: peta[e.fileId].semester, diubah: peta[e.fileId].diubah } : null;
+  });
+  hasil.cplProdi = CPL_PRODI;
   return Object.assign(hasil, refMkp());
 }
 
@@ -270,7 +277,7 @@ function aksiMkpUnggah(d, token) {
   if (!c || (c.jenis !== "dok" && c.jenis !== "daftar")) throw galat("Jenis dokumen tidak dikenal.");
   var x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, c, true);
   var target = c.k === "rps" ? kunciRpsBersama(x, u) : [u.k];
-  var entri, file = null;
+  var entri, file = null, rpsJson = c.k === "rps" && d.tautan === undefined ? bersihRpsData(d.rps) : null;
   if (d.tautan !== undefined) {
     var url = teks(d.tautan).trim();
     if (!/^https:\/\/[^\s<>"]+$/.test(url) || url.length > 500) throw galat("Tautan harus diawali https:// dan tanpa spasi.");
@@ -303,7 +310,8 @@ function aksiMkpUnggah(d, token) {
     if (file) try { file.setTrashed(true); } catch (_) {}
     throw e;
   }
-  catat(p.id, "mkp.unggah", { semester: smt, kode: kode, komp: c.k, t: entri.t, kelas: target.join(",") });
+  if (rpsJson && file) simpanRpsData(smt, kode, target, file.getId(), rpsJson, p);
+  catat(p.id, "mkp.unggah", { semester: smt, kode: kode, komp: c.k, t: entri.t, kelas: target.join(","), baca: rpsJson ? 1 : 0 });
   return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
 }
 

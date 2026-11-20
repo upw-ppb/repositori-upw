@@ -3,6 +3,28 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.42.0 — 20 Nov 2026 — Uji Coba
+Ringkas: Templat RPS Word terisi otomatis dari data aplikasi, RPS Word yang diunggah dibaca dan diperiksa menurut butir 8, saran metode dari RPS, dan CPL Tabel 4 terisi otomatis.
+Disetujui pemilik 20 Nov 2026 ("Setuju, Kerjakan Tahap 1"), dengan berkas CPL Prodi UPW Kurikulum MRA-TP 2023 dan RPS Praktik Desain dan Media Digital sebagai acuan format.
+- **CPL prodi**: gas/Cpl.js berisi 68 CPL kurikulum MRA-TP 2023 (S1–S11, KU1–KU9, P1–P18, KK1–KK30) dari berkas Excel prodi.
+- **Templat RPS (terisi)** di bagian RPS laci Portofolio MK: dosen memilih CPL prodi yang dibebankan, lalu mengunduh Word berisi kop (logo Kemenpar,
+  Poltekpar Bali, ASEAN, BAN-PT), identitas MK dari kurikulum (kode, sks teori/praktik, semester), labor division, dosen pengampu kelas itu dengan NIP, otorisasi
+  KPS dan Ketua Jurusan, 16 pertemuan (8 UTS, 16 UAS) dengan waktu menurut sks (kuliah 50'+60'+60', praktik 170' per sks), portofolio penilaian, dan petunjuk [ … ].
+  Bila MK sudah punya RPS terbaca sebelumnya, seluruh isinya (CPMK, Sub-CPMK, korelasi, pertemuan, bobot) ikut terisi agar tinggal ditinjau (RPS ditinjau berkala).
+- **Pembaca RPS Word** (docs/uji/rps.js, tanpa AI, dari judul tabel/kolom): identitas, CPL (kode + rujukan CPL prodi), CPMK (+ CPL yang didukung), Sub-CPMK,
+  korelasi, bahan kajian, pustaka, dosen, program pembelajaran, dan portofolio penilaian. Dicoba pada RPS Praktik Desain dan Media Digital: seluruh bagian terbaca.
+- **Pemeriksaan butir 8** di laci: unsur wajib (capaian pembelajaran, bahan kajian, metode, waktu dan tahapan, asesmen/bobot 100%), kode/rumusan CPL dibanding
+  CPL prodi, CPL tanpa CPMK, kode MK dan sks dibanding kurikulum, tim pengajar tercantum, konsistensi bobot dua tabel. Kedalaman isi tetap dinilai GKM.
+- **Saran metode dari RPS** di bagian Metode pembelajaran (PjBL, CBL, RBE, IBE, teaching factory, praktik lapangan, daring) + tombol "Centang sesuai RPS".
+- **Tabel 4 iLKPS dan Data Prodi › Kurikulum**: centang CPL Sikap/Pengetahuan/KU/KK dan kolom RPS terisi dari RPS terbaca terakhir (digabung dengan isian manual).
+- **Otorisasi templat RPS** (Data Prodi › Kurikulum, Admin Prodi/Super Admin): nama/NIP Ketua Jurusan dan KPS (kosong = akun berperan KPS), labor division.
+- Struktur data: tabel baru **RpsData** (VERSI_SKEMA 30) dan Pengaturan rpsOtorisasi. Versi lama mengabaikan tabel ini, jadi rollback ke v0.41.0 tanpa
+  pemulihan data (hanya fitur RPS yang hilang).
+- Uji: 780 + 44 uji server lulus (18 uji baru di uji-v42-bagian.mjs, termasuk buat → baca templat di Node). Uji tampilan: dosen memilih 4 CPL, mengunduh templat,
+  mengunggah RPS Praktik Desain dan Media Digital (hasil baca + 4 temuan wajib tampil, saran metode, centang dan simpan metode); Admin menyimpan otorisasi;
+  Kurikulum menampilkan CPL dan RPS dari RPS; penjelajah 48 halaman/laci tanpa masalah. Templat Word belum dibuka di Microsoft Word asli (divalidasi XML + Quick Look).
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.41.0 — 20 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.41.0 (tampilan docs/ dan server Apps Script Produksi deployment @23): unduh semua bukti Portofolio MK sebagai ZIP per semester
   (Data Prodi › Portofolio MK), per mata kuliah, atau per kelas (laci mata kuliah), dengan Daftar isi.xlsx dan Catatan dan tautan.txt per kelas.

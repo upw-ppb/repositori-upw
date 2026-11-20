@@ -66,11 +66,13 @@ var SKEMA = {
           "kpsId", "lampiran", "riwayat", "oleh", "dibuat", "diubah", "dihapus", /* v0.32.0 */ "risalah", "berkas"],
   PesertaRapat: ["rapatId", "userId", "jawab", "alasan", "waktu", "dibaca"],
   /* v0.39.0 */
-  PesertaKelas: ["semester", "kodeMk", "kunci", "userIds", "oleh", "diubah"]
+  PesertaKelas: ["semester", "kodeMk", "kunci", "userIds", "oleh", "diubah"],
+  /* v0.42.0 */
+  RpsData: ["semester", "kodeMk", "kunci", "fileId", "data", "oleh", "diubah"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 29;
+var VERSI_SKEMA = 30;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
