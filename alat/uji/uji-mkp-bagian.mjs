@@ -22,7 +22,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   cek("isi palsu ditolak", /tidak sesuai/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "rps.pdf", isi: Buffer.from("<html>").toString("base64") }, tDsn)));
   cek("komponen tak dikenal ditolak", /tidak dikenal/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "x", nama: "a.pdf", isi: pdf() }, tDsn)));
   let D = ok("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "RPS Pengantar.pdf", isi: pdf() }, tDsn);
-  const f1 = Object.values(g.files).find(f => /RPS terbaru - RPS Pengantar\.pdf/.test(f.nama || ""));
+  const f1 = Object.values(g.files).find(f => /RPS terbaru - kelas [A-Z0-9]+ - RPS Pengantar\.pdf/.test(f.nama || ""));
   cek("RPS terunggah ke Drive Bukti/Portofolio MK/<semester>/<MK>", D.rps && D.rps.t === "file" && f1 && f1.folder && /UPW|Pengantar|Travel/.test(f1.folder.nama), f1 && f1.folder && f1.folder.nama);
   D = ok("mkp.unggah", { semester: kini, kode: kd, komp: "rps", tautan: "https://drive.google.com/rps-baru" }, tDsn);
   cek("ganti RPS dengan tautan: file lama dibuang", D.rps.t === "tautan" && D.rps.url === "https://drive.google.com/rps-baru" && f1.terbuang === true);
@@ -44,17 +44,19 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   cek("KPS membuka file bukti", L.t === "file" && L.mime === "image/png" && L.isi);
   D = ok("mkp.hapus", { semester: kini, kode: kd, komp: "interaksi", id: fid }, tDsn);
   cek("hapus bukti sendiri", D.interaksi.length === 1);
-  cek("lengkap 5 dari 6 (kontrak belum)", D.lengkap.length === 5 && D.lengkap.indexOf("kontrak") < 0, D.lengkap);
+  const kA = D.kelas.find(x => x.k === D.kunci), banyak = D.jumlahKelas > 1;
+  cek("v0.40.0: kelas yang diisi lengkap 5 dari 6 (kontrak belum); MK lengkap hanya bila semua kelas lengkap (RPS bersama karena tim sama)",
+    kA.lengkap.length === 5 && kA.lengkap.indexOf("kontrak") < 0 && (banyak ? D.lengkap.join() === "rps" : D.lengkap.length === 5), [kA.lengkap, D.lengkap, D.jumlahKelas]);
   cek("pengingat RPS hilang setelah RPS ada", ok("tugas.saya", {}, tDsn).mkpBelumRps.length === 0);
   cek("semester lampau hanya dilihat", /sudah lewat/.test(salah("mkp.unggah", { semester: lalu, kode: kd, komp: "rps", tautan: "https://x.id/a" }, tDsn)) && ok("mkp.saya", { semester: lalu }, tDsn).mk[0].bolehUtama === false);
   cek("semester tidak valid ditolak", /Semester tidak valid/.test(salah("mkp.saya", { semester: "2025" }, tDsn)));
   cek("MK tanpa tim ditolak", /belum punya tim/.test(salah("mkp.detail", { semester: kini, kode: "UPWXXX" }, tAdm)));
   const R = ok("mkp.rekap", { semester: kini }, tKps);
-  cek("rekap KPS: 2 MK, RPS 50%, metode 50%", R.mk.length === 2 && R.persen.n === 2 && R.persen.rps === 0.5 && R.persen.metode === 0.5, R.persen);
+  cek("rekap KPS: 2 MK, RPS 50%, metode 50% (atau 0% bila MK punya 2 kelas dan baru 1 kelas diisi)", R.mk.length === 2 && R.persen.n === 2 && R.persen.rps === 0.5 && R.persen.metode === (banyak ? 0 : 0.5), R.persen);
   cek("dosen tidak bisa membuka rekap; Admin tidak bisa mengunggah", /izin/.test(salah("mkp.rekap", {}, tDsn)) && /izin/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "kontrak", tautan: "https://x.id" }, tAdm)));
   cek("detail oleh Admin: hanya lihat", (() => { const x = ok("mkp.detail", { semester: kini, kode: kd }, tAdm); return !x.peran && !x.bolehUtama && x.rps; })());
   const ts = Number(kini.slice(0, 4));
   const P = ok("penilaian.data", { ts }, tAdm);
-  cek("Penilaian butir 8/22/25 menyebut Portofolio MK", /RPS tersedia di 50%/.test(P.rows.find(r => r.n === 8).info) && /rubrik di 50%/.test(P.rows.find(r => r.n === 25).info) && /metode tercatat/.test(P.rows.find(r => r.n === 22).info), P.rows.find(r => r.n === 8).info);
+  cek("Penilaian butir 8/22/25 menyebut Portofolio MK", /RPS tersedia di 50%/.test(P.rows.find(r => r.n === 8).info) && /rubrik di (50|0)%/.test(P.rows.find(r => r.n === 25).info) && /metode tercatat/.test(P.rows.find(r => r.n === 22).info), P.rows.find(r => r.n === 8).info);
   cek("migrasi: PortofolioMk", !!g.sheets.PortofolioMk);
 }

@@ -63,7 +63,7 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
     ok("dp.timSimpan", { semester: kini, kodeMk: kd.kode, perKelas: { A: [{ t: "u", id: dsn }, { t: "u", id: d3 }], B: [{ t: "u", id: d2 }] } }, tAdm);
     const m1 = ok("mkp.saya", {}, tDsn).mk.find(x => x.kode === kd.kode), m2 = ok("mkp.saya", {}, tD2).mk.find(x => x.kode === kd.kode);
     cek("Portofolio MK: pengampu utama kelas A dan kelas B sama-sama 'utama'", m1 && m1.peran === "utama" && m2 && m2.peran === "utama" && m2.bolehUtama, [m1 && m1.peran, m2 && m2.peran]);
-    cek("Portofolio MK: daftar tim menandai dua pengampu utama", m1.tim.filter(x => x.utama).length === 2 && m1.tim.find(x => x.id === d3).utama === false);
+    cek("Portofolio MK (v0.40.0 per kelas): dosen hanya melihat kelasnya; tim kelas A = dsn (utama) + d3", m1.kelas.map(x => x.k).join() === "A" && m1.tim.filter(x => x.utama).length === 1 && m1.tim.find(x => x.id === d3).utama === false && !m1.tim.some(x => x.id === d2) && m2.kelas.map(x => x.k).join() === "B");
     ok("dp.timSimpan", Object.assign({ semester: kini, kodeMk: kd.kode }, asli), tAdm);
     cek("Portofolio MK: tim semula dipulihkan", ok("mkp.saya", {}, tDsn).mk.find(x => x.kode === kd.kode).peran === "utama");
   } else cek("Portofolio MK: ada MK berjalan dengan dosen utama (data uji)", false);

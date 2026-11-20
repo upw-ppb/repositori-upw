@@ -314,6 +314,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   987654321 (Dasar, smt 2) dan 123456789 (Lanjutan, smt 3); pemilik diminta mengganti ke 231041217 / 231041228 + kelompok lewat Ubah MK.
 - v0.39.2 (20 Nov 2026, Uji Coba): buatPencocokNama(D) di unggahan tim (persis/tanpa gelar/≥2 kata dengan satu kata khas, GELAR_NAMA, KATA_NAMA_UMUM);
   r.tafsir → kolom "Terbaca sebagai"; X.tambahanHtml = beban SKS per orang di pratinjau. dp.data.dosen[].nip hanya untuk PERAN_TIM_IMPOR. Uji: jalankan392 di uji-v39-bagian.mjs.
+- v0.40.0 (20 Nov 2026, Uji Coba): Portofolio MK PER KELAS (gas/PortofolioMk.js): unitKelas(x) (tim "" → satu unit per kelasTimMk), peranUnit, isiUnit (isi.kls[K];
+  cadangan data lama per MK / isi.kel untuk komponen u), RPS bersama = kunciRpsBersama (sig tim + kelompok sama), unitSasaran(d.kunci), adaKompMk = semua unit lengkap.
+  mkpKeKlien → kelas[] (dosen: kelas yang diajar). PesertaKelas: dosen hanya kunci timnya. Tampilan: viewMkp() per kelas (S.laci.kel = kunci), kartu per kelas di hMk,
+  rekap per kelas. Uji: alat/uji/uji-v40-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

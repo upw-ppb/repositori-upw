@@ -45,36 +45,61 @@ function adaKomp(isi, k) {
   if (Array.isArray(v)) return v.length > 0;
   return !!v;
 }
-/** MK dengan tim pada semester itu (dasar persentase). v0.38.0: kelas = tim per kunci (untuk MK berkelompok paralel). */
+/** MK dengan tim pada semester itu (dasar persentase). v0.38.0: kelas = tim per kunci. */
 function mkBertim(smt) {
   var tim = timSemester(smt), mks = semuaMk();
-  return mks.filter(function (m) { return tim[m.kode] && tim[m.kode].anggota.length; }).map(function (m) { return { mk: m, anggota: tim[m.kode].anggota, utama: tim[m.kode].utama, kelas: tim[m.kode].kelas }; });
+  return mks.filter(function (m) { return tim[m.kode] && tim[m.kode].anggota.length; }).map(function (m) { return { mk: m, smt: smt, anggota: tim[m.kode].anggota, utama: tim[m.kode].utama, kelas: tim[m.kode].kelas }; });
 }
-/* v0.38.0: MK berkelompok paralel (mis. Bahasa Asing Pilihan Jepang/Jerman/Perancis): RPS, kontrak, rubrik, dan metode (komponen pengampu utama)
-   diisi PER KELOMPOK di isi.kel[KELOMPOK]; integrasi dan bukti interaksi tetap per MK. Kelompok kelas A dan B dengan nama sama berbagi satu isian. */
-function kelompokMk(x) { return (x.mk.kelompok || []).map(function (g) { return g.n.toUpperCase(); }); }
-/** Kelompok (huruf besar) yang pengampu utamanya userId. */
-function kelompokUtama(x, userId) {
-  var h = [];
-  Object.keys(x.kelas || {}).forEach(function (k) { var kel = kelompokDariKunci(k), a = (x.kelas[k] || [])[0]; if (kel && a && a.t === "u" && a.id === userId && h.indexOf(kel) < 0) h.push(kel); });
+/* v0.40.0 (keputusan pemilik 20 Nov 2026, standar LAMWisata butir 8/22/25):
+   Portofolio MK diisi PER KELAS (kunci tim: "A", "B", atau "A/JEPANG" untuk MK berkelompok). Setiap kelas terpisah dan hanya terlihat oleh tim kelas itu
+   (pengelola: Admin Prodi, KPS, GKM, Super Admin melihat semua) — juga bila pengajarnya sama (jumlah bukti = jumlah kelas).
+   Pengecualian: RPS adalah dokumen mata kuliah → kelas-kelas dengan TIM YANG SAMA PERSIS (dan kelompok yang sama) berbagi satu RPS; tim berbeda → RPS terpisah.
+   Penyimpanan: isi.kls[KUNCI] = {rps, kontrak, rubrik, metode, integ[], interaksi[]}. RPS bersama ditulis ke semua kunci yang setim.
+   Data lama (per MK sebelum v0.40, per kelompok v0.38 di isi.kel) dibaca sebagai cadangan untuk komponen pengampu utama. */
+/** Unit kelas: [{k, kelas, g, ang, sig}]; tim "sama untuk semua kelas" → satu unit per kelas yang mengambil MK. */
+function unitKelas(x) {
+  if (x._unit) return x._unit;
+  var kls = x.kelas || {}, h = [];
+  if (kls[""] !== undefined) { kelasTimMk(x.smt, x.mk.semester, petaKelasAngkatan()).forEach(function (k) { h.push({ k: k, ang: kls[""] || [] }); }); }
+  else Object.keys(kls).sort().forEach(function (k) { if ((kls[k] || []).length) h.push({ k: k, ang: kls[k] }); });
+  h.forEach(function (u) { u.g = kelompokDariKunci(u.k); u.kelas = String(u.k).split("/")[0]; u.sig = u.g + "|" + u.ang.map(function (a) { return a.t + a.id; }).sort().join(","); });
+  x._unit = h;
   return h;
 }
-function wadahKelompok(s, kel) { if (!kel) return s; s.kel = s.kel || {}; s.kel[kel] = s.kel[kel] || {}; return s.kel[kel]; }
-/** Komponen lengkap untuk satu MK: MK berkelompok → komponen pengampu utama harus ada di SEMUA kelompok. */
-function adaKompMk(x, s, k) {
-  var c = kompMkp(k), kel = kelompokMk(x);
-  if (!kel.length || !c.u) return adaKomp(s, k);
-  return kel.every(function (g) { return adaKomp(((s.kel || {})[g]) || {}, k); });
+/** Peran pengguna di satu unit: "utama" (anggota pertama, dosen), "anggota", atau "". */
+function peranUnit(u, userId) {
+  var i = -1; u.ang.forEach(function (a, j) { if (i < 0 && a.t === "u" && a.id === userId) i = j; });
+  return i < 0 ? "" : i === 0 ? "utama" : "anggota";
 }
-/** Kelompok sasaran isian pengampu utama: MK biasa → "" ; MK berkelompok → d.kelompok harus kelompok yang ia ampu sebagai utama. */
-function kelompokSasaran(x, d, p, c) {
-  var kel = kelompokMk(x);
-  if (!kel.length || !c.u) return "";
-  var g = String(d.kelompok || "").toUpperCase();
-  if (kel.indexOf(g) < 0) throw galat("Pilih kelompok (" + x.mk.kelompok.map(function (y) { return y.n; }).join(", ") + ") untuk " + c.l + ".");
-  if (kelompokUtama(x, p.id).indexOf(g) < 0) throw galat(c.l + " kelompok " + g + " diisi oleh pengampu utama kelompok itu.");
-  return g;
+/** Isian satu unit (dengan cadangan data lama untuk komponen pengampu utama). */
+function isiUnit(s, u) {
+  var w = (s.kls || {})[u.k] || {}, lama = u.g ? ((s.kel || {})[u.g] || {}) : s, o = {};
+  KOMP_MKP.forEach(function (c) {
+    var v = w[c.k];
+    if (c.u && v === undefined) v = lama[c.k];   // null = sengaja dihapus di kelas ini
+    o[c.k] = c.jenis === "dok" || c.jenis === "metode" ? (v || null) : (Array.isArray(v) ? v : []);
+  });
+  return o;
 }
+function wadahUnit(s, k) { s.kls = s.kls || {}; var w = s.kls[k] = s.kls[k] || {}; if (!Array.isArray(w.integ)) w.integ = []; if (!Array.isArray(w.interaksi)) w.interaksi = []; return w; }
+/** Kunci yang berbagi RPS dengan unit u (tim dan kelompok sama persis). */
+function kunciRpsBersama(x, u) { return unitKelas(x).filter(function (v) { return v.sig === u.sig; }).map(function (v) { return v.k; }); }
+/** Komponen lengkap untuk satu MK = lengkap di SEMUA kelasnya (LAMWisata menghitung per mata kuliah). */
+function adaKompMk(x, s, k) { var l = unitKelas(x); return l.length > 0 && l.every(function (u) { return adaKomp(isiUnit(s, u), k); }); }
+/** Pilih unit sasaran: d.kunci, atau unit pertama yang boleh diisi pengguna (utama untuk komponen pengampu utama). */
+function unitSasaran(x, d, p, c, ubahIsi) {
+  var l = unitKelas(x), k = String(d.kunci || "").toUpperCase(), u;
+  if (k) { u = l.filter(function (v) { return v.k === k; })[0]; if (!u) throw galat("Kelas tidak dikenal untuk mata kuliah ini."); }
+  else u = l.filter(function (v) { var r = peranUnit(v, p.id); return c && c.u ? r === "utama" : !!r; })[0] || l.filter(function (v) { return peranUnit(v, p.id); })[0] || l[0];
+  if (!u) throw galat("Mata kuliah ini belum punya tim pengajar.");
+  var r = peranUnit(u, p.id);
+  if (ubahIsi) {
+    if (!r) throw galat("Anda tidak mengajar " + labelUnit(x, u) + "; isian kelas itu diisi oleh tim kelas itu sendiri.");
+    if (c && c.u && r !== "utama") throw galat(c.l + " " + labelUnit(x, u) + " diisi oleh pengampu utama kelas itu.");
+  } else if (!r && !punyaPeran(p, PERAN_MKP_REKAP)) throw galat("Anda tidak mengajar " + labelUnit(x, u) + ".");
+  return u;
+}
+function labelUnit(x, u) { var g = u.g ? (x.mk.kelompok || []).filter(function (y) { return y.n.toUpperCase() === u.g; })[0] : null; return "kelas " + u.kelas + (u.g ? " · " + (g ? g.n : u.g) : ""); }
 /** v0.28.0: utama = daftar userId pengampu utama (tim per kelas bisa punya pengampu utama berbeda); tanpa daftar → anggota[0]. */
 function peranTim(anggota, userId, utama) {
   var i = -1; anggota.forEach(function (a, j) { if (i < 0 && a.t === "u" && a.id === userId) i = j; });
@@ -112,9 +137,9 @@ function infoMkpTs(ts) {
   if (!p.n) return {};
   var f = function (v) { return Math.round(v * 100) + "%"; };
   return {
-    8: "Portofolio MK TS: RPS tersedia di " + f(p.rps) + " dari " + p.n + " MK",
-    22: "Portofolio MK TS: metode tercatat di " + f(p.metode) + ", integrasi penelitian/PkM di " + f(p.integ) + ", bukti interaksi di " + f(p.interaksi) + " MK",
-    25: "Portofolio MK TS: rubrik di " + f(p.rubrik) + ", kontrak kuliah di " + f(p.kontrak) + " MK (skor 4 butuh rubrik ≥ 70% MK)"
+    8: "Portofolio MK TS: RPS tersedia di " + f(p.rps) + " dari " + p.n + " MK (semua kelasnya)",
+    22: "Portofolio MK TS: metode tercatat di " + f(p.metode) + ", integrasi penelitian/PkM di " + f(p.integ) + ", bukti interaksi di " + f(p.interaksi) + " MK (semua kelasnya)",
+    25: "Portofolio MK TS: rubrik di " + f(p.rubrik) + ", kontrak kuliah di " + f(p.kontrak) + " MK (semua kelasnya; skor 4 butuh rubrik ≥ 70% MK)"
   };
 }
 
@@ -124,27 +149,32 @@ function entriKeKlien(e, idx) {
     id: e.id || "", o: e.o, oleh: o ? o.nama : "", w: e.w || "" };
   return x;
 }
-function mkpKeKlien(x, smt, isi, p, idx, prak) {
-  var per = peranTim(x.anggota, p.id, x.utama), buka = smtTerbuka(smt);
-  var s = isi || {};
+function metodeKeKlien(m, idx) { return m ? { v: m.v || [], lain: m.lain || "", oleh: (idx.byId[m.o] || {}).nama || "", w: m.w || "" } : { v: [], lain: "" }; }
+/** Data satu unit kelas untuk tampilan. */
+function unitKeKlien(x, u, s, p, idx, prak, buka) {
+  var w = isiUnit(s, u), r = peranUnit(u, p.id), g = u.g ? (x.mk.kelompok || []).filter(function (y) { return y.n.toUpperCase() === u.g; })[0] : null;
+  var bersama = kunciRpsBersama(x, u).filter(function (k) { return k !== u.k; });
+  return { k: u.k, kelas: u.kelas, g: u.g, gNama: g ? g.n : "", gKode: g ? g.kode : "", label: "Kelas " + u.kelas + (u.g ? " · " + (g ? g.n : u.g) : ""),
+    tim: namaAnggota(u.ang, idx, prak, null), peran: r, bolehUtama: buka && r === "utama", bolehAnggota: buka && !!r, rpsBersama: bersama,
+    rps: entriKeKlien(w.rps, idx), kontrak: entriKeKlien(w.kontrak, idx), rubrik: entriKeKlien(w.rubrik, idx), metode: metodeKeKlien(w.metode, idx),
+    integ: w.integ.map(function (e) { return entriKeKlien(e, idx); }), interaksi: w.interaksi.map(function (e) { return entriKeKlien(e, idx); }),
+    lengkap: KOMP_MKP.filter(function (c) { return adaKomp(w, c.k); }).map(function (c) { return c.k; }) };
+}
+/** MK untuk tampilan: unit kelas yang boleh dilihat pengguna (dosen: kelas yang ia ajar; pengelola: semua). Bidang lama (rps, kontrak, …) = unit terpilih. */
+function mkpKeKlien(x, smt, isi, p, idx, prak, kunci) {
+  var buka = smtTerbuka(smt), s = isi || {}, semuaU = unitKelas(x), lihatSemua = punyaPeran(p, PERAN_MKP_REKAP);
+  var tampak = semuaU.filter(function (u) { return lihatSemua || peranUnit(u, p.id); });
+  var kelas = tampak.map(function (u) { return unitKeKlien(x, u, s, p, idx, prak, buka); });
+  var pilih = kelas.filter(function (u) { return u.k === String(kunci || "").toUpperCase(); })[0] || kelas.filter(function (u) { return u.peran; })[0] || kelas[0] || {};
+  var per = peranTim(x.anggota, p.id, x.utama);
   return {
     semester: smt, labelSemester: labelSmt(smt), kode: x.mk.kode, nama: x.mk.nama, sks: sksMk(x.mk), sksPraktik: x.mk.sksPraktik, smtMk: x.mk.semester,
-    tim: namaAnggota(x.anggota, idx, prak, x.utama), peran: per, buka: buka,
-    bolehUtama: buka && per === "utama", bolehAnggota: buka && !!per,
-    rps: entriKeKlien(s.rps, idx), kontrak: entriKeKlien(s.kontrak, idx), rubrik: entriKeKlien(s.rubrik, idx),
-    metode: s.metode ? { v: s.metode.v || [], lain: s.metode.lain || "", oleh: (idx.byId[s.metode.o] || {}).nama || "", w: s.metode.w || "" } : { v: [], lain: "" },
-    integ: (s.integ || []).map(function (e) { return entriKeKlien(e, idx); }),
-    interaksi: (s.interaksi || []).map(function (e) { return entriKeKlien(e, idx); }),
-    lengkap: KOMP_MKP.filter(function (c) { return adaKompMk(x, s, c.k); }).map(function (c) { return c.k; }),
-    // v0.38.0: isian pengampu utama per kelompok paralel
-    kelompok: (x.mk.kelompok || []).map(function (g) {
-      var G = g.n.toUpperCase(), w = (s.kel || {})[G] || {}, utamaK = [];
-      Object.keys(x.kelas || {}).forEach(function (k) { if (kelompokDariKunci(k) === G) { var a = (x.kelas[k] || [])[0]; if (a && a.t === "u") { var o = idx.byId[a.id]; var nm = o ? o.nama : "(dosen)"; if (utamaK.indexOf(nm) < 0) utamaK.push(nm); } } });
-      return { n: g.n, kode: g.kode, k: G, utama: utamaK, boleh: buka && kelompokUtama(x, p.id).indexOf(G) >= 0,
-        rps: entriKeKlien(w.rps, idx), kontrak: entriKeKlien(w.kontrak, idx), rubrik: entriKeKlien(w.rubrik, idx),
-        metode: w.metode ? { v: w.metode.v || [], lain: w.metode.lain || "", oleh: (idx.byId[w.metode.o] || {}).nama || "", w: w.metode.w || "" } : { v: [], lain: "" },
-        lengkap: KOMP_MKP.filter(function (c) { return c.u && adaKomp(w, c.k); }).map(function (c) { return c.k; }) };
-    })
+    tim: pilih.tim || [], peran: per, buka: buka, kunci: pilih.k || "",
+    bolehUtama: !!pilih.bolehUtama, bolehAnggota: !!pilih.bolehAnggota,
+    rps: pilih.rps || null, kontrak: pilih.kontrak || null, rubrik: pilih.rubrik || null, metode: pilih.metode || { v: [], lain: "" },
+    integ: pilih.integ || [], interaksi: pilih.interaksi || [],
+    lengkap: KOMP_MKP.filter(function (c) { return adaKompMk(x, s, c.k); }).map(function (c) { return c.k; }),   // MK: semua kelas
+    kelas: kelas, jumlahKelas: semuaU.length
   };
 }
 function pilihanSemesterMkp() {
@@ -156,42 +186,44 @@ function refMkp() { return { komp: KOMP_MKP, daftarMetode: METODE_MKP, pilihanSe
 
 /* ---------- aksi baca ---------- */
 
-/** MK yang diampu pengguna (dosen) pada satu semester. */
+/** MK yang diampu pengguna (dosen) pada satu semester (hanya kelas yang ia ajar). */
 function aksiMkpSaya(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["dosen"]);
   var smt = semesterSah(d.semester || semesterInfo().kode), isi = semuaMkpSemester(smt), idx = indeksOrang(), prak = petaPraktisi();
-  var mk = mkBertim(smt).filter(function (x) { return peranTim(x.anggota, p.id, x.utama); }).map(function (x) {
-    return mkpKeKlien(x, smt, isi[x.mk.kode] ? isi[x.mk.kode].isi : null, p, idx, prak);
+  var mk = mkBertim(smt).filter(function (x) { return unitKelas(x).some(function (u) { return peranUnit(u, p.id); }); }).map(function (x) {
+    var h = mkpKeKlien(x, smt, isi[x.mk.kode] ? isi[x.mk.kode].isi : null, p, idx, prak);
+    h.kelas = h.kelas.filter(function (u) { return u.peran; });
+    return h;
   });
   return Object.assign({ semester: smt, labelSemester: labelSmt(smt), mk: mk }, refMkp());
 }
-/** Rekap kelengkapan semua MK bertim pada satu semester (Admin Prodi / KPS / Super Admin). */
+/** Rekap kelengkapan semua MK bertim pada satu semester (Admin Prodi / KPS / Super Admin / GKM), rinci per kelas. */
 function aksiMkpRekap(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_MKP_REKAP);
   var smt = semesterSah(d.semester || semesterInfo().kode), isi = semuaMkpSemester(smt), idx = indeksOrang(), prak = petaPraktisi();
   var mk = mkBertim(smt).map(function (x) { return mkpKeKlien(x, smt, isi[x.mk.kode] ? isi[x.mk.kode].isi : null, p, idx, prak); });
-  var tanpaTim = semuaMk().filter(function (m) { return m.semester % 2 === (/-1$/.test(smt) ? 1 : 0); }).length - mk.length;
+  var tanpaTim = semuaMk().filter(function (m) { return m.semester % 2 === (/-1$/.test(smt) ? 1 : 0) && !m.tanpaTim; }).length - mk.length;
   return Object.assign({ semester: smt, labelSemester: labelSmt(smt), mk: mk, persen: persenMkp([smt]), tanpaTim: Math.max(0, tanpaTim) }, refMkp());
 }
 function ambilMkp(smt, kode, p, perluUbah) {
   var x = mkBertim(smt).filter(function (y) { return y.mk.kode === kode; })[0];
   if (!x) throw galat("Mata kuliah ini belum punya tim pengajar pada " + labelSmt(smt) + ".");
-  var per = peranTim(x.anggota, p.id, x.utama);
-  if (!per && !punyaPeran(p, PERAN_MKP_REKAP)) throw galat("Anda bukan anggota tim pengajar mata kuliah ini.");
+  var anggota = unitKelas(x).some(function (u) { return peranUnit(u, p.id); });
+  if (!anggota && !punyaPeran(p, PERAN_MKP_REKAP)) throw galat("Anda bukan anggota tim pengajar mata kuliah ini.");
   if (perluUbah) {
-    if (!per) throw galat("Hanya anggota tim pengajar yang mengisi portofolio mata kuliah.");
+    if (!anggota) throw galat("Hanya anggota tim pengajar yang mengisi portofolio mata kuliah.");
     if (!smtTerbuka(smt)) throw galat(labelSmt(smt) + " sudah lewat; portofolio hanya bisa dilihat.");
   }
-  x.peran = per;
+  x.peran = peranTim(x.anggota, p.id, x.utama);
   return x;
 }
 function aksiMkpDetail(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_MKP_REKAP.concat(["dosen"]));
   var smt = semesterSah(d.semester), kode = teks(d.kode), x = ambilMkp(smt, kode, p, false), r = semuaMkpSemester(smt)[kode];
-  var hasil = mkpKeKlien(x, smt, r ? r.isi : null, p, indeksOrang(), petaPraktisi());
+  var hasil = mkpKeKlien(x, smt, r ? r.isi : null, p, indeksOrang(), petaPraktisi(), d.kunci);
   // Kuliah tamu yang menyebut kode MK ini (jenis "kuliahtamu", isian "Mata kuliah terkait").
   var a = Number(smt.slice(0, 4)), ganjil = /-1$/.test(smt);
   hasil.kuliahTamu = semuaKegiatan().filter(function (k) {
@@ -220,15 +252,24 @@ function ubahMkp(smt, kode, p, fn) {
   });
 }
 function idAcak() { return Utilities.getUuid().slice(0, 8); }
+/** fileId yang masih dirujuk isian (semua kelas + data lama) — berkas yang tidak dirujuk lagi boleh dipindah ke sampah. */
+function fileDirujukMkp(s) {
+  var h = {}, cek = function (o) { if (!o) return; KOMP_MKP.forEach(function (c) { var v = o[c.k]; (Array.isArray(v) ? v : [v]).forEach(function (e) { if (e && e.t === "file") h[e.fileId] = 1; }); }); };
+  cek(s); Object.keys(s.kel || {}).forEach(function (g) { cek(s.kel[g]); }); Object.keys(s.kls || {}).forEach(function (k) { cek(s.kls[k]); });
+  return h;
+}
+function buangTakDirujuk(lama, s) {
+  var dirujuk = fileDirujukMkp(s);
+  lama.forEach(function (e) { if (e && e.t === "file" && !dirujuk[e.fileId]) try { DriveApp.getFileById(e.fileId).setTrashed(true); } catch (_) {} });
+}
 
 function aksiMkpUnggah(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["dosen"]);
   var smt = semesterSah(d.semester), kode = teks(d.kode), c = kompMkp(String(d.komp || ""));
   if (!c || (c.jenis !== "dok" && c.jenis !== "daftar")) throw galat("Jenis dokumen tidak dikenal.");
-  var x = ambilMkp(smt, kode, p, true);
-  if (c.u && x.peran !== "utama") throw galat(c.l + " diunggah oleh pengampu utama.");
-  var kel = kelompokSasaran(x, d, p, c);
+  var x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, c, true);
+  var target = c.k === "rps" ? kunciRpsBersama(x, u) : [u.k];
   var entri, file = null;
   if (d.tautan !== undefined) {
     var url = teks(d.tautan).trim();
@@ -242,27 +283,28 @@ function aksiMkpUnggah(d, token) {
     var bytes = Utilities.base64Decode(isi);
     if (bytes.length > BUKTI_MAKS) throw galat("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai Tautan.");
     if (!isiSesuai(eks, bytes)) throw galat("Isi file tidak sesuai dengan jenisnya (." + eks + "). Simpan ulang file dari aplikasi aslinya, lalu coba lagi.");
-    file = folderMkp(smt, x.mk).createFile(Utilities.newBlob(bytes, mime, namaAman(c.l + " - " + nama)));
+    file = folderMkp(smt, x.mk).createFile(Utilities.newBlob(bytes, mime, namaAman(c.l + " - " + labelUnit(x, u) + " - " + nama)));
     entri = { t: "file", fileId: file.getId(), nama: nama, mime: mime, ukuran: bytes.length };
   }
   if (c.jenis === "daftar") entri.ket = potong(d.ket, 200).trim();
   entri.o = p.id; entri.w = new Date().toISOString();
-  var lama = null;
+  var lama = [];
   try {
     ubahMkp(smt, kode, p, function (s) {
-      if (c.jenis === "dok") { var w = wadahKelompok(s, kel); lama = w[c.k]; w[c.k] = entri; }
+      if (c.jenis === "dok") target.forEach(function (k) { var w = wadahUnit(s, k); lama.push(isiUnit(s, unitKelas(x).filter(function (v) { return v.k === k; })[0])[c.k]); w[c.k] = entri; });
       else {
-        if (s[c.k].length >= MAKS_DAFTAR_MKP) throw galat("Maksimal " + MAKS_DAFTAR_MKP + " bukti per mata kuliah. Gabungkan beberapa dokumentasi dalam satu tautan folder.");
-        entri.id = idAcak(); s[c.k].push(entri);
+        var w = wadahUnit(s, u.k);
+        if (w[c.k].length >= MAKS_DAFTAR_MKP) throw galat("Maksimal " + MAKS_DAFTAR_MKP + " bukti per kelas. Gabungkan beberapa dokumentasi dalam satu tautan folder.");
+        entri.id = idAcak(); w[c.k].push(entri);
       }
+      buangTakDirujuk(lama, s);
     });
   } catch (e) {
     if (file) try { file.setTrashed(true); } catch (_) {}
     throw e;
   }
-  if (lama && lama.t === "file") try { DriveApp.getFileById(lama.fileId).setTrashed(true); } catch (_) {}
-  catat(p.id, "mkp.unggah", { semester: smt, kode: kode, komp: c.k, t: entri.t, kelompok: kel });
-  return aksiMkpDetail({ semester: smt, kode: kode }, token);
+  catat(p.id, "mkp.unggah", { semester: smt, kode: kode, komp: c.k, t: entri.t, kelas: target.join(",") });
+  return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
 }
 
 function aksiMkpHapus(d, token) {
@@ -270,54 +312,57 @@ function aksiMkpHapus(d, token) {
   wajibPeran(p, ["dosen"]);
   var smt = semesterSah(d.semester), kode = teks(d.kode), c = kompMkp(String(d.komp || ""));
   if (!c || c.jenis === "metode") throw galat("Jenis isian tidak dikenal.");
-  var x = ambilMkp(smt, kode, p, true), dibuang = null, kel = c.jenis === "dok" && x.peran === "utama" ? kelompokSasaran(x, d, p, c) : "";
+  var x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, c.jenis === "dok" ? c : null, true);
   ubahMkp(smt, kode, p, function (s) {
+    var dibuang = [];
     if (c.jenis === "dok") {
-      if (x.peran !== "utama") throw galat("Hanya pengampu utama yang bisa menghapus " + c.l + ".");
-      var w = wadahKelompok(s, kel);
-      if (!w[c.k]) throw galat("Dokumen ini belum diunggah.");
-      dibuang = w[c.k]; delete w[c.k];
+      if (peranUnit(u, p.id) !== "utama") throw galat("Hanya pengampu utama kelas itu yang bisa menghapus " + c.l + ".");
+      var target = c.k === "rps" ? kunciRpsBersama(x, u) : [u.k], ada = false;
+      target.forEach(function (k) {
+        var uu = unitKelas(x).filter(function (v) { return v.k === k; })[0], v = isiUnit(s, uu)[c.k], w = wadahUnit(s, k);
+        if (v) { ada = true; dibuang.push(v); }
+        w[c.k] = null;   // null = dihapus (tidak memakai lagi data lama sebagai cadangan)
+      });
+      if (!ada) throw galat("Dokumen ini belum diunggah.");
     } else {
-      var i = -1; s[c.k].forEach(function (e, j) { if (e.id === String(d.id || "")) i = j; });
+      var w2 = wadahUnit(s, u.k), i = -1; w2[c.k].forEach(function (e, j) { if (e.id === String(d.id || "")) i = j; });
       if (i < 0) throw galat("Isian tidak ditemukan.");
-      if (s[c.k][i].o !== p.id) throw galat("Hanya penulis/pengunggahnya yang bisa menghapus isian ini.");
-      dibuang = s[c.k].splice(i, 1)[0];
+      if (w2[c.k][i].o !== p.id) throw galat("Hanya penulis/pengunggahnya yang bisa menghapus isian ini.");
+      dibuang.push(w2[c.k].splice(i, 1)[0]);
     }
+    buangTakDirujuk(dibuang, s);
   });
-  if (dibuang && dibuang.t === "file") try { DriveApp.getFileById(dibuang.fileId).setTrashed(true); } catch (_) {}
-  catat(p.id, "mkp.hapus", { semester: smt, kode: kode, komp: c.k });
-  return aksiMkpDetail({ semester: smt, kode: kode }, token);
+  catat(p.id, "mkp.hapus", { semester: smt, kode: kode, komp: c.k, kelas: u.k });
+  return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
 }
 
 function aksiMkpMetode(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["dosen"]);
-  var smt = semesterSah(d.semester), kode = teks(d.kode), x = ambilMkp(smt, kode, p, true);
-  if (x.peran !== "utama") throw galat("Metode pembelajaran diisi oleh pengampu utama.");
-  var kel = kelompokSasaran(x, d, p, kompMkp("metode"));
+  var smt = semesterSah(d.semester), kode = teks(d.kode), x = ambilMkp(smt, kode, p, true), c = kompMkp("metode"), u = unitSasaran(x, d, p, c, true);
   var v = (Array.isArray(d.metode) ? d.metode : []).map(String).filter(function (m, i, a) { return METODE_MKP.indexOf(m) >= 0 && a.indexOf(m) === i; });
   var lain = potong(d.lain, 200).trim();
   ubahMkp(smt, kode, p, function (s) {
-    var w = wadahKelompok(s, kel);
-    if (!v.length && !lain) delete w.metode; else w.metode = { v: v, lain: lain, o: p.id, w: new Date().toISOString() };
+    var w = wadahUnit(s, u.k);
+    w.metode = !v.length && !lain ? null : { v: v, lain: lain, o: p.id, w: new Date().toISOString() };
   });
-  catat(p.id, "mkp.metode", { semester: smt, kode: kode, n: v.length + (lain ? 1 : 0) });
-  return aksiMkpDetail({ semester: smt, kode: kode }, token);
+  catat(p.id, "mkp.metode", { semester: smt, kode: kode, n: v.length + (lain ? 1 : 0), kelas: u.k });
+  return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
 }
 
 function aksiMkpInteg(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["dosen"]);
-  var smt = semesterSah(d.semester), kode = teks(d.kode);
-  ambilMkp(smt, kode, p, true);
+  var smt = semesterSah(d.semester), kode = teks(d.kode), x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, null, true);
   var t = potong(d.teks, 1000).trim();
   if (t.length < 15) throw galat("Tuliskan bentuk integrasinya (minimal 15 huruf), misalnya data penelitian apa yang dipakai mahasiswa.");
   ubahMkp(smt, kode, p, function (s) {
-    if (s.integ.length >= MAKS_DAFTAR_MKP) throw galat("Maksimal " + MAKS_DAFTAR_MKP + " catatan integrasi per mata kuliah.");
-    s.integ.push({ id: idAcak(), teks: t, o: p.id, w: new Date().toISOString() });
+    var w = wadahUnit(s, u.k);
+    if (w.integ.length >= MAKS_DAFTAR_MKP) throw galat("Maksimal " + MAKS_DAFTAR_MKP + " catatan integrasi per kelas.");
+    w.integ.push({ id: idAcak(), teks: t, o: p.id, w: new Date().toISOString() });
   });
-  catat(p.id, "mkp.integ", { semester: smt, kode: kode });
-  return aksiMkpDetail({ semester: smt, kode: kode }, token);
+  catat(p.id, "mkp.integ", { semester: smt, kode: kode, kelas: u.k });
+  return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
 }
 
 function aksiMkpLihat(d, token) {
@@ -325,20 +370,22 @@ function aksiMkpLihat(d, token) {
   wajibPeran(p, PERAN_MKP_REKAP.concat(["dosen"]));
   var smt = semesterSah(d.semester), kode = teks(d.kode), c = kompMkp(String(d.komp || ""));
   if (!c || (c.jenis !== "dok" && c.jenis !== "daftar")) throw galat("Jenis dokumen tidak dikenal.");
-  var x = ambilMkp(smt, kode, p, false), g = String(d.kelompok || "").toUpperCase();
-  if (g && kelompokMk(x).indexOf(g) < 0) throw galat("Kelompok tidak dikenal.");
-  var r = semuaMkpSemester(smt)[kode], s = r ? r.isi : {}, w = c.u && g ? ((s.kel || {})[g] || {}) : s;
-  var e = c.jenis === "dok" ? w[c.k] : (s[c.k] || []).filter(function (y) { return y.id === String(d.id || ""); })[0];
+  var x = ambilMkp(smt, kode, p, false), u = unitSasaran(x, d, p, null, false);
+  var r = semuaMkpSemester(smt)[kode], s = r ? r.isi : {}, w = isiUnit(s, u);
+  var e = c.jenis === "dok" ? w[c.k] : w[c.k].filter(function (y) { return y.id === String(d.id || ""); })[0];
   if (!e) throw galat("Dokumen ini belum diunggah.");
   if (e.t !== "file") return { t: e.t, url: e.url || "" };
   var b = DriveApp.getFileById(e.fileId).getBlob();
   return { t: "file", nama: e.nama, mime: e.mime, isi: Utilities.base64Encode(b.getBytes()) };
 }
 
-/** Pengingat: MK yang Anda ampu sebagai pengampu utama pada semester berjalan tetapi RPS-nya belum ada. */
+/** Pengingat: kelas yang Anda ampu sebagai pengampu utama pada semester berjalan tetapi RPS-nya belum ada. */
 function mkpBelumRps(p) {
   if (!punyaPeran(p, ["dosen"])) return [];
-  var smt = semesterInfo().kode, isi = semuaMkpSemester(smt);
-  return mkBertim(smt).filter(function (x) { return peranTim(x.anggota, p.id, x.utama) === "utama" && !(isi[x.mk.kode] && isi[x.mk.kode].isi.rps); })
-    .map(function (x) { return { kode: x.mk.kode, nama: x.mk.nama, semester: smt }; });
+  var smt = semesterInfo().kode, isi = semuaMkpSemester(smt), h = [];
+  mkBertim(smt).forEach(function (x) {
+    var s = isi[x.mk.kode] ? isi[x.mk.kode].isi : {}, sudah = {};
+    unitKelas(x).forEach(function (u) { if (peranUnit(u, p.id) === "utama" && !isiUnit(s, u).rps && !sudah[u.sig]) { sudah[u.sig] = 1; h.push({ kode: x.mk.kode, nama: x.mk.nama + " (" + labelUnit(x, u) + ")", semester: smt }); } });
+  });
+  return h;
 }

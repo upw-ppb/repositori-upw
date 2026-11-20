@@ -33,18 +33,18 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tD2 }) {
   ok("dp.timSimpan", { semester: smt, kodeMk: "231041217", perKelas: { "A/JEPANG": [{ t: "u", id: dsn }], "B/JEPANG": [{ t: "u", id: dsn }], "A/JERMAN": [{ t: "u", id: d2 }], "A/PERANCIS": [{ t: "u", id: d3 }] } }, tAdm);
   // Portofolio MK per kelompok
   const pdf = s => Buffer.concat([Buffer.from("%PDF-1.4\n" + s), Buffer.alloc(40)]).toString("base64");
-  cek("RPS MK berkelompok wajib memilih kelompok; dosen hanya mengisi kelompoknya sendiri",
-    /Pilih kelompok/.test(salah("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", nama: "rps.pdf", isi: pdf("x") }, tDsn))
-    && /pengampu utama kelompok/.test(salah("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kelompok: "JERMAN", nama: "rps.pdf", isi: pdf("x") }, tDsn)));
-  let D = ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kelompok: "JEPANG", nama: "RPS Jepang.pdf", isi: pdf("jp") }, tDsn);
-  const kJp = D.kelompok.find(x => x.k === "JEPANG");
-  cek("RPS Jepang tersimpan per kelompok; MK belum lengkap selama Jerman/Perancis belum", kJp.rps && kJp.rps.nama === "RPS Jepang.pdf" && kJp.boleh && !D.kelompok.find(x => x.k === "JERMAN").boleh && !D.lengkap.includes("rps") && kJp.utama.length === 1);
-  ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kelompok: "JERMAN", tautan: "https://drive.google.com/rps-jerman" }, tD2);
-  ok("mkp.metode", { semester: smt, kode: "231041217", kelompok: "JERMAN", metode: ["Case based learning"] }, tD2);
-  D = ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kelompok: "PERANCIS", nama: "RPS Perancis.pdf", isi: pdf("fr") }, tKps);
-  cek("semua kelompok punya RPS → komponen RPS MK lengkap; metode per kelompok", D.lengkap.includes("rps") && D.kelompok.find(x => x.k === "JERMAN").metode.v.join() === "Case based learning" && !D.lengkap.includes("metode"));
-  cek("lihat RPS kelompok (tautan) dan hapus oleh pengampu kelompoknya", ok("mkp.lihat", { semester: smt, kode: "231041217", komp: "rps", kelompok: "JERMAN" }, tKps).url === "https://drive.google.com/rps-jerman"
-    && !ok("mkp.hapus", { semester: smt, kode: "231041217", komp: "rps", kelompok: "JEPANG" }, tDsn).kelompok.find(x => x.k === "JEPANG").rps);
+  // v0.40.0: Portofolio MK per kelas (kunci "A/JEPANG"); RPS bersama hanya untuk kelas dengan tim yang sama (Jepang A dan B, sama-sama dsn).
+  cek("dosen tidak bisa mengisi kelas/kelompok yang tidak ia ajar", /tidak mengajar/.test(salah("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JERMAN", nama: "rps.pdf", isi: pdf("x") }, tDsn)));
+  let D = ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JEPANG", nama: "RPS Jepang.pdf", isi: pdf("jp") }, tDsn);
+  const kj = k => D.kelas.find(x => x.k === k);
+  cek("RPS Jepang: satu unggahan untuk kelas A dan B (tim sama); dosen hanya melihat kelas yang ia ajar; MK belum lengkap", D.kelas.map(x => x.k).join() === "A/JEPANG,B/JEPANG"
+    && kj("A/JEPANG").rps.nama === "RPS Jepang.pdf" && kj("B/JEPANG").rps.nama === "RPS Jepang.pdf" && kj("A/JEPANG").rpsBersama.join() === "B/JEPANG" && !D.lengkap.includes("rps"));
+  ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JERMAN", tautan: "https://drive.google.com/rps-jerman" }, tD2);
+  ok("mkp.metode", { semester: smt, kode: "231041217", kunci: "A/JERMAN", metode: ["Case based learning"] }, tD2);
+  D = ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/PERANCIS", nama: "RPS Perancis.pdf", isi: pdf("fr") }, tKps);
+  cek("semua kelas punya RPS → RPS MK lengkap; metode per kelas (hanya Jerman) → belum lengkap", D.lengkap.includes("rps") && kj("A/JERMAN").metode.v.join() === "Case based learning" && !D.lengkap.includes("metode"));
+  cek("lihat RPS kelas lain oleh pengelola; hapus RPS Jepang menghapus dari kelas A dan B", ok("mkp.lihat", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JERMAN" }, tKps).url === "https://drive.google.com/rps-jerman"
+    && (() => { const H = ok("mkp.hapus", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JEPANG" }, tDsn); return !H.kelas.find(x => x.k === "A/JEPANG").rps && !H.kelas.find(x => x.k === "B/JEPANG").rps; })());
   // Kelompok dihapus dari kurikulum → baris kelompok diabaikan (data tidak dihapus).
   ok("dp.mkSimpan", { data: { kode: "231041217", nama: "Bahasa Asing Pilihan Kepemanduan Dasar", semester: 3, sksKuliah: 2, kelompok: "" } }, tAdm);
   cek("kelompok dikosongkan: tim kelompok diabaikan (MK tampil belum punya tim), data tetap di sheet", tim().anggota.length === 0 && (g.sheets.TimPengajar || []).slice(1).some(r => r[1] === "231041217" && /\//.test(String(r.at(-1)))));

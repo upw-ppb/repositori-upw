@@ -80,6 +80,8 @@ function aksiPesertaData(d, token) {
   var timMk = ctx.tim[m.kode], lihatSemua = punyaPeran(p, PERAN_DP_LIHAT);
   if (!lihatSemua && !(timMk && timMk.anggota.some(function (a) { return a.t === "u" && a.id === p.id; }))) throw galat("Anda bukan pengajar mata kuliah ini.");
   var ps = pesertaMk(smt, m, ctx), idx = indeksOrang(), prak = petaPraktisi(), angk = angkatanMk(smt, m.semester);
+  // v0.40.0: dosen hanya melihat peserta kelas/kelompok yang ia ajar (pengelola melihat semua).
+  if (!lihatSemua) Object.keys(ps).forEach(function (k) { if (!timUntukKunci(timMk, k).some(function (a) { return a.t === "u" && a.id === p.id; })) delete ps[k]; });
   var orang = function (id) { var x = ctx.aktif[id]; return x ? { id: x.id, nim: x.nim, nama: x.nama, kelas: x.kelas, masuk: x.masuk } : null; };
   catat(p.id, "peserta.data", { semester: smt, kode: m.kode });
   return {

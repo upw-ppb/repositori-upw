@@ -3,6 +3,24 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.40.0 — 20 Nov 2026 — Uji Coba
+Ringkas: Portofolio MK per kelas: setiap kelas punya isian sendiri dan hanya terlihat oleh tim kelas itu; RPS dipakai bersama hanya oleh kelas dengan tim yang sama; dosen hanya melihat peserta kelasnya.
+Keputusan pemilik 20 Nov 2026 ("Kerjakan"), mengacu Matriks LAMWisata butir 8 (RPS per mata kuliah, dilaksanakan konsisten), 22, dan 25 (kontrak, rubrik/portofolio,
+bukti pembelajaran per kelas): dua kelas dengan pengajar berbeda = pengajar berbeda (terpisah, tidak saling melihat); kelas lain tetap terpisah walau pengajarnya sama
+(jumlah bukti = jumlah kelas), kecuali RPS satu untuk kelas-kelas dengan tim yang sama persis (mis. Bahasa Jepang kelas A dan B oleh dosen yang sama).
+- **Mata Kuliah Saya (dosen)**: satu kartu per kelas yang diajar (mis. UPW201 · Kelas A, UPW201 · Kelas B); tim yang ditampilkan hanya tim kelas itu.
+- **Laci portofolio**: pilihan kelas (dosen hanya kelas yang ia ajar); kontrak, rubrik, metode, integrasi, dan bukti pembelajaran per kelas; RPS ditandai
+  "berlaku juga untuk Kelas …" bila timnya sama. Dosen tidak bisa mengisi atau membuka kelas yang tidak ia ajar.
+- **Rekap (Admin Prodi, KPS, GKM, Super Admin)**: baris per kelas dengan timnya; persentase butir 8/22/25 menghitung MK lengkap bila semua kelasnya lengkap.
+- **Peserta kelas**: dosen hanya melihat peserta kelas/kelompok yang ia ajar; pengelola tetap melihat dan mengatur semua.
+- Penyimpanan: isian per kelas di kolom isi Portofolio MK (isi.kls[kelas]); data lama per MK (sebelum v0.40) dan per kelompok (v0.38) dibaca sebagai cadangan untuk
+  RPS/kontrak/rubrik/metode. Berkas lama dibuang ke sampah Drive hanya bila tidak dipakai kelas lain. Tidak ada tabel/kolom baru; rollback ke v0.39.2 tanpa pemulihan
+  data (versi lama tidak menampilkan isian per kelas, data tidak hilang).
+- Uji: 753 + 44 uji server lulus (10 uji baru di uji-v40-bagian.mjs; uji lama Portofolio MK/v0.28/v0.38 disesuaikan dengan aturan per kelas). Uji tampilan: dosen
+  mengajar UPW101 kelas A dan B (dua kartu, RPS sekali berlaku keduanya, kontrak per kelas) dan UPW301 kelas A saja (kelas B dosen lain tidak tampil, peserta hanya
+  kelas A); rekap Admin per kelas; penjelajah 48 halaman/laci tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.39.2 — 20 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.39.2 (tampilan docs/ dan server Apps Script Produksi deployment @21): templat tim pengajar menerima nama yang diketik
   (tanpa gelar, inisial, NIP, atau minimal 2 kata nama) dengan tanda "Terbaca sebagai", dan pratinjau unggahan menampilkan beban SKS per orang.
