@@ -3,6 +3,24 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.45.0 — 21 Nov 2026 — Uji Coba
+Ringkas: Nilai dari SIAKAD per kelas (template nilai dibaca dan diperiksa otomatis), contoh dalam PDF yang dibuka langsung, dan data bersama templat (LMS, tempat, batas umpan balik, keterlambatan, peraturan akademik).
+Persetujuan pemilik 21 Nov 2026 ("saya setuju dengan semua saran anda, bisa dilanjutkan"): lembar Excel portofolio buatan aplikasi dihapus, ketercapaian CPL ditunda, contoh jadi PDF.
+- **Nilai dari SIAKAD** (bagian Rubrik / portofolio penilaian, per kelas, pengampu utama): unggah berkas "Download Template" SIAKAD (Kelas Kuliah → Nilai Perkuliahan → Upload Excel)
+  apa adanya (.xls berformat Excel modern). Dibaca di browser: komponen dan bobot dari judul kolom (mis. "UTS (25%)"), nilai per mahasiswa, nilai akhir dihitung aplikasi (kolom Nilai/Grade
+  template bernilai 0), sebaran huruf menurut skala prodi. Catatan (berkas tetap diterima): bobot tidak 100%, nilai kosong per komponen, kode MK di nama berkas berbeda, NIM tidak cocok
+  peserta kelas (< 80%), bobot UTS/UAS berbeda dengan RPS. Keterangan jalur SIAKAD dan "unggah setelah perkuliahan selesai" tampil di bagian itu dan di urutan pengisian.
+  Server: mkp.nilaiUnggah/mkp.nilaiHapus, isi.kls[K].nilai {berkas, ring}; hanya ringkasan yang disimpan di sheet (nilai per mahasiswa tetap di berkas Drive). mkp.lihat dan ZIP
+  (nomor 4 "Nilai dari SIAKAD") ikut. Diuji dengan template SIAKAD Pancasila D1A02 (5 komponen, 27 mahasiswa).
+- **Lembar Excel portofolio penilaian buatan aplikasi dihapus** dari tampilan dan contoh (tumpang tindih dengan SIAKAD). Teks kontrak/rubrik merujuk rekap nilai SIAKAD.
+- **Contoh dalam PDF** (docs/uji/contoh/rps.pdf, kontrak.pdf, rubrik.pdf; dibuat `node alat/contoh-pdf.mjs` dengan Chrome headless): tombol "Lihat contoh … (PDF)" membuka tab baru.
+- **Data bersama templat** (Data Prodi › Kurikulum, dulu "Otorisasi templat RPS"): tambahan tempat penandatanganan (bawaan tempat surat prodi), nama LMS, batas umpan balik (hari), batas
+  mempertanyakan nilai (hari kerja), aturan keterlambatan, peraturan akademik. Dipakai kontrak kuliah dan rubrik; kehadiran minimal kini juga tercantum di templat RPS.
+- Tidak ada tabel/kolom baru (nilai di isian Portofolio MK; data bersama di Pengaturan rpsOtorisasi). Rollback ke v0.44.0 tanpa pemulihan data (berkas nilai tetap di Drive).
+- Uji: 828 + 44 uji server lulus (19 uji baru di uji-v45-bagian.mjs, data mahasiswa buatan). Uji tampilan: dosen mengunggah template SIAKAD asli (ringkasan + 3 catatan tampil), tautan
+  contoh PDF tersedia; penjelajah tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.44.0 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.44.0 (tampilan docs/ dan server Apps Script Produksi deployment @26): contoh dan templat di setiap bagian Portofolio MK dan saran
   penelitian/PkM tim untuk catatan integrasi.

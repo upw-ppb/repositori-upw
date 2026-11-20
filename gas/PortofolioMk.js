@@ -82,6 +82,7 @@ function isiUnit(s, u) {
     if (c.u && v === undefined) v = lama[c.k];   // null = sengaja dihapus di kelas ini
     o[c.k] = c.jenis === "dok" || c.jenis === "metode" ? (v || null) : (Array.isArray(v) ? v : []);
   });
+  o.nilai = w.nilai || null;   // v0.45.0: rekap nilai dari SIAKAD (per kelas, tanpa cadangan data lama)
   return o;
 }
 function wadahUnit(s, k) { s.kls = s.kls || {}; var w = s.kls[k] = s.kls[k] || {}; if (!Array.isArray(w.integ)) w.integ = []; if (!Array.isArray(w.interaksi)) w.interaksi = []; return w; }
@@ -161,7 +162,8 @@ function unitKeKlien(x, u, s, p, idx, prak, buka) {
     tim: namaAnggota(u.ang, idx, prak, null), peran: r, bolehUtama: buka && r === "utama", bolehAnggota: buka && !!r, rpsBersama: bersama,
     rps: entriKeKlien(w.rps, idx), kontrak: entriKeKlien(w.kontrak, idx), rubrik: entriKeKlien(w.rubrik, idx), metode: metodeKeKlien(w.metode, idx),
     integ: w.integ.map(function (e) { return entriKeKlien(e, idx); }), interaksi: w.interaksi.map(function (e) { return entriKeKlien(e, idx); }),
-    lengkap: KOMP_MKP.filter(function (c) { return adaKomp(w, c.k); }).map(function (c) { return c.k; }) };
+    lengkap: KOMP_MKP.filter(function (c) { return adaKomp(w, c.k); }).map(function (c) { return c.k; }),
+    nilai: w.nilai ? Object.assign(entriKeKlien(w.nilai, idx), { ring: w.nilai.ring || null }) : null };
 }
 /** MK untuk tampilan: unit kelas yang boleh dilihat pengguna (dosen: kelas yang ia ajar; pengelola: semua). Bidang lama (rps, kontrak, …) = unit terpilih. */
 function mkpKeKlien(x, smt, isi, p, idx, prak, kunci) {
@@ -264,7 +266,7 @@ function ubahMkp(smt, kode, p, fn) {
 function idAcak() { return Utilities.getUuid().slice(0, 8); }
 /** fileId yang masih dirujuk isian (semua kelas + data lama) — berkas yang tidak dirujuk lagi boleh dipindah ke sampah. */
 function fileDirujukMkp(s) {
-  var h = {}, cek = function (o) { if (!o) return; KOMP_MKP.forEach(function (c) { var v = o[c.k]; (Array.isArray(v) ? v : [v]).forEach(function (e) { if (e && e.t === "file") h[e.fileId] = 1; }); }); };
+  var h = {}, cek = function (o) { if (!o) return; KOMP_MKP.forEach(function (c) { var v = o[c.k]; (Array.isArray(v) ? v : [v]).forEach(function (e) { if (e && e.t === "file") h[e.fileId] = 1; }); }); if (o.nilai && o.nilai.fileId) h[o.nilai.fileId] = 1; };
   cek(s); Object.keys(s.kel || {}).forEach(function (g) { cek(s.kel[g]); }); Object.keys(s.kls || {}).forEach(function (k) { cek(s.kls[k]); });
   return h;
 }
@@ -385,7 +387,7 @@ function aksiMkpInteg(d, token) {
 function aksiMkpLihat(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_MKP_REKAP.concat(["dosen"]));
-  var smt = semesterSah(d.semester), kode = teks(d.kode), c = kompMkp(String(d.komp || ""));
+  var smt = semesterSah(d.semester), kode = teks(d.kode), c = d.komp === "nilai" ? { k: "nilai", jenis: "dok" } : kompMkp(String(d.komp || ""));
   if (!c || (c.jenis !== "dok" && c.jenis !== "daftar")) throw galat("Jenis dokumen tidak dikenal.");
   var x = ambilMkp(smt, kode, p, false), u = unitSasaran(x, d, p, null, false);
   var r = semuaMkpSemester(smt)[kode], s = r ? r.isi : {}, w = isiUnit(s, u);
@@ -442,6 +444,7 @@ function aksiMkpDaftarZip(d, token) {
       return r;
     };
     var berkas = [];
+    if (w.nilai) berkas.push(ent(w.nilai, { k: "nilai", l: "Nilai dari SIAKAD", jenis: "dok" }));
     KOMP_MKP.forEach(function (c) {
       if (c.jenis === "dok" && w[c.k]) berkas.push(ent(w[c.k], c));
       if (c.jenis === "daftar" || c.jenis === "catatan") w[c.k].forEach(function (e) { berkas.push(ent(e, c)); });
@@ -464,7 +467,7 @@ function aksiMkpAmbilZip(d, token) {
   var isi = semuaMkpSemester(smt), peta = {}, hasil = [], total = 0;
   unitTampakZip(smt, p, "", "").forEach(function (o) { peta[o.x.mk.kode + "|" + o.u.k] = o; });
   for (var i = 0; i < item.length; i++) {
-    var t = item[i] || {}, o = peta[teks(t.kode) + "|" + String(t.kunci || "").toUpperCase()], c = kompMkp(String(t.komp || ""));
+    var t = item[i] || {}, o = peta[teks(t.kode) + "|" + String(t.kunci || "").toUpperCase()], c = t.komp === "nilai" ? { k: "nilai", jenis: "dok" } : kompMkp(String(t.komp || ""));
     try {
       if (!o) throw galat("Kelas ini tidak bisa Anda unduh.");
       if (!c || (c.jenis !== "dok" && c.jenis !== "daftar")) throw galat("Jenis dokumen tidak dikenal.");
@@ -536,4 +539,38 @@ function aksiMkpSaranInteg(d, token) {
   });
   h.sort(function (a, b) { return String(b.tgl).localeCompare(String(a.tgl)); });
   return { semester: smt, kode: kode, kunci: u.k, kegiatan: h.slice(0, 80) };
+}
+
+/* ---------- v0.45.0: rekap nilai dari SIAKAD (template "Download Template" di Nilai Perkuliahan) ---------- */
+var NILAI_RING_MAKS = 6000;
+/** Unggah berkas nilai SIAKAD (.xls/.xlsx) untuk satu kelas; ring = ringkasan hasil baca di tampilan (komponen, bobot, rata-rata, kosong, catatan). Per mahasiswa tidak disimpan di sheet. */
+function aksiMkpNilaiUnggah(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["dosen"]);
+  var smt = semesterSah(d.semester), kode = teks(d.kode), x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, kompMkp("rubrik"), true);
+  var nama = namaAman(d.nama), eks = (nama.split(".").pop() || "").toLowerCase();
+  if (eks !== "xls" && eks !== "xlsx") throw galat("Unggah berkas Excel dari SIAKAD (.xls atau .xlsx).");
+  var isi = teks(d.isi);
+  if (!isi || isi.length > Math.ceil(BUKTI_MAKS / 3) * 4 + 8) throw galat("Ukuran file maksimal 10 MB.");
+  var bytes = Utilities.base64Decode(isi);
+  if (!isiSesuai("xlsx", bytes)) throw galat("Berkas bukan Excel yang sah. Unduh ulang dari SIAKAD (Download Template), lalu unggah tanpa diubah formatnya.");
+  var ring = jsonDari(typeof d.ring === "string" ? d.ring : JSON.stringify(d.ring || null), null);
+  if (!ring || !Array.isArray(ring.komponen) || !ring.komponen.length) throw galat("Isi nilai SIAKAD tidak terbaca (kolom komponen dengan bobot, mis. \"UTS (25%)\", tidak ditemukan).");
+  var rj = JSON.stringify(ring);
+  if (rj.length > NILAI_RING_MAKS) throw galat("Ringkasan nilai terlalu panjang.");
+  var file = folderMkp(smt, x.mk).createFile(Utilities.newBlob(bytes, BUKTI_EKS.xlsx, namaAman("Nilai SIAKAD - " + labelUnit(x, u) + " - " + nama)));
+  var entri = { t: "file", fileId: file.getId(), nama: nama, mime: BUKTI_EKS.xlsx, ukuran: bytes.length, o: p.id, w: new Date().toISOString(), ring: ring };
+  try {
+    ubahMkp(smt, kode, p, function (s) { var w = wadahUnit(s, u.k), lama = w.nilai ? [w.nilai] : []; w.nilai = entri; buangTakDirujuk(lama, s); });
+  } catch (e) { try { file.setTrashed(true); } catch (_) {} throw e; }
+  catat(p.id, "mkp.nilai", { semester: smt, kode: kode, kelas: u.k, komponen: ring.komponen.length, mhs: ring.nMhs || 0 });
+  return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
+}
+function aksiMkpNilaiHapus(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["dosen"]);
+  var smt = semesterSah(d.semester), kode = teks(d.kode), x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, kompMkp("rubrik"), true);
+  ubahMkp(smt, kode, p, function (s) { var w = wadahUnit(s, u.k); if (!w.nilai) throw galat("Nilai SIAKAD belum diunggah."); var lama = [w.nilai]; delete w.nilai; buangTakDirujuk(lama, s); });
+  catat(p.id, "mkp.nilaiHapus", { semester: smt, kode: kode, kelas: u.k });
+  return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
 }

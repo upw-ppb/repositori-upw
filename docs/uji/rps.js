@@ -79,7 +79,7 @@ function kosong(R, pilihCpl, hariIni) {
     labor: R.otorisasi.labor || (L && L.labor) || "", kualifikasi: (R.kualifikasi && R.kualifikasi.kualifikasi) || (L && L.kualifikasi) || "", jenjang: (R.kualifikasi && R.kualifikasi.jenjang) || (L && L.jenjang) || "",
     otor: { pengembang: R.tim.filter(t => !t.praktisi).slice(0, 3).map(t => ({ nama: t.nama, nip: t.nip })),
       kps: { nama: R.otorisasi.kpsNama, nip: R.otorisasi.kpsNip, jabatan: R.otorisasi.kpsJabatan }, kajur: { nama: R.otorisasi.kajurNama, nip: R.otorisasi.kajurNip, jabatan: R.otorisasi.kajurJabatan } },
-    dosen: R.tim.map(t => t.nama + (t.praktisi ? " (praktisi)" : ""))
+    dosen: R.tim.map(t => t.nama + (t.praktisi ? " (praktisi)" : "")), hadirMin: R.otorisasi.hadirMin || ""
   };
   const pilih = (pilihCpl || []).filter(k => prodi[k]);
   const cplLama = L ? (L.cpl || []).filter(c => !pilih.length || pilih.includes(String(c.ref || "").toUpperCase())) : [];
@@ -204,7 +204,7 @@ function buat(D, logo) {
     ? { c: [{ t: p.minggu, rata: "center" }, { t: p.ujian, span: 5, b: 1, rata: "center", fill: ABU }, { t: pc(p.bobot), rata: "center" }, "", "", ""] }
     : { c: [{ t: p.minggu, rata: "center" }, p.cpl || "", p.cpmk || "", p.sub || "", p.indikator || "", p.bentuk || "", { t: pc(p.bobot), rata: "center" }, "", "", ""] }));
   h.push(tabel(gq, port));
-  h.push(par("Catatan: Nilai UAS untuk vokasi 30% teori dan 70% praktik; nilai UJK terintegrasi dengan nilai praktik. Rincian instrumen (soal, rubrik, lembar observasi) dilampirkan pada portofolio penilaian mata kuliah.", { i: 1, ukuran: 9, sebelum: 80, sesudah: 240 }));
+  h.push(par("Catatan: Nilai UAS untuk vokasi 30% teori dan 70% praktik; nilai UJK terintegrasi dengan nilai praktik. Rincian instrumen (soal, rubrik, lembar observasi) dilampirkan pada portofolio penilaian mata kuliah." + (D.hadirMin ? ` Syarat mengikuti UAS: kehadiran minimal ${D.hadirMin}%.` : ""), { i: 1, ukuran: 9, sebelum: 80, sesudah: 240 }));
   // Otorisasi
   h.push(par("OTORISASI", { b: 1, sesudah: 120, ukuran: 11 }));
   const ttd = (jab, orang) => `${jab}\n\n\n\n${orang.map(o => (o.nama || "[Nama]") + (o.nip ? `\nNIP: ${o.nip}` : "")).join("\n\n")}`;
@@ -486,9 +486,12 @@ function skalaTabel(W, R) {
   return tabel(g, b);
 }
 /** I = isian tambahan (contoh): kontak, jadwal, lms, batas, telat, hariUmpan, hariKeberatan, monevTemuan, monevPerbaikan, lain, tempatTgl. */
-function kontrak(R, D, logo, I = {}) {
+function kontrak(R, D, logo, I0 = {}) {
   gbr.n = 0;
   const W = 9638, media = mediaLogo(logo), h = [], O = R.otorisasi || {};
+  // v0.45.0: data bersama prodi (Data Prodi › Kurikulum › Data bersama templat) mengisi bagian yang kosong
+  const I = Object.assign({}, I0), B = { lms: O.lms, telat: O.telat, hariUmpan: O.hariUmpan, hariKeberatan: O.hariKeberatan, tempatTgl: O.tempat ? O.tempat + ", [tanggal pertemuan pertama]" : "" };
+  Object.keys(B).forEach(k => { if (!I[k] && B[k]) I[k] = B[k]; });
   h.push(kopTabel(W, "KONTRAK PERKULIAHAN", null, media));
   bab(h, "A. IDENTITAS MATA KULIAH");
   h.push(tabel([2800, W - 2800], identitasBaris(R, D, true, I).map(([a, b]) => ({ c: [{ t: a, b: 1 }, b] }))));
@@ -523,12 +526,12 @@ function kontrak(R, D, logo, I = {}) {
   poin(h, ["Penilaian dilaksanakan sesuai jadwal, bentuk, dan bobot pada bagian E. Perubahan hanya dengan kesepakatan dosen dan mahasiswa, dicatat dan diumumkan di kelas/LMS.",
     `Tugas dikumpulkan melalui ${I.lms || "[LMS/surel/kelas]"} paling lambat ${I.batas || "[batas waktu]"}. Keterlambatan: ${I.telat || "[aturan pengurangan nilai]"}.`,
     "Mahasiswa yang berhalangan ujian dengan alasan sah mengikuti ujian susulan sesuai ketentuan akademik.",
-    "Plagiarisme dan kecurangan dikenai sanksi sesuai peraturan akademik Politeknik Pariwisata Bali."]);
+    "Plagiarisme dan kecurangan dikenai sanksi sesuai peraturan akademik Politeknik Pariwisata Bali" + (O.pedoman ? ` (${O.pedoman})` : "") + "."]);
   bab(h, "H. UMPAN BALIK DAN HAK MEMPERTANYAKAN NILAI (unsur 3)");
   poin(h, [`Hasil setiap penilaian dikembalikan dengan umpan balik tertulis/lisan paling lambat ${I.hariUmpan || "[7]"} hari setelah penilaian.`,
     `Mahasiswa dapat mempertanyakan hasil penilaian kepada dosen paling lambat ${I.hariKeberatan || "[3]"} hari kerja setelah nilai diumumkan; dosen menanggapi dan mencatat perubahan bila ada.`]);
   bab(h, "I. DOKUMENTASI PENILAIAN (unsur 4)");
-  poin(h, ["Instrumen, hasil kerja, rubrik terisi, dan rekap nilai (lembar portofolio penilaian) disimpan dosen dan diunggah ke Repositori UPW (Portofolio Mata Kuliah) setiap semester."]);
+  poin(h, ["Instrumen, hasil kerja, dan rubrik terisi disimpan dosen; rekap nilai diunduh dari SIAKAD (Nilai Perkuliahan › Download Template) setelah semua nilai terisi. Semuanya diunggah ke Repositori UPW (Portofolio Mata Kuliah) setiap semester."]);
   bab(h, "J. PROSEDUR PENILAIAN (unsur 5)");
   poin(h, ["Perencanaan: rencana penilaian disusun di RPS dan disepakati dalam kontrak ini.", "Pemberian tugas atau soal beserta kriteria dan rubriknya.",
     "Observasi kinerja / pelaksanaan penilaian sesuai jadwal.", "Pengembalian hasil observasi dan umpan balik kepada mahasiswa.", "Pemberian nilai akhir berdasarkan bobot pada bagian E."], true);
@@ -550,8 +553,9 @@ function kontrak(R, D, logo, I = {}) {
   return paket(h, { judul: "Kontrak Perkuliahan " + R.mk.nama, penanda: "UPW-KONTRAK v1", media });
 }
 /** o.hanyaBerubrik: hanya komponen yang punya p.rubrik ([{k, l:[4 deskripsi], b}]) — dipakai untuk contoh. */
-function rubrik(R, D, logo, o = {}) {
+function rubrik(R, D, logo, o0 = {}) {
   gbr.n = 0;
+  const o = Object.assign({ lms: (R.otorisasi || {}).lms }, o0);
   const W = LEBAR, media = mediaLogo(logo), h = [];
   h.push(kopTabel(W, "RUBRIK DAN PORTOFOLIO PENILAIAN", null, media));
   bab(h, "A. IDENTITAS MATA KULIAH");
@@ -577,7 +581,7 @@ function rubrik(R, D, logo, o = {}) {
     h.push(tabel(gr, baris));
   });
   bab(h, "D. PORTOFOLIO PENILAIAN");
-  poin(h, ["Rekap nilai setiap mahasiswa per komponen, nilai akhir, huruf mutu, dan ketercapaian CPL dicatat pada lembar Excel \"Portofolio penilaian\" (unduh dari aplikasi; nama peserta kelas sudah terisi).",
+  poin(h, ["Rekap nilai setiap mahasiswa per komponen dan bobot diambil dari SIAKAD (Kelas Kuliah › Nilai Perkuliahan › Upload Excel › Download Template) setelah perkuliahan selesai, lalu diunggah ke Portofolio MK.",
     "Lampirkan contoh hasil kerja mahasiswa (nilai tinggi, sedang, rendah) dan rubrik terisi untuk setiap penilaian sebagai bukti."]);
   return paket(h, { lanskap: true, judul: "Rubrik dan Portofolio Penilaian " + R.mk.nama, penanda: "UPW-RUBRIK v1", media });
 }

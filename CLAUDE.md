@@ -337,6 +337,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   RPS Praktik Desain dan Media Digital, nama pejabat dihapus) → AKSI.mkpContoh (buat/kontrak(R,D,logo,I)/rubrik(…,{hanyaBerubrik})/portoXlsx). porto[].rubrik = [{k, l[4], b}].
   gas/PortofolioMk.js: JENIS_INTEG, aksi mkp.saranInteg; mkp.integ menerima d.keg (entri keg/kj/kjn). Tampilan: saranIntegHtml (kataInteg + akarKata, STOP_INTEG),
   integPakai/integLepas, renderJagaInteg (jaga teks catatan). Uji: alat/uji/uji-v44-bagian.mjs.
+- v0.45.0 (21 Nov 2026, Uji Coba): nilai SIAKAD. Template SIAKAD = xlsx berakhiran .xls, lembar "Form Inputan": No | NIM | Nama Mahasiswa | "KOMPONEN (b%)"… | Nilai | Grade | Keterangan
+  (Nilai/Grade 0); nama berkas template_nilai_<periode>_<kodeMK>_<kelas SIAKAD, mis. D1A02>.xls. Tampilan: bacaNilaiSiakad(lembar, {skala, namaBerkas, kodeMk, nimPeserta, ujianRps}) → ring,
+  bagianNilaiSiakad(G), unggahNilaiSiakad (data-mfile="nilai"), NO_DOK_MKP.nilai = 4. Server: mkp.nilaiUnggah/nilaiHapus (pengampu utama), isiUnit().nilai, unitKeKlien.nilai, mkp.lihat
+  komp "nilai", ZIP. Data bersama: RPS_OTOR_KOLOM + tempat/lms/hariUmpan/hariKeberatan/telat/pedoman; kontrak(R,D,logo,I0) mengisi dari R.otorisasi; D.hadirMin di RPS. Contoh PDF:
+  `node alat/contoh-pdf.mjs` (pengubah docx→HTML khusus rps.js + Chrome headless) → docs/uji/contoh/*.pdf; jalankan ulang bila contoh-mkp.json/rps.js berubah. JANGAN simpan berkas
+  nilai SIAKAD asli (nama mahasiswa) di repo. Uji: alat/uji/uji-v45-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

@@ -8,7 +8,7 @@
  */
 var PERAN_RPS_ATUR = ["admin", "superadmin"];
 var RPS_DATA_MAKS = 48000;
-var RPS_OTOR_KOLOM = ["labor", "kajurJabatan", "kajurNama", "kajurNip", "kpsJabatan", "kpsNama", "kpsNip", /* v0.43.0 */ "skalaNilai", "hadirMin"];
+var RPS_OTOR_KOLOM = ["labor", "kajurJabatan", "kajurNama", "kajurNip", "kpsJabatan", "kpsNama", "kpsNip", /* v0.43.0 */ "skalaNilai", "hadirMin", /* v0.45.0 */ "tempat", "lms", "hariUmpan", "hariKeberatan", "telat", "pedoman"];
 
 function rpsOtorisasi() {
   var o = jsonPengaturan("rpsOtorisasi", {}), h = {};
@@ -17,6 +17,7 @@ function rpsOtorisasi() {
   if (!h.kajurJabatan) h.kajurJabatan = "Ketua Jurusan Kepariwisataan";
   if (!h.kpsJabatan) h.kpsJabatan = "Koordinator Program Studi";
   h.skala = skalaNilai(h.skalaNilai);
+  if (!h.tempat) h.tempat = pengaturanSurat().tempat;
   if (!h.kpsNama) { var k = pengaturanSurat().kps; if (k) { h.kpsNama = k.nama; h.kpsNip = k.nip; h.kpsDariAkun = true; } }
   return h;
 }
@@ -27,7 +28,8 @@ function aksiRpsOtorisasi(d, token) {
   if (d.simpan) {
     wajibPeran(p, PERAN_RPS_ATUR);
     var o = {};
-    RPS_OTOR_KOLOM.forEach(function (k) { o[k] = potong(d[k], k === "skalaNilai" ? 600 : 120).trim(); });
+    RPS_OTOR_KOLOM.forEach(function (k) { o[k] = potong(d[k], k === "skalaNilai" ? 600 : k === "telat" || k === "pedoman" ? 200 : 120).trim(); });
+    ["hariUmpan", "hariKeberatan"].forEach(function (k) { if (o[k] && !/^\d{1,2}$/.test(o[k])) throw galat("Batas hari ditulis angka, mis. 7."); });
     if (o.skalaNilai && skalaNilai(o.skalaNilai).length < 2) throw galat("Skala nilai: tulis satu baris per huruf, mis. A; 4; 85–100.");
     if (o.hadirMin && !/^\d{1,3}$/.test(o.hadirMin)) throw galat("Kehadiran minimal ditulis angka persen, mis. 80.");
     if (o.kajurNip && !/^[\d ]{8,30}$/.test(o.kajurNip)) throw galat("NIP Ketua Jurusan hanya berisi angka.");
