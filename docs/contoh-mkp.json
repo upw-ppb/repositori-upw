@@ -1,0 +1,551 @@
+{
+ "catatan": "Contoh Portofolio MK (v0.44.0) dari RPS Praktik Desain dan Media Digital Prodi UPW, nama pejabat dihapus. Dipakai tombol Contoh di laci Portofolio MK.",
+ "rps": {
+  "v": 1,
+  "sumber": "contoh",
+  "mk": {
+   "nama": "Praktik Desain dan Media Digital",
+   "kode": "PDM",
+   "rumpun": "Digital",
+   "sks": "2",
+   "sksT": 0,
+   "sksP": 2,
+   "semester": "3",
+   "tgl": "10 Juli 2026"
+  },
+  "otor": {
+   "pengembang": [
+    {
+     "nama": "[Nama dosen pengembang RPS, dengan gelar]",
+     "nip": ""
+    }
+   ],
+   "kps": {
+    "nama": "[Nama Koordinator Program Studi]",
+    "nip": "",
+    "jabatan": "Koordinator Program Studi"
+   },
+   "kajur": {
+    "nama": "[Nama Ketua Jurusan]",
+    "nip": "",
+    "jabatan": "Ketua Jurusan Kepariwisataan"
+   }
+  },
+  "cpl": [
+   {
+    "kode": "CPL1",
+    "ref": "S9",
+    "t": "Menunjukkan sikap bertanggung jawab atas pekerjaan di bidang keahliannya secara mandiri."
+   },
+   {
+    "kode": "CPL2",
+    "ref": "P12",
+    "t": "Menguasai konsep teoritis tentang tata cara konsep, prinsip, metode, dan teknik pembuatan, presentasi, tentang pemasaran, promosi dan penjualan produk dan jasa perjalanan wisata."
+   },
+   {
+    "kode": "CPL3",
+    "ref": "KU1",
+    "t": "Mampu menerapkan pemikiran logis, kritis, inovatif, bermutu, dan terukur dalam melakukan jenis pekerjaan spesifik, di bidang keahliannya serta sesuai dengan standar kompetensi kerja bidang yang bersangkutan."
+   },
+   {
+    "kode": "CPL4",
+    "ref": "KK23",
+    "t": "Mampu mengidentifikasi konsep digitalisasi produk wisata pada industri perjalanan wisata."
+   }
+  ],
+  "cpmk": [
+   {
+    "kode": "CPMK 1",
+    "t": "Menguasai konsep dasar dan prinsip desain grafis serta media digital untuk kebutuhan publikasi pariwisata. (CPL2, CPL4)",
+    "cpl": [
+     "CPL2",
+     "CPL4"
+    ]
+   },
+   {
+    "kode": "CPMK 2",
+    "t": "Mampu merancang dan memproduksi buku profil wisata (media promosi cetak) yang profesional melalui kerja sama dengan mitra desa/daya tarik wisata. (CPL3, CPL2)",
+    "cpl": [
+     "CPL3",
+     "CPL2"
+    ]
+   },
+   {
+    "kode": "CPMK 3",
+    "t": "Mampu mengembangkan konten audio-visual berbasis smartphone untuk mendukung promosi digital destinasi wisata. (CPL3, CPL4)",
+    "cpl": [
+     "CPL3",
+     "CPL4"
+    ]
+   },
+   {
+    "kode": "CPMK 4",
+    "t": "Mampu menerapkan konsep digitalisasi dan bekerja secara profesional dengan mitra eksternal dalam mendukung promosi produk wisata. (CPL1, CPL4)",
+    "cpl": [
+     "CPL1",
+     "CPL4"
+    ]
+   }
+  ],
+  "sub": [
+   {
+    "kode": "Sub-CPMK 1",
+    "t": "Menjelaskan konsep dasar dan peran desain grafis dalam industri perjalanan wisata."
+   },
+   {
+    "kode": "Sub-CPMK 2",
+    "t": "Menerapkan unsur dan prinsip desain, tipografi, warna, serta tata letak dalam sebuah karya desain."
+   },
+   {
+    "kode": "Sub-CPMK 3",
+    "t": "Mengoperasikan tools desain digital (Canva) untuk kebutuhan publikasi cetak, termasuk persiapan file siap cetak."
+   },
+   {
+    "kode": "Sub-CPMK 4",
+    "t": "Merancang konten media sosial sebagai pendukung promosi digital destinasi mitra."
+   },
+   {
+    "kode": "Sub-CPMK 5",
+    "t": "Menyusun struktur, outline, dan layout buku profil wisata berdasarkan hasil riset kebutuhan mitra."
+   },
+   {
+    "kode": "Sub-CPMK 6",
+    "t": "Merancang dan memproduksi konten audio-visual berbasis smartphone (foto dan video) untuk mendukung promosi digital mitra."
+   },
+   {
+    "kode": "Sub-CPMK 7",
+    "t": "Mengintegrasikan seluruh narasi, foto, dan data menjadi buku profil wisata yang utuh dan siap cetak."
+   },
+   {
+    "kode": "Sub-CPMK 8",
+    "t": "Mengevaluasi proses dan hasil project serta mempertanggungjawabkannya secara akademik dan profesional kepada mitra dan penguji."
+   }
+  ],
+  "kor": {
+   "CPMK 1": [
+    1,
+    2,
+    3
+   ],
+   "CPMK 2": [
+    5,
+    7
+   ],
+   "CPMK 3": [
+    4,
+    6
+   ],
+   "CPMK 4": [
+    8
+   ]
+  },
+  "pustakaUtama": [
+   "Modul Media Grafis — Langkah Praktis Produksi Media Grafis.",
+   "Pengantar Desain Grafis.",
+   "Sless, D. Learning and Visual Communication.",
+   "Produksi Iklan Audio dan Visual — Universitas Mercu Buana."
+  ],
+  "pustakaPendukung": [
+   "Dokumentasi resmi Canva untuk Pendidikan.",
+   "Portal Jejaring Desa Wisata (Jadesta) Kemenparekraf RI.",
+   "Katalog publikasi Pokdarwis dan destinasi daerah.",
+   "Referensi dasar copywriting dan storytelling pemasaran (Kerangka AIDA)."
+  ],
+  "dosen": [
+   "[Dosen pengampu utama, dengan gelar]",
+   "[Dosen anggota tim, dengan gelar]",
+   "[Dosen anggota tim, dengan gelar]"
+  ],
+  "pertemuan": [
+   {
+    "ke": "1",
+    "sub": "Sub-CPMK 1",
+    "bahan": "• Pengantar desain grafis dan sejarah singkatnya.\n• Peran desain grafis di industri pariwisata.\n• Membedah buku profil wisata eksisting.\n• Gambaran besar project & kriteria mitra.",
+    "metode": "Kuliah, Diskusi Kelompok, Curah Pendapat (Brainstorming).",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Membedah 2-3 contoh buku profil wisata.\n• Membentuk kelompok (4-5 orang).\n• Menyusun 3 daftar calon mitra destinasi.",
+    "kriteria": "• Ketepatan mengidentifikasi anatomi buku profil wisata eksisting.\n• Kesesuaian calon mitra dengan kriteria project.",
+    "bobot": 3,
+    "ref": "1, 2, 5"
+   },
+   {
+    "ke": "2",
+    "sub": "Sub-CPMK 2",
+    "bahan": "• Unsur desain (garis, bentuk, warna, dll).\n• Prinsip desain (keseimbangan, kontras, hierarki, dll).",
+    "metode": "Kuliah, Studio Praktik (Redesign Challenge).",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Redesign Challenge: merevisi brosur wisata dengan minimal 3 prinsip desain.\n• Observasi awal ke lokasi calon mitra.",
+    "kriteria": "• Ketepatan penerapan minimal 3 prinsip desain pada hasil revisi.\n• Kelengkapan dokumentasi observasi awal.",
+    "bobot": 4,
+    "ref": "2, 5"
+   },
+   {
+    "ke": "3",
+    "sub": "Sub-CPMK 2",
+    "bahan": "• Jenis dan pemilihan tipografi.\n• Teori warna & pemetaan karakter destinasi.\n• Grid system, margin, dan alignment.",
+    "metode": "Kuliah, Diskusi Kelompok, Studio Praktik.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Menyusun Moodboard/Style Guide (font, palet warna, referensi foto) untuk mitra.\n• Finalisasi pemilihan mitra.",
+    "kriteria": "• Kesesuaian pilihan font dan warna dengan karakter destinasi.\n• Kerapian struktur Moodboard.",
+    "bobot": 4,
+    "ref": "2, 5"
+   },
+   {
+    "ke": "4",
+    "sub": "Sub-CPMK 3",
+    "bahan": "• Pengenalan Canva untuk multi-halaman & Brand Kit.\n• Persiapan cetak: 300 DPI, CMYK, bleed, margin aman.\n• Sumber aset legal (Unsplash, Pexels, dll).",
+    "metode": "Kuliah, Demonstrasi, Studio Praktik.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Membuat draf cover dummy buku.\n• Mengajukan surat permohonan kerja sama resmi ke mitra.",
+    "kriteria": "• Ketepatan pengaturan teknis cetak pada draf cover.\n• Kelengkapan penyusunan surat permohonan.",
+    "bobot": 4,
+    "ref": "1, 5"
+   },
+   {
+    "ke": "5",
+    "sub": "Sub-CPMK 4",
+    "bahan": "• Ide konten media sosial pariwisata.\n• Adaptasi konten lintas platform & optimasi mobile.\n• Analisis performa dasar (reach, engagement).",
+    "metode": "Kuliah, Studio Praktik, Kunjungan Lapangan I.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Audit akun medsos mitra.\n• Mendesain 3 draf konten medsos (Feed, Story, Reels).\n• Kunjungan Lapangan I (Pengumpulan data awal).",
+    "kriteria": "• Ketepatan adaptasi format konten sesuai platform.\n• Kelengkapan data dasar hasil kunjungan pertama.",
+    "bobot": 4,
+    "ref": "6, 7"
+   },
+   {
+    "ke": "6",
+    "sub": "Sub-CPMK 5",
+    "bahan": "• Anatomi buku profil wisata (cover, sambutan, daya tarik, paket, galeri).\n• Grid system multi-halaman.\n• Menyeimbangkan foto dan teks.",
+    "metode": "Kuliah, Studio Praktik Terbimbing.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Mengisi Template Outline Buku (bab, estimasi halaman, PIC).\n• Menjadwalkan kunjungan lapangan utama.",
+    "kriteria": "• Kelengkapan dan kelogisan outline buku.\n• Kejelasan pembagian tanggung jawab (PIC) tim.",
+    "bobot": 6,
+    "ref": "1, 7"
+   },
+   {
+    "ke": "7",
+    "sub": "Sub-CPMK 5",
+    "bahan": "• Storytelling visual (foto hero vs pendukung, Rule of Thirds).\n• Copywriting AIDA untuk narasi paket/daya tarik.\n• Variasi layout editorial.",
+    "metode": "Kuliah, Workshop Desain, Peer Critique.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Mendesain 2 halaman contoh (Daya Tarik & Paket Wisata).\n• Merevisi desain berdasarkan masukan kelas.",
+    "kriteria": "• Kualitas storytelling visual dan narasi AIDA.\n• Konsistensi gaya visual sesuai Style Guide.",
+    "bobot": 6,
+    "ref": "4, 8"
+   },
+   {
+    "ke": "8",
+    "ujian": "UTS",
+    "bobot": 15
+   },
+   {
+    "ke": "9",
+    "sub": "Sub-CPMK 6",
+    "bahan": "• Konsep Audio Visual (AV) & peran dimensi waktu.\n• Peran AV dalam promosi pariwisata.\n• Standar realistis: Video promosi smartphone.",
+    "metode": "Kuliah, Analisis Video Promosi.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Menganalisis 3 video promosi destinasi (Reels/TikTok).\n• Menyusun Shot List untuk kunjungan lapangan utama.",
+    "kriteria": "• Ketajaman analisis elemen AV (visual & audio).\n• Kelengkapan perencanaan Shot List.",
+    "bobot": 4,
+    "ref": "4"
+   },
+   {
+    "ke": "10",
+    "sub": "Sub-CPMK 6",
+    "bahan": "• Teknik shooting: framing, golden hour, stability.\n• Dasar editing (CapCut/Canva Video).\n• Checklist teknis logistik pra-produksi.",
+    "metode": "Kuliah, Demonstrasi, Latihan Praktik Lapangan.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Latihan shooting 3 teknik (wide, medium, close-up).\n• Menyiapkan jadwal dan instrumen wawancara lapangan.",
+    "kriteria": "• Kualitas teknis shot (stabilitas, fokus, komposisi).\n• Kematangan persiapan logistik lapangan.",
+    "bobot": 4,
+    "ref": "4, 5"
+   },
+   {
+    "ke": "11",
+    "sub": "Sub-CPMK 6",
+    "bahan": "• Kunjungan Lapangan Utama (Dokumentasi visual, wawancara narasumber, verifikasi data, engagement mitra).",
+    "metode": "Praktik Lapangan (Field Visit).",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Eksekusi dokumentasi AV sesuai Shot List.\n• Wawancara pihak pengelola/wisatawan.\n• Verifikasi data paket wisata.",
+    "kriteria": "• Kelengkapan perolehan data dan dokumentasi.\n• Kedisiplinan dan etika profesional selama di lapangan.",
+    "bobot": 6,
+    "ref": "6, 7"
+   },
+   {
+    "ke": "12",
+    "sub": "Sub-CPMK 6",
+    "bahan": "• Kurasi aset foto/video.\n• Editing ringan (crop, color correction).\n• Draf narasi tekstual buku.",
+    "metode": "Presentasi, Peer Review, Studio Praktik.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Presentasi 5-8 aset visual terbaik ke kelas.\n• Kurasi mandiri seluruh aset.\n• Mulai menyusun draf narasi buku (AIDA).",
+    "kriteria": "• Ketepatan kurasi (relevansi, kualitas teknis, storytelling).\n• Progres draf narasi.",
+    "bobot": 5,
+    "ref": "4, 8"
+   },
+   {
+    "ke": "13",
+    "sub": "Sub-CPMK 7",
+    "bahan": "• Proses layout penuh buku profil wisata.\n• Quality Control (QC) struktur, teks, navigasi, dan cetak.\n• Validasi mitra.",
+    "metode": "Studio Desain Terbimbing Kolaboratif.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Menyusun seluruh halaman buku di Canva.\n• Mengirim draf PDF ke mitra untuk divalidasi.\n• Inisiasi tanda tangan Surat Pernyataan.",
+    "kriteria": "• Kelengkapan layout dan konsistensi visual seluruh buku.\n• Lolos Quality Control internal sebelum dikirim.",
+    "bobot": 7,
+    "ref": "1, 2"
+   },
+   {
+    "ke": "14",
+    "sub": "Sub-CPMK 8",
+    "bahan": "• Makalah evaluasi project (Latar Belakang hingga Kendala & Pembelajaran).\n• Tindak lanjut masukan mitra.\n• Finalisasi legalitas pemanfaatan karya.",
+    "metode": "Penulisan Terbimbing, Studio Revisi.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Menyusun draf makalah lengkap.\n• Eksekusi revisi buku berdasarkan masukan mitra.\n• Memproses cetak sample fisik.",
+    "kriteria": "• Kedalaman refleksi pada struktur makalah.\n• Ketepatan respons terhadap revisi klien (mitra).",
+    "bobot": 4,
+    "ref": "3, 8"
+   },
+   {
+    "ke": "15",
+    "sub": "Sub-CPMK 8",
+    "bahan": "• Teknik presentasi pelaporan project.\n• Refleksi metakognitif pembelajaran.\n• Testimoni mitra (apresiasi).",
+    "metode": "Presentasi Kelompok, Peer Review, Tanya Jawab.",
+    "waktu": "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'",
+    "pengalaman": "• Presentasi hasil akhir (12-15 menit).\n• Finalisasi 5 deliverables menuju UAS.",
+    "kriteria": "• Kejelasan penyampaian dan kemampuan mempertanggungjawabkan karya.\n• Kedalaman refleksi diri.",
+    "bobot": 4,
+    "ref": "8"
+   },
+   {
+    "ke": "16",
+    "ujian": "UAS",
+    "bobot": 20
+   }
+  ],
+  "porto": [
+   {
+    "minggu": "1",
+    "cpl": "CPL2, CPL4",
+    "cpmk": "CPMK 1",
+    "sub": "Sub-CPMK 1",
+    "indikator": "1.1 Ketepatan mengidentifikasi anatomi buku eksisting.\n1.2 Kesesuaian pemilihan mitra.",
+    "bentuk": "Tugas Kelompok (Analisis & Proposal Mitra)",
+    "bobot": 3
+   },
+   {
+    "minggu": "2",
+    "cpl": "CPL2, CPL3",
+    "cpmk": "CPMK 1",
+    "sub": "Sub-CPMK 2",
+    "indikator": "2.1 Ketepatan penerapan 3 prinsip desain.\n2.2 Kelengkapan dokumentasi observasi.",
+    "bentuk": "Praktik (Redesign)",
+    "bobot": 4,
+    "rubrik": [
+     {
+      "k": "2.1 Ketepatan penerapan minimal 3 prinsip desain",
+      "l": [
+       "Menerapkan ≥ 4 prinsip desain secara tepat dan konsisten; hasil revisi jelas lebih komunikatif",
+       "Menerapkan 3 prinsip desain dengan tepat",
+       "Menerapkan 2 prinsip desain atau penerapannya kurang konsisten",
+       "Menerapkan < 2 prinsip desain; revisi tidak memperbaiki brosur"
+      ],
+      "b": 70
+     },
+     {
+      "k": "2.2 Kelengkapan dokumentasi observasi awal",
+      "l": [
+       "Foto, catatan, dan data kontak calon mitra lengkap dan rapi",
+       "Foto dan catatan lengkap, data kontak sebagian",
+       "Dokumentasi sebagian besar belum lengkap",
+       "Tidak ada dokumentasi observasi"
+      ],
+      "b": 30
+     }
+    ]
+   },
+   {
+    "minggu": "3",
+    "cpl": "CPL2, CPL3",
+    "cpmk": "CPMK 1",
+    "sub": "Sub-CPMK 2",
+    "indikator": "3.1 Kesesuaian font & warna dengan karakter.\n3.2 Kerapian Style Guide.",
+    "bentuk": "Praktik (Moodboard)",
+    "bobot": 4
+   },
+   {
+    "minggu": "4",
+    "cpl": "CPL2, CPL3",
+    "cpmk": "CPMK 1",
+    "sub": "Sub-CPMK 3",
+    "indikator": "4.1 Ketepatan setelan resolusi, CMYK, & bleed.\n4.2 Format tata naskah persuratan.",
+    "bentuk": "Draf Cover & Surat Resmi",
+    "bobot": 4
+   },
+   {
+    "minggu": "5",
+    "cpl": "CPL3, CPL4",
+    "cpmk": "CPMK 3",
+    "sub": "Sub-CPMK 4",
+    "indikator": "5.1 Adaptasi safe-area mobile & rasio.\n5.2 Kelengkapan data dasar pariwisata.",
+    "bentuk": "Draf Medsos & Laporan Visit I",
+    "bobot": 4
+   },
+   {
+    "minggu": "6",
+    "cpl": "CPL2, CPL3",
+    "cpmk": "CPMK 2",
+    "sub": "Sub-CPMK 5",
+    "indikator": "6.1 Kelogisan struktur outline.\n6.2 Distribusi PIC tim.",
+    "bentuk": "Dokumen Outline Buku",
+    "bobot": 6
+   },
+   {
+    "minggu": "7",
+    "cpl": "CPL2, CPL3",
+    "cpmk": "CPMK 2",
+    "sub": "Sub-CPMK 5",
+    "indikator": "7.1 Kualitas storytelling visual.\n7.2 Penerapan copywriting AIDA.",
+    "bentuk": "Praktik (2 Halaman Buku)",
+    "bobot": 6,
+    "rubrik": [
+     {
+      "k": "7.1 Kualitas storytelling visual",
+      "l": [
+       "Foto hero dan pendukung kuat, Rule of Thirds tepat, alur visual menarik",
+       "Pemilihan foto tepat dengan sedikit kekurangan komposisi",
+       "Foto kurang mendukung cerita atau komposisi lemah",
+       "Foto tidak relevan dengan daya tarik/paket"
+      ],
+      "b": 50
+     },
+     {
+      "k": "7.2 Penerapan copywriting AIDA",
+      "l": [
+       "Keempat unsur AIDA lengkap, persuasif, bebas salah ketik",
+       "AIDA lengkap dengan sedikit kekurangan bahasa",
+       "Hanya 2–3 unsur AIDA tampak",
+       "Narasi tidak mengikuti AIDA"
+      ],
+      "b": 50
+     }
+    ]
+   },
+   {
+    "minggu": "8",
+    "ujian": "UTS",
+    "bobot": 15
+   },
+   {
+    "minggu": "9",
+    "cpl": "CPL3, CPL4",
+    "cpmk": "CPMK 3",
+    "sub": "Sub-CPMK 6",
+    "indikator": "9.1 Ketajaman analisis teknik AV.\n9.2 Kelengkapan perencanaan adegan.",
+    "bentuk": "Analisis Video & Shot List",
+    "bobot": 4
+   },
+   {
+    "minggu": "10",
+    "cpl": "CPL3, CPL4",
+    "cpmk": "CPMK 3",
+    "sub": "Sub-CPMK 6",
+    "indikator": "10.1 Stabilitas dan komposisi tangkapan.\n10.2 Kesiapan logistik peralatan.",
+    "bentuk": "Praktik Lapangan Terbatas",
+    "bobot": 4
+   },
+   {
+    "minggu": "11",
+    "cpl": "CPL1, CPL4",
+    "cpmk": "CPMK 3, 4",
+    "sub": "Sub-CPMK 6, 8",
+    "indikator": "11.1 Akurasi verifikasi data paket wisata.\n11.2 Etika profesional di industri.",
+    "bentuk": "Observasi Dosen (Field Visit)",
+    "bobot": 6,
+    "rubrik": [
+     {
+      "k": "11.1 Akurasi verifikasi data paket wisata",
+      "l": [
+       "Seluruh data (harga, durasi, fasilitas) terverifikasi dengan narasumber dan dokumen",
+       "Sebagian besar data terverifikasi",
+       "Banyak data belum diverifikasi",
+       "Data tidak diverifikasi"
+      ],
+      "b": 60
+     },
+     {
+      "k": "11.2 Etika profesional di lapangan",
+      "l": [
+       "Tepat waktu, santun, izin dokumentasi diminta, menjaga nama baik kampus",
+       "Etika baik dengan satu catatan kecil",
+       "Beberapa pelanggaran etika ringan",
+       "Pelanggaran etika yang merugikan mitra"
+      ],
+      "b": 40
+     }
+    ]
+   },
+   {
+    "minggu": "12",
+    "cpl": "CPL3, CPL4",
+    "cpmk": "CPMK 3",
+    "sub": "Sub-CPMK 6",
+    "indikator": "12.1 Kualitas hasil kurasi aset visual.\n12.2 Progres narasi wisata.",
+    "bentuk": "Praktik Kurasi & Peer Review",
+    "bobot": 5
+   },
+   {
+    "minggu": "13",
+    "cpl": "CPL2, CPL3",
+    "cpmk": "CPMK 2",
+    "sub": "Sub-CPMK 7",
+    "indikator": "13.1 Kelengkapan layout seluruh buku.\n13.2 Lolos pengecekan standar cetak.",
+    "bentuk": "Praktik Layout Terpadu",
+    "bobot": 7
+   },
+   {
+    "minggu": "14",
+    "cpl": "CPL1, CPL3",
+    "cpmk": "CPMK 2, 4",
+    "sub": "Sub-CPMK 7, 8",
+    "indikator": "14.1 Kedalaman refleksi akademis.\n14.2 Kecepatan respons revisi mitra.",
+    "bentuk": "Makalah & File Revisi",
+    "bobot": 4
+   },
+   {
+    "minggu": "15",
+    "cpl": "CPL1, CPL2",
+    "cpmk": "CPMK 2, 4",
+    "sub": "Sub-CPMK 8",
+    "indikator": "15.1 Kejelasan artikulasi presentasi.\n15.2 Pertanggungjawaban karya ke publik.",
+    "bentuk": "Presentasi & Tanya Jawab",
+    "bobot": 4
+   },
+   {
+    "minggu": "16",
+    "ujian": "UAS",
+    "bobot": 20
+   }
+  ],
+  "labor": "Travel Agencies dan Tour Operation",
+  "kualifikasi": "Certificate IV",
+  "jenjang": "Level 3",
+  "deskripsi": "Mata kuliah Praktik Desain dan Media Digital membekali mahasiswa dengan pengetahuan dan keterampilan desain grafis serta media digital yang diterapkan langsung melalui project-based learning dengan mitra desa/daya tarik wisata. Sepanjang satu semester, mahasiswa secara berkelompok memproduksi Buku Profil Wisata (mencakup daya tarik, fasilitas, paket wisata, narasi, dan foto) hingga menghasilkan 2 eksemplar cetak fisik beserta file master digital. Kerja sama dengan mitra dituangkan dalam Surat Pernyataan Pemanfaatan Karya. Lulusan diharapkan memiliki kompetensi praktis pembuatan konten promosi profesional yang relevan dengan industri Usaha Perjalanan Wisata.",
+  "bahan": "• D2.TCS.CL5.07 — Co-ordinate production of brochures and marketing materials\n• D2.TTA.CL2.13 — Operate a computerised reservation system (dalam konteks penyiapan data informasi produk untuk media digital).",
+  "media": "Laptop/smartphone, aplikasi Canva/CapCut, koneksi internet, LCD Projector, alat dokumentasi lapangan (kamera smartphone), platform e-learning.",
+  "tempat": "Kampus Politeknik Pariwisata Bali & Lokasi Mitra Desa/Daya Tarik Wisata (Pertemuan 5 dan 11).",
+  "prasyarat": "-"
+ },
+ "kontrak": {
+  "kontak": "Surel dosen; WhatsApp grup kelas; konsultasi Rabu 13.00–15.00 di ruang dosen",
+  "jadwal": "Senin 08.00–11.20, Lab Komputer UPW; pertemuan 5 dan 11 di lokasi mitra",
+  "lms": "LMS kampus",
+  "batas": "Senin pukul 23.59 setiap minggu tugas",
+  "telat": "nilai tugas dikurangi 10 per hari keterlambatan, maksimal 3 hari",
+  "hariUmpan": "7",
+  "hariKeberatan": "3",
+  "monevTemuan": "Survei kepuasan semester lalu: mahasiswa meminta kriteria penilaian buku profil lebih jelas sejak awal",
+  "monevPerbaikan": "Rubrik buku profil dibagikan di pertemuan 1 dan dibahas bersama; bobot kunjungan lapangan dinaikkan menjadi 6%",
+  "lain": "Setiap kelompok wajib membawa surat izin kerja sama saat kunjungan lapangan",
+  "tempatTgl": "Nusa Dua, 4 Agustus 2026"
+ }
+}

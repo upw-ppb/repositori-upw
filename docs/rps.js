@@ -468,12 +468,12 @@ function komponenNilai(D) {
   const P = D && (D.porto || []).length ? D.porto : D && (D.pertemuan || []).length ? D.pertemuan.map(p => ({ minggu: p.ke, ujian: p.ujian, bentuk: p.pengalaman, cpmk: p.sub, indikator: p.kriteria, bobot: p.bobot })) : [];
   return P.filter(p => p.ujian || p.bobot);
 }
-function identitasBaris(R, D, lengkap) {
+function identitasBaris(R, D, lengkap, I = {}) {
   const M = R.mk, tim = (R.tim || []).map(t => t.nama + (t.nip ? ` (NIP ${t.nip})` : t.praktisi ? " (praktisi)" : "")).join("\n") || "[Dosen pengampu]";
   const q = R.kualifikasi || {}, b = [["Mata kuliah", `${M.nama} (${M.kode})`], ["Bobot", `${M.sks} sks (teori ${(Number(M.sksKuliah) || 0) + (Number(M.sksSeminar) || 0)}, praktik ${Number(M.sksPraktik) || 0})`],
     ["Semester / kelas", `${M.semester} / ${String(R.labelKelas || "").replace(/^kelas /i, "Kelas ")}`], ["Tahun akademik", R.labelSemester || ""], ["Dosen pengampu", tim]];
-  if (lengkap) b.push(["Kualifikasi / jenjang", [q.kualifikasi, q.jenjang].filter(Boolean).join(", ") || "[Kualifikasi, jenjang]"], ["Kontak dosen", "[Surel / telepon / jam konsultasi]"],
-    ["Jadwal dan tempat", "[Hari, jam, ruang/lokasi]"], ["Mata kuliah prasyarat", (D && isi(D.prasyarat)) || "-"]);
+  if (lengkap) b.push(["Kualifikasi / jenjang", [q.kualifikasi, q.jenjang].filter(Boolean).join(", ") || "[Kualifikasi, jenjang]"], ["Kontak dosen", I.kontak || "[Surel / telepon / jam konsultasi]"],
+    ["Jadwal dan tempat", I.jadwal || "[Hari, jam, ruang/lokasi]"], ["Mata kuliah prasyarat", (D && isi(D.prasyarat)) || "-"]);
   return b;
 }
 function bab(h, t) { h.push(par(t, { b: 1, sebelum: 200, sesudah: 80, ukuran: 11 })); }
@@ -485,12 +485,13 @@ function skalaTabel(W, R) {
     .forEach(r => b.push({ c: r.map(t => ({ t, rata: "center" })) }));
   return tabel(g, b);
 }
-function kontrak(R, D, logo) {
+/** I = isian tambahan (contoh): kontak, jadwal, lms, batas, telat, hariUmpan, hariKeberatan, monevTemuan, monevPerbaikan, lain, tempatTgl. */
+function kontrak(R, D, logo, I = {}) {
   gbr.n = 0;
   const W = 9638, media = mediaLogo(logo), h = [], O = R.otorisasi || {};
   h.push(kopTabel(W, "KONTRAK PERKULIAHAN", null, media));
   bab(h, "A. IDENTITAS MATA KULIAH");
-  h.push(tabel([2800, W - 2800], identitasBaris(R, D, true).map(([a, b]) => ({ c: [{ t: a, b: 1 }, b] }))));
+  h.push(tabel([2800, W - 2800], identitasBaris(R, D, true, I).map(([a, b]) => ({ c: [{ t: a, b: 1 }, b] }))));
   bab(h, "B. DESKRIPSI MATA KULIAH");
   h.push(par((D && isi(D.deskripsi)) || "[Deskripsi singkat mata kuliah, sama dengan RPS]"));
   bab(h, "C. CAPAIAN PEMBELAJARAN");
@@ -520,12 +521,12 @@ function kontrak(R, D, logo) {
   h.push(par("Tanda ☒ diisi otomatis dari RPS; ubah sesuai pelaksanaan. Rubrik setiap penilaian ada pada dokumen Rubrik dan Portofolio Penilaian.", { i: 1, ukuran: 9 }));
   bab(h, "G. KESEPAKATAN PELAKSANAAN PENILAIAN (unsur 2)");
   poin(h, ["Penilaian dilaksanakan sesuai jadwal, bentuk, dan bobot pada bagian E. Perubahan hanya dengan kesepakatan dosen dan mahasiswa, dicatat dan diumumkan di kelas/LMS.",
-    "Tugas dikumpulkan melalui [LMS/surel/kelas] paling lambat [batas waktu]. Keterlambatan: [aturan pengurangan nilai].",
+    `Tugas dikumpulkan melalui ${I.lms || "[LMS/surel/kelas]"} paling lambat ${I.batas || "[batas waktu]"}. Keterlambatan: ${I.telat || "[aturan pengurangan nilai]"}.`,
     "Mahasiswa yang berhalangan ujian dengan alasan sah mengikuti ujian susulan sesuai ketentuan akademik.",
     "Plagiarisme dan kecurangan dikenai sanksi sesuai peraturan akademik Politeknik Pariwisata Bali."]);
   bab(h, "H. UMPAN BALIK DAN HAK MEMPERTANYAKAN NILAI (unsur 3)");
-  poin(h, ["Hasil setiap penilaian dikembalikan dengan umpan balik tertulis/lisan paling lambat [7] hari setelah penilaian.",
-    "Mahasiswa dapat mempertanyakan hasil penilaian kepada dosen paling lambat [3] hari kerja setelah nilai diumumkan; dosen menanggapi dan mencatat perubahan bila ada."]);
+  poin(h, [`Hasil setiap penilaian dikembalikan dengan umpan balik tertulis/lisan paling lambat ${I.hariUmpan || "[7]"} hari setelah penilaian.`,
+    `Mahasiswa dapat mempertanyakan hasil penilaian kepada dosen paling lambat ${I.hariKeberatan || "[3]"} hari kerja setelah nilai diumumkan; dosen menanggapi dan mencatat perubahan bila ada.`]);
   bab(h, "I. DOKUMENTASI PENILAIAN (unsur 4)");
   poin(h, ["Instrumen, hasil kerja, rubrik terisi, dan rekap nilai (lembar portofolio penilaian) disimpan dosen dan diunggah ke Repositori UPW (Portofolio Mata Kuliah) setiap semester."]);
   bab(h, "J. PROSEDUR PENILAIAN (unsur 5)");
@@ -535,12 +536,12 @@ function kontrak(R, D, logo) {
   h.push(par("Nilai akhir = Σ (nilai komponen × bobot). Nilai dilaporkan dalam bentuk angka dan huruf menurut skala berikut:", { sesudah: 80 }));
   h.push(skalaTabel(W, R));
   bab(h, "L. PERBAIKAN BERDASARKAN MONEV PENILAIAN (unsur 7)");
-  poin(h, ["Hasil monev penilaian semester sebelumnya: [temuan, mis. dari survei mahasiswa atau evaluasi GKM]", "Perbaikan yang diterapkan pada semester ini: [perubahan bentuk, bobot, atau rubrik]"]);
+  poin(h, ["Hasil monev penilaian semester sebelumnya: " + (I.monevTemuan || "[temuan, mis. dari survei mahasiswa atau evaluasi GKM]"), "Perbaikan yang diterapkan pada semester ini: " + (I.monevPerbaikan || "[perubahan bentuk, bobot, atau rubrik]")]);
   bab(h, "M. TATA TERTIB PERKULIAHAN");
   poin(h, [`Kehadiran minimal ${O.hadirMin ? O.hadirMin + "%" : "[ … ]%"} dari jumlah pertemuan sebagai syarat mengikuti UAS.`, "Mahasiswa hadir tepat waktu, berpakaian sesuai ketentuan kampus, dan menjaga etika selama kegiatan di kampus maupun di lokasi mitra.",
-    "[Ketentuan lain yang disepakati]"]);
+    I.lain || "[Ketentuan lain yang disepakati]"]);
   h.push(par("Kontrak ini disepakati pada pertemuan pertama dan berlaku selama satu semester.", { sebelum: 200, sesudah: 120 }));
-  h.push(par("[Tempat], [tanggal pertemuan pertama]", { rata: "right", sesudah: 120 }));
+  h.push(par(I.tempatTgl || "[Tempat], [tanggal pertemuan pertama]", { rata: "right", sesudah: 120 }));
   const dsn = (R.tim || []).filter(t => !t.praktisi)[0] || {};
   h.push(tabel(bagi(W, 3), [{ c: [
     { t: `Dosen Pengampu\n\n\n\n${dsn.nama || "[Nama]"}\nNIP: ${dsn.nip || "[NIP]"}`, rata: "center" },
@@ -548,7 +549,8 @@ function kontrak(R, D, logo) {
     { t: `Mengetahui,\n${O.kpsJabatan || "Koordinator Program Studi"}\n\n\n${O.kpsNama || "[Nama]"}\nNIP: ${O.kpsNip || "[NIP]"}`, rata: "center" }] }], { tanpaGaris: 1 }));
   return paket(h, { judul: "Kontrak Perkuliahan " + R.mk.nama, penanda: "UPW-KONTRAK v1", media });
 }
-function rubrik(R, D, logo) {
+/** o.hanyaBerubrik: hanya komponen yang punya p.rubrik ([{k, l:[4 deskripsi], b}]) — dipakai untuk contoh. */
+function rubrik(R, D, logo, o = {}) {
   gbr.n = 0;
   const W = LEBAR, media = mediaLogo(logo), h = [];
   h.push(kopTabel(W, "RUBRIK DAN PORTOFOLIO PENILAIAN", null, media));
@@ -560,17 +562,18 @@ function rubrik(R, D, logo) {
     ["Otentik", "Penilaian memakai tugas dan unjuk kerja nyata yang mencerminkan pekerjaan di industri perjalanan wisata" + ((D && D.porto || []).some(p => isi(p.bentuk)) ? ` (${[...new Set(D.porto.map(p => isi(p.bentuk)).filter(Boolean))].slice(0, 4).join("; ")})` : "") + ". [Sesuaikan]"],
     ["Objektif", "Penilaian memakai rubrik dengan kriteria dan rentang skor yang jelas pada bagian C. [Sesuaikan]"],
     ["Akuntabel", "Prosedur, kriteria, dan bobot disepakati pada kontrak perkuliahan dan dipahami mahasiswa sejak awal. [Sesuaikan]"],
-    ["Transparan", "Kriteria, bobot, dan hasil penilaian dapat diakses mahasiswa melalui [LMS/kelas]. [Sesuaikan]"]].map(([a, b]) => ({ c: [{ t: a, b: 1 }, b] })))));
+    ["Transparan", `Kriteria, bobot, dan hasil penilaian dapat diakses mahasiswa melalui ${o.lms || "[LMS/kelas]"}. [Sesuaikan]`]].map(([a, b]) => ({ c: [{ t: a, b: 1 }, b] })))));
   bab(h, "C. RUBRIK PENILAIAN");
   h.push(par("Rentang skor setiap tingkat dapat disesuaikan. Isi deskripsi kinerja yang dapat diamati untuk setiap kriteria.", { i: 1, ukuran: 9, sesudah: 80 }));
-  const K = komponenNilai(D), daftar = K.length ? K : [{ minggu: "[ ]", bentuk: "[Tugas/praktik]", cpmk: "[CPMK]", indikator: "[Kriteria 1]\n[Kriteria 2]", bobot: "" }];
+  const K = komponenNilai(D).filter(p => !o.hanyaBerubrik || (p.rubrik || []).length), daftar = K.length ? K : [{ minggu: "[ ]", bentuk: "[Tugas/praktik]", cpmk: "[CPMK]", indikator: "[Kriteria 1]\n[Kriteria 2]", bobot: "" }];
   const gr = [600, 3600].concat(bagi(W - 600 - 3600 - 1100, 4)).concat([1100]);
   daftar.forEach((p, n) => {
     const judul = p.ujian ? `${n + 1}. ${p.ujian} (minggu ${p.minggu}) · bobot ${p.bobot ?? "[ ]"}%` : `${n + 1}. Minggu ${p.minggu} · ${isi(p.bentuk) || "[Bentuk penilaian]"} · ${[isi(p.cpmk), isi(p.sub)].filter(Boolean).join(" / ") || "[CPMK]"} · bobot ${p.bobot === "" || p.bobot == null ? "[ ]" : p.bobot}%`;
     h.push(par(judul, { b: 1, sebelum: 160, sesudah: 60 }));
     const krit = p.ujian ? ["[Kisi-kisi / kriteria soal 1]", "[Kriteria 2]"] : (String(p.indikator || "").split(/\n|(?=\b\d+\.\d+\s)/).map(s => s.replace(/^[•\-\s]+/, "").trim()).filter(s => isi(s)));
     const baris = [{ c: [{ t: "No", b: 1, fill: PEACH, rata: "center" }, { t: "Kriteria / indikator", b: 1, fill: PEACH }].concat(LEVEL.map(([l, r]) => ({ t: `${l}\n(${r})`, b: 1, fill: PEACH, rata: "center" }))).concat([{ t: "Bobot kriteria (%)", b: 1, fill: PEACH, rata: "center" }]), hdr: 1 }];
-    (krit.length ? krit : ["[Kriteria]"]).forEach((k, i) => baris.push({ c: [{ t: String(i + 1), rata: "center" }, k].concat(LEVEL.map(() => "[Deskripsi kinerja]")).concat([{ t: "[ ]", rata: "center" }]) }));
+    if ((p.rubrik || []).length) p.rubrik.forEach((v, i) => baris.push({ c: [{ t: String(i + 1), rata: "center" }, v.k].concat(LEVEL.map((_, j) => (v.l || [])[j] || "[Deskripsi kinerja]")).concat([{ t: v.b != null ? String(v.b) : "[ ]", rata: "center" }]) }));
+    else (krit.length ? krit : ["[Kriteria]"]).forEach((k, i) => baris.push({ c: [{ t: String(i + 1), rata: "center" }, k].concat(LEVEL.map(() => "[Deskripsi kinerja]")).concat([{ t: "[ ]", rata: "center" }]) }));
     h.push(tabel(gr, baris));
   });
   bab(h, "D. PORTOFOLIO PENILAIAN");

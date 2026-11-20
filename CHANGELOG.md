@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.44.0 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.44.0 (tampilan docs/ dan server Apps Script Produksi deployment @26): contoh dan templat di setiap bagian Portofolio MK dan saran
+  penelitian/PkM tim untuk catatan integrasi.
+- Tidak ada perubahan struktur data. Rollback ke v0.43.1 cukup tampilan (tag v0.43.1) dan deployment @25.
+- Penyetuju: pemilik, di chat 21 Nov 2026: "setuju tayang v0.44.0".
+
 ## v0.44.0 — 21 Nov 2026 — Uji Coba
 Ringkas: Contoh dan templat di setiap bagian Portofolio MK, serta saran penelitian/PkM tim yang cocok dengan RPS untuk catatan integrasi (tertaut ke kegiatannya).
 Tahap 3 dari rencana RPS (pemilik: "Tahap 3", 21 Nov 2026), mengacu butir 8, 22 (A, C, D, E), dan 25.
