@@ -389,3 +389,76 @@ function mkpBelumRps(p) {
   });
   return h;
 }
+
+/* ---------- unduh ZIP (v0.41.0) ----------
+   Daftar semua isian Portofolio MK yang boleh dilihat pengguna (pengelola: semua kelas; dosen: kelas yang ia ajar), lalu berkasnya diambil
+   beberapa sekaligus (≤ MKP_ZIP_BATCH byte per panggilan). ZIP disusun di browser. Isian teks/tautan ikut di daftar (masuk "Catatan dan tautan.txt"). */
+var MKP_ZIP_BATCH = 8 * 1024 * 1024;
+var MKP_ZIP_MAKS_ITEM = 60;
+function unitTampakZip(smt, p, kode, kunci) {
+  var lihatSemua = punyaPeran(p, PERAN_MKP_REKAP), h = [];
+  mkBertim(smt).forEach(function (x) {
+    if (kode && x.mk.kode !== kode) return;
+    unitKelas(x).forEach(function (u) {
+      if (kunci && u.k !== kunci) return;
+      if (lihatSemua || peranUnit(u, p.id)) h.push({ x: x, u: u });
+    });
+  });
+  return h;
+}
+function aksiMkpDaftarZip(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_MKP_REKAP.concat(["dosen"]));
+  var smt = semesterSah(d.semester), kode = d.kode ? teks(d.kode) : "", kunci = String(d.kunci || "").toUpperCase();
+  var isi = semuaMkpSemester(smt), idx = indeksOrang(), prak = petaPraktisi(), nama = function (id) { return (idx.byId[id] || {}).nama || ""; };
+  var l = unitTampakZip(smt, p, kode, kunci);
+  if (kode && !l.length) throw galat("Mata kuliah atau kelas ini tidak bisa Anda unduh.");
+  var mk = {}, n = 0, b = 0;
+  l.forEach(function (o) {
+    var x = o.x, u = o.u, s = isi[x.mk.kode] ? isi[x.mk.kode].isi : {}, w = isiUnit(s, u);
+    var m = mk[x.mk.kode] = mk[x.mk.kode] || { kode: x.mk.kode, nama: x.mk.nama, sks: sksMk(x.mk), smtMk: x.mk.semester, kelas: [] };
+    var g = u.g ? (x.mk.kelompok || []).filter(function (y) { return y.n.toUpperCase() === u.g; })[0] : null;
+    var ent = function (e, c) {
+      var r = { komp: c.k, l: c.l, id: c.jenis === "dok" ? "" : (e.id || ""), t: e.t, nama: e.nama || "", ukuran: e.ukuran || 0, url: e.t === "tautan" ? e.url || "" : "",
+        ket: e.ket || "", teks: e.teks || "", oleh: nama(e.o), w: e.w || "" };
+      if (e.t === "file") { n++; b += r.ukuran; }
+      return r;
+    };
+    var berkas = [];
+    KOMP_MKP.forEach(function (c) {
+      if (c.jenis === "dok" && w[c.k]) berkas.push(ent(w[c.k], c));
+      if (c.jenis === "daftar" || c.jenis === "catatan") w[c.k].forEach(function (e) { berkas.push(ent(e, c)); });
+    });
+    m.kelas.push({ k: u.k, label: "Kelas " + u.kelas + (u.g ? " · " + (g ? g.n : u.g) : ""), gKode: g ? g.kode : "",
+      tim: namaAnggota(u.ang, idx, prak, null).map(function (t) { return t.nama + (t.t === "p" ? " (praktisi)" : ""); }),
+      rpsBersama: kunciRpsBersama(x, u).filter(function (k) { return k !== u.k; }),
+      metode: w.metode ? { v: w.metode.v || [], lain: w.metode.lain || "", oleh: nama(w.metode.o), w: w.metode.w || "" } : null,
+      lengkap: KOMP_MKP.filter(function (c) { return adaKomp(w, c.k); }).map(function (c) { return c.k; }), berkas: berkas });
+  });
+  catat(p.id, "mkp.zip", { semester: smt, kode: kode || "semua", kelas: kunci || "semua", file: n, byte: b });
+  return { semester: smt, labelSemester: labelSmt(smt), komp: KOMP_MKP, mk: Object.keys(mk).map(function (k) { return mk[k]; }), jumlahFile: n, ukuran: b, batch: MKP_ZIP_BATCH };
+}
+/** Ambil beberapa berkas sekaligus: d.item = [{kode, kunci, komp, id}]. Berhenti setelah ± MKP_ZIP_BATCH byte; sisanya dikirim ulang oleh tampilan (selesai = jumlah item diproses). */
+function aksiMkpAmbilZip(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_MKP_REKAP.concat(["dosen"]));
+  var smt = semesterSah(d.semester), item = Array.isArray(d.item) ? d.item.slice(0, MKP_ZIP_MAKS_ITEM) : [];
+  if (!item.length) throw galat("Tidak ada berkas yang diminta.");
+  var isi = semuaMkpSemester(smt), peta = {}, hasil = [], total = 0;
+  unitTampakZip(smt, p, "", "").forEach(function (o) { peta[o.x.mk.kode + "|" + o.u.k] = o; });
+  for (var i = 0; i < item.length; i++) {
+    var t = item[i] || {}, o = peta[teks(t.kode) + "|" + String(t.kunci || "").toUpperCase()], c = kompMkp(String(t.komp || ""));
+    try {
+      if (!o) throw galat("Kelas ini tidak bisa Anda unduh.");
+      if (!c || (c.jenis !== "dok" && c.jenis !== "daftar")) throw galat("Jenis dokumen tidak dikenal.");
+      var s = isi[o.x.mk.kode] ? isi[o.x.mk.kode].isi : {}, w = isiUnit(s, o.u);
+      var e = c.jenis === "dok" ? w[c.k] : w[c.k].filter(function (y) { return y.id === String(t.id || ""); })[0];
+      if (!e || e.t !== "file") throw galat("Berkas tidak ditemukan (mungkin baru saja diganti atau dihapus).");
+      var bytes = DriveApp.getFileById(e.fileId).getBlob().getBytes();
+      total += bytes.length;
+      hasil.push({ ok: true, isi: Utilities.base64Encode(bytes) });
+    } catch (err) { hasil.push({ ok: false, galat: err && err.message ? err.message : String(err) }); }
+    if (total >= MKP_ZIP_BATCH) break;
+  }
+  return { hasil: hasil, selesai: hasil.length };
+}

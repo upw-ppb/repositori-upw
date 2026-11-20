@@ -318,6 +318,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   cadangan data lama per MK / isi.kel untuk komponen u), RPS bersama = kunciRpsBersama (sig tim + kelompok sama), unitSasaran(d.kunci), adaKompMk = semua unit lengkap.
   mkpKeKlien → kelas[] (dosen: kelas yang diajar). PesertaKelas: dosen hanya kunci timnya. Tampilan: viewMkp() per kelas (S.laci.kel = kunci), kartu per kelas di hMk,
   rekap per kelas. Uji: alat/uji/uji-v40-bagian.mjs.
+- v0.41.0 (20 Nov 2026, Uji Coba): unduh ZIP Portofolio MK. gas/PortofolioMk.js: mkp.daftarZip {semester, kode?, kunci?} (unitTampakZip = hak lihat sama dengan
+  mkpKeKlien; catat "mkp.zip") dan mkp.ambilZip {semester, item[{kode,kunci,komp,id}]} (berhenti setelah MKP_ZIP_BATCH 8 MB; hasil[] per item ok/galat; selesai = jumlah diproses).
+  Tampilan: buatZipMkp/lembarZipMkp/teksCatatanMkp, AKSI.mkpZip (data-s, data-kode?, data-kunci?); tombol di isiMkpRekap dan laciMkp. Uji: alat/uji/uji-v41-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

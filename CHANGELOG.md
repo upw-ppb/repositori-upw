@@ -3,6 +3,22 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.41.0 — 20 Nov 2026 — Uji Coba
+Ringkas: Unduh semua bukti Portofolio MK sebagai ZIP: per semester, per mata kuliah, atau per kelas, dengan folder per kelas, daftar isi Excel, dan catatan tautan.
+Disetujui pemilik 20 Nov 2026 ("Setuju, kerjakan").
+- **Data Prodi › Portofolio MK** (Admin Prodi, KPS, GKM, Super Admin): tombol **Unduh semua bukti (ZIP)** untuk satu semester.
+- **Laci mata kuliah**: **Unduh Kelas … (ZIP)** (dosen: hanya kelas yang ia ajar) dan **Unduh semua kelas (ZIP)** (semua kelas yang boleh dilihat).
+- Isi ZIP: `Portofolio MK <semester>/<kode nama MK>/<Kelas …>/` berisi 1 RPS, 2 Kontrak kuliah, 3 Rubrik, folder Bukti pembelajaran, dan Catatan dan tautan.txt
+  (tim, kelengkapan, metode, integrasi penelitian/PkM, semua tautan); di akar: Daftar isi.xlsx (lembar Ringkasan per kelas dan Isian per berkas dengan letaknya di ZIP)
+  dan berkas-gagal.txt bila ada berkas yang gagal diambil. RPS bersama disalin ke setiap kelas yang memakainya.
+- Sebelum mengunduh tampil jumlah file dan perkiraan ukuran (peringatan bila > 300 MB). Server: aksi baru mkp.daftarZip (daftar isian, dicatat di Log "mkp.zip")
+  dan mkp.ambilZip (mengambil beberapa berkas sekaligus, ± 8 MB per panggilan; berkas yang tidak boleh atau tidak ada ditolak satu per satu tanpa menggagalkan yang lain).
+  Hak akses sama dengan melihat Portofolio MK; asesor belum diberi tombol ini.
+- Tidak ada perubahan struktur data; rollback ke v0.40.0 tanpa pemulihan data.
+- Uji: 762 + 44 uji server lulus (9 uji baru di uji-v41-bagian.mjs). Uji tampilan: Admin mengunduh ZIP semester (folder per MK/kelas, RPS bersama di kelas A dan B,
+  Daftar isi.xlsx, catatan) dan ZIP satu kelas dari laci; tanpa galat konsol.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.40.0 — 20 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.40.0 (tampilan docs/ dan server Apps Script Produksi deployment @22): Portofolio MK per kelas (terpisah dan hanya terlihat oleh tim
   kelas itu; RPS bersama hanya untuk kelas dengan tim yang sama), kartu Mata Kuliah Saya per kelas, rekap per kelas, dan peserta kelas untuk dosen hanya kelasnya.
