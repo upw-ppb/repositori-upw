@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.47.0 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.47.0 (tampilan docs/ dan server Apps Script Produksi deployment @29): ubah nama, nonaktifkan/aktifkan kembali, dan hapus akun yang belum dipakai
+  dari daftar akun (hapus dan nonaktifkan hanya Super Admin).
+- Tidak ada perubahan struktur data. Rollback ke v0.46.0 cukup tampilan (tag v0.46.0) dan deployment @28; akun yang sudah dihapus tetap terhapus.
+- Penyetuju: pemilik, di chat 21 Nov 2026: "setuju tayang v0.47.0".
+
 ## v0.47.0 — 21 Nov 2026 — Uji Coba
 Ringkas: Ubah nama akun (termasuk yang belum aktivasi), nonaktifkan/aktifkan kembali, dan hapus akun yang belum dipakai data, dari daftar akun; hapus dan nonaktifkan hanya Super Admin.
 Permintaan pemilik 21 Nov 2026 ("Ys, tambahkan … hanya super admin saja yang bisa [menghapus]").
