@@ -61,12 +61,13 @@ function tabel(grid, baris, o = {}) {
 const bagi = (total, n) => { const a = Array(n).fill(Math.floor(total / n)); a[n - 1] += total - a.reduce((p, q) => p + q, 0); return a; };
 const garisNama = o => `${o.nama || "[Nama]"}\nNIP: ${o.nip || "[NIP]"}`;
 
-/** Waktu bawaan menurut SKS (Permendikbudristek 53/2023: 1 sks kuliah = 50' tatap muka + 60' terstruktur + 60' mandiri per minggu; 1 sks praktik = 170' per minggu). */
+/** Waktu bawaan per pertemuan (v0.43.0). Jam sajian menurut SK kurikulum MRA-TP 2023: teori 1 sks = 1 JP (50'), praktik 1 sks = 2 JP (100') per minggu.
+    Sisa beban 1 sks = 45 jam per semester (Permendikbudristek 53/2023; ± 170' per minggu) ditulis sebagai penugasan terstruktur (PT) dan kegiatan mandiri (KM). */
 function waktuBawaan(mk) {
   const t = Number(mk.sksT) || 0, p = Number(mk.sksP) || 0, h = [];
-  if (t) h.push(`TM: ${t} × 50'`, `PT: ${t} × 60'`, `KM: ${t} × 60'`);
-  if (p) h.push(`Praktik: ${p} × 170'`);
-  return h.join("\n") || "[Waktu, mis. TM: 2 × 50']";
+  if (t) h.push(`TM: ${t} JP × 50' = ${t * 50}'`, `PT: ${t} × 60'`, `KM: ${t} × 60'`);
+  if (p) h.push(`Praktik: ${2 * p} JP × 50' = ${p * 100}'`, `PT/KM: ${p} × 70'`);
+  return h.join("\n") || "[Waktu, mis. TM: 2 JP × 50']";
 }
 
 /** Data templat baru dari bahan server (mkp.rpsRef). pilihCpl = daftar kode CPL prodi yang dipilih dosen. */
@@ -75,7 +76,7 @@ function kosong(R, pilihCpl, hariIni) {
   const sksT = (Number(mk.sksKuliah) || 0) + (Number(mk.sksSeminar) || 0), sksP = Number(mk.sksPraktik) || 0;
   const dasar = {
     v: 1, mk: { nama: mk.nama, kode: mk.kode, rumpun: (L && L.mk && L.mk.rumpun) || "", sks: String(mk.sks), semester: String(mk.semester), tgl: hariIni || "", sksT, sksP },
-    labor: (L && L.labor) || R.otorisasi.labor || "", kualifikasi: (L && L.kualifikasi) || "", jenjang: (L && L.jenjang) || "",
+    labor: R.otorisasi.labor || (L && L.labor) || "", kualifikasi: (R.kualifikasi && R.kualifikasi.kualifikasi) || (L && L.kualifikasi) || "", jenjang: (R.kualifikasi && R.kualifikasi.jenjang) || (L && L.jenjang) || "",
     otor: { pengembang: R.tim.filter(t => !t.praktisi).slice(0, 3).map(t => ({ nama: t.nama, nip: t.nip })),
       kps: { nama: R.otorisasi.kpsNama, nip: R.otorisasi.kpsNip, jabatan: R.otorisasi.kpsJabatan }, kajur: { nama: R.otorisasi.kajurNama, nip: R.otorisasi.kajurNip, jabatan: R.otorisasi.kajurJabatan } },
     dosen: R.tim.map(t => t.nama + (t.praktisi ? " (praktisi)" : ""))
@@ -100,20 +101,42 @@ function kosong(R, pilihCpl, hariIni) {
   });
 }
 
+/* ---------- bagian bersama dokumen prodi (kop berlogo, paket Word) ---------- */
+function mediaLogo(logo) {
+  return [["rIdL1", "logo-kemenpar", logo && logo.kemenpar, 1], ["rIdL2", "logo-poltekpar", logo && logo.poltekpar, 1.04], ["rIdL3", "logo-asean", logo && logo.asean, 1], ["rIdL4", "logo-banpt", logo && logo.banpt, 0.86]].filter(m => m[2]);
+}
+function kopTabel(lebar, judul, dok, media) {
+  const lg = id => { const m = media.find(q => q[0] === id); return m ? gbr(m[0], m[1], 1.5, m[3]) : par(""); };
+  const sisi = Math.round(lebar * 0.17), tengah = lebar - 2 * sisi, gk = [sisi, Math.floor(tengah / 2), tengah - Math.floor(tengah / 2), sisi];
+  return tabel(gk, [
+    { c: [{ xml: lg("rIdL1") + lg("rIdL2"), vm: "r", va: "center" }, { t: "KEMENTERIAN PARIWISATA REPUBLIK INDONESIA\nPOLITEKNIK PARIWISATA BALI", span: 2, b: 1, rata: "center", ukuran: 12, va: "center" }, { xml: lg("rIdL3") + lg("rIdL4"), vm: "r", va: "center" }], tinggi: 1300 },
+    { c: [{ vm: "c" }, { t: judul + "\nPROGRAM STUDI USAHA PERJALANAN WISATA", span: 2, b: 1, rata: "center", ukuran: 12, va: "center" }, { vm: "c" }], tinggi: 900 },
+    { c: [`No. Dokumen : ${(dok && dok.no) || ""}`, `No. Revisi : ${(dok && dok.revisi) || "00"}`,
+      { xml: `<w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>${run("Halaman : ")}<w:fldSimple w:instr=" PAGE ">${run("1")}</w:fldSimple>${run(" dari ")}<w:fldSimple w:instr=" NUMPAGES ">${run("1")}</w:fldSimple></w:p>` },
+      `Tanggal Terbit : ${(dok && dok.terbit) || ""}`] }
+  ]);
+}
+function paket(h, o) {
+  const media = o.media || [];
+  const sect = o.lanskap ? `<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="1020" w:right="850" w:bottom="1020" w:left="850" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>`
+    : `<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>`;
+  const rel = media.map(m => `<Relationship Id="${m[0]}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${m[1]}.png"/>`).join("");
+  const f = [
+    { nama: "[Content_Types].xml", data: `${KEP}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>` },
+    { nama: "_rels/.rels", data: `${KEP}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>` },
+    { nama: "docProps/core.xml", data: `${KEP}<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${x(o.judul || "")}</dc:title><dc:creator>Repositori UPW</dc:creator><dc:description>${x(o.penanda || "")}</dc:description></cp:coreProperties>` },
+    { nama: "word/_rels/document.xml.rels", data: `${KEP}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdGaya" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${rel}</Relationships>` },
+    { nama: "word/styles.xml", data: `${KEP}<w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="id-ID"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>` },
+    { nama: "word/document.xml", data: `${KEP}<w:document ${NS}><w:body>${h.join("")}${sect}</w:body></w:document>` }
+  ].concat(media.map(m => ({ nama: `word/media/${m[1]}.png`, data: m[2] })));
+  const zip = G.UPW_ZIP.zip(f);
+  return typeof Blob !== "undefined" ? new Blob([zip], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }) : zip;
+}
 function buat(D, logo) {
   gbr.n = 0;
   const h = [];
-  const media = [["rIdL1", "logo-kemenpar", logo && logo.kemenpar, 1], ["rIdL2", "logo-poltekpar", logo && logo.poltekpar, 1.04], ["rIdL3", "logo-asean", logo && logo.asean, 1], ["rIdL4", "logo-banpt", logo && logo.banpt, 0.86]].filter(m => m[2]);
-  const lg = id => { const m = media.find(q => q[0] === id); return m ? gbr(m[0], m[1], 1.5, m[3]) : par(""); };
-  // Kop
-  const gk = [2600, 4969, 4969, 2600];
-  h.push(tabel(gk, [
-    { c: [{ xml: lg("rIdL1") + lg("rIdL2"), vm: "r", va: "center" }, { t: "KEMENTERIAN PARIWISATA REPUBLIK INDONESIA\nPOLITEKNIK PARIWISATA BALI", span: 2, b: 1, rata: "center", ukuran: 12, va: "center" }, { xml: lg("rIdL3") + lg("rIdL4"), vm: "r", va: "center" }], tinggi: 1300 },
-    { c: [{ vm: "c" }, { t: "RENCANA PEMBELAJARAN SEMESTER (RPS)\nPROGRAM STUDI USAHA PERJALANAN WISATA", span: 2, b: 1, rata: "center", ukuran: 12, va: "center" }, { vm: "c" }], tinggi: 900 },
-    { c: [`No. Dokumen : ${(D.dok && D.dok.no) || ""}`, `No. Revisi : ${(D.dok && D.dok.revisi) || "00"}`,
-      { xml: `<w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>${run("Halaman : ")}<w:fldSimple w:instr=" PAGE ">${run("1")}</w:fldSimple>${run(" dari ")}<w:fldSimple w:instr=" NUMPAGES ">${run("1")}</w:fldSimple></w:p>` },
-      `Tanggal Terbit : ${(D.dok && D.dok.terbit) || ""}`] }
-  ]));
+  const media = mediaLogo(logo);
+  h.push(kopTabel(LEBAR, "RENCANA PEMBELAJARAN SEMESTER (RPS)", D.dok, media));
   h.push(par("A. PERENCANAAN PERKULIAHAN", { b: 1, sebelum: 200, sesudah: 120, ukuran: 11 }));
   // Identitas
   const g6 = bagi(LEBAR, 6), M = D.mk || {}, O = D.otor || {}, hd = (t, o = {}) => Object.assign({ t, b: 1, fill: PEACH, rata: "center" }, o);
@@ -172,7 +195,7 @@ function buat(D, logo) {
     ? { c: [{ t: p.ke, rata: "center" }, { t: p.ujian, span: 6, b: 1, rata: "center", fill: ABU }, { t: pc(p.bobot), rata: "center" }, ""] }
     : { c: [{ t: p.ke, rata: "center" }, p.sub || "", p.bahan || "", p.metode || "", p.waktu || "", p.pengalaman || "", p.kriteria || "", { t: pc(p.bobot), rata: "center" }, p.ref || ""] }));
   h.push(tabel(gp, prog));
-  h.push(par("Catatan: Waktu ditulis per pertemuan (TM = tatap muka, PT = penugasan terstruktur, KM = kegiatan mandiri; praktik 170 menit per sks per minggu). Jumlah bobot seluruh pertemuan termasuk UTS dan UAS = 100%. Kode pustaka pada kolom Referensi merujuk nomor daftar Pustaka.", { i: 1, ukuran: 9, sebelum: 80, sesudah: 120 }));
+  h.push(par("Catatan: Waktu ditulis per pertemuan dalam jam pelajaran (JP = 50 menit). Jam sajian menurut struktur kurikulum: teori 1 sks = 1 JP, praktik 1 sks = 2 JP per minggu; sisa beban 1 sks = 45 jam per semester berupa penugasan terstruktur (PT) dan kegiatan mandiri (KM). TM = tatap muka. Jumlah bobot seluruh pertemuan termasuk UTS dan UAS = 100%. Kolom Referensi berisi nomor daftar Pustaka.", { i: 1, ukuran: 9, sebelum: 80, sesudah: 120 }));
   // C. Portofolio penilaian
   h.push(par("C. PORTOFOLIO PENILAIAN DAN EVALUASI KETERCAPAIAN CPL MAHASISWA", { b: 1, sesudah: 120, ukuran: 11, halamanBaru: 1 }));
   const gq = [900, 1500, 1500, 1700, 3400, 2300, 900, 1100, 1100, 738];
@@ -189,18 +212,7 @@ function buat(D, logo) {
     { t: ttd((O.kajur && O.kajur.jabatan) || "Ketua Jurusan", [O.kajur || {}]), rata: "center" },
     { t: ttd((O.kps && O.kps.jabatan) || "Koordinator Program Studi", [O.kps || {}]), rata: "center" },
     { t: ttd("Dosen Pengampu Mata Kuliah", (O.pengembang || []).length ? O.pengembang : [{}]), rata: "center" }] }], { tanpaGaris: 1 }));
-  const sect = `<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="1020" w:right="850" w:bottom="1020" w:left="850" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>`;
-  const rel = media.map(m => `<Relationship Id="${m[0]}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${m[1]}.png"/>`).join("");
-  const f = [
-    { nama: "[Content_Types].xml", data: `${KEP}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>` },
-    { nama: "_rels/.rels", data: `${KEP}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>` },
-    { nama: "docProps/core.xml", data: `${KEP}<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${x("RPS " + (M.nama || ""))}</dc:title><dc:creator>Repositori UPW</dc:creator><dc:description>${PENANDA}</dc:description></cp:coreProperties>` },
-    { nama: "word/_rels/document.xml.rels", data: `${KEP}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdGaya" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${rel}</Relationships>` },
-    { nama: "word/styles.xml", data: `${KEP}<w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="id-ID"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>` },
-    { nama: "word/document.xml", data: `${KEP}<w:document ${NS}><w:body>${h.join("")}${sect}</w:body></w:document>` }
-  ].concat(media.map(m => ({ nama: `word/media/${m[1]}.png`, data: m[2] })));
-  const zip = G.UPW_ZIP.zip(f);
-  return typeof Blob !== "undefined" ? new Blob([zip], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }) : zip;
+  return paket(h, { lanskap: true, judul: "RPS " + (M.nama || ""), penanda: PENANDA, media });
 }
 
 /* ---------- pembaca Word ---------- */
@@ -208,7 +220,7 @@ const ent = s => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g
 function teksSel(s) {
   const ps = s.match(/<w:p[ >][\s\S]*?<\/w:p>/g) || [];
   return ps.map(p => ent((p.match(/<w:t[^>]*>[^<]*<\/w:t>|<w:tab\/>|<w:br[^>]*\/>/g) || []).map(t => t.startsWith("<w:tab") ? " " : t.startsWith("<w:br") ? "\n" : t.replace(/<[^>]+>/g, "")).join("")))
-    .join("\n").replace(/[\uf000-\uf8ff]/g, "").replace(/\u00a0/g, " ").replace(/[ \t]+/g, " ").replace(/(\S)\s*•\s*/g, "$1\n• ").replace(/ *\n */g, "\n").trim();
+    .join("\n").replace(/[\uf000-\uf8ff]/g, "").replace(/\u00a0/g, " ").replace(/[ \t]+/g, " ").replace(/(\S)\s*•\s*/g, "$1\n• ").replace(/([.;])\s*(\d+\.\d+\s)/g, "$1\n$2").replace(/ *\n */g, "\n").trim();
 }
 /** Bagi XML menjadi potongan tingkat atas untuk tag tertentu (abaikan tabel bersarang). */
 function potong(s, tag) {
@@ -341,6 +353,7 @@ function mirip(a, b) { const A = new Set(kata(a)), B = new Set(kata(b)); if (!A.
 const intiNama = s => kata(String(s || "").split(",")[0].replace(/\b(dr|drs|dra|ir|prof|hj|h)\.?\s/gi, " ")).filter(w => !/^(s|m|st|mm|se|ss|par|tr|pd|hum|si|kom|ak|sc|ma|che|cee)$/.test(w));
 function namaSama(a, b) { const A = intiNama(a), B = new Set(intiNama(b)); const n = A.filter(w => B.has(w)).length; return n >= Math.min(2, A.length, B.size); }
 
+const normKual = s => String(s || "").toLowerCase().replace(/sertifikat/g, "certificate").replace(/advance\b/g, "advanced").replace(/[^a-z ]/g, " ").replace(/\s+/g, " ").trim();
 function periksa(D, R) {
   const h = [], wajib = t => h.push({ t: "wajib", teks: t }), saran = t => h.push({ t: "saran", teks: t }), ok = t => h.push({ t: "ok", teks: t });
   const prodi = {}; ((R && R.cplProdi) || []).forEach(c => { prodi[c.k] = c; });
@@ -352,6 +365,10 @@ function periksa(D, R) {
     if (D.mk.semester && nomor(D.mk.semester) && nomor(D.mk.semester) !== Number(mk.semester)) saran(`Semester di RPS (${D.mk.semester}) berbeda dengan kurikulum (${mk.semester}).`);
   }
   if (!D.mk.tgl) saran("Tanggal penyusunan belum diisi (bukti RPS ditinjau berkala).");
+  const Q = R && R.kualifikasi;
+  if (Q && Q.kualifikasi && (!isi(D.kualifikasi) || !isi(D.jenjang))) saran(`Kualifikasi dan jenjang belum diisi (semester ${mk ? mk.semester : ""}: ${Q.kualifikasi}, ${Q.jenjang}).`);
+  else if (Q && Q.kualifikasi && (normKual(D.kualifikasi) !== normKual(Q.kualifikasi) || nomor(D.jenjang) !== nomor(Q.jenjang)))
+    saran(`Kualifikasi/jenjang di RPS (${D.kualifikasi}, ${D.jenjang}) berbeda dengan struktur kurikulum untuk semester ${mk ? mk.semester : ""} (${Q.kualifikasi}, ${Q.jenjang}).`);
   // Capaian pembelajaran
   if (D.cpl.length) {
     const salah = D.cpl.filter(c => c.ref && prodi[c.ref.toUpperCase()] && mirip(c.t, prodi[c.ref.toUpperCase()].t) < 0.6);
@@ -436,5 +453,161 @@ function ringkas(D) {
   return { cpl: (D.cpl || []).length, cpmk: (D.cpmk || []).length, sub: (D.sub || []).length, pertemuan: P.length, bobot: Math.round(P.reduce((a, p) => a + (p.bobot || 0), 0) * 100) / 100,
     unsur: [...new Set((D.cpl || []).map(c => (String(c.ref).toUpperCase().match(/^(KU|KK|S|P)/) || [])[1]).filter(Boolean))] };
 }
-G.UPW_RPS = { buat, kosong, baca, periksa, saranMetode, ringkas, waktuBawaan, PENANDA };
+/* ---------- Tahap 2 (v0.43.0): kontrak kuliah, rubrik/portofolio penilaian (Word), lembar nilai (Excel) ----------
+   Mengacu Matriks LAMWisata butir 25: A (5 prinsip penilaian + rubrik/portofolio), B (teknik & instrumen), C (7 unsur pelaksanaan penilaian).
+   Bahan: R = mkp.rpsRef (MK, tim kelas, otorisasi + skala nilai), D = RPS terbaca terakhir (boleh null → isian [ … ]). */
+const KTK = "☒", KSG = "☐";
+const TEKNIK = [["Observasi", /observasi|pengamatan|field visit/i], ["Partisipasi", /partisipasi|keaktifan|diskusi|peer/i], ["Unjuk kerja", /praktik|unjuk kerja|presentasi|demonstrasi|proyek|project|redesign|layout|shooting/i],
+  ["Tes tertulis", /tes tertulis|ujian tertulis|kuis|quiz|esai/i], ["Tes lisan", /lisan|tanya jawab|wawancara/i], ["Angket", /angket|kuesioner|refleksi diri|penilaian sejawat|peer review/i]];
+const INSTRUMEN = [["Rubrik (penilaian proses)", /rubrik|praktik|presentasi|observasi|unjuk|diskusi/i], ["Portofolio (penilaian hasil)", /portofolio|laporan|makalah|dokumen|file|outline|analisis/i],
+  ["Karya desain", /desain|layout|buku|konten|video|foto|brosur|poster|karya|moodboard|cover/i]];
+function teksPenilaian(D) { return D ? [].concat((D.porto || []).map(p => [p.bentuk, p.indikator].join(" ")), (D.pertemuan || []).map(p => [p.kriteria, p.pengalaman, p.metode].join(" "))).join(" \n ") : ""; }
+const centang = (daftar, t) => daftar.map(([l, re]) => `${t && re.test(t) ? KTK : KSG} ${l}`).join("    ");
+const LEVEL = [["Sangat baik", "86–100"], ["Baik", "71–85"], ["Cukup", "56–70"], ["Kurang", "≤ 55"]];
+function komponenNilai(D) {
+  const P = D && (D.porto || []).length ? D.porto : D && (D.pertemuan || []).length ? D.pertemuan.map(p => ({ minggu: p.ke, ujian: p.ujian, bentuk: p.pengalaman, cpmk: p.sub, indikator: p.kriteria, bobot: p.bobot })) : [];
+  return P.filter(p => p.ujian || p.bobot);
+}
+function identitasBaris(R, D, lengkap) {
+  const M = R.mk, tim = (R.tim || []).map(t => t.nama + (t.nip ? ` (NIP ${t.nip})` : t.praktisi ? " (praktisi)" : "")).join("\n") || "[Dosen pengampu]";
+  const q = R.kualifikasi || {}, b = [["Mata kuliah", `${M.nama} (${M.kode})`], ["Bobot", `${M.sks} sks (teori ${(Number(M.sksKuliah) || 0) + (Number(M.sksSeminar) || 0)}, praktik ${Number(M.sksPraktik) || 0})`],
+    ["Semester / kelas", `${M.semester} / ${String(R.labelKelas || "").replace(/^kelas /i, "Kelas ")}`], ["Tahun akademik", R.labelSemester || ""], ["Dosen pengampu", tim]];
+  if (lengkap) b.push(["Kualifikasi / jenjang", [q.kualifikasi, q.jenjang].filter(Boolean).join(", ") || "[Kualifikasi, jenjang]"], ["Kontak dosen", "[Surel / telepon / jam konsultasi]"],
+    ["Jadwal dan tempat", "[Hari, jam, ruang/lokasi]"], ["Mata kuliah prasyarat", (D && isi(D.prasyarat)) || "-"]);
+  return b;
+}
+function bab(h, t) { h.push(par(t, { b: 1, sebelum: 200, sesudah: 80, ukuran: 11 })); }
+function poin(h, l, nomor) { l.forEach((t, i) => h.push(par((nomor ? `${i + 1}. ` : "• ") + t, { sesudah: 40 }))); }
+function skalaTabel(W, R) {
+  const s = (R.otorisasi && R.otorisasi.skala) || [];
+  const g = bagi(W, 3), b = [{ c: ["Nilai huruf", "Angka mutu", "Rentang nilai angka"].map(t => ({ t, b: 1, fill: PEACH, rata: "center" })) }];
+  (s.length ? s.map(v => [v.h, String(v.m).replace(".", ","), `${String(v.a).replace(".", ",")} – ${String(v.b).replace(".", ",")}`]) : [1, 2, 3, 4, 5].map(() => ["[Huruf]", "[Angka mutu]", "[Rentang]"]))
+    .forEach(r => b.push({ c: r.map(t => ({ t, rata: "center" })) }));
+  return tabel(g, b);
+}
+function kontrak(R, D, logo) {
+  gbr.n = 0;
+  const W = 9638, media = mediaLogo(logo), h = [], O = R.otorisasi || {};
+  h.push(kopTabel(W, "KONTRAK PERKULIAHAN", null, media));
+  bab(h, "A. IDENTITAS MATA KULIAH");
+  h.push(tabel([2800, W - 2800], identitasBaris(R, D, true).map(([a, b]) => ({ c: [{ t: a, b: 1 }, b] }))));
+  bab(h, "B. DESKRIPSI MATA KULIAH");
+  h.push(par((D && isi(D.deskripsi)) || "[Deskripsi singkat mata kuliah, sama dengan RPS]"));
+  bab(h, "C. CAPAIAN PEMBELAJARAN");
+  const cpl = (D && D.cpl || []).length ? D.cpl.map(c => `${c.kode}${c.ref ? ` (${c.ref})` : ""}: ${c.t}`) : ["[CPL prodi yang dibebankan, sama dengan RPS]"];
+  const cpmk = (D && D.cpmk || []).length ? D.cpmk.map(c => `${c.kode}: ${c.t}`) : ["[CPMK, sama dengan RPS]"];
+  h.push(par("CPL yang dibebankan:", { b: 1, sesudah: 40 })); poin(h, cpl);
+  h.push(par("Capaian pembelajaran mata kuliah (CPMK):", { b: 1, sebelum: 80, sesudah: 40 })); poin(h, cpmk);
+  bab(h, "D. RENCANA KEGIATAN PEMBELAJARAN");
+  const gp = [1100, 5000, W - 6100], rp = [{ c: ["Pertemuan", "Topik / bahan kajian", "Bentuk / metode pembelajaran"].map(t => ({ t, b: 1, fill: PEACH, rata: "center" })), hdr: 1 }];
+  ((D && D.pertemuan || []).length ? D.pertemuan : Array.from({ length: 16 }, (_, i) => i === 7 ? { ke: "8", ujian: "UTS" } : i === 15 ? { ke: "16", ujian: "UAS" } : { ke: String(i + 1), bahan: "[Topik]", metode: "[Metode]" }))
+    .forEach(p => rp.push(p.ujian ? { c: [{ t: p.ke, rata: "center" }, { t: p.ujian, span: 2, b: 1, rata: "center", fill: ABU }] } : { c: [{ t: p.ke, rata: "center" }, isi(p.bahan) || "[Topik]", isi(p.metode) || "[Metode]"] }));
+  h.push(tabel(gp, rp));
+  bab(h, "E. RENCANA PENILAIAN (unsur 1: kontrak rencana penilaian)");
+  const K = komponenNilai(D), gk = [1000, 3900, 1800, W - 7900 - 1000, 1000];
+  const rk = [{ c: ["Minggu", "Bentuk penilaian / tugas", "CPMK / Sub-CPMK", "Indikator", "Bobot (%)"].map(t => ({ t, b: 1, fill: PEACH, rata: "center" })), hdr: 1 }];
+  (K.length ? K : [{ minggu: "[ ]", bentuk: "[Tugas/praktik]", cpmk: "[CPMK]", indikator: "[Indikator]", bobot: "" }, { minggu: "8", ujian: "UTS", bobot: "" }, { minggu: "16", ujian: "UAS", bobot: "" }])
+    .forEach(p => rk.push({ c: [{ t: p.minggu, rata: "center" }, p.ujian ? { t: p.ujian === "UTS" ? "Ujian Tengah Semester (UTS)" : p.ujian === "UAS" ? "Ujian Akhir Semester (UAS)" : p.ujian, b: 1 } : isi(p.bentuk) || "[Bentuk]",
+      p.ujian ? "" : [isi(p.cpmk), isi(p.sub)].filter(Boolean).join(" / "), p.ujian ? "" : isi(p.indikator), { t: p.bobot === "" || p.bobot == null ? "[ ]" : String(p.bobot), rata: "center" }] }));
+  const tot = K.reduce((a, p) => a + (Number(p.bobot) || 0), 0);
+  rk.push({ c: [{ t: "Jumlah", span: 4, b: 1, rata: "right" }, { t: K.length ? String(Math.round(tot * 100) / 100) : "100", b: 1, rata: "center" }] });
+  h.push(tabel(gk, rk));
+  if (K.length && Math.round(tot * 100) !== 10000) h.push(par(`[Periksa: jumlah bobot dari RPS ${String(Math.round(tot * 100) / 100).replace(".", ",")}%, seharusnya 100%]`, { sebelum: 40 }));
+  const tp = teksPenilaian(D);
+  bab(h, "F. TEKNIK DAN INSTRUMEN PENILAIAN");
+  h.push(par("Teknik penilaian: " + centang(TEKNIK, tp), { sesudah: 40 }));
+  h.push(par("Instrumen penilaian: " + centang(INSTRUMEN, tp), { sesudah: 40 }));
+  h.push(par("Tanda ☒ diisi otomatis dari RPS; ubah sesuai pelaksanaan. Rubrik setiap penilaian ada pada dokumen Rubrik dan Portofolio Penilaian.", { i: 1, ukuran: 9 }));
+  bab(h, "G. KESEPAKATAN PELAKSANAAN PENILAIAN (unsur 2)");
+  poin(h, ["Penilaian dilaksanakan sesuai jadwal, bentuk, dan bobot pada bagian E. Perubahan hanya dengan kesepakatan dosen dan mahasiswa, dicatat dan diumumkan di kelas/LMS.",
+    "Tugas dikumpulkan melalui [LMS/surel/kelas] paling lambat [batas waktu]. Keterlambatan: [aturan pengurangan nilai].",
+    "Mahasiswa yang berhalangan ujian dengan alasan sah mengikuti ujian susulan sesuai ketentuan akademik.",
+    "Plagiarisme dan kecurangan dikenai sanksi sesuai peraturan akademik Politeknik Pariwisata Bali."]);
+  bab(h, "H. UMPAN BALIK DAN HAK MEMPERTANYAKAN NILAI (unsur 3)");
+  poin(h, ["Hasil setiap penilaian dikembalikan dengan umpan balik tertulis/lisan paling lambat [7] hari setelah penilaian.",
+    "Mahasiswa dapat mempertanyakan hasil penilaian kepada dosen paling lambat [3] hari kerja setelah nilai diumumkan; dosen menanggapi dan mencatat perubahan bila ada."]);
+  bab(h, "I. DOKUMENTASI PENILAIAN (unsur 4)");
+  poin(h, ["Instrumen, hasil kerja, rubrik terisi, dan rekap nilai (lembar portofolio penilaian) disimpan dosen dan diunggah ke Repositori UPW (Portofolio Mata Kuliah) setiap semester."]);
+  bab(h, "J. PROSEDUR PENILAIAN (unsur 5)");
+  poin(h, ["Perencanaan: rencana penilaian disusun di RPS dan disepakati dalam kontrak ini.", "Pemberian tugas atau soal beserta kriteria dan rubriknya.",
+    "Observasi kinerja / pelaksanaan penilaian sesuai jadwal.", "Pengembalian hasil observasi dan umpan balik kepada mahasiswa.", "Pemberian nilai akhir berdasarkan bobot pada bagian E."], true);
+  bab(h, "K. PELAPORAN NILAI (unsur 6)");
+  h.push(par("Nilai akhir = Σ (nilai komponen × bobot). Nilai dilaporkan dalam bentuk angka dan huruf menurut skala berikut:", { sesudah: 80 }));
+  h.push(skalaTabel(W, R));
+  bab(h, "L. PERBAIKAN BERDASARKAN MONEV PENILAIAN (unsur 7)");
+  poin(h, ["Hasil monev penilaian semester sebelumnya: [temuan, mis. dari survei mahasiswa atau evaluasi GKM]", "Perbaikan yang diterapkan pada semester ini: [perubahan bentuk, bobot, atau rubrik]"]);
+  bab(h, "M. TATA TERTIB PERKULIAHAN");
+  poin(h, [`Kehadiran minimal ${O.hadirMin ? O.hadirMin + "%" : "[ … ]%"} dari jumlah pertemuan sebagai syarat mengikuti UAS.`, "Mahasiswa hadir tepat waktu, berpakaian sesuai ketentuan kampus, dan menjaga etika selama kegiatan di kampus maupun di lokasi mitra.",
+    "[Ketentuan lain yang disepakati]"]);
+  h.push(par("Kontrak ini disepakati pada pertemuan pertama dan berlaku selama satu semester.", { sebelum: 200, sesudah: 120 }));
+  h.push(par("[Tempat], [tanggal pertemuan pertama]", { rata: "right", sesudah: 120 }));
+  const dsn = (R.tim || []).filter(t => !t.praktisi)[0] || {};
+  h.push(tabel(bagi(W, 3), [{ c: [
+    { t: `Dosen Pengampu\n\n\n\n${dsn.nama || "[Nama]"}\nNIP: ${dsn.nip || "[NIP]"}`, rata: "center" },
+    { t: "Perwakilan Mahasiswa\n\n\n\n[Nama]\nNIM: [NIM]", rata: "center" },
+    { t: `Mengetahui,\n${O.kpsJabatan || "Koordinator Program Studi"}\n\n\n${O.kpsNama || "[Nama]"}\nNIP: ${O.kpsNip || "[NIP]"}`, rata: "center" }] }], { tanpaGaris: 1 }));
+  return paket(h, { judul: "Kontrak Perkuliahan " + R.mk.nama, penanda: "UPW-KONTRAK v1", media });
+}
+function rubrik(R, D, logo) {
+  gbr.n = 0;
+  const W = LEBAR, media = mediaLogo(logo), h = [];
+  h.push(kopTabel(W, "RUBRIK DAN PORTOFOLIO PENILAIAN", null, media));
+  bab(h, "A. IDENTITAS MATA KULIAH");
+  h.push(tabel([3200, W - 3200], identitasBaris(R, D, false).map(([a, b]) => ({ c: [{ t: a, b: 1 }, b] }))));
+  bab(h, "B. PRINSIP PENILAIAN (butir 25 A)");
+  h.push(tabel([2600, W - 2600], [{ c: [{ t: "Prinsip", b: 1, fill: PEACH }, { t: "Penerapan pada mata kuliah ini", b: 1, fill: PEACH }], hdr: 1 }].concat([
+    ["Edukatif", "Hasil penilaian dan umpan balik membantu mahasiswa memperbaiki cara belajar dan mencapai CPMK. [Sesuaikan]"],
+    ["Otentik", "Penilaian memakai tugas dan unjuk kerja nyata yang mencerminkan pekerjaan di industri perjalanan wisata" + ((D && D.porto || []).some(p => isi(p.bentuk)) ? ` (${[...new Set(D.porto.map(p => isi(p.bentuk)).filter(Boolean))].slice(0, 4).join("; ")})` : "") + ". [Sesuaikan]"],
+    ["Objektif", "Penilaian memakai rubrik dengan kriteria dan rentang skor yang jelas pada bagian C. [Sesuaikan]"],
+    ["Akuntabel", "Prosedur, kriteria, dan bobot disepakati pada kontrak perkuliahan dan dipahami mahasiswa sejak awal. [Sesuaikan]"],
+    ["Transparan", "Kriteria, bobot, dan hasil penilaian dapat diakses mahasiswa melalui [LMS/kelas]. [Sesuaikan]"]].map(([a, b]) => ({ c: [{ t: a, b: 1 }, b] })))));
+  bab(h, "C. RUBRIK PENILAIAN");
+  h.push(par("Rentang skor setiap tingkat dapat disesuaikan. Isi deskripsi kinerja yang dapat diamati untuk setiap kriteria.", { i: 1, ukuran: 9, sesudah: 80 }));
+  const K = komponenNilai(D), daftar = K.length ? K : [{ minggu: "[ ]", bentuk: "[Tugas/praktik]", cpmk: "[CPMK]", indikator: "[Kriteria 1]\n[Kriteria 2]", bobot: "" }];
+  const gr = [600, 3600].concat(bagi(W - 600 - 3600 - 1100, 4)).concat([1100]);
+  daftar.forEach((p, n) => {
+    const judul = p.ujian ? `${n + 1}. ${p.ujian} (minggu ${p.minggu}) · bobot ${p.bobot ?? "[ ]"}%` : `${n + 1}. Minggu ${p.minggu} · ${isi(p.bentuk) || "[Bentuk penilaian]"} · ${[isi(p.cpmk), isi(p.sub)].filter(Boolean).join(" / ") || "[CPMK]"} · bobot ${p.bobot === "" || p.bobot == null ? "[ ]" : p.bobot}%`;
+    h.push(par(judul, { b: 1, sebelum: 160, sesudah: 60 }));
+    const krit = p.ujian ? ["[Kisi-kisi / kriteria soal 1]", "[Kriteria 2]"] : (String(p.indikator || "").split(/\n|(?=\b\d+\.\d+\s)/).map(s => s.replace(/^[•\-\s]+/, "").trim()).filter(s => isi(s)));
+    const baris = [{ c: [{ t: "No", b: 1, fill: PEACH, rata: "center" }, { t: "Kriteria / indikator", b: 1, fill: PEACH }].concat(LEVEL.map(([l, r]) => ({ t: `${l}\n(${r})`, b: 1, fill: PEACH, rata: "center" }))).concat([{ t: "Bobot kriteria (%)", b: 1, fill: PEACH, rata: "center" }]), hdr: 1 }];
+    (krit.length ? krit : ["[Kriteria]"]).forEach((k, i) => baris.push({ c: [{ t: String(i + 1), rata: "center" }, k].concat(LEVEL.map(() => "[Deskripsi kinerja]")).concat([{ t: "[ ]", rata: "center" }]) }));
+    h.push(tabel(gr, baris));
+  });
+  bab(h, "D. PORTOFOLIO PENILAIAN");
+  poin(h, ["Rekap nilai setiap mahasiswa per komponen, nilai akhir, huruf mutu, dan ketercapaian CPL dicatat pada lembar Excel \"Portofolio penilaian\" (unduh dari aplikasi; nama peserta kelas sudah terisi).",
+    "Lampirkan contoh hasil kerja mahasiswa (nilai tinggi, sedang, rendah) dan rubrik terisi untuk setiap penilaian sebagai bukti."]);
+  return paket(h, { lanskap: true, judul: "Rubrik dan Portofolio Penilaian " + R.mk.nama, penanda: "UPW-RUBRIK v1", media });
+}
+/** Lembar Excel portofolio penilaian: peserta × komponen (bobot dari RPS, bisa diubah), nilai akhir, huruf, ketercapaian CPL. */
+function portoXlsx(R, D, peserta) {
+  const K = komponenNilai(D), komp = K.length ? K : [{ minggu: "", bentuk: "Tugas", bobot: 30 }, { minggu: "8", ujian: "UTS", bobot: 30 }, { minggu: "16", ujian: "UAS", bobot: 40 }];
+  const kol = n => { let s = ""; n++; while (n) { const r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; };
+  const a0 = 3, aN = a0 + komp.length - 1, cAkhir = aN + 1, ps = (peserta || []).length ? peserta : Array.from({ length: 5 }, () => ({ nim: "", nama: "" }));
+  const skala = ((R.otorisasi && R.otorisasi.skala) || []).slice().sort((p, q) => q.a - p.a);
+  const huruf = r => skala.length ? { f: skala.slice(0, -1).reduceRight((acc, s) => `IF(${kol(cAkhir)}${r}>=${s.a},"${s.h}",${acc})`, `"${skala[skala.length - 1].h}"`).replace(/^/, `IF(${kol(cAkhir)}${r}="","",`) + ")" } : "";
+  const judul = k => k.ujian ? `${k.ujian}` : `M${k.minggu} ${String(isi(k.bentuk) || "Tugas").slice(0, 40)}`;
+  const nilai = [["No", "NIM", "Nama"].concat(komp.map(judul), ["Nilai akhir", "Huruf"]), ["", "", "Bobot (%) →"].concat(komp.map(k => Number(k.bobot) || 0), [{ f: `SUM(${kol(a0)}2:${kol(aN)}2)`, v: komp.reduce((a, k) => a + (Number(k.bobot) || 0), 0) }, ""])];
+  ps.forEach((m, i) => { const r = i + 3; nilai.push([i + 1, m.nim || "", m.nama || ""].concat(komp.map(() => ""), [{ f: `IF(COUNT(${kol(a0)}${r}:${kol(aN)}${r})=0,"",SUMPRODUCT(${kol(a0)}${r}:${kol(aN)}${r},${kol(a0)}$2:${kol(aN)}$2)/${kol(cAkhir)}$2)` }, huruf(r)])); });
+  const cpl = (D && D.cpl || []).map(c => c.kode);
+  const lembar = [{ nama: "Nilai", baris: nilai, lebar: [5, 14, 30].concat(komp.map(() => 14), [12, 8]) }];
+  if (cpl.length) {
+    const kc = cpl.map(k => komp.map((c, j) => c.ujian ? -1 : (String(c.cpl || "").toUpperCase().replace(/\s/g, "").split(/[,;/]/).includes(k.toUpperCase()) ? j : -1)).filter(j => j >= 0));
+    const b = [["No", "NIM", "Nama"].concat(cpl.map((k, i) => `${k}${(D.cpl[i] || {}).ref ? " (" + D.cpl[i].ref + ")" : ""}`))];
+    const rumusCpl = (js, r) => {
+      const sel = js.map(j => "Nilai!" + kol(a0 + j) + r), bb = js.map(j => "Nilai!" + kol(a0 + j) + "$2");
+      return { f: "IF(COUNT(" + sel.join(",") + ")=0,\"\",(" + js.map((j, q) => "N(" + sel[q] + ")*" + bb[q]).join("+") + ")/(" + bb.join("+") + "))" };
+    };
+    ps.forEach((m, i) => { const r = i + 3; b.push([i + 1, m.nim || "", m.nama || ""].concat(kc.map(js => js.length ? rumusCpl(js, r) : ""))); });
+    const n = ps.length;
+    b.push(["", "", "Rata-rata kelas"].concat(cpl.map((_, i) => ({ f: `IFERROR(AVERAGE(${kol(3 + i)}2:${kol(3 + i)}${n + 1}),"")` }))));
+    lembar.push({ nama: "Ketercapaian CPL", baris: b, lebar: [5, 14, 30].concat(cpl.map(() => 14)) });
+  }
+  lembar.push({ nama: "Petunjuk", baris: [["Portofolio penilaian " + R.mk.nama + " (" + R.mk.kode + ") · " + (R.labelKelas || "") + " · " + (R.labelSemester || "")],
+    ["Isi nilai 0–100 pada lembar Nilai (baris mulai 3). Baris 2 berisi bobot dari RPS; ubah bila kontrak menyepakati bobot lain."],
+    ["Nilai akhir = Σ (nilai × bobot) ÷ jumlah bobot. Huruf mengikuti skala nilai di Pengaturan prodi" + (skala.length ? "." : " (belum diatur: kolom Huruf kosong).")],
+    ["Lembar Ketercapaian CPL menghitung rata-rata berbobot komponen yang mengukur setiap CPL (dari kolom CPL portofolio penilaian di RPS)."],
+    ["Peserta diambil dari Peserta kelas di aplikasi pada saat diunduh."]], lebar: [120] });
+  return lembar;
+}
+G.UPW_RPS = { buat, kosong, baca, periksa, saranMetode, ringkas, waktuBawaan, PENANDA, kontrak, rubrik, portoXlsx };
 })();

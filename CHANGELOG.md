@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.43.1 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.43.1 (tampilan docs/ dan server Apps Script Produksi deployment @25), termasuk isi v0.43.0: templat kontrak kuliah, rubrik, dan lembar
+  portofolio penilaian terisi dari RPS; RPS resmi PDF + Word sumber; catatan tanda tangan; kualifikasi/jenjang dan jam sajian otomatis; keterangan urutan pengisian.
+- Tidak ada perubahan struktur data (VERSI_SKEMA tetap 30), jadi server tidak membuat cadangan baru. Rollback ke v0.42.0 cukup tampilan (tag v0.42.0) dan deployment @24.
+- Setelah tayang: Admin Prodi mengisi skala nilai dan kehadiran minimal di Data Prodi › Kurikulum › Otorisasi templat RPS (selain nama/NIP Ketua Jurusan).
+- Penyetuju: pemilik, di chat 21 Nov 2026: "setuju tayang v0.43.1".
+
 ## v0.43.1 — 21 Nov 2026 — Uji Coba
 Ringkas: Keterangan urutan pengisian Portofolio MK: unggah RPS dulu, lalu unduh templat kontrak kuliah, rubrik, dan lembar portofolio penilaian yang terisi dari RPS.
 Permintaan pemilik 21 Nov 2026 ("berikan keterangan informasi itu pada aplikasi"); pemilik juga setuju keterangan privasi biodata dan tanda tangan KPS tetap ditampilkan.
