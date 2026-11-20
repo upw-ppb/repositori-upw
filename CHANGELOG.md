@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.45.0 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.45.0 (tampilan docs/ dan server Apps Script Produksi deployment @27): nilai dari SIAKAD per kelas, contoh dalam PDF, data bersama templat;
+  lembar Excel portofolio buatan aplikasi dihapus dari tampilan.
+- Tidak ada perubahan struktur data. Rollback ke v0.44.0 cukup tampilan (tag v0.44.0) dan deployment @26.
+- Setelah tayang: Admin Prodi mengisi Data Prodi › Kurikulum › Data bersama templat (Ketua Jurusan, skala nilai, kehadiran minimal, LMS, batas umpan balik/keberatan,
+  aturan keterlambatan, peraturan akademik).
+- Penyetuju: pemilik, di chat 21 Nov 2026: "setuju tayang v0.45.0".
+
 ## v0.45.0 — 21 Nov 2026 — Uji Coba
 Ringkas: Nilai dari SIAKAD per kelas (template nilai dibaca dan diperiksa otomatis), contoh dalam PDF yang dibuka langsung, dan data bersama templat (LMS, tempat, batas umpan balik, keterlambatan, peraturan akademik).
 Persetujuan pemilik 21 Nov 2026 ("saya setuju dengan semua saran anda, bisa dilanjutkan"): lembar Excel portofolio buatan aplikasi dihapus, ketercapaian CPL ditunda, contoh jadi PDF.
