@@ -3,6 +3,11 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.39.1 — 20 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.39.1 (tampilan docs/ dan server Apps Script Produksi deployment @20): Tabel 4 iLKPS menulis semua kode kelompok MK pilihan dalam satu baris.
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru. Rollback ke v0.39.0 cukup tampilan (tag v0.39.0) dan deployment @19.
+- Penyetuju: pemilik, di chat 20 Nov 2026: "setuju tayang v0.39.1".
+
 ## v0.39.1 — 20 Nov 2026 — Uji Coba
 Ringkas: Tabel 4 iLKPS (Kurikulum) menulis semua kode kelompok MK pilihan dalam satu baris, mis. 231041217 / 231041215 / 231041216; jumlah MK dan SKS tetap.
 Permintaan pemilik 20 Nov 2026 ("Ya, buatkan"), agar kode di dokumen akreditasi sama dengan dokumen kurikulum resmi.

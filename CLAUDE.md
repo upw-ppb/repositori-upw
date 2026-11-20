@@ -93,7 +93,7 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Rahasia server (MERICA) di Script Properties, BUKAN di repo.
 - Server Produksi DIBUAT 13 Nov 2026 (pemilik: "Buat sekarang"): proyek "Repositori UPW (Produksi)", scriptId
   1zQ7xhO3bgX4NsfHiRCeMdr3T8VH8L5u_TlTuilPp3KXUxU3JYR_lhXr0, deployment AKfycbylF-ZVlYYDbAmQE3OBH0q7P_cOBaAFO-WSK0OKsErHLyEf4JmbWe4jrkV3VZVk2uK3
-  (v0.39.0 sejak 20 Nov 2026, @19, "setuju tayang v0.39.0"). Semua di alat/produksi.json. 13 Nov 2026: pemilik sudah menjalankan izinkanServer + siapkanProduksi (ping: lingkungan
+  (v0.39.1 sejak 20 Nov 2026, @20, "setuju tayang v0.39.1"). Semua di alat/produksi.json. 13 Nov 2026: pemilik sudah menjalankan izinkanServer + siapkanProduksi (ping: lingkungan
   produksi); kata sandi Super Admin Produksi hanya diketahui pemilik. JANGAN panggil aksi "siapkan" ke URL Produksi.
   Cek dari luar cukup ping (curl -sL --data '{"aksi":"ping"}', tanpa -X POST agar redirect jadi GET). Spreadsheet/Drive Produksi dibuat oleh siapkanProduksi. gas/.clasp.json TETAP Uji Coba; push ke Produksi
   dari folder sementara (lihat PRODUKSI.md) dan HANYA setelah "setuju tayang".
