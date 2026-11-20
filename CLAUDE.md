@@ -310,6 +310,8 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   mhs.mkSaya (menu "mkm"). MK biasa: otomatis = mhs aktif angkatanMk() kelas itu, baris tersimpan menggantikan; MK berkelompok: hanya baris tersimpan. EWMP (ampuTs):
   SKS ÷ SEMUA anggota tim termasuk praktisi (keputusan pemilik "semua dibagi"). Tampilan: laciPeserta (psbagi/pspilih, templatPeserta [peserta:smt:kode]), hMkMhs.
   Uji: alat/uji/uji-v39-bagian.mjs.
+- v0.39.1 (20 Nov 2026, Uji Coba): Tabel 4 kode MK berkelompok = kodeTabelMk(m) ("kode / kode / kode"). Produksi: MK bahasa pilihan semula berkode sementara
+  987654321 (Dasar, smt 2) dan 123456789 (Lanjutan, smt 3); pemilik diminta mengganti ke 231041217 / 231041228 + kelompok lewat Ubah MK.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

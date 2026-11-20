@@ -3,6 +3,17 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.39.1 — 20 Nov 2026 — Uji Coba
+Ringkas: Tabel 4 iLKPS (Kurikulum) menulis semua kode kelompok MK pilihan dalam satu baris, mis. 231041217 / 231041215 / 231041216; jumlah MK dan SKS tetap.
+Permintaan pemilik 20 Nov 2026 ("Ya, buatkan"), agar kode di dokumen akreditasi sama dengan dokumen kurikulum resmi.
+- Tabel 4: kolom Kode Mata Kuliah untuk MK berkelompok paralel = kode utama + kode kelompok lain (dipisah " / "); tetap satu baris, SKS dihitung sekali; catatan
+  tabel menjelaskannya. Ekspor Excel iLKPS ikut. MK berkelompok tanpa kode kelompok tetap menulis kode utama.
+- Panduan pengisian untuk Produksi (disampaikan ke pemilik): ganti kode sementara 987654321 → 231041217 (Dasar) dan 123456789 → 231041228 (Lanjutan) lewat
+  Ubah MK, lalu isi Kelompok paralel; sebelum menetapkan tim/peserta.
+- Server: hanya Tabel 4 (fungsi kodeTabelMk); struktur data tidak berubah. Rollback ke v0.39.0 tanpa pemulihan data.
+- Uji: 737 + 44 uji server lulus (1 uji baru). Uji tampilan: ubah kode MK sementara lewat formulir + isi kelompok, Tabel 4 menampilkan satu baris dengan tiga kode.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.39.0 — 20 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.39.0 (tampilan docs/ dan server Apps Script Produksi deployment @19), sekaligus memuat v0.38.0: MK pilihan dengan kelompok paralel
   (Bahasa Asing Pilihan: tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok), peserta kelas (otomatis/diatur/dibagi per kelompok,

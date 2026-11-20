@@ -40,3 +40,12 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2 }) {
   cek("tampilan: menu mkm untuk mahasiswa, tombol Peserta, templat Excel pembagian kelompok", /if \(p === "mahasiswa"\) m\.push\("mkm"\)/.test(app) && /data-act="pesertaBuka"/.test(app) && /\[peserta:/.test(app) && /function hMkMhs/.test(app));
   void m2;
 }
+// v0.39.1: Tabel 4 menulis semua kode kelompok MK berkelompok (satu baris MK).
+export function jalankan391({ cek, ok, tAdm }) {
+  console.log("51. Tabel 4: kode kelompok MK pilihan");
+  ok("dp.mkSimpan", { data: { kode: "UPW977", nama: "Uji Kode Kelompok", semester: 2, sksKuliah: 2, kelompok: "Jepang (UPW977), Jerman (UPW978), Perancis (UPW979)" } }, tAdm);
+  ok("dp.mkSimpan", { data: { kode: "UPW980", nama: "Uji Kode Kelompok Tanpa Kode", semester: 2, sksKuliah: 2, kelompok: "Jepang, Jerman" } }, tAdm);
+  const T4 = ok("ilkps.data", { ts: 2025 }, tAdm).tabel.find(t => t.kode === "4"), b = T4.baris.filter(r => /UPW97[7-9]|UPW980/.test(String(r[2])));
+  cek("Tabel 4: satu baris dengan tiga kode; MK berkelompok tanpa kode kelompok tetap kode utama; total MK tidak bertambah",
+    b.length === 2 && b.some(r => r[2] === "UPW977 / UPW978 / UPW979" && r[3] === "Uji Kode Kelompok") && b.some(r => r[2] === "UPW980") && /semua kode kelompoknya/.test(T4.catatan));
+}

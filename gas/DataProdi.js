@@ -47,6 +47,13 @@ function bersihKelompok(v) {
   if (hasil.length > 6) throw galat("Kelompok paralel maksimal 6.");
   return hasil;
 }
+/** v0.39.1: kode MK untuk Tabel 4 — MK berkelompok paralel ditulis dengan semua kode kelompoknya (mis. "231041217 / 231041215 / 231041216"), tetap satu baris MK. */
+function kodeTabelMk(m) {
+  var l = (m.kelompok || []).map(function (g) { return g.kode; }).filter(Boolean);
+  if (!l.length) return m.kode;
+  if (l.indexOf(m.kode) < 0) l.unshift(m.kode);
+  return l.join(" / ");
+}
 /** Kunci tim per kelompok: "A/JEPANG". */
 function kunciKelompok(kelas, n) { return String(kelas).toUpperCase() + "/" + String(n).toUpperCase(); }
 function kelompokDariKunci(k) { var i = String(k).indexOf("/"); return i < 0 ? "" : String(k).slice(i + 1); }
@@ -528,9 +535,9 @@ function tabelDosen(ts) {
     kolom: ["No.", "Semester", "Kode Mata Kuliah", "Nama Mata Kuliah", "Mata Kuliah Kompetensi", "Kuliah/Responsi/Tutorial (sks)", "Seminar (sks)",
       "Praktikum/Praktik/Praktik Lapangan (sks)", "Konversi Kredit ke Jam", "CPL: Sikap", "CPL: Pengetahuan", "CPL: Keterampilan Umum", "CPL: Keterampilan Khusus",
       "Dokumen Rencana Pembelajaran", "Unit Penyelenggara"],
-    baris: mks.map(function (m, i) { return [i + 1, m.semester, m.kode, m.nama, m.kompetensi ? "V" : "", m.sksKuliah, m.sksSeminar, m.sksPraktik, sksMk(m) * JAM_PER_SKS,
+    baris: mks.map(function (m, i) { return [i + 1, m.semester, kodeTabelMk(m), m.nama, m.kompetensi ? "V" : "", m.sksKuliah, m.sksSeminar, m.sksPraktik, sksMk(m) * JAM_PER_SKS,
       m.cplSikap ? "V" : "", m.cplPengetahuan ? "V" : "", m.cplKu ? "V" : "", m.cplKk ? "V" : "", m.rps, m.unit]; }),
-    catatan: "Konversi jam = total sks × " + JAM_PER_SKS + " jam/semester (Permendikbudristek 53/2023). Total " + mks.reduce(function (s, m) { return s + sksMk(m); }, 0) + " sks, " +
+    catatan: "Konversi jam = total sks × " + JAM_PER_SKS + " jam/semester (Permendikbudristek 53/2023). MK pilihan berkelompok ditulis dengan semua kode kelompoknya (dihitung satu MK). Total " + mks.reduce(function (s, m) { return s + sksMk(m); }, 0) + " sks, " +
       mks.reduce(function (s, m) { return s + m.sksPraktik; }, 0) + " sks praktik." });
   // Tabel 5: pembimbing utama TA, dari kegiatan "bimbingan" yang disetujui.
   var idx = indeksOrang(), tsL = [ts - 2, ts - 1, ts], hit = {};
