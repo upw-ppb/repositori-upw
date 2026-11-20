@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.39.2 — 20 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.39.2 (tampilan docs/ dan server Apps Script Produksi deployment @21): templat tim pengajar menerima nama yang diketik
+  (tanpa gelar, inisial, NIP, atau minimal 2 kata nama) dengan tanda "Terbaca sebagai", dan pratinjau unggahan menampilkan beban SKS per orang.
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru. Rollback ke v0.39.1 cukup tampilan (tag v0.39.1) dan deployment @20.
+- Penyetuju: pemilik, di chat 20 Nov 2026: "setuju tayang v0.39.2".
+
 ## v0.39.2 — 20 Nov 2026 — Uji Coba
 Ringkas: Templat Excel tim pengajar menerima nama yang diketik (tanpa gelar, inisial, NIP, atau minimal 2 kata nama sama) dan pratinjau unggahan menampilkan beban SKS per orang.
 Permintaan pemilik 20 Nov 2026 ("ya kerjakan"): nama tidak harus dipilih dari dropdown.
