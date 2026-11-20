@@ -3,9 +3,18 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.46.0 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.46.0 (tampilan docs/ dan server Apps Script Produksi deployment @28): CPL yang dibebankan per MK, unit kompetensi per MK, Cocokkan dengan PDDikti.
+- Struktur data berubah (kolom MataKuliah.unitKomp dan cplMk, VERSI_SKEMA 31): server mencadangkan spreadsheet lalu menambah kolom otomatis pada permintaan pertama.
+  Rollback ke v0.45.0 (tag v0.45.0 + deployment @27) tidak perlu pemulihan data: versi lama mengabaikan kedua kolom itu.
+- Setelah tayang: Admin Prodi menempelkan daftar dosen prodi dari PDDikti di Data Prodi › Status dosen › Cocokkan dengan PDDikti; KPS/Admin Prodi menetapkan CPL per MK
+  di Data Prodi › Kurikulum › CPL & unit.
+- Pemilik meminta sebutan jabatan perorangan tidak ditulis di aplikasi (dibuat umum); catatan v0.46.0 Uji Coba disesuaikan.
+- Penyetuju: pemilik, di chat 21 Nov 2026: "Setuju tayang v.0.46.0".
+
 ## v0.46.0 — 21 Nov 2026 — Uji Coba
 Ringkas: CPL yang dibebankan per mata kuliah ditetapkan KPS/Admin Prodi, unit kompetensi per MK dari dokumen pemetaan kurikulum, dan pencocokan dosen dengan daftar PDDikti.
-Disetujui pemilik 21 Nov 2026 ("Sesuaikan … jika tidak ada, silahkan dikerjakan"). Pengajar industri dan Kasubbag TPK tidak pernah menjadi pengampu utama, jadi fitur akun
+Disetujui pemilik 21 Nov 2026 ("Sesuaikan … jika tidak ada, silahkan dikerjakan"). Pengajar industri dan pengajar yang tidak terdaftar di PDDikti tidak pernah menjadi pengampu utama, jadi fitur akun
 praktisi dibatalkan.
 - **Unit kompetensi per MK** (gas/UnitKompetensi.js): 122 unit ASEAN (kode, nama Inggris, nama Indonesia) untuk 48 MK dari lembar "Pembentukan Mata Kuliah" dan "Identifikasi Komp"
   berkas Pemetaan Kurikulum UPW ASEAN MRA-TP 2023 (Review Kurikulum 2025), dicocokkan dengan MK di aplikasi menurut NAMA saja; kode dan semester MK di berkas itu tidak dipakai

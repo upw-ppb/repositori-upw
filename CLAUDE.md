@@ -93,7 +93,7 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Rahasia server (MERICA) di Script Properties, BUKAN di repo.
 - Server Produksi DIBUAT 13 Nov 2026 (pemilik: "Buat sekarang"): proyek "Repositori UPW (Produksi)", scriptId
   1zQ7xhO3bgX4NsfHiRCeMdr3T8VH8L5u_TlTuilPp3KXUxU3JYR_lhXr0, deployment AKfycbylF-ZVlYYDbAmQE3OBH0q7P_cOBaAFO-WSK0OKsErHLyEf4JmbWe4jrkV3VZVk2uK3
-  (v0.45.0 sejak 21 Nov 2026, @27, "setuju tayang v0.45.0"). Semua di alat/produksi.json. 13 Nov 2026: pemilik sudah menjalankan izinkanServer + siapkanProduksi (ping: lingkungan
+  (v0.46.0 sejak 21 Nov 2026, @28, "Setuju tayang v.0.46.0"). Semua di alat/produksi.json. 13 Nov 2026: pemilik sudah menjalankan izinkanServer + siapkanProduksi (ping: lingkungan
   produksi); kata sandi Super Admin Produksi hanya diketahui pemilik. JANGAN panggil aksi "siapkan" ke URL Produksi.
   Cek dari luar cukup ping (curl -sL --data '{"aksi":"ping"}', tanpa -X POST agar redirect jadi GET). Spreadsheet/Drive Produksi dibuat oleh siapkanProduksi. gas/.clasp.json TETAP Uji Coba; push ke Produksi
   dari folder sementara (lihat PRODUKSI.md) dan HANYA setelah "setuju tayang".
@@ -347,7 +347,7 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   2023 PPB Review Kurikulum.xlsx"; berkas itu TIDAK berisi matriks CPL–MK; kode/semester MK di sana diabaikan atas perintah pemilik; "jam sajian" praktik di sana 3 jam/sks, SK 2 jam/sks
   → aplikasi ikut SK). MataKuliah.unitKomp/cplMk (VERSI_SKEMA 31); unitMk(m), cplMkDitetapkan(m), usulanCplMk(m), aksi dp.cplMk/dp.cplMkSimpan (PERAN_CPL_MK kps/admin/superadmin).
   rpsRef/detail: cplMk + unitKomp/unitMk; kosong() memakai R.cplMk dan bahan dari unit; periksa() ref.cplMk/ref.unit. Tampilan: laciCplMk (jenis "cplMk"), panelPddikti/bacaPddikti
-  (memakai buatPencocokNama; menerapkan lewat biodata.massal). Jenis pengajar (keputusan pemilik): industri dan Kasubbag TPK (tidak di PDDikti) hanya team teaching, bukan utama →
+  (memakai buatPencocokNama; menerapkan lewat biodata.massal). Jenis pengajar (keputusan pemilik): pengajar industri dan pengajar yang tidak terdaftar di PDDikti (mis. tenaga kependidikan yang ikut mengajar) hanya team teaching, bukan utama →
   status Dosen industri / praktisi dan Dosen tidak tetap. JANGAN simpan daftar PDDikti (NIDN/NUPTK) di repo. Uji: alat/uji/uji-v46-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
