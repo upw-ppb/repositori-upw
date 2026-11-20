@@ -349,6 +349,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   rpsRef/detail: cplMk + unitKomp/unitMk; kosong() memakai R.cplMk dan bahan dari unit; periksa() ref.cplMk/ref.unit. Tampilan: laciCplMk (jenis "cplMk"), panelPddikti/bacaPddikti
   (memakai buatPencocokNama; menerapkan lewat biodata.massal). Jenis pengajar (keputusan pemilik): pengajar industri dan pengajar yang tidak terdaftar di PDDikti (mis. tenaga kependidikan yang ikut mengajar) hanya team teaching, bukan utama →
   status Dosen industri / praktisi dan Dosen tidak tetap. JANGAN simpan daftar PDDikti (NIDN/NUPTK) di repo. Uji: alat/uji/uji-v46-bagian.mjs.
+- v0.47.0 (21 Nov 2026, Uji Coba): gas/Akun.js aksi admin.ubahNama (superadmin semua; admin hanya akun berperan tepat "mahasiswa"), admin.statusAkun (superadmin; nonaktif → hapusSemuaSesi),
+  admin.hapusAkun (superadmin; d.konfirmasi = username; rujukanAkun(id) memindai semua tabel SKEMA + biodata kecuali Pengguna, Log, TABEL_PRIBADI_AKUN; dirujuk → {dihapus:false, rujukan}).
+  superAdminAktif() melindungi Super Admin terakhir. Tampilan: laciAkunKelola (jenis "akunKelola"), LABEL_TABEL_AKUN. Uji: alat/uji/uji-v47-bagian.mjs (pakai NIM uji yang belum dipakai uji lain).
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

@@ -3,6 +3,22 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.47.0 — 21 Nov 2026 — Uji Coba
+Ringkas: Ubah nama akun (termasuk yang belum aktivasi), nonaktifkan/aktifkan kembali, dan hapus akun yang belum dipakai data, dari daftar akun; hapus dan nonaktifkan hanya Super Admin.
+Permintaan pemilik 21 Nov 2026 ("Ys, tambahkan … hanya super admin saja yang bisa [menghapus]").
+- **Ubah nama** (aksi admin.ubahNama): Super Admin untuk semua akun, Admin Prodi hanya akun mahasiswa. Spasi dirapikan; nama < 3 huruf, diawali = + - @, atau tidak berubah ditolak.
+  Log mencatat nama lama dan baru.
+- **Nonaktifkan / aktifkan kembali** (admin.statusAkun, Super Admin): akun nonaktif tidak bisa masuk (sesinya dihapus) dan tidak dihitung di data aktif; aktif kembali →
+  "aktif" (sudah aktivasi) atau "belum aktivasi". Akun sendiri dan Super Admin aktif terakhir dilindungi.
+- **Hapus permanen** (admin.hapusAkun, Super Admin; konfirmasi dengan mengetik NIM/NIP): hanya bila akun tidak dirujuk tabel data mana pun (kegiatan, tim pengajar, peserta kelas,
+  dokumen, rapat, penilaian, dll.). Bila masih dirujuk, akun tidak dihapus dan tabel rujukannya ditampilkan (sarankan nonaktifkan). Baris pribadi (sesi, kode, biodata, riwayat semester,
+  foto, pengingat) ikut dihapus. Log mencatat NIM/NIP, nama, peran, dan status akun yang dihapus.
+- Tampilan: tombol "Ubah nama / hapus" (Super Admin) atau "Ubah nama" (Admin Prodi, baris mahasiswa) di daftar akun Pengguna; laci akunKelola. Panduan Super Admin diperbarui.
+- Tanpa perubahan struktur data; rollback ke v0.46.0 aman (akun yang sudah dihapus tetap terhapus).
+- Uji: 852 + 44 uji server lulus (8 uji baru di uji-v47-bagian.mjs). Uji tampilan: Super Admin mengubah nama akun dosen belum aktivasi, menghapus akun yang belum dipakai, ditolak saat
+  menghapus dosen yang dipakai (kegiatan 8, tim pengajar 2, bank dokumen 2), menonaktifkan dan mengaktifkan kembali; tanpa galat konsol.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.46.0 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.46.0 (tampilan docs/ dan server Apps Script Produksi deployment @28): CPL yang dibebankan per MK, unit kompetensi per MK, Cocokkan dengan PDDikti.
 - Struktur data berubah (kolom MataKuliah.unitKomp dan cplMk, VERSI_SKEMA 31): server mencadangkan spreadsheet lalu menambah kolom otomatis pada permintaan pertama.

@@ -316,3 +316,75 @@ function aksiAdminTanpaEmail(d, token) {
 
 /** Angkatan dari NIM: dua angka pertama = tahun masuk (25 → 2025). 0 bila NIM tidak diawali dua angka. (v0.17.0) */
 function angkatanNim(nim) { var m = /^(\d{2})\d/.exec(String(nim || "")); return m ? 2000 + Number(m[1]) : 0; }
+
+/* ---------- v0.47.0: ubah nama, nonaktifkan/aktifkan, dan hapus akun ----------
+   Ubah nama: Super Admin (semua akun) dan Admin Prodi (akun mahasiswa saja). Nonaktifkan dan hapus: hanya Super Admin.
+   Hapus permanen hanya bila akun belum dirujuk data mana pun (kegiatan, tim pengajar, peserta, penilaian, dll.); bila sudah dirujuk, akun dinonaktifkan
+   saja agar data lain tetap utuh. Baris pribadi (sesi, kode, biodata, riwayat semester, foto, pengingat untuknya) ikut dihapus. Semua tercatat di Log. */
+var TABEL_PRIBADI_AKUN = ["Sesi", "Kode", "RiwayatSemester", "FotoProfil", "Pengingat", "BiodataMahasiswa", "BiodataPegawai"];
+function aksiAdminUbahNama(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["superadmin", "admin"]);
+  var superA = punyaPeran(p, ["superadmin"]), t = cari("Pengguna", function (x) { return x.id === d.userId; });
+  if (!t) throw galat("Pengguna tidak ditemukan.");
+  if (!superA && peranDari(t).join(",") !== "mahasiswa") throw galat("Admin Prodi hanya dapat mengubah nama akun mahasiswa.");
+  var nama = potong(d.nama, 150).replace(/\s+/g, " ").trim();
+  if (nama.length < 3) throw galat("Tulis nama lengkap (minimal 3 huruf).");
+  if (/^[=+\-@]/.test(nama)) throw galat("Nama tidak boleh diawali tanda = + - @.");
+  if (nama === teks(t.nama)) throw galat("Nama tidak berubah.");
+  var lama = teks(t.nama);
+  kunciTulis(function () { ubah("Pengguna", t, { nama: nama, diubahPada: new Date() }); });
+  catat(p.id, "admin.ubahNama", { untuk: t.id, username: String(t.username), lama: lama, baru: nama });
+  return { pengguna: profilAdmin(t, superA) };
+}
+function superAdminAktif(kecuali) {
+  return semua("Pengguna").filter(function (x) { return x.id !== kecuali && x.status !== "nonaktif" && peranDari(x).indexOf("superadmin") >= 0; }).length;
+}
+/** Tabel yang masih merujuk userId (selain baris pribadi dan Log). */
+function rujukanAkun(id) {
+  var h = [], tab = Object.keys(SKEMA).concat(Object.keys(tabelBiodata()));
+  tab.forEach(function (n) {
+    if (n === "Pengguna" || n === "Log" || TABEL_PRIBADI_AKUN.indexOf(n) >= 0) return;
+    var c = 0;
+    semua(n).forEach(function (r) { for (var k in r) { if (k.charAt(0) === "_") continue; var v = r[k]; if (typeof v === "string" && v.indexOf(id) >= 0) { c++; break; } } });
+    if (c) h.push({ tabel: n, n: c });
+  });
+  return h;
+}
+function aksiAdminStatusAkun(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["superadmin"]);
+  var t = cari("Pengguna", function (x) { return x.id === d.userId; });
+  if (!t) throw galat("Pengguna tidak ditemukan.");
+  if (t.id === p.id) throw galat("Anda tidak dapat menonaktifkan akun Anda sendiri.");
+  var aktif = !!d.aktif;
+  if (!aktif && peranDari(t).indexOf("superadmin") >= 0 && superAdminAktif(t.id) < 1) throw galat("Harus tersisa minimal satu Super Admin aktif.");
+  var status = aktif ? (t.hash ? "aktif" : "impor") : "nonaktif";
+  kunciTulis(function () { ubah("Pengguna", t, { status: status, diubahPada: new Date() }); });
+  if (!aktif) hapusSemuaSesi(t.id);
+  catat(p.id, aktif ? "admin.aktifkanAkun" : "admin.nonaktifkanAkun", { untuk: t.id, username: String(t.username), nama: teks(t.nama) });
+  return { pengguna: profilAdmin(t, true) };
+}
+/** Hapus permanen (d.konfirmasi = NIM/NIP akun). Bila akun masih dirujuk data, tidak dihapus: { dihapus: false, rujukan }. */
+function aksiAdminHapusAkun(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["superadmin"]);
+  var t = cari("Pengguna", function (x) { return x.id === d.userId; });
+  if (!t) throw galat("Pengguna tidak ditemukan.");
+  if (t.id === p.id) throw galat("Anda tidak dapat menghapus akun Anda sendiri.");
+  if (normalUser(d.konfirmasi) !== normalUser(t.username)) throw galat("Ketik NIM/NIP akun ini dengan tepat untuk mengonfirmasi penghapusan.");
+  if (peranDari(t).indexOf("superadmin") >= 0 && superAdminAktif(t.id) < 1) throw galat("Harus tersisa minimal satu Super Admin aktif.");
+  var rujukan = rujukanAkun(t.id);
+  if (rujukan.length) return { dihapus: false, rujukan: rujukan };
+  var jejak = { username: String(t.username), nama: teks(t.nama), peran: teks(t.peran), status: teks(t.status) };
+  kunciTulis(function () {
+    TABEL_PRIBADI_AKUN.forEach(function (n) {
+      semua(n).filter(function (r) { return r.userId === t.id || (n === "Pengingat" && r.untuk === t.id); })
+        .sort(function (a, b) { return b._baris - a._baris; }).forEach(function (r) { hapusBaris(n, r); });
+    });
+    var u = cari("Pengguna", function (x) { return x.id === t.id; });
+    if (u) hapusBaris("Pengguna", u);
+  });
+  catat(p.id, "admin.hapusAkun", Object.assign({ untuk: t.id }, jejak));
+  return { dihapus: true };
+}
