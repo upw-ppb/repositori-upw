@@ -1,5 +1,6 @@
 // Uji v0.39.0: peserta kelas (otomatis per kelas, diatur per orang, dibagi per kelompok) dan Mata Kuliah Saya untuk mahasiswa.
 import fs from "node:fs";
+import vm from "node:vm";
 export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2 }) {
   console.log("50. Peserta kelas dan Mata Kuliah Saya (mahasiswa)");
   const dsn = ID("199001152015041001"), d2 = ID("198001012005011009"), m1 = ID("250103"), smt = "2026-1";
@@ -48,4 +49,30 @@ export function jalankan391({ cek, ok, tAdm }) {
   const T4 = ok("ilkps.data", { ts: 2025 }, tAdm).tabel.find(t => t.kode === "4"), b = T4.baris.filter(r => /UPW97[7-9]|UPW980/.test(String(r[2])));
   cek("Tabel 4: satu baris dengan tiga kode; MK berkelompok tanpa kode kelompok tetap kode utama; total MK tidak bertambah",
     b.length === 2 && b.some(r => r[2] === "UPW977 / UPW978 / UPW979" && r[3] === "Uji Kode Kelompok") && b.some(r => r[2] === "UPW980") && /semua kode kelompoknya/.test(T4.catatan));
+}
+// v0.39.2: pencocokan nama di unggahan templat tim (nama boleh diketik). Diuji langsung pada kode tampilan.
+export function jalankan392({ cek }) {
+  console.log("52. Templat tim: pencocokan nama yang diketik");
+  const app = fs.readFileSync("web/aplikasi.js", "utf8");
+  const potong = (a, b) => app.slice(app.indexOf(a), app.indexOf(b));
+  const kode = potong("const labelDosenTim", "function templatTim") + potong("/* v0.39.2: pencocokan nama bertahap", "/** Periksa hasil baca templat tim");
+  const ctx = {}; vm.createContext(ctx); vm.runInContext(kode + "\n;this.buat = buatPencocokNama;", ctx);
+  const D = { dosen: [
+      { id: "k", nama: "Dr. Komang Sri Widiastuti, M.Par.", inisial: "KSW", nip: "197911302005012001" },
+      { id: "g", nama: "Gede Arya Pratama, S.E., M.M.", inisial: "GAP", nip: "199001152015041001" },
+      { id: "l", nama: "Lukia Zuarida, S.S., M.Par.", inisial: "LZ", nip: "198501012010122001" },
+      { id: "m1", nama: "I Made Artajaya, S.ST.Par., M.Par.", inisial: "MA", nip: "1" },
+      { id: "m2", nama: "I Made Putra Wijaya, M.M.", inisial: "MPW", nip: "2" },
+      { id: "n1", nama: "Ni Luh Putu Sari, M.Par.", inisial: "NLS", nip: "3" },
+      { id: "n2", nama: "Ni Luh Putu Dewi, M.Par.", inisial: "NLD", nip: "4" }],
+    praktisi: [{ id: "p", nama: "Teguh Hadisukarno", perusahaan: "PT Wisata" }] };
+  const c = ctx.buat(D), id = v => (c(v).a || {}).id, cara = v => c(v).cara;
+  cek("persis: pilihan dropdown, nama lengkap, inisial (huruf kecil), NIP", id("Dr. Komang Sri Widiastuti, M.Par. (KSW)") === "k" && id("gede arya pratama, s.e., m.m.") === "g" && id("ksw") === "k" && id("199001152015041001") === "g" && cara("KSW") === "persis");
+  cek("tanpa gelar: 'Komang Sri Widiastuti', 'Lukia Zuarida', praktisi 'Teguh Hadisukarno'", id("Komang Sri Widiastuti") === "k" && cara("Komang Sri Widiastuti") === "tanpa gelar" && id("Lukia Zuarida") === "l" && id("teguh hadisukarno") === "p");
+  cek("mirip (≥2 kata): 'Komang Widiastuti', 'Bu Komang Widiastuti', 'Made Artajaya'", id("Komang Widiastuti") === "k" && cara("Komang Widiastuti") === "mirip" && id("Bu Komang Widiastuti") === "k" && id("Made Artajaya") === "m1");
+  cek("tidak menebak: satu kata ('Lukia'), hanya kata nama umum ('Ni Luh Putu'), atau dua orang sama cocok ('I Made')",
+    !id("Lukia") && c("Lukia").satuKata && !id("Ni Luh Putu") && !id("I Made") && !id("Orang Lain Sekali"));
+  cek("kata khas memilih orang yang benar di antara nama umum: 'Ni Luh Sari' → Sari, 'Luh Putu Dewi' → Dewi", id("Ni Luh Sari") === "n1" && id("Luh Putu Dewi") === "n2");
+  cek("tampilan: kolom 'Terbaca sebagai' dan beban SKS per orang di pratinjau; petunjuk menulis nama di templat",
+    /k: "tafsir", l: "Terbaca sebagai \(periksa\)"/.test(app) && /Beban SKS per orang menurut berkas ini/.test(app) && /\["Menulis nama"/.test(app));
 }

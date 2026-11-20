@@ -207,7 +207,7 @@ function aksiDpData(d, token) {
   // Semester berikutnya (untuk persiapan) sampai 10 semester ke belakang.
   var pilihanSmt = [], kk = s.ganjil ? kodeSmt(s.awal, false) : kodeSmt(s.awal + 1, true);
   for (var i = 0; i < 11; i++) { pilihanSmt.push(kk); kk = /-1$/.test(kk) ? kodeSmt(Number(kk.slice(0, 4)) - 1, false) : kodeSmt(Number(kk.slice(0, 4)), true); }
-  var ganjil = /-1$/.test(smt);
+  var ganjil = /-1$/.test(smt), bolehLihatNip = punyaPeran(p, PERAN_TIM_IMPOR);
   var semua_ = mks.map(function (m) { var x = Object.assign({}, m); delete x._r; x.sks = sksMk(m); return x; });
   return {
     bolehUbah: punyaPeran(p, PERAN_DP_UBAH),
@@ -215,7 +215,7 @@ function aksiDpData(d, token) {
     mk: semua_, jamPerSks: JAM_PER_SKS,
     praktisi: semuaPraktisi().map(function (x) { var b = x._bukti; delete x._r; delete x._bukti; x.bukti = buktiPraktisiKeKlien(b); x.memenuhi = praktisiMemenuhi(x); return x; }),
     slotBuktiPraktisi: SLOT_BUKTI_PRAKTISI,
-    dosen: daftarDosen().map(function (x) { return { id: x.id, nama: x.nama, inisial: x.inisial, status: x.status }; }),
+    dosen: daftarDosen().map(function (x) { return { id: x.id, nama: x.nama, inisial: x.inisial, status: x.status, nip: bolehLihatNip ? x.nip : "" }; }),   // v0.39.2: NIP untuk mencocokkan nama di templat tim
     semester: smt, labelSemester: labelSmt(smt), pilihanSemester: pilihanSmt.map(function (k) { return { kode: k, label: labelSmt(k) }; }),
     tim: semua_.filter(function (m) { return m.semester % 2 === (ganjil ? 1 : 0); }).map(function (m) {
       var x = tim[m.kode];

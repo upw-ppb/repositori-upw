@@ -1,0 +1,429 @@
+{
+ "sumber": "Keputusan Direktur Politeknik Pariwisata Bali No. SK/1498/KR.00.02/PTP.2/2023, Lampiran 4, versi 'Review 2025 Rev 1' (berkas pemilik 20 Nov 2026: 'Keputusan Direktur Struktur CATC Prodi UPW Review 2025 Rev 1 (1).pdf').",
+ "catatan": "Kode singkatan dari SK (bukan kode numerik aplikasi). Perubahan dari versi sebelumnya (diterima 20 Nov 2026 pagi): GDS (Global Distribution System) semester 5 → 6, SKB (Studi Kelayakan Bisnis dan Investasi Usaha Perjalanan Wisata) semester 6 → 5. Jumlah per semester di versi ini sudah benar. Nomor dan tanggal SK tidak berubah (20 Juni 2023).",
+ "mk": [
+  {
+   "semester": 1,
+   "kode": "AGA",
+   "nama": "Agama",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 1,
+   "kode": "PAN",
+   "nama": "Pancasila",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 1,
+   "kode": "DFP",
+   "nama": "Dokumen Fasilitasi Perjalanan",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 1,
+   "kode": "PPH",
+   "nama": "Pengetahuan Pariwisata, Hospitality & Event",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 1,
+   "kode": "PKL",
+   "nama": "Praktik Kesehatan, Keselamatan Kerja dan Lingkungan (K3L)",
+   "teori": 0,
+   "praktik": 2,
+   "sks": 2
+  },
+  {
+   "semester": 1,
+   "kode": "PSD",
+   "nama": "Praktik Sistem Reservasi & Dokumen Pasasi Udara",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 1,
+   "kode": "KBP",
+   "nama": "Komunikasi dan Korespondensi Bisnis Perjalanan",
+   "teori": 0,
+   "praktik": 2,
+   "sks": 2
+  },
+  {
+   "semester": 1,
+   "kode": "GEP",
+   "nama": "Geografi & Daya Tarik Wisata",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 2,
+   "kode": "LID",
+   "nama": "Literasi Digital",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 2,
+   "kode": "PPW",
+   "nama": "Praktik Perencanaan Paket Wisata",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 2,
+   "kode": "BIO",
+   "nama": "Bahasa Inggris Perjalanan Tingkat Operasional",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 2,
+   "kode": "PIT",
+   "nama": "Pengelolaan Bisnis Transportasi",
+   "teori": 0,
+   "praktik": 2,
+   "sks": 2
+  },
+  {
+   "semester": 2,
+   "kode": "PKW",
+   "nama": "Praktik Kepemanduan Wisata",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 2,
+   "kode": "TOD",
+   "nama": "Tata Operasi Darat",
+   "teori": 0,
+   "praktik": 2,
+   "sks": 2
+  },
+  {
+   "semester": 2,
+   "kode": "BAD",
+   "nama": "Bahasa Asing Pilihan Kepemanduan Dasar",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 2,
+   "kode": "KEN",
+   "nama": "Kewarganegaraan",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 3,
+   "kode": "ABP",
+   "nama": "Akuntansi Biro Perjalanan Wisata",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 3,
+   "kode": "PIP",
+   "nama": "Pemasaran Industri Perjalanan",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 3,
+   "kode": "PDM",
+   "nama": "Praktik Desain & Media Digital",
+   "teori": 0,
+   "praktik": 2,
+   "sks": 2
+  },
+  {
+   "semester": 3,
+   "kode": "PMW",
+   "nama": "Praktik Memimpin Perjalanan Wisata",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 3,
+   "kode": "PTI",
+   "nama": "Praktik Perjalanan Tur Insentif",
+   "teori": 0,
+   "praktik": 2,
+   "sks": 2
+  },
+  {
+   "semester": 3,
+   "kode": "PWM",
+   "nama": "Produk Wisata Minat Khusus",
+   "teori": 0,
+   "praktik": 2,
+   "sks": 2
+  },
+  {
+   "semester": 3,
+   "kode": "BAL",
+   "nama": "Bahasa Asing Pilihan Kepemanduan Lanjutan",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 3,
+   "kode": "BIT",
+   "nama": "Bahasa Inggris Perjalanan Tingkat Penyelia",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 3,
+   "kode": "WKP",
+   "nama": "Wisata Kapal Pesiar",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 4,
+   "kode": "EKO",
+   "nama": "Ekowisata",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 4,
+   "kode": "MRE",
+   "nama": "Manajemen Resiko Industri Perjalanan",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 4,
+   "kode": "BIP",
+   "nama": "Bahasa Inggris Perjalanan Tingkat Profesional",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 4,
+   "kode": "SPT",
+   "nama": "Statistika",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 4,
+   "kode": "POW",
+   "nama": "Praktik Operasional Perjalanan Wisata",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 4,
+   "kode": "SSB",
+   "nama": "Sejarah, Seni & Budaya Lokal",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 4,
+   "kode": "PKU",
+   "nama": "Pengelolaan Keuangan Usaha Perjalanan",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 4,
+   "kode": "KWN",
+   "nama": "Kewirausahaan",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 5,
+   "kode": "BAN",
+   "nama": "Budaya Anti Korupsi dan Narkoba",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 5,
+   "kode": "MAS",
+   "nama": "Manajemen Strategis",
+   "teori": 3,
+   "praktik": 0,
+   "sks": 3
+  },
+  {
+   "semester": 5,
+   "kode": "AIP",
+   "nama": "Aplikasi dan Inovasi Perjalanan Wisata",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 5,
+   "kode": "MET",
+   "nama": "Metode Penelitian Terapan",
+   "teori": 3,
+   "praktik": 0,
+   "sks": 3
+  },
+  {
+   "semester": 5,
+   "kode": "APM",
+   "nama": "Aplikasi Manajemen Industri Perjalanan",
+   "teori": 0,
+   "praktik": 6,
+   "sks": 6
+  },
+  {
+   "semester": 5,
+   "kode": "SKB",
+   "nama": "Studi Kelayakan Bisnis dan Investasi Usaha Perjalanan Wisata",
+   "teori": 4,
+   "praktik": 0,
+   "sks": 4
+  },
+  {
+   "semester": 6,
+   "kode": "GDS",
+   "nama": "Global Distribution System",
+   "teori": 0,
+   "praktik": 3,
+   "sks": 3
+  },
+  {
+   "semester": 6,
+   "kode": "PBT",
+   "nama": "Proyek Bisnis Terapan",
+   "teori": 0,
+   "praktik": 4,
+   "sks": 4
+  },
+  {
+   "semester": 6,
+   "kode": "PSD",
+   "nama": "Pengelolaan Sumber Daya Manusia",
+   "teori": 3,
+   "praktik": 0,
+   "sks": 3
+  },
+  {
+   "semester": 6,
+   "kode": "KLB",
+   "nama": "Komunikasi Lintas Budaya",
+   "teori": 3,
+   "praktik": 0,
+   "sks": 3
+  },
+  {
+   "semester": 6,
+   "kode": "PPR",
+   "nama": "Pelayanan Prima",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 6,
+   "kode": "PPP",
+   "nama": "Pengelolaan Perusahaan Perjalanan Wisata",
+   "teori": 0,
+   "praktik": 4,
+   "sks": 4
+  },
+  {
+   "semester": 7,
+   "kode": "MAG",
+   "nama": "Magang Industri",
+   "teori": 0,
+   "praktik": 20,
+   "sks": 20
+  },
+  {
+   "semester": 8,
+   "kode": "BAI",
+   "nama": "Bahasa Indonesia",
+   "teori": 2,
+   "praktik": 0,
+   "sks": 2
+  },
+  {
+   "semester": 8,
+   "kode": "DTB",
+   "nama": "Digital Travel Business",
+   "teori": 0,
+   "praktik": 4,
+   "sks": 4
+  },
+  {
+   "semester": 8,
+   "kode": "PA",
+   "nama": "Proyek Akhir",
+   "teori": 0,
+   "praktik": 6,
+   "sks": 6
+  }
+ ],
+ "ringkas": {
+  "jumlahMk": 49,
+  "totalSks": 148,
+  "sksTeori": 54,
+  "sksPraktik": 94,
+  "pjp": 63.5,
+  "perSemester": {
+   "1": 18,
+   "2": 19,
+   "3": 19,
+   "4": 20,
+   "5": 21,
+   "6": 19,
+   "7": 20,
+   "8": 12
+  }
+ },
+ "perubahan": [
+  {
+   "kode": "GDS",
+   "kodeAplikasi": "231042147",
+   "dari": 5,
+   "ke": 6
+  },
+  {
+   "kode": "SKB",
+   "kodeAplikasi": "231041141",
+   "dari": 6,
+   "ke": 5
+  }
+ ]
+}

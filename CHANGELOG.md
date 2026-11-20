@@ -3,6 +3,19 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.39.2 — 20 Nov 2026 — Uji Coba
+Ringkas: Templat Excel tim pengajar menerima nama yang diketik (tanpa gelar, inisial, NIP, atau minimal 2 kata nama sama) dan pratinjau unggahan menampilkan beban SKS per orang.
+Permintaan pemilik 20 Nov 2026 ("ya kerjakan"): nama tidak harus dipilih dari dropdown.
+- Pencocokan bertahap saat unggah: (1) persis — pilihan dropdown, nama lengkap, inisial, NIP; (2) nama tanpa gelar sama persis; (3) minimal 2 kata nama sama,
+  setidaknya satu bukan kata nama umum Bali (Made, Komang, Ni, Luh, Putu, …), dan hanya SATU orang yang paling cocok. Berlaku juga untuk praktisi.
+- Tidak menebak: satu kata saja (kecuali inisial/NIP), atau lebih dari satu orang sama cocok → baris ditandai beserta daftar kandidatnya; baris lain tetap tersimpan.
+- Pratinjau: kolom "Terbaca sebagai (periksa)" untuk nama yang dicocokkan otomatis; tabel "Beban SKS per orang menurut berkas ini" (aturan sama dengan templat),
+  karena rumus lembar Beban SKS di Excel hanya mengenali nama dari dropdown. Lembar Petunjuk templat menjelaskan cara menulis nama.
+- Server: dp.data mengirim NIP dosen hanya untuk KPS/Admin Prodi (untuk pencocokan); struktur data tidak berubah. Rollback ke v0.39.1 tanpa pemulihan data.
+- Uji: 743 + 44 uji server lulus (6 uji baru pencocokan nama, termasuk nama umum Bali dan kandidat ganda). Uji tampilan: berkas dengan nama diketik
+  ("Komang Widiastuti", "Bu Komang Widiastuti", "Komang Sri Widiastuti") dikenali dan ditandai; "Komang" saja ditolak; beban SKS pratinjau 9 dan 3 SKS sesuai hitungan.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.39.1 — 20 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.39.1 (tampilan docs/ dan server Apps Script Produksi deployment @20): Tabel 4 iLKPS menulis semua kode kelompok MK pilihan dalam satu baris.
 - Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru. Rollback ke v0.39.0 cukup tampilan (tag v0.39.0) dan deployment @19.

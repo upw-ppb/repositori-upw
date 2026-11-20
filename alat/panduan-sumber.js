@@ -359,6 +359,7 @@ export const topik = [
       "Tab <b>Dokumen dosen</b>: kelengkapan ijazah/sertifikat dan tombol <b>Ingatkan</b>.",
       "Tab <b>Lulusan</b>, <b>PMB</b>, <b>Keuangan</b>: isi untuk Tabel 8–10 dan 21."],
     tips: ["Mengubah data: Admin Prodi dan Super Admin. KPS dan GKM hanya melihat (GKM juga bisa mengingatkan dosen).",
+      "Nama di templat tim boleh diketik (tidak harus dari daftar): nama lengkap dengan/tanpa gelar, inisial, NIP, atau minimal 2 kata nama. Nama yang dicocokkan otomatis ditandai di pratinjau (kolom Terbaca sebagai); bila cocok dengan lebih dari satu orang, baris ditandai untuk diperbaiki. Pratinjau juga menampilkan beban SKS per orang.",
       "Impor tim pengajar dari Excel: hanya KPS dan Admin Prodi. Beban SKS di templat: dosen tunggal mendapat SKS penuh; team teaching membagi SKS rata (3 SKS untuk 3 orang = 1 SKS per orang); tim untuk semua kelas dihitung untuk setiap kelas yang mengambil MK.",
       "Berkas dari semester lain ditolak. Mata kuliah tanpa nama di berkas tidak diubah; menghapus tim lewat tombol Ubah tim.",
       "<b>Peserta kelas</b> (tombol <b>Peserta</b> di tab Tim pengajar; diatur Admin Prodi dan KPS): MK biasa otomatis berisi mahasiswa aktif angkatan dan kelasnya, bisa disesuaikan per orang (<b>Atur</b>, mis. mahasiswa mengulang). MK pilihan: pilih kelompok setiap mahasiswa, atau <b>Unduh templat Excel</b> → isi kolom Kelompok → <b>Unggah</b> → <b>Simpan pembagian</b>. Mahasiswa melihat MK dan dosennya di menu Mata Kuliah Saya; dosen melihat daftar pesertanya.",
