@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.40.0 — 20 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.40.0 (tampilan docs/ dan server Apps Script Produksi deployment @22): Portofolio MK per kelas (terpisah dan hanya terlihat oleh tim
+  kelas itu; RPS bersama hanya untuk kelas dengan tim yang sama), kartu Mata Kuliah Saya per kelas, rekap per kelas, dan peserta kelas untuk dosen hanya kelasnya.
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru. Rollback ke v0.39.2 cukup tampilan (tag v0.39.2) dan deployment @21.
+- Penyetuju: pemilik, di chat 20 Nov 2026: "setuju tayang v0.40.0".
+
 ## v0.40.0 — 20 Nov 2026 — Uji Coba
 Ringkas: Portofolio MK per kelas: setiap kelas punya isian sendiri dan hanya terlihat oleh tim kelas itu; RPS dipakai bersama hanya oleh kelas dengan tim yang sama; dosen hanya melihat peserta kelasnya.
 Keputusan pemilik 20 Nov 2026 ("Kerjakan"), mengacu Matriks LAMWisata butir 8 (RPS per mata kuliah, dilaksanakan konsisten), 22, dan 25 (kontrak, rubrik/portofolio,
