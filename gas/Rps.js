@@ -8,7 +8,7 @@
  */
 var PERAN_RPS_ATUR = ["admin", "superadmin"];
 var RPS_DATA_MAKS = 48000;
-var RPS_OTOR_KOLOM = ["labor", "kajurJabatan", "kajurNama", "kajurNip", "kpsJabatan", "kpsNama", "kpsNip"];
+var RPS_OTOR_KOLOM = ["labor", "kajurJabatan", "kajurNama", "kajurNip", "kpsJabatan", "kpsNama", "kpsNip", /* v0.43.0 */ "skalaNilai", "hadirMin"];
 
 function rpsOtorisasi() {
   var o = jsonPengaturan("rpsOtorisasi", {}), h = {};
@@ -16,6 +16,7 @@ function rpsOtorisasi() {
   if (!h.labor) h.labor = "Travel Agencies dan Tour Operation";
   if (!h.kajurJabatan) h.kajurJabatan = "Ketua Jurusan Kepariwisataan";
   if (!h.kpsJabatan) h.kpsJabatan = "Koordinator Program Studi";
+  h.skala = skalaNilai(h.skalaNilai);
   if (!h.kpsNama) { var k = pengaturanSurat().kps; if (k) { h.kpsNama = k.nama; h.kpsNip = k.nip; h.kpsDariAkun = true; } }
   return h;
 }
@@ -26,7 +27,9 @@ function aksiRpsOtorisasi(d, token) {
   if (d.simpan) {
     wajibPeran(p, PERAN_RPS_ATUR);
     var o = {};
-    RPS_OTOR_KOLOM.forEach(function (k) { o[k] = potong(d[k], 120).trim(); });
+    RPS_OTOR_KOLOM.forEach(function (k) { o[k] = potong(d[k], k === "skalaNilai" ? 600 : 120).trim(); });
+    if (o.skalaNilai && skalaNilai(o.skalaNilai).length < 2) throw galat("Skala nilai: tulis satu baris per huruf, mis. A; 4; 85–100.");
+    if (o.hadirMin && !/^\d{1,3}$/.test(o.hadirMin)) throw galat("Kehadiran minimal ditulis angka persen, mis. 80.");
     if (o.kajurNip && !/^[\d ]{8,30}$/.test(o.kajurNip)) throw galat("NIP Ketua Jurusan hanya berisi angka.");
     if (o.kpsNip && !/^[\d ]{8,30}$/.test(o.kpsNip)) throw galat("NIP Koordinator Program Studi hanya berisi angka.");
     kunciTulis(function () { simpanPengaturan("rpsOtorisasi", o, "Otorisasi dan identitas templat RPS (JSON)"); });
@@ -35,6 +38,12 @@ function aksiRpsOtorisasi(d, token) {
   return { otorisasi: rpsOtorisasi(), boleh: punyaPeran(p, PERAN_RPS_ATUR) };
 }
 
+/** Skala nilai dari teks "A; 4; 85–100" per baris → [{h, m, a, b}] (huruf, angka mutu, batas bawah, batas atas). */
+function skalaNilai(t) {
+  return String(t || "").split(/\n/).map(function (s) { var p = s.split(/[;|\t]/).map(function (v) { return v.trim(); }); if (p.length < 3) return null;
+    var r = p[2].match(/(\d+(?:[.,]\d+)?)\s*[-–]\s*(\d+(?:[.,]\d+)?)/); if (!p[0] || !r) return null;
+    return { h: p[0], m: Number(p[1].replace(",", ".")), a: Number(r[1].replace(",", ".")), b: Number(r[2].replace(",", ".")) }; }).filter(Boolean);
+}
 function rpsDataDari(r) {
   return { semester: String(r.semester), kodeMk: teks(r.kodeMk), kunci: teks(r.kunci).split(",").filter(String), fileId: teks(r.fileId),
     data: jsonDari(r.data, null), oleh: teks(r.oleh), diubah: r.diubah instanceof Date ? r.diubah.toISOString() : teks(r.diubah) };
@@ -93,6 +102,6 @@ function aksiMkpRpsRef(d, token) {
   var m = x.mk, g = u.g ? (m.kelompok || []).filter(function (y) { return y.n.toUpperCase() === u.g; })[0] : null;
   return { semester: smt, labelSemester: labelSmt(smt), kunci: u.k, labelKelas: labelUnit(x, u),
     mk: { kode: g && g.kode ? g.kode : m.kode, nama: m.nama + (g ? " (" + g.n + ")" : ""), semester: m.semester, sksKuliah: m.sksKuliah, sksSeminar: m.sksSeminar, sksPraktik: m.sksPraktik, sks: sksMk(m) },
-    tim: tim, otorisasi: rpsOtorisasi(), cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL,
+    tim: tim, otorisasi: rpsOtorisasi(), cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL, kualifikasi: kualifikasiMk(m.semester),
     terakhir: akhir ? { semester: akhir.semester, labelSemester: labelSmt(akhir.semester), data: akhir.data } : null };
 }

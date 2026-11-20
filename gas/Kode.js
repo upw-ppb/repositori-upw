@@ -3,7 +3,7 @@
  * Semua permintaan masuk lewat doPost dengan badan JSON: { aksi, token, data }.
  * Jawaban selalu JSON: { ok: true, ... } atau { ok: false, galat: "pesan untuk pengguna" }.
  */
-var VERSI_SERVER = "0.42.0";
+var VERSI_SERVER = "0.43.0";
 
 function doGet() {
   return jawab({ ok: true, layanan: "Repositori Akreditasi UPW", versi: VERSI_SERVER, lingkungan: lingkungan() });
@@ -178,6 +178,8 @@ var AKSI = {
   "mkp.daftarZip": aksiMkpDaftarZip,
   "mkp.ambilZip": aksiMkpAmbilZip,
   "mkp.rpsRef": aksiMkpRpsRef,
+  "mkp.rpsBaca": aksiMkpRpsBaca,
+  "mkp.ttd": aksiMkpTtd,
   "rps.otorisasi": aksiRpsOtorisasi,
   "bank.data": aksiBankData,
   "bank.unggah": aksiBankUnggah,

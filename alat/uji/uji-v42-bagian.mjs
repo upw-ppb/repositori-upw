@@ -27,7 +27,7 @@ export async function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM }) 
   const ab = async b => await b.arrayBuffer();
   const K = U.kosong(R, ["S9", "P12", "KU1", "KK23"], "20 November 2026");
   cek("templat baru: identitas dari aplikasi, CPL terpilih dengan rumusan prodi, 16 pertemuan (8 UTS, 16 UAS), waktu menurut sks", K.mk.kode === "UPW992" && K.cpl.map(c => c.ref).join() === "S9,P12,KU1,KK23"
-    && K.cpl[3].t === C.find(c => c.k === "KK23").t && K.pertemuan.length === 16 && K.pertemuan[7].ujian === "UTS" && K.pertemuan[15].ujian === "UAS" && /TM: 2 × 50'/.test(K.pertemuan[0].waktu)
+    && K.cpl[3].t === C.find(c => c.k === "KK23").t && K.pertemuan.length === 16 && K.pertemuan[7].ujian === "UTS" && K.pertemuan[15].ujian === "UAS" && /TM: 2 JP × 50' = 100'/.test(K.pertemuan[0].waktu)
     && K.otor.kajur.nama === "Dr. Kajur Uji, M.Par." && K.otor.pengembang[0].nip === "199001152015041001");
   const kosongBaca = await U.baca(await ab(U.buat(K, logo)));
   const cekKosong = U.periksa(kosongBaca, Object.assign({}, R, { mk: R.mk }));

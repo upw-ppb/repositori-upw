@@ -3,6 +3,30 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.43.0 — 21 Nov 2026 — Uji Coba
+Ringkas: Templat kontrak kuliah, rubrik, dan lembar portofolio penilaian terisi dari RPS; RPS resmi PDF dengan Word sumber untuk pemeriksaan; catatan tanda tangan; kualifikasi/jenjang dan jam sajian otomatis.
+Permintaan pemilik 21 Nov 2026 (butir 1–5, "lanjut ke tahap 2").
+- **Keterangan siapa yang bisa melihat dihapus** dari laci Portofolio MK ("Setiap kelas punya isian sendiri dan hanya terlihat oleh tim kelas itu. RPS dipakai bersama hanya oleh
+  kelas dengan tim pengajar yang sama.") dan dari panduan (Portofolio MK, Rapat, Data Prodi). Keterangan privasi biodata (Keluarga dan ekonomi) dan tanda tangan KPS tetap.
+- **RPS resmi PDF + Word sumber**: RPS bertanda tangan diunggah sebagai PDF; tombol "Unggah Word sumber untuk pemeriksaan" membaca Word di browser (file Word tidak disimpan)
+  dan menempelkan hasil baca ke RPS PDF (aksi mkp.rpsBaca). Unggah Word langsung tetap bisa. PDF tidak dibaca otomatis (teks PDF tidak memuat susunan tabel; pindaian tidak berteks).
+- **Catatan tanda tangan** (aksi mkp.ttd): pengampu utama mencentang tanda tangan yang ada pada RPS (dosen pengembang, KPS, Ketua Jurusan) dan kontrak kuliah (dosen, perwakilan
+  mahasiswa, KPS). Bila belum lengkap tampil "Catatan: belum bertanda tangan …"; dokumen tetap diterima. Mengganti file menghapus centang lama.
+- **Kualifikasi dan jenjang otomatis** dari semester MK menurut struktur kurikulum SK (smt 1 Certificate II/Level 1, 2 Certificate III/Level 2, 3–4 Certificate IV/Level 3,
+  5–6 Diploma/Level 4, 7–8 Advanced Diploma/Level 5); pemeriksaan RPS memberi saran bila berbeda.
+- **Jam sajian**: waktu per pertemuan di templat RPS = teori 1 JP (50') per sks + PT 60' + KM 60'; praktik 2 JP (100') per sks + PT/KM 70' (1 sks = 45 jam per semester).
+- **Tahap 2: templat penilaian (butir 25)** di laci Portofolio MK:
+  Kontrak kuliah (Word): identitas, deskripsi, CPL/CPMK, rencana kegiatan, rencana penilaian dari RPS (jumlah bobot), teknik dan instrumen (dicentang dari RPS), 7 unsur pelaksanaan
+  penilaian (kesepakatan, umpan balik dan keberatan, dokumentasi, prosedur, pelaporan nilai huruf dan angka, perbaikan dari monev), tata tertib, tanda tangan 3 pihak.
+  Rubrik dan portofolio penilaian (Word): 5 prinsip penilaian, rubrik per komponen penilaian RPS (kriteria dari indikator, 4 tingkat kinerja).
+  Lembar portofolio penilaian (Excel): peserta kelas, bobot dari RPS, rumus nilai akhir dan huruf mutu, lembar ketercapaian CPL per mahasiswa.
+- **Otorisasi templat RPS** ditambah skala nilai (huruf; angka mutu; rentang) dan kehadiran minimal.
+- Tidak ada tabel/kolom baru (centang tanda tangan disimpan di isian Portofolio MK; skala di Pengaturan rpsOtorisasi). Rollback ke v0.42.0 tanpa pemulihan data.
+- Uji: 799 + 44 uji server lulus (19 uji baru di uji-v43-bagian.mjs). Uji tampilan: dosen mengunggah RPS PDF lalu Word sumber RPS Praktik Desain dan Media Digital (hasil baca
+  tampil), mencentang tanda tangan (catatan "belum bertanda tangan: Ketua Jurusan"), mengunduh kontrak, rubrik, dan Excel portofolio (peserta kelas terisi); penjelajah 38 halaman
+  tanpa masalah. Templat belum dibuka di Microsoft Word asli (divalidasi XML + Quick Look).
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.42.0 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.42.0 (tampilan docs/ dan server Apps Script Produksi deployment @24): templat RPS terisi otomatis, pembaca RPS Word dengan
   pemeriksaan butir 8, saran metode dari RPS, 68 CPL prodi, CPL Tabel 4 dan kolom Kurikulum dari RPS, Otorisasi templat RPS.

@@ -20,6 +20,9 @@ var KOMP_MKP = [
 var METODE_MKP = ["Case based learning", "Project based learning", "Research based education (RBE)", "Industry based education (IBE)",
   "Teaching industry / factory", "Praktik lapangan di destinasi", "Daring / blended"];
 var PERAN_MKP_REKAP = ["admin", "superadmin", "kps", "gkm"];
+/** v0.43.0: tanda tangan yang diharapkan pada dokumen resmi (dicentang pengampu utama; dokumen tetap diterima bila belum lengkap). */
+var TTD_MKP = { rps: [["dosen", "Dosen pengembang RPS"], ["kps", "Koordinator Program Studi"], ["kajur", "Ketua Jurusan"]],
+  kontrak: [["dosen", "Dosen pengampu"], ["mhs", "Perwakilan mahasiswa"], ["kps", "Koordinator Program Studi (mengetahui)"]] };
 var MAKS_DAFTAR_MKP = 30;
 
 function kompMkp(k) { return KOMP_MKP.filter(function (x) { return x.k === k; })[0]; }
@@ -146,7 +149,7 @@ function infoMkpTs(ts) {
 function entriKeKlien(e, idx) {
   if (!e) return null;
   var o = idx.byId[e.o], x = { t: e.t, nama: e.nama || "", ukuran: e.ukuran || 0, url: e.t === "tautan" ? e.url : "", ket: e.ket || "", teks: e.teks || "",
-    id: e.id || "", o: e.o, oleh: o ? o.nama : "", w: e.w || "" };
+    id: e.id || "", o: e.o, oleh: o ? o.nama : "", w: e.w || "", ttd: e.ttd || null };
   return x;
 }
 function metodeKeKlien(m, idx) { return m ? { v: m.v || [], lain: m.lain || "", oleh: (idx.byId[m.o] || {}).nama || "", w: m.w || "" } : { v: [], lain: "" }; }
@@ -182,7 +185,7 @@ function pilihanSemesterMkp() {
   for (var i = 0; i < 9; i++) { l.push({ kode: kk, label: labelSmt(kk) }); kk = /-1$/.test(kk) ? kodeSmt(Number(kk.slice(0, 4)) - 1, false) : kodeSmt(Number(kk.slice(0, 4)), true); }
   return l;
 }
-function refMkp() { return { komp: KOMP_MKP, daftarMetode: METODE_MKP, pilihanSemester: pilihanSemesterMkp(), semesterKini: semesterInfo().kode }; }
+function refMkp() { return { komp: KOMP_MKP, daftarMetode: METODE_MKP, pilihanSemester: pilihanSemesterMkp(), semesterKini: semesterInfo().kode, ttdMkp: TTD_MKP }; }
 
 /* ---------- aksi baca ---------- */
 
@@ -237,7 +240,7 @@ function aksiMkpDetail(d, token) {
     var e = isiUnit(s0, u).rps, k = (hasil.kelas || []).filter(function (v) { return v.k === u.k; })[0];
     if (k) k.rpsBaca = e && e.t === "file" && peta[e.fileId] ? { data: peta[e.fileId].data, semester: peta[e.fileId].semester, diubah: peta[e.fileId].diubah } : null;
   });
-  hasil.cplProdi = CPL_PRODI;
+  hasil.cplProdi = CPL_PRODI; hasil.kualifikasiMk = kualifikasiMk(x.mk.semester);
   return Object.assign(hasil, refMkp());
 }
 
@@ -469,4 +472,40 @@ function aksiMkpAmbilZip(d, token) {
     if (total >= MKP_ZIP_BATCH) break;
   }
   return { hasil: hasil, selesai: hasil.length };
+}
+
+/* ---------- v0.43.0: hasil baca dari Word sumber untuk RPS resmi (PDF), dan centang tanda tangan ---------- */
+/** RPS resmi diunggah sebagai PDF bertanda tangan; pengampu utama menambahkan hasil baca dari file Word sumbernya (file Word tidak disimpan). */
+function aksiMkpRpsBaca(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["dosen"]);
+  var smt = semesterSah(d.semester), kode = teks(d.kode), c = kompMkp("rps"), x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, c, true);
+  var dataJson = bersihRpsData(d.rps);
+  if (!dataJson) throw galat("Isi RPS Word tidak terbaca.");
+  var r = semuaMkpSemester(smt)[kode], e = isiUnit(r ? r.isi : {}, u).rps;
+  if (!e || e.t !== "file") throw galat("Unggah dulu RPS resmi (PDF bertanda tangan), lalu tambahkan file Word sumbernya untuk pemeriksaan.");
+  simpanRpsData(smt, kode, kunciRpsBersama(x, u), e.fileId, dataJson, p);
+  catat(p.id, "mkp.rpsBaca", { semester: smt, kode: kode, kelas: u.k });
+  return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
+}
+/** Centang tanda tangan pada dokumen resmi (RPS, kontrak). d.ttd = {kunci: true|false}. RPS bersama: berlaku untuk semua kelas yang memakainya. */
+function aksiMkpTtd(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, ["dosen"]);
+  var smt = semesterSah(d.semester), kode = teks(d.kode), k = String(d.komp || ""), daftar = TTD_MKP[k];
+  if (!daftar) throw galat("Jenis dokumen tidak dikenal.");
+  var c = kompMkp(k), x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, c, true), v = {};
+  daftar.forEach(function (t) { v[t[0]] = !!(d.ttd && d.ttd[t[0]]); });
+  var target = k === "rps" ? kunciRpsBersama(x, u) : [u.k];
+  ubahMkp(smt, kode, p, function (s) {
+    var ada = false;
+    target.forEach(function (kk) {
+      var uu = unitKelas(x).filter(function (y) { return y.k === kk; })[0], e = isiUnit(s, uu)[k];
+      if (!e) return;
+      ada = true; wadahUnit(s, kk)[k] = Object.assign({}, e, { ttd: v });
+    });
+    if (!ada) throw galat("Dokumen ini belum diunggah.");
+  });
+  catat(p.id, "mkp.ttd", { semester: smt, kode: kode, komp: k, kelas: u.k, ttd: Object.keys(v).filter(function (z) { return v[z]; }).join(",") });
+  return aksiMkpDetail({ semester: smt, kode: kode, kunci: u.k }, token);
 }

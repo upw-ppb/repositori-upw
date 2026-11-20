@@ -73,3 +73,12 @@ var CPL_PRODI = [
   {"k": "KK29", "u": "KK", "t": "Mampu menunjukkan kemampuan untuk menghasilkan daftar nama (roster) dan jadwal staf yang memadai untuk dinominasikan dalam jangka waktu tertentu, batasan anggaran yang dinominasikan, serta mematuhi instrumen ketenagakerjaan dan persyaratan undang-undang negara tuan rumah"},
   {"k": "KK30", "u": "KK", "t": "Mampu mengembangkan komunikasi dalam Korespondensi yang sesuai untuk kepentingan bisnis dengan seluruh mitra kerja dalam Bahasa Indonesia, minimal satu bahasa internasional atau bahasa asing lainnya"}
 ];
+
+/** v0.43.0: kualifikasi dan jenjang ASEAN MRA-TP per semester, menurut struktur kurikulum SK Direktur (Kurikulum 2023 MRA-TP, versi perbaikan):
+ *  smt 1 Sertifikat II/Jenjang 1, smt 2 Sertifikat III/Jenjang 2, smt 3–4 Sertifikat IV/Jenjang 3, smt 5–6 Diploma/Jenjang 4, smt 7–8 Advanced Diploma/Jenjang 5.
+ *  Ditulis dalam istilah ACCSTP seperti pada RPS prodi (Certificate IV, Level 3). Labor division semua semester: Travel Agencies dan Tour Operation. */
+var KUALIFIKASI_SMT = { 1: ["Certificate II", "Level 1"], 2: ["Certificate III", "Level 2"], 3: ["Certificate IV", "Level 3"], 4: ["Certificate IV", "Level 3"],
+  5: ["Diploma", "Level 4"], 6: ["Diploma", "Level 4"], 7: ["Advanced Diploma", "Level 5"], 8: ["Advanced Diploma", "Level 5"] };
+/** Jam sajian per minggu menurut SK kurikulum: teori 1 sks = 1 jam pelajaran (50 menit), praktik 1 sks = 2 jam pelajaran (100 menit). */
+var JP_TEORI = 1, JP_PRAKTIK = 2, MENIT_JP = 50;
+function kualifikasiMk(smtMk) { var k = KUALIFIKASI_SMT[Number(smtMk)]; return k ? { kualifikasi: k[0], jenjang: k[1] } : { kualifikasi: "", jenjang: "" }; }

@@ -328,6 +328,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   lanskap, logo docs/uji/templat/logo-*.png)/baca (regex XML, jalan di Node)/periksa/saranMetode. Teks "[ … ]" = petunjuk (dianggap kosong). Contoh RPS acuan:
   "~/…/Dosen/Perkuliahan/Kelas/2026-2027/Praktik Desain dan Media Digital/RPS Praktik Desain dan Media Digital.docx" (ada tanda tangan: JANGAN disalin ke repo).
   Rencana: Tahap 2 v0.43.0 templat kontrak kuliah + rubrik (butir 25), Tahap 3 v0.44.0 saran penelitian/PkM + contoh/templat tiap isian. Uji: alat/uji/uji-v42-bagian.mjs.
+- v0.43.0 (21 Nov 2026, Uji Coba): KUALIFIKASI_SMT/kualifikasiMk + JP_TEORI/JP_PRAKTIK (gas/Cpl.js); rpsRef.kualifikasi, mkp.detail kualifikasiMk + ttdMkp. TTD_MKP (rps, kontrak) +
+  aksi mkp.ttd (entri.ttd; RPS bersama ke semua kunci setim) dan mkp.rpsBaca (hasil baca Word sumber → RpsData dengan fileId RPS PDF). Pengaturan rpsOtorisasi + skalaNilai/hadirMin
+  (skalaNilai(t) → skala). rps.js: mediaLogo/kopTabel/paket (dipakai bersama), kontrak(R,D,logo), rubrik(R,D,logo), portoXlsx(R,D,peserta) → UPW_ZIP.xlsx. Tampilan: ttdMkpHtml,
+  bacaRpsSumber (data-mfile="rpsSumber"), bagianTemplatNilai + AKSI.mkpTemplat (refTemplat cache S.laci.refT). Keterangan "siapa yang bisa melihat" tidak ditulis lagi di tampilan
+  (keputusan pemilik), kecuali jaminan privasi biodata dan tanda tangan. Uji: alat/uji/uji-v43-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
