@@ -3,6 +3,15 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.43.1 — 21 Nov 2026 — Uji Coba
+Ringkas: Keterangan urutan pengisian Portofolio MK: unggah RPS dulu, lalu unduh templat kontrak kuliah, rubrik, dan lembar portofolio penilaian yang terisi dari RPS.
+Permintaan pemilik 21 Nov 2026 ("berikan keterangan informasi itu pada aplikasi"); pemilik juga setuju keterangan privasi biodata dan tanda tangan KPS tetap ditampilkan.
+- Mata Kuliah Saya: kotak "Siapa mengisi apa?" ditambah urutan pengisian 1–3. Laci mata kuliah: kotak urutan tampil untuk pengampu utama selama RPS kelas itu belum terbaca.
+- Bagian Kontrak kuliah dan Rubrik: bila RPS belum terbaca, keterangan tegas bahwa RPS perlu diunggah dulu (templat tetap bisa diunduh dengan isian [ … ]).
+- Panduan Mata Kuliah Saya ditambah langkah urutan. Tanpa perubahan data; rollback ke v0.43.0 aman.
+- Uji: semua uji server lulus; uji tampilan laci sebelum dan sesudah RPS terbaca.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.43.0 — 21 Nov 2026 — Uji Coba
 Ringkas: Templat kontrak kuliah, rubrik, dan lembar portofolio penilaian terisi dari RPS; RPS resmi PDF dengan Word sumber untuk pemeriksaan; catatan tanda tangan; kualifikasi/jenjang dan jam sajian otomatis.
 Permintaan pemilik 21 Nov 2026 (butir 1–5, "lanjut ke tahap 2").
