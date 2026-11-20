@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.41.0 — 20 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.41.0 (tampilan docs/ dan server Apps Script Produksi deployment @23): unduh semua bukti Portofolio MK sebagai ZIP per semester
+  (Data Prodi › Portofolio MK), per mata kuliah, atau per kelas (laci mata kuliah), dengan Daftar isi.xlsx dan Catatan dan tautan.txt per kelas.
+- Tidak ada perubahan struktur data, jadi server tidak membuat cadangan baru. Rollback ke v0.40.0 cukup tampilan (tag v0.40.0) dan deployment @22.
+- Penyetuju: pemilik, di chat 20 Nov 2026: "setuju tayang v0.41.0".
+
 ## v0.41.0 — 20 Nov 2026 — Uji Coba
 Ringkas: Unduh semua bukti Portofolio MK sebagai ZIP: per semester, per mata kuliah, atau per kelas, dengan folder per kelas, daftar isi Excel, dan catatan tautan.
 Disetujui pemilik 20 Nov 2026 ("Setuju, kerjakan").
