@@ -25,7 +25,7 @@ var SKEMA = {
   DokumenPribadi: ["id", "userId", "nama", "jenis", "tahun", "t", "fileId", "namaFile", "mime", "ukuran", "url", "dibuat", "dihapus"],
   /* v0.8.0 */
   MataKuliah: ["id", "kode", "nama", "semester", "kompetensi", "sksKuliah", "sksSeminar", "sksPraktik", "cplSikap", "cplPengetahuan", "cplKu", "cplKk",
-               "rps", "unit", "diubah", "dihapus", /* v0.36.0 */ "tanpaTim", /* v0.38.0 */ "kelompok"],
+               "rps", "unit", "diubah", "dihapus", /* v0.36.0 */ "tanpaTim", /* v0.38.0 */ "kelompok", /* v0.46.0 */ "unitKomp", "cplMk"],
   Praktisi: ["id", "nama", "nidk", "perusahaan", "pendidikan", "bidang", "sertifikat", "diubah", "dihapus",
              /* v0.29.0 */ "jabatan", "pengalaman", "memimpinTim", "penerbit", "kerjaSama", "bukti"],
   TimPengajar: ["semester", "kodeMk", "anggota", "diubah", "oleh", /* v0.28.0 */ "kelas"],
@@ -72,7 +72,7 @@ var SKEMA = {
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 30;
+var VERSI_SKEMA = 31;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {

@@ -21,7 +21,9 @@ function mkDari(r) {
   return { _r: r, id: r.id, kode: teks(r.kode), nama: teks(r.nama), semester: Number(r.semester) || 0, kompetensi: ya(r.kompetensi),
     sksKuliah: angka(r.sksKuliah), sksSeminar: angka(r.sksSeminar), sksPraktik: angka(r.sksPraktik),
     cplSikap: ya(r.cplSikap), cplPengetahuan: ya(r.cplPengetahuan), cplKu: ya(r.cplKu), cplKk: ya(r.cplKk), rps: teks(r.rps), unit: teks(r.unit) || "Prodi UPW",
-    tanpaTim: ya(r.tanpaTim), kelompok: (jsonDari(r.kelompok, []) || []).filter(function (g) { return g && g.n; }) };
+    tanpaTim: ya(r.tanpaTim), kelompok: (jsonDari(r.kelompok, []) || []).filter(function (g) { return g && g.n; }),
+    /* v0.46.0: null = pakai unit bawaan dokumen kurikulum; cplMk = {cpl: [kode CPL prodi], oleh, pada} ditetapkan KPS/Admin Prodi */
+    unitKomp: jsonDari(r.unitKomp, null), cplMk: jsonDari(r.cplMk, null) };
 }
 /**
  * v0.38.0: MK pilihan dengan KELOMPOK PARALEL (mis. Bahasa Asing Pilihan: Jepang / Jerman / Perancis). Satu MK di kurikulum (SKS kurikulum tetap),
@@ -211,6 +213,7 @@ function aksiDpData(d, token) {
   var rpsAkhir = rpsTerakhirPerMk();   // v0.42.0: unsur CPL dan RPS dari RPS Word terbaca terakhir
   var semua_ = mks.map(function (m) { var x = Object.assign({}, m); delete x._r; x.sks = sksMk(m);
     var rp = rpsAkhir[m.kode]; if (rp) { x.rpsBaca = { semester: rp.semester, label: labelSmt(rp.semester), unsur: Object.keys(unsurCplRps(rp.data)) }; }
+    x.unitKomp = unitMk(m); x.unitBawaan = m.unitKomp === null; x.cplMk = cplMkDitetapkan(m);
     return x; });
   return {
     bolehUbah: punyaPeran(p, PERAN_DP_UBAH),
@@ -539,9 +542,9 @@ function tabelDosen(ts) {
     kolom: ["No.", "Semester", "Kode Mata Kuliah", "Nama Mata Kuliah", "Mata Kuliah Kompetensi", "Kuliah/Responsi/Tutorial (sks)", "Seminar (sks)",
       "Praktikum/Praktik/Praktik Lapangan (sks)", "Konversi Kredit ke Jam", "CPL: Sikap", "CPL: Pengetahuan", "CPL: Keterampilan Umum", "CPL: Keterampilan Khusus",
       "Dokumen Rencana Pembelajaran", "Unit Penyelenggara"],
-    baris: mks.map(function (m, i) { var rp = rpsTs[m.kode], u = rp ? unsurCplRps(rp.data) : {};
+    baris: mks.map(function (m, i) { var rp = rpsTs[m.kode], cm = cplMkDitetapkan(m), u = cm.length ? unsurKodeCpl(cm) : rp ? unsurCplRps(rp.data) : {};
       return [i + 1, m.semester, kodeTabelMk(m), m.nama, m.kompetensi ? "V" : "", m.sksKuliah, m.sksSeminar, m.sksPraktik, sksMk(m) * JAM_PER_SKS,
-      m.cplSikap || u.S ? "V" : "", m.cplPengetahuan || u.P ? "V" : "", m.cplKu || u.KU ? "V" : "", m.cplKk || u.KK ? "V" : "", m.rps || (rp ? "RPS " + labelSmt(rp.semester) : ""), m.unit]; }),
+      (cm.length ? u.S : m.cplSikap || u.S) ? "V" : "", (cm.length ? u.P : m.cplPengetahuan || u.P) ? "V" : "", (cm.length ? u.KU : m.cplKu || u.KU) ? "V" : "", (cm.length ? u.KK : m.cplKk || u.KK) ? "V" : "", m.rps || (rp ? "RPS " + labelSmt(rp.semester) : ""), m.unit]; }),
     catatan: "Konversi jam = total sks × " + JAM_PER_SKS + " jam/semester (Permendikbudristek 53/2023). MK pilihan berkelompok ditulis dengan semua kode kelompoknya (dihitung satu MK). Total " + mks.reduce(function (s, m) { return s + sksMk(m); }, 0) + " sks, " +
       mks.reduce(function (s, m) { return s + m.sksPraktik; }, 0) + " sks praktik." });
   // Tabel 5: pembimbing utama TA, dari kegiatan "bimbingan" yang disetujui.

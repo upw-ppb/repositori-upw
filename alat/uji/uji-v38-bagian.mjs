@@ -4,7 +4,7 @@ import fs from "node:fs";
 export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tD2 }) {
   console.log("49. MK pilihan dengan kelompok paralel");
   const dsn = ID("199001152015041001"), d2 = ID("198001012005011009"), d3 = ID("197911302005012001"), smt = "2033-1", MK = g.sheets.MataKuliah;
-  cek("migrasi: kolom kelompok di akhir MataKuliah; SKEMA_VERSI ≥ 28", MK[0].at(-1) === "kelompok" && Number(g.props.SKEMA_VERSI) >= 28);
+  cek("migrasi: kolom kelompok sesudah tanpaTim di MataKuliah (kolom baru selalu di akhir); SKEMA_VERSI ≥ 28", MK[0].indexOf("kelompok") === MK[0].indexOf("tanpaTim") + 1 && Number(g.props.SKEMA_VERSI) >= 28);
   cek("kelompok tidak sah ditolak (1 kelompok, nama ganda, kode tidak sah)", /minimal 2/.test(salah("dp.mkSimpan", { data: { kode: "231041217", nama: "BA", semester: 3, sksKuliah: 2, kelompok: "Jepang" } }, tAdm))
     && /ganda/.test(salah("dp.mkSimpan", { data: { kode: "231041217", nama: "BA", semester: 3, sksKuliah: 2, kelompok: "Jepang, jepang" } }, tAdm))
     && /tidak valid/.test(salah("dp.mkSimpan", { data: { kode: "231041217", nama: "BA", semester: 3, sksKuliah: 2, kelompok: "Jepang (12 34), Jerman" } }, tAdm)));

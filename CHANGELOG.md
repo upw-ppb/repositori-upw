@@ -3,6 +3,25 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.46.0 — 21 Nov 2026 — Uji Coba
+Ringkas: CPL yang dibebankan per mata kuliah ditetapkan KPS/Admin Prodi, unit kompetensi per MK dari dokumen pemetaan kurikulum, dan pencocokan dosen dengan daftar PDDikti.
+Disetujui pemilik 21 Nov 2026 ("Sesuaikan … jika tidak ada, silahkan dikerjakan"). Pengajar industri dan Kasubbag TPK tidak pernah menjadi pengampu utama, jadi fitur akun
+praktisi dibatalkan.
+- **Unit kompetensi per MK** (gas/UnitKompetensi.js): 122 unit ASEAN (kode, nama Inggris, nama Indonesia) untuk 48 MK dari lembar "Pembentukan Mata Kuliah" dan "Identifikasi Komp"
+  berkas Pemetaan Kurikulum UPW ASEAN MRA-TP 2023 (Review Kurikulum 2025), dicocokkan dengan MK di aplikasi menurut NAMA saja; kode dan semester MK di berkas itu tidak dipakai
+  (kurikulum yang berlaku tetap Data Prodi). 35 dari 49 MK kurikulum mendapat unit. Bisa diubah per MK (MataKuliah.unitKomp) atau dikembalikan ke bawaan.
+- **CPL yang dibebankan per MK** (MataKuliah.cplMk, ditetapkan KPS/Admin Prodi/Super Admin di Data Prodi › Kurikulum › CPL & unit): usulan dari RPS terakhir MK dan dari kecocokan
+  kata unit kompetensi (hanya CPL P/KK, ditandai lemah). Setelah ditetapkan: templat RPS memakai CPL itu (dosen tidak memilih), Bahan Kajian terisi unit kompetensi, pemeriksaan RPS
+  memberi temuan wajib bila CPL berbeda dan saran bila unit belum di bahan kajian, Tabel 4 iLKPS mengambil unsur CPL dari penetapan.
+- **Cocokkan dengan PDDikti** (Data Prodi › Status dosen, Admin Prodi): daftar dosen prodi dari PDDikti ditempel, dibaca di layar (tidak disimpan), nama dicocokkan tanpa gelar,
+  yang cocok diberi status DTPS, NIDN, dan Terdaftar di PDDikti lewat impor biodata massal. Akun dosen yang tidak ada di daftar ditampilkan beserta panduan status menurut instrumen
+  (DTPT / dosen tidak tetap / dosen industri). dp.status kini menyertakan NIP/NIDN untuk pengelola.
+- Struktur data: kolom baru MataKuliah.unitKomp dan cplMk (VERSI_SKEMA 31, di akhir tabel). Versi lama tetap bisa membaca data; rollback ke v0.45.0 tanpa pemulihan data
+  (penetapan CPL dan unit tidak dipakai versi lama).
+- Uji: 844 + 44 uji server lulus (16 uji baru di uji-v46-bagian.mjs, data dosen buatan). Uji tampilan: Admin menetapkan CPL PDM (usulan unit + centang), unit bawaan tampil;
+  PDDikti: 2 dari 3 nama cocok, status/NIDN tersimpan; penjelajah 48 halaman tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.45.0 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.45.0 (tampilan docs/ dan server Apps Script Produksi deployment @27): nilai dari SIAKAD per kelas, contoh dalam PDF, data bersama templat;
   lembar Excel portofolio buatan aplikasi dihapus dari tampilan.

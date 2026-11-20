@@ -104,6 +104,63 @@ function aksiMkpRpsRef(d, token) {
   var m = x.mk, g = u.g ? (m.kelompok || []).filter(function (y) { return y.n.toUpperCase() === u.g; })[0] : null;
   return { semester: smt, labelSemester: labelSmt(smt), kunci: u.k, labelKelas: labelUnit(x, u),
     mk: { kode: g && g.kode ? g.kode : m.kode, nama: m.nama + (g ? " (" + g.n + ")" : ""), semester: m.semester, sksKuliah: m.sksKuliah, sksSeminar: m.sksSeminar, sksPraktik: m.sksPraktik, sks: sksMk(m) },
-    tim: tim, otorisasi: rpsOtorisasi(), cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL, kualifikasi: kualifikasiMk(m.semester),
+    tim: tim, otorisasi: rpsOtorisasi(), cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL, kualifikasi: kualifikasiMk(m.semester), cplMk: cplMkDitetapkan(m), unitKomp: unitMk(m),
     terakhir: akhir ? { semester: akhir.semester, labelSemester: labelSmt(akhir.semester), data: akhir.data } : null };
 }
+
+/* ---------- v0.46.0: unit kompetensi dan CPL yang dibebankan per mata kuliah (ditetapkan KPS/Admin Prodi) ---------- */
+var PERAN_CPL_MK = ["kps", "admin", "superadmin"];
+function unitMk(m) { return Array.isArray(m.unitKomp) ? m.unitKomp : unitMkBawaan(m.nama); }
+function cplMkDitetapkan(m) { return m.cplMk && Array.isArray(m.cplMk.cpl) ? m.cplMk.cpl : []; }
+function unsurKodeCpl(kode) { var u = {}; kode.forEach(function (k) { var x = String(k).match(/^(KU|KK|S|P)\d+/); if (x) u[x[1]] = true; }); return u; }
+var STOP_USULAN = ["dan", "yang", "dalam", "pada", "tentang", "tata", "cara", "konsep", "teoritis", "menguasai", "mampu", "pelaksanaan", "tugas", "bidang", "tour",
+  "travel", "perjalanan", "wisata", "untuk", "serta", "dengan", "secara", "dari", "atau", "praktik", "pengelolaan"];
+function kataUsulan(s) { return String(s || "").toLowerCase().replace(/&/g, " dan ").replace(/[^a-z ]/g, " ").split(/\s+/).filter(function (w) { return w.length > 3 && STOP_USULAN.indexOf(w) < 0; }); }
+/** Usulan CPL: (1) dari RPS terbaca terakhir MK ini; (2) dari kecocokan kata unit kompetensi + nama MK dengan rumusan CPL Pengetahuan/KK (lemah, hanya titik awal). */
+function usulanCplMk(m) {
+  var rp = rpsTerakhirPerMk()[m.kode], dariRps = [];
+  if (rp) ((rp.data && rp.data.cpl) || []).forEach(function (c) { var k = String(c.ref || "").toUpperCase(); if (CPL_PRODI.some(function (p) { return p.k === k; }) && dariRps.indexOf(k) < 0) dariRps.push(k); });
+  var teksUnit = unitMk(m).map(function (u) { return u.id + " " + u.en; }).join(" ") + " " + m.nama, kw = {};
+  kataUsulan(teksUnit).forEach(function (w) { kw[w] = 1; });
+  var dariUnit = CPL_PRODI.filter(function (c) { return c.u === "P" || c.u === "KK"; }).map(function (c) {
+    var n = 0, s = {}; kataUsulan(c.t).forEach(function (w) { if (kw[w] && !s[w]) { s[w] = 1; n++; } }); return { k: c.k, n: n };
+  }).filter(function (x) { return x.n >= 2; }).sort(function (a, b) { return b.n - a.n; }).slice(0, 6).map(function (x) { return x.k; });
+  return { rps: dariRps, rpsSemester: rp ? labelSmt(rp.semester) : "", unit: dariUnit };
+}
+function cariMkKode(kode) {
+  var m = semuaMk().filter(function (x) { return x.kode === String(kode || "").toUpperCase(); })[0];
+  if (!m) throw galat("Mata kuliah tidak ditemukan.");
+  return m;
+}
+function aksiDpCplMk(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_DP_LIHAT);
+  var m = cariMkKode(d.kode);
+  return { kode: m.kode, nama: m.nama, semester: m.semester, cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL, ditetapkan: cplMkDitetapkan(m), oleh: m.cplMk ? teks(m.cplMk.olehNama) : "",
+    pada: m.cplMk ? teks(m.cplMk.pada) : "", unit: unitMk(m), unitBawaan: m.unitKomp === null, usulan: usulanCplMk(m), boleh: punyaPeran(p, PERAN_CPL_MK) };
+}
+/** Simpan penetapan CPL (d.cpl = [kode], [] = hapus penetapan) dan/atau unit kompetensi (d.unit = [{k, en, id}] | d.unitBawaan = true). */
+function aksiDpCplMkSimpan(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_CPL_MK);
+  var m = cariMkKode(d.kode), o = {};
+  if (Array.isArray(d.cpl)) {
+    var sah = {}; CPL_PRODI.forEach(function (c) { sah[c.k] = 1; });
+    var l = d.cpl.map(function (k) { return String(k).toUpperCase().trim(); }).filter(function (k, i, a) { return a.indexOf(k) === i; });
+    l.forEach(function (k) { if (!sah[k]) throw galat("Kode CPL tidak dikenal: " + k); });
+    l.sort(function (a, b) { var ua = UNSUR_URUT.indexOf(a.replace(/\d+/, "")), ub = UNSUR_URUT.indexOf(b.replace(/\d+/, "")); return ua - ub || Number(a.replace(/\D/g, "")) - Number(b.replace(/\D/g, "")); });
+    o.cplMk = l.length ? JSON.stringify({ cpl: l, oleh: p.id, olehNama: p.nama, pada: hariIni() }) : "";
+  }
+  if (d.unitBawaan) o.unitKomp = "";
+  else if (Array.isArray(d.unit)) {
+    if (d.unit.length > 40) throw galat("Maksimal 40 unit kompetensi per mata kuliah.");
+    var u = d.unit.map(function (x) { return { k: potong(x && x.k, 40).trim(), en: potong(x && x.en, 200).trim(), id: potong(x && x.id, 200).trim() }; }).filter(function (x) { return x.k || x.en || x.id; });
+    u.forEach(function (x) { if (!x.en && !x.id) throw galat("Unit " + (x.k || "") + ": tulis nama unitnya."); });
+    o.unitKomp = JSON.stringify(u);
+  }
+  if (!Object.keys(o).length) throw galat("Tidak ada yang disimpan.");
+  kunciTulis(function () { ubah("MataKuliah", m._r, o); });
+  catat(p.id, "dp.cplMk", { kode: m.kode, cpl: o.cplMk !== undefined ? (JSON.parse(o.cplMk || '{"cpl":[]}').cpl || []).join(",") : "-", unit: o.unitKomp !== undefined ? "ubah" : "-" });
+  return aksiDpCplMk({ kode: m.kode }, token);
+}
+var UNSUR_URUT = ["S", "KU", "P", "KK"];

@@ -30,7 +30,9 @@ function aksiDpStatus(d, token) {
     bolehUbah: punyaPeran(p, PERAN_DP_UBAH), hariIni: kini, label: STATUS_DOSEN,
     dosen: daftarDosen().map(function (x) {
       var l = (per[x.id] || []).map(function (y) { var z = Object.assign({}, y); delete z._r; return z; });
-      return { id: x.id, nama: x.nama, inisial: x.inisial, statusDosen: x.status, kini: statusDosenPada(per[x.id], kini), periode: l };
+      var o = { id: x.id, nama: x.nama, inisial: x.inisial, statusDosen: x.status, kini: statusDosenPada(per[x.id], kini), periode: l };
+      if (punyaPeran(p, PERAN_DP_UBAH)) { o.nip = x.nip; o.nidn = x.nidn; o.pddikti = x.pddikti; }   // v0.46.0: cocokkan dengan PDDikti
+      return o;
     })
   };
 }

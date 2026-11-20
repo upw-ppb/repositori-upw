@@ -343,6 +343,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   komp "nilai", ZIP. Data bersama: RPS_OTOR_KOLOM + tempat/lms/hariUmpan/hariKeberatan/telat/pedoman; kontrak(R,D,logo,I0) mengisi dari R.otorisasi; D.hadirMin di RPS. Contoh PDF:
   `node alat/contoh-pdf.mjs` (pengubah docx→HTML khusus rps.js + Chrome headless) → docs/uji/contoh/*.pdf; jalankan ulang bila contoh-mkp.json/rps.js berubah. JANGAN simpan berkas
   nilai SIAKAD asli (nama mahasiswa) di repo. Uji: alat/uji/uji-v45-bagian.mjs.
+- v0.46.0 (21 Nov 2026, Uji Coba): gas/UnitKompetensi.js (UNIT_MK_2023 dari "~/…/Prodi UPW/Kurikulum/Kurikulum 2023 MRA-TP/Review Kurikulum 2025/Pemetaan Kurikulum UPW ASEAN MRA TP
+  2023 PPB Review Kurikulum.xlsx"; berkas itu TIDAK berisi matriks CPL–MK; kode/semester MK di sana diabaikan atas perintah pemilik; "jam sajian" praktik di sana 3 jam/sks, SK 2 jam/sks
+  → aplikasi ikut SK). MataKuliah.unitKomp/cplMk (VERSI_SKEMA 31); unitMk(m), cplMkDitetapkan(m), usulanCplMk(m), aksi dp.cplMk/dp.cplMkSimpan (PERAN_CPL_MK kps/admin/superadmin).
+  rpsRef/detail: cplMk + unitKomp/unitMk; kosong() memakai R.cplMk dan bahan dari unit; periksa() ref.cplMk/ref.unit. Tampilan: laciCplMk (jenis "cplMk"), panelPddikti/bacaPddikti
+  (memakai buatPencocokNama; menerapkan lewat biodata.massal). Jenis pengajar (keputusan pemilik): industri dan Kasubbag TPK (tidak di PDDikti) hanya team teaching, bukan utama →
+  status Dosen industri / praktisi dan Dosen tidak tetap. JANGAN simpan daftar PDDikti (NIDN/NUPTK) di repo. Uji: alat/uji/uji-v46-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

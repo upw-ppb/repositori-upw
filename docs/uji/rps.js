@@ -81,12 +81,14 @@ function kosong(R, pilihCpl, hariIni) {
       kps: { nama: R.otorisasi.kpsNama, nip: R.otorisasi.kpsNip, jabatan: R.otorisasi.kpsJabatan }, kajur: { nama: R.otorisasi.kajurNama, nip: R.otorisasi.kajurNip, jabatan: R.otorisasi.kajurJabatan } },
     dosen: R.tim.map(t => t.nama + (t.praktisi ? " (praktisi)" : "")), hadirMin: R.otorisasi.hadirMin || ""
   };
-  const pilih = (pilihCpl || []).filter(k => prodi[k]);
+  // v0.46.0: CPL yang ditetapkan prodi untuk MK ini menggantikan pilihan dosen.
+  const pilih = ((R.cplMk && R.cplMk.length) ? R.cplMk : (pilihCpl || [])).filter(k => prodi[k]);
+  const bahanUnit = (R.unitKomp || []).map(u => `• ${u.k} — ${u.en}${u.id ? ` (${u.id})` : ""}`).join("\n");
   const cplLama = L ? (L.cpl || []).filter(c => !pilih.length || pilih.includes(String(c.ref || "").toUpperCase())) : [];
   const cpl = pilih.length ? pilih.map((k, i) => { const l = cplLama.find(c => String(c.ref).toUpperCase() === k); return { kode: l ? l.kode : "CPL" + (i + 1), ref: k, t: prodi[k].t }; })
     : cplLama.length ? cplLama : [];
   if (L) {
-    return Object.assign({}, L, dasar, { cpl, pertemuan: (L.pertemuan || []).map(p => Object.assign({}, p, { waktu: p.waktu || (p.ujian ? "" : waktuBawaan(dasar.mk)) })) });
+    return Object.assign({}, L, dasar, { cpl, bahan: isi(L.bahan) ? L.bahan : (bahanUnit || L.bahan), pertemuan: (L.pertemuan || []).map(p => Object.assign({}, p, { waktu: p.waktu || (p.ujian ? "" : waktuBawaan(dasar.mk)) })) });
   }
   const wkt = waktuBawaan(dasar.mk), pertemuan = [];
   for (let i = 1; i <= 16; i++) pertemuan.push(i === 8 || i === 16 ? { ke: String(i), ujian: i === 8 ? "UTS" : "UAS", bobot: "" }
@@ -95,7 +97,7 @@ function kosong(R, pilihCpl, hariIni) {
   return Object.assign(dasar, {
     cpl, cpmk: [1, 2, 3].map(i => ({ kode: "CPMK " + i, t: "[Rumusan CPMK, diakhiri kode CPL yang didukung, mis. (CPL1, CPL2)]", cpl: [] })),
     sub: [1, 2, 3, 4].map(i => ({ kode: "Sub-CPMK " + i, t: "[Kemampuan akhir yang direncanakan]" })), kor: {},
-    deskripsi: "[Deskripsi singkat mata kuliah]", bahan: "[Bahan kajian / unit kompetensi]", pustakaUtama: ["[Penulis. Tahun. Judul. Kota: Penerbit.]"],
+    deskripsi: "[Deskripsi singkat mata kuliah]", bahan: bahanUnit || "[Bahan kajian / unit kompetensi]", pustakaUtama: ["[Penulis. Tahun. Judul. Kota: Penerbit.]"],
     pustakaPendukung: ["[Pustaka pendukung]"], media: "[Perangkat lunak dan perangkat keras]", tempat: "Kampus Politeknik Pariwisata Bali", prasyarat: "-",
     pertemuan, porto: pertemuan.map(p => p.ujian ? { minggu: p.ke, ujian: p.ujian, bobot: "" } : { minggu: p.ke, cpl: "[CPL…]", cpmk: "[CPMK…]", sub: "[Sub-CPMK…]", indikator: "[Indikator]", bentuk: "[Bentuk penilaian]", bobot: "" })
   });
@@ -376,6 +378,16 @@ function periksa(D, R) {
     if (takDikenal.length) wajib(`Kode CPL prodi tidak dikenali untuk ${takDikenal.map(c => c.kode).join(", ")} (tulis seperti "CPL1 (S9)").`);
     salah.forEach(c => saran(`Rumusan ${c.kode} (${c.ref}) berbeda dengan CPL prodi ${c.ref}: "${prodi[c.ref.toUpperCase()].t}".`));
     if (!takDikenal.length && !salah.length) ok(`${D.cpl.length} CPL prodi dibebankan dan sesuai daftar CPL kurikulum.`);
+  }
+  if (R && R.cplMk && R.cplMk.length && D.cpl.length) {   // v0.46.0: dibanding CPL yang ditetapkan prodi untuk MK ini
+    const diRps = new Set(D.cpl.map(c => String(c.ref || "").toUpperCase())), tetap = new Set(R.cplMk);
+    const kurang = R.cplMk.filter(k => !diRps.has(k)), lebih = [...diRps].filter(k => k && !tetap.has(k));
+    if (kurang.length || lebih.length) wajib(`CPL di RPS berbeda dengan CPL yang ditetapkan prodi untuk MK ini (${R.cplMk.join(", ")})${kurang.length ? `; belum dimuat: ${kurang.join(", ")}` : ""}${lebih.length ? `; di luar penetapan: ${lebih.join(", ")}` : ""}.`);
+    else ok("CPL di RPS sama dengan penetapan prodi untuk MK ini.");
+  }
+  if (R && R.unit && R.unit.length && isi(D.bahan)) {
+    const b = String(D.bahan).replace(/\s/g, "").toUpperCase(), tak = R.unit.filter(u => u.k && !b.includes(String(u.k).replace(/\s/g, "").toUpperCase()));
+    if (tak.length) saran(`Unit kompetensi kurikulum belum tercantum di bahan kajian: ${tak.map(u => u.k).join(", ")}.`);
   }
   if (D.cpmk.length) {
     const tanpa = D.cpmk.filter(c => !c.cpl.length);
