@@ -358,6 +358,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   (unduh + rekap per CPL), centang data-cplsek di laciCplMk. Berkas pemetaan prodi (49 MK, 68 CPL) diunggah KPS/Admin lewat panel itu di Produksi. Uji: alat/uji/uji-v48-bagian.mjs.
 - v0.48.1 (21 Nov 2026, Uji Coba): permintaan pemilik — tombol/daftar unduhan aplikasi (v0.25.2) dan jendela showSaveFilePicker (v0.22.0) DIHAPUS. simpanBerkas = a[download] biasa
   agar berkas tampil di tombol unduhan Chrome/Edge (pemilik membuka berkas/Finder dari sana). JANGAN tambahkan lagi daftar unduhan sendiri atau jendela Simpan ke…. Uji: uji-v481-bagian.mjs.
+- v0.48.2 (21 Nov 2026, Uji Coba): penampil berkas DI DALAM aplikasi (permintaan pemilik: jendela baru membingungkan). penampil() dipanggil sinkron saat klik (pengganti
+  window.open("", "_blank")), mengembalikan pengendali w.tampil(url, nama, mime)/w.location.href/w.close(); elemen .penampil di luar render(); history.pushState {pen:1}, popstate/Esc/✕
+  menutup tanpa menutup laci. lihatBerkasUrl(url) mengambil berkas statis jadi Blob (server lokal mengirim PDF sebagai octet-stream). JANGAN membuka PDF/gambar di jendela baru lagi.
+  Uji: uji-v482-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

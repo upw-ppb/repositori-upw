@@ -189,7 +189,10 @@ function catatNavigasi() {
   navI++; navMax = navI; history.pushState({ upw: 1, i: navI, v: S.view }, "");
 }
 window.addEventListener("popstate", e => {
-  const st = e.state; if (!st || !st.upw || !S.pengguna) return;
+  if (penLewati) { penLewati = false; return; }                 // v0.48.2: langkah mundur dari tombol Tutup penampil
+  if (PEN) { tutupPenampil(true); return; }                     // tombol mundur menutup penampil berkas, halaman tetap
+  const st = e.state; if (st && st.pen) { history.back(); return; }   // maju ke penampil yang sudah ditutup: lewati
+  if (!st || !st.upw || !S.pengguna) return;
   if (!bolehTutup()) { history.go(st.i < navI ? 1 : -1); return; }
   navDariPop = true; navI = st.i; if (navI > navMax) navMax = navI;
   S.view = st.v; S.laci = null; S.galat = ""; if (st.v === "penilaian") S.nilai = null;
@@ -199,6 +202,59 @@ function tombolNavigasi() {
   if (!S.pengguna) return "";
   return `<div class="row nav-hist" style="gap:4px;flex-wrap:nowrap"><button class="iconbtn" data-act="navKembali" aria-label="Kembali ke halaman sebelumnya" title="Kembali" ${navI > 0 ? "" : "disabled"}>${ic("kembali")}</button>
     <button class="iconbtn" data-act="navMaju" aria-label="Maju ke halaman berikutnya" title="Maju" ${navI < navMax ? "" : "disabled"}>${ic("maju")}</button></div>`;
+}
+
+/* ---------- Penampil berkas di dalam aplikasi (v0.48.2) ----------
+   Permintaan pemilik: PDF/gambar yang dibuka dari aplikasi dulu tampil di jendela baru yang mirip aplikasi, sehingga pengguna ragu menutupnya.
+   Kini berkas tampil di lapisan penuh DI DALAM aplikasi dengan tombol "Kembali ke aplikasi" / ✕ / Esc / tombol mundur (browser, mouse, ← di bilah atas).
+   penampil() dipanggil langsung saat klik (pengganti jendela kosong window.open) dan mengembalikan pengendali yang meniru jendela:
+   w.tampil(url, nama, mime), w.location.href = url, w.close(), w.document.write() (diabaikan). Tautan ke situs lain tetap dibuka di jendela browser.
+   Lapisan ini di luar render() (elemen sendiri di body) agar PDF tidak dimuat ulang setiap layar digambar ulang. */
+let PEN = null, penLewati = false;
+function penampil() {
+  if (PEN) { PEN.muat(); return PEN; }
+  const el = document.createElement("div");
+  el.className = "penampil"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Penampil berkas");
+  el.innerHTML = `<div class="pen-bar"><button class="btn sm primary pen-kembali" data-pen="tutup">${ic("kembali")}<span>Kembali ke aplikasi</span></button>
+    <b class="pen-nama">Membuka berkas…</b><span class="pen-aksi row" style="gap:6px;flex-wrap:nowrap"></span>
+    <button class="iconbtn" data-pen="tutup" aria-label="Tutup berkas" title="Tutup berkas (Esc)">✕</button></div><div class="pen-isi"></div>`;
+  el.addEventListener("click", e => { if (e.target.closest("[data-pen=tutup]")) tutupPenampil(); });
+  document.body.appendChild(el); document.body.classList.add("pen-buka");
+  const c = {
+    el,
+    muat() { el.querySelector(".pen-nama").textContent = "Membuka berkas…"; el.querySelector(".pen-aksi").innerHTML = ""; el.querySelector(".pen-isi").innerHTML = '<div class="memuat">Membuka berkas…</div>'; },
+    tampil(url, nama, mime) {
+      let luar = false; try { luar = !/^blob:/.test(url) && new URL(url, location.href).origin !== location.origin; } catch (_) {}
+      if (luar) {   // tautan situs lain: dibuka di browser; bila diblokir (dibuka setelah menunggu server), tampilkan tombolnya
+        const jw = window.open(url, "_blank", "noopener"); if (jw) { tutupPenampil(); return; }
+        el.querySelector(".pen-nama").textContent = "Tautan"; el.querySelector(".pen-aksi").innerHTML = "";
+        el.querySelector(".pen-isi").innerHTML = `<div class="pen-gambar"><a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Buka tautan di browser</a></div>`; return;
+      }
+      const n = nama || decodeURIComponent((String(url).split("?")[0].split("/").pop() || "berkas")).replace(/^[0-9a-f-]{36}$/, "berkas");
+      el.querySelector(".pen-nama").textContent = n;
+      el.querySelector(".pen-aksi").innerHTML = `<a class="btn sm" href="${esc(url)}" download="${esc(n)}">Unduh</a><a class="btn sm" href="${esc(url)}" target="_blank" rel="noopener" title="Bila berkas tidak tampil di sini">Buka di jendela baru</a>`;
+      el.querySelector(".pen-isi").innerHTML = /^image\//.test(mime || "") ? `<div class="pen-gambar"><img src="${esc(url)}" alt="${esc(n)}"></div>` : `<iframe src="${esc(url)}" title="${esc(n)}"></iframe>`;
+      el.querySelector(".pen-kembali").focus();
+    },
+    close() { tutupPenampil(); },
+    location: { set href(u) { c.tampil(u); } },
+    document: { write() {} }
+  };
+  c.muat(); PEN = c;
+  history.pushState(Object.assign({}, history.state || {}, { pen: 1 }), "");
+  return c;
+}
+function tutupPenampil(dariPop) {
+  if (!PEN) return;
+  PEN.el.remove(); PEN = null; document.body.classList.remove("pen-buka");
+  if (!dariPop && history.state && history.state.pen) { penLewati = true; history.back(); }
+}
+/** Buka berkas statis (contoh PDF) di penampil. */
+async function lihatBerkasUrl(url, nama) {
+  // diambil dulu lalu dijadikan Blob berjenis tepat, agar PDF selalu tampil (bukan terunduh) walau server mengirim jenis berkas umum
+  const w = penampil(), mime = /\.(png|jpe?g|webp)$/i.test(url.split("?")[0]) ? "image/" + (url.split("?")[0].split(".").pop().replace("jpg", "jpeg")) : "application/pdf";
+  try { const r = await fetch(url); if (!r.ok) throw new Error("Berkas tidak bisa dibuka (" + r.status + ")."); w.tampil(URL.createObjectURL(new Blob([await r.arrayBuffer()], { type: mime })), nama, mime); }
+  catch (e) { w.close(); toast(e.message || "Berkas tidak bisa dibuka."); }
 }
 
 /* ---------- Unduhan ----------
@@ -322,7 +378,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}${panelKesiapan()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.48.1: tombol unduhan di dalam aplikasi dihapus; berkas yang diunduh kini muncul di <b>tombol unduhan Chrome/Edge</b> (bisa dibuka langsung atau ditampilkan di Finder). v0.48.0: <b>Pembebanan CPL per MK dari Excel</b> (Data Prodi › Kurikulum): CPL utama (wajib diukur di RPS), CPL penunjang, dan rasional untuk semua MK sekaligus, dengan pratinjau dan unduhan pemetaan + rekap per CPL. v0.47.0: tombol <b>Ubah nama / hapus</b> di daftar akun (Super Admin: ubah nama, nonaktifkan, hapus akun yang belum dipakai; Admin Prodi: ubah nama mahasiswa). v0.46.0: <b>CPL yang dibebankan per MK</b> ditetapkan KPS/Admin Prodi dan <b>unit kompetensi</b> per MK (Data Prodi › Kurikulum › CPL &amp; unit), dipakai templat dan pemeriksaan RPS serta Tabel 4; <b>Cocokkan dengan PDDikti</b> di Status dosen. v0.45.0: <b>nilai dari SIAKAD</b> (unggah template nilai per kelas, dibaca dan diperiksa otomatis), contoh dalam <b>PDF</b> (dibuka langsung), dan <b>Data bersama templat</b> (LMS, tempat, batas umpan balik, keterlambatan, peraturan akademik). v0.44.0: <b>Contoh</b> di setiap bagian Portofolio MK (contoh RPS, kontrak, rubrik, dan lembar penilaian lengkap) dan <b>saran penelitian/PkM tim</b> yang cocok dengan RPS untuk catatan integrasi. v0.43.1: keterangan <b>urutan pengisian</b> Portofolio MK (RPS dulu, lalu templat kontrak, rubrik, dan lembar penilaian). v0.43.0: templat <b>kontrak kuliah</b>, <b>rubrik penilaian</b>, dan <b>lembar portofolio penilaian (Excel)</b> terisi dari RPS; RPS resmi PDF + Word sumber untuk pemeriksaan; catatan <b>tanda tangan</b>; kualifikasi/jenjang dan jam sajian otomatis. v0.42.0: <b>templat RPS terisi otomatis</b> dan <b>pembaca RPS Word</b> di Portofolio MK (pemeriksaan butir 8, saran metode, CPL Tabel 4 otomatis), daftar 68 CPL prodi, Otorisasi templat RPS di Data Prodi › Kurikulum. v0.41.0: <b>unduh semua bukti Portofolio MK (ZIP)</b> per semester, per mata kuliah, atau per kelas (Data Prodi › Portofolio MK dan laci mata kuliah). v0.40.0: <b>Portofolio MK per kelas</b> (setiap kelas terpisah dan hanya terlihat oleh tim kelas itu; RPS bersama hanya untuk tim yang sama), dosen hanya melihat <b>peserta kelasnya</b>. v0.39.2: templat tim pengajar menerima <b>nama yang diketik</b> (tanpa gelar, inisial, NIP, atau minimal 2 kata nama) dengan tanda "Terbaca sebagai", dan pratinjau menampilkan <b>beban SKS per orang</b>. v0.39.1: Tabel 4 iLKPS menulis <b>semua kode kelompok</b> MK pilihan (mis. 231041217 / 231041215 / 231041216) dalam satu baris. v0.39.0: <b>peserta kelas</b> (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa; juga lewat Excel), menu <b>Mata Kuliah Saya</b> untuk mahasiswa (MK dan dosen pengajar); SKS dibagi ke semua anggota tim termasuk praktisi. v0.38.0: <b>MK pilihan dengan kelompok paralel</b> (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok. v0.37.0: tombol <b>Edit</b> pada riwayat status mahasiswa (ganti SK yang salah, perbaiki tanggal/alasan/status; tercatat di Log). v0.36.1: templat tim pengajar selalu berisi <b>baris kelas A dan B</b> per mata kuliah, dan daftar nama selalu terbaru. v0.36.0: penanda <b>tanpa dosen pengampu</b> untuk Magang dan Tugas Akhir di Kurikulum. v0.35.0: <b>templat Excel tim pengajar</b> (KPS dan Admin Prodi) dengan hitungan <b>beban SKS per dosen</b> otomatis. v0.34.0: <b>kop surat prodi</b> di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM. v0.33.0: <b>saran butir Matriks otomatis</b> saat mengetik agenda rapat, tindak lanjut, keputusan risalah, nama dokumen Bank, dan judul kegiatan, serta kotak <b>Cari butir</b> di Penilaian. v0.32.0: <b>risalah rapat</b> per agenda (keputusan otomatis jadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen. v0.31.0: menu <b>Rapat &amp; Tindak Lanjut</b>: undangan rapat dari KPS (surat PDF bertanda tangan, notifikasi dan jawaban kehadiran peserta) dan daftar tindak lanjut sampai terverifikasi. v0.30.0: tombol <b>i</b> berisi definisi dan kriteria skor instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain. v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.48.2: PDF dan gambar kini dibuka <b>di dalam aplikasi</b>, dengan tombol <b>Kembali ke aplikasi</b> (juga ✕, Esc, atau tombol mundur). v0.48.1: tombol unduhan di dalam aplikasi dihapus; berkas yang diunduh kini muncul di <b>tombol unduhan Chrome/Edge</b> (bisa dibuka langsung atau ditampilkan di Finder). v0.48.0: <b>Pembebanan CPL per MK dari Excel</b> (Data Prodi › Kurikulum): CPL utama (wajib diukur di RPS), CPL penunjang, dan rasional untuk semua MK sekaligus, dengan pratinjau dan unduhan pemetaan + rekap per CPL. v0.47.0: tombol <b>Ubah nama / hapus</b> di daftar akun (Super Admin: ubah nama, nonaktifkan, hapus akun yang belum dipakai; Admin Prodi: ubah nama mahasiswa). v0.46.0: <b>CPL yang dibebankan per MK</b> ditetapkan KPS/Admin Prodi dan <b>unit kompetensi</b> per MK (Data Prodi › Kurikulum › CPL &amp; unit), dipakai templat dan pemeriksaan RPS serta Tabel 4; <b>Cocokkan dengan PDDikti</b> di Status dosen. v0.45.0: <b>nilai dari SIAKAD</b> (unggah template nilai per kelas, dibaca dan diperiksa otomatis), contoh dalam <b>PDF</b> (dibuka langsung), dan <b>Data bersama templat</b> (LMS, tempat, batas umpan balik, keterlambatan, peraturan akademik). v0.44.0: <b>Contoh</b> di setiap bagian Portofolio MK (contoh RPS, kontrak, rubrik, dan lembar penilaian lengkap) dan <b>saran penelitian/PkM tim</b> yang cocok dengan RPS untuk catatan integrasi. v0.43.1: keterangan <b>urutan pengisian</b> Portofolio MK (RPS dulu, lalu templat kontrak, rubrik, dan lembar penilaian). v0.43.0: templat <b>kontrak kuliah</b>, <b>rubrik penilaian</b>, dan <b>lembar portofolio penilaian (Excel)</b> terisi dari RPS; RPS resmi PDF + Word sumber untuk pemeriksaan; catatan <b>tanda tangan</b>; kualifikasi/jenjang dan jam sajian otomatis. v0.42.0: <b>templat RPS terisi otomatis</b> dan <b>pembaca RPS Word</b> di Portofolio MK (pemeriksaan butir 8, saran metode, CPL Tabel 4 otomatis), daftar 68 CPL prodi, Otorisasi templat RPS di Data Prodi › Kurikulum. v0.41.0: <b>unduh semua bukti Portofolio MK (ZIP)</b> per semester, per mata kuliah, atau per kelas (Data Prodi › Portofolio MK dan laci mata kuliah). v0.40.0: <b>Portofolio MK per kelas</b> (setiap kelas terpisah dan hanya terlihat oleh tim kelas itu; RPS bersama hanya untuk tim yang sama), dosen hanya melihat <b>peserta kelasnya</b>. v0.39.2: templat tim pengajar menerima <b>nama yang diketik</b> (tanpa gelar, inisial, NIP, atau minimal 2 kata nama) dengan tanda "Terbaca sebagai", dan pratinjau menampilkan <b>beban SKS per orang</b>. v0.39.1: Tabel 4 iLKPS menulis <b>semua kode kelompok</b> MK pilihan (mis. 231041217 / 231041215 / 231041216) dalam satu baris. v0.39.0: <b>peserta kelas</b> (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa; juga lewat Excel), menu <b>Mata Kuliah Saya</b> untuk mahasiswa (MK dan dosen pengajar); SKS dibagi ke semua anggota tim termasuk praktisi. v0.38.0: <b>MK pilihan dengan kelompok paralel</b> (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok. v0.37.0: tombol <b>Edit</b> pada riwayat status mahasiswa (ganti SK yang salah, perbaiki tanggal/alasan/status; tercatat di Log). v0.36.1: templat tim pengajar selalu berisi <b>baris kelas A dan B</b> per mata kuliah, dan daftar nama selalu terbaru. v0.36.0: penanda <b>tanpa dosen pengampu</b> untuk Magang dan Tugas Akhir di Kurikulum. v0.35.0: <b>templat Excel tim pengajar</b> (KPS dan Admin Prodi) dengan hitungan <b>beban SKS per dosen</b> otomatis. v0.34.0: <b>kop surat prodi</b> di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM. v0.33.0: <b>saran butir Matriks otomatis</b> saat mengetik agenda rapat, tindak lanjut, keputusan risalah, nama dokumen Bank, dan judul kegiatan, serta kotak <b>Cari butir</b> di Penilaian. v0.32.0: <b>risalah rapat</b> per agenda (keputusan otomatis jadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen. v0.31.0: menu <b>Rapat &amp; Tindak Lanjut</b>: undangan rapat dari KPS (surat PDF bertanda tangan, notifikasi dan jawaban kehadiran peserta) dan daftar tindak lanjut sampai terverifikasi. v0.30.0: tombol <b>i</b> berisi definisi dan kriteria skor instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain. v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -753,7 +809,7 @@ document.addEventListener("input", e => {
     }
   }
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && S.instr) { S.instr = null; render(); return; } if (e.key === "Escape" && S.laci) { S.laci = null; render(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && PEN) { tutupPenampil(); return; } if (e.key === "Escape" && S.instr) { S.instr = null; render(); return; } if (e.key === "Escape" && S.laci) { S.laci = null; render(); } });
 
 /* ---------- kegiatan dan surat tugas (v0.3.0) ---------- */
 /* Isian formulir disimpan di S.form setiap kali diketik/dipilih. Kotak teks TIDAK menggambar ulang layar (agar klik tombol tidak hilang);
@@ -1240,14 +1296,14 @@ function unggahBk(slot, isi) {
 }
 async function lihatBukti(id, slot, e) {
   if (e.t === "tautan") { window.open(e.url, "_blank", "noopener,noreferrer"); return; }
-  const w = window.open("", "_blank");
+  const w = penampil();
   if (w) w.document.write('<p style="font-family:sans-serif;padding:16px">Membuka berkas…</p>');
   try {
     const j = await api("bukti.lihat", { id, slot });
     const bin = atob(j.isi), arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
     const url = URL.createObjectURL(new Blob([arr], { type: j.mime }));
-    if (w && /pdf|image/.test(j.mime)) w.location.href = url;
+    if (w && /pdf|image/.test(j.mime)) w.tampil(url, j.nama, j.mime);
     else { if (w) w.close(); simpanBerkas(new Blob([arr], { type: j.mime }), j.nama); }
     setTimeout(() => URL.revokeObjectURL(url), 120000);
   } catch (err) { if (w) w.close(); toast(err.message); }
@@ -1582,8 +1638,8 @@ Object.assign(AKSI, {
     buktiPraktisi({ slot: d.slot, hapus: true }, "Bukti dihapus.");
   },
   async dpPrakLihat(d) {
-    const w = window.open("", "_blank");
-    try { const j = await api("dp.praktisiBuktiLihat", { id: S.laci.x.id, slot: d.slot }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w) w.location.href = URL.createObjectURL(blob); else simpanBerkas(blob, j.nama); }
+    const w = penampil();
+    try { const j = await api("dp.praktisiBuktiLihat", { id: S.laci.x.id, slot: d.slot }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w && /pdf|image/.test(j.mime)) w.tampil(URL.createObjectURL(blob), j.nama, j.mime); else { if (w) w.close(); simpanBerkas(blob, j.nama); } }
     catch (e) { if (w) w.close(); toast(e.message); }
   },
   dpPrakHapus() {
@@ -2254,8 +2310,9 @@ const CONTOH_MKP = {
 function contohMkpHtml(k) {
   const C = CONTOH_MKP[k]; if (!C) return "";
   return `<details class="small" style="margin-top:4px"><summary style="cursor:pointer;color:var(--brand)">Contoh</summary><ul style="margin:4px 0 4px 18px;padding:0">${C.teks.map(t => `<li style="margin-bottom:3px">${t}</li>`).join("")}</ul>
-    ${C.pdf ? `<div class="row" style="flex-wrap:wrap">${C.pdf.map(([j, l]) => `<a class="btn sm" href="contoh/${j}.pdf?v=${encodeURIComponent(K.versi)}" target="_blank" rel="noopener">${l}</a>`).join("")}</div><span class="hint">Contoh hanya gambaran (dibuka di tab baru), dari RPS Praktik Desain dan Media Digital Prodi UPW tanpa nama pejabat. Untuk mengerjakan, pakai tombol templat (terisi).</span>` : ""}</details>`;
+    ${C.pdf ? `<div class="row" style="flex-wrap:wrap">${C.pdf.map(([j, l]) => `<button class="btn sm" data-act="lihatContoh" data-j="${j}" data-l="${esc(l)}">${l}</button>`).join("")}</div><span class="hint">Contoh hanya gambaran (dibuka di dalam aplikasi; tutup dengan Kembali ke aplikasi), dari RPS Praktik Desain dan Media Digital Prodi UPW tanpa nama pejabat. Untuk mengerjakan, pakai tombol templat (terisi).</span>` : ""}</details>`;
 }
+Object.assign(AKSI, { lihatContoh(d) { lihatBerkasUrl(`contoh/${d.j}.pdf?v=${encodeURIComponent(K.versi)}`, String(d.l || d.j).replace(/^Lihat\s+/i, "").replace(/\s*\(PDF\)\s*/i, "").replace(/^./, c => c.toUpperCase()) + ".pdf"); } });
 /** Render ulang tanpa menghapus catatan integrasi yang sedang diketik. */
 function renderJagaInteg() { const v = $("mkpInteg") ? $("mkpInteg").value : null; render(); const e = $("mkpInteg"); if (e && v !== null) e.value = v; }
 /** Saran integrasi: penelitian/PkM/publikasi tim kelas ini, diurutkan menurut kecocokan kata dengan RPS kelas ini (tanpa AI). */
@@ -2688,14 +2745,14 @@ Object.assign(AKSI, {
     const { x, xv, G } = viewMkp(), c = d.komp === "nilai" ? { jenis: "dok" } : x.komp.find(y => y.k === d.komp), e = d.komp === "nilai" ? (G && G.nilai) : c.jenis === "dok" ? xv[d.komp] : x[d.komp].find(y => y.id === d.id);
     if (!e) return;
     if (e.t === "tautan") { window.open(e.url, "_blank", "noopener,noreferrer"); return; }
-    const w = window.open("", "_blank");
+    const w = penampil();
     if (w) w.document.write('<p style="font-family:sans-serif;padding:16px">Membuka berkas…</p>');
     try {
       const j = await api("mkp.lihat", { semester: x.semester, kode: x.kode, komp: d.komp, id: d.id || undefined, kunci: S.laci.kel || undefined });
       const bin = atob(j.isi), arr = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
       const url = URL.createObjectURL(new Blob([arr], { type: j.mime }));
-      if (w && /pdf|image/.test(j.mime)) w.location.href = url;
+      if (w && /pdf|image/.test(j.mime)) w.tampil(url, j.nama, j.mime);
       else { if (w) w.close(); simpanBerkas(new Blob([arr], { type: j.mime }), j.nama); }
       setTimeout(() => URL.revokeObjectURL(url), 120000);
     } catch (err) { if (w) w.close(); toast(err.message); }
@@ -2825,14 +2882,14 @@ Object.assign(AKSI, {
     const s = S.bank.slot.find(x => x.kunci === d.kunci), v = s && s.versi.find(x => x.id === d.id);
     if (!v) return;
     if (v.t === "tautan") { window.open(v.url, "_blank", "noopener,noreferrer"); if (S.bank.asesor) api("bank.lihat", { kunci: d.kunci, id: d.id }).catch(() => {}); return; }
-    const w = window.open("", "_blank");
+    const w = penampil();
     if (w) w.document.write('<p style="font-family:sans-serif;padding:16px">Membuka berkas…</p>');
     try {
       const j = await api("bank.lihat", { kunci: d.kunci, id: d.id });
       const bin = atob(j.isi), arr = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
       const url = URL.createObjectURL(new Blob([arr], { type: j.mime }));
-      if (w && /pdf|image/.test(j.mime)) w.location.href = url;
+      if (w && /pdf|image/.test(j.mime)) w.tampil(url, j.nama, j.mime);
       else { if (w) w.close(); simpanBerkas(new Blob([arr], { type: j.mime }), j.nama); }
       setTimeout(() => URL.revokeObjectURL(url), 120000);
     } catch (err) { if (w) w.close(); toast(err.message); }
@@ -3279,13 +3336,13 @@ Object.assign(AKSI, {
   },
   async dbLihat(d) {
     const x = S.dokBio.dokumen.find(y => y.id === d.id); if (!x) return;
-    const w = window.open("", "_blank");
+    const w = penampil();
     try {
       const j = await api("dok.lihat", { id: d.id, dariBiodata: 1 });
       if (j.t !== "file") { if (w) w.location.href = j.url; else window.open(j.url, "_blank", "noopener"); return; }
       const bin = atob(j.isi), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
       const url = URL.createObjectURL(new Blob([arr], { type: j.mime }));
-      if (w && /pdf|image/.test(j.mime)) w.location.href = url; else { if (w) w.close(); unduhBlob(new Blob([arr], { type: j.mime }), j.nama); }
+      if (w && /pdf|image/.test(j.mime)) w.tampil(url, j.nama, j.mime); else { if (w) w.close(); unduhBlob(new Blob([arr], { type: j.mime }), j.nama); }
     } catch (e) { if (w) w.close(); toast(e.message); }
   },
   dokdIngatkan(d) {
@@ -3704,10 +3761,10 @@ Object.assign(AKSI, {
     jalankan(async () => { S.mskAdm = await api("masukan.ubah", data); S.laci = null; S.tugas = null; toast("Status masukan tersimpan."); });
   },
   async mskLampiran(d) {
-    const w = window.open("", "_blank");
+    const w = penampil();
     try {
       const j = await api("masukan.lampiran", { id: d.id }), bin = atob(j.isi), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-      const blob = new Blob([arr], { type: j.mime }); if (w) w.location.href = URL.createObjectURL(blob); else simpanBerkas(blob, j.nama);
+      const blob = new Blob([arr], { type: j.mime }); if (w && /pdf|image/.test(j.mime)) w.tampil(URL.createObjectURL(blob), j.nama, j.mime); else { if (w) w.close(); simpanBerkas(blob, j.nama); }
     } catch (e) { if (w) w.close(); toast(e.message); }
   },
   mskXlsx() {
@@ -4042,10 +4099,10 @@ Object.assign(AKSI, {
   },
   gkmBatasSimpan() { jalankan(async () => { await api("gkm.batas", { semester: S.gkm.laporan.semester, tanggal: nilai("gkmBatas") }); await muatUlangGkm(); toast("Batas disimpan."); }); },
   async gkmLihat(d) {
-    const w = window.open("", "_blank");
+    const w = penampil();
     try {
       const j = await api("gkm.lampiran", { semester: S.gkm.laporan.semester, fileId: d.id }), bin = atob(j.isi), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-      const blob = new Blob([arr], { type: j.mime }); if (w) w.location.href = URL.createObjectURL(blob); else simpanBerkas(blob, j.nama);
+      const blob = new Blob([arr], { type: j.mime }); if (w && /pdf|image/.test(j.mime)) w.tampil(URL.createObjectURL(blob), j.nama, j.mime); else { if (w) w.close(); simpanBerkas(blob, j.nama); }
     } catch (e) { if (w) w.close(); toast(e.message); }
   },
   gkmHapusLamp(d) {
@@ -4248,8 +4305,8 @@ Object.assign(AKSI, {
     });
   },
   async smBukti(d) {
-    const w = window.open("", "_blank");
-    try { const j = await api("admin.buktiStatusMhs", { id: d.id }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w) w.location.href = URL.createObjectURL(blob); else simpanBerkas(blob, j.nama); }
+    const w = penampil();
+    try { const j = await api("admin.buktiStatusMhs", { id: d.id }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w && /pdf|image/.test(j.mime)) w.tampil(URL.createObjectURL(blob), j.nama, j.mime); else { if (w) w.close(); simpanBerkas(blob, j.nama); } }
     catch (e) { if (w) w.close(); toast(e.message); }
   },
   pXlsx() {
@@ -4709,10 +4766,10 @@ Object.assign(AKSI, {
   async dokLihat(d) {
     const x = S.porto.dokumen.find(y => y.id === d.id); if (!x) return;
     if (x.t === "tautan") { window.open(x.url, "_blank", "noopener,noreferrer"); return; }
-    const w = window.open("", "_blank");
+    const w = penampil();
     try {
       const j = await api("dok.lihat", { id: d.id }), blob = new Blob([dariBase64(j.isi)], { type: j.mime });
-      if (w && /pdf|image/.test(j.mime)) { w.location.href = URL.createObjectURL(blob); } else { if (w) w.close(); unduh(blob, j.nama); }
+      if (w && /pdf|image/.test(j.mime)) { w.tampil(URL.createObjectURL(blob), j.nama, j.mime); } else { if (w) w.close(); unduh(blob, j.nama); }
     } catch (e) { if (w) w.close(); toast(e.message); }
   },
   portoPdf() { cetakSurat(htmlPortoCetak(S.porto)); },
@@ -5163,8 +5220,8 @@ Object.assign(AKSI, {
     jalankan(async () => { await api("tl.hapus", { id }); S.tl = await api("tl.daftar"); S.laci = null; S.nilai = null; toast("Poin dihapus."); });
   },
   async tlLihatBukti(d) {
-    const w = window.open("", "_blank");
-    try { const j = await api("tl.bukti", { id: d.id }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w && /pdf|image/.test(j.mime)) w.location.href = URL.createObjectURL(blob); else { if (w) w.close(); simpanBerkas(blob, j.nama); } }
+    const w = penampil();
+    try { const j = await api("tl.bukti", { id: d.id }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w && /pdf|image/.test(j.mime)) w.tampil(URL.createObjectURL(blob), j.nama, j.mime); else { if (w) w.close(); simpanBerkas(blob, j.nama); } }
     catch (e) { if (w) w.close(); toast(e.message); }
   }
 });
@@ -5303,8 +5360,8 @@ Object.assign(AKSI, {
   rapatBerkasTautan(d) { S.laci.tautJ = S.laci.tautJ === d.j ? "" : d.j; render(); fokus("rbTaut"); },
   rapatBerkasTautanSimpan() { const url = ($("rbTaut") || {}).value || "", j = S.laci.tautJ; S.laci.tautJ = ""; kirimBerkasRapat(j, { tautan: url.trim() }); },
   async rapatBerkasLihat(d) {
-    const w = window.open("", "_blank");
-    try { const j = await api("rapat.berkasLihat", { id: S.laci.r.id, jenis: d.j }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w && /pdf|image/.test(j.mime)) w.location.href = URL.createObjectURL(blob); else { if (w) w.close(); simpanBerkas(blob, j.nama); } }
+    const w = penampil();
+    try { const j = await api("rapat.berkasLihat", { id: S.laci.r.id, jenis: d.j }); const blob = new Blob([dariBase64(j.isi)], { type: j.mime }); if (w && /pdf|image/.test(j.mime)) w.tampil(URL.createObjectURL(blob), j.nama, j.mime); else { if (w) w.close(); simpanBerkas(blob, j.nama); } }
     catch (e) { if (w) w.close(); toast(e.message); }
   }
 });

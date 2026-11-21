@@ -346,3 +346,17 @@ tr.sorot td{background:var(--gold-soft);transition:background .3s}
 .kertas .kop{display:flex;align-items:center;gap:.25cm;border-bottom:2.25pt solid #000;padding-bottom:6px;margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;line-height:1.3;color:#000}
 .kertas .kop img{width:2.1cm;height:auto;flex:none}
 .kertas .kop .kop-teks{flex:1;text-align:center}
+
+/* v0.48.2: penampil berkas di dalam aplikasi */
+body.pen-buka{overflow:hidden}
+.penampil{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column}
+.pen-bar{display:flex;align-items:center;gap:10px;padding:8px max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));background:var(--surface);border-bottom:1px solid var(--line);padding-top:max(8px,env(safe-area-inset-top,0px))}
+.pen-bar .pen-kembali{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pen-bar .pen-kembali svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pen-nama{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pen-isi{flex:1;min-height:0;display:flex}
+.pen-isi iframe{flex:1;width:100%;height:100%;border:0;background:#525659}
+.pen-isi .memuat{margin:auto}
+.pen-gambar{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:12px}
+.pen-gambar img{max-width:100%;max-height:100%;object-fit:contain;background:#fff}
+@media (max-width:640px){.pen-bar .pen-kembali span{display:none}.pen-aksi a:last-child{display:none}}

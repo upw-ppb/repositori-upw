@@ -3,6 +3,19 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.48.2 — 21 Nov 2026 — Uji Coba
+Ringkas: PDF dan gambar dibuka di dalam aplikasi (bukan jendela baru), dengan tombol Kembali ke aplikasi, ✕, Esc, atau tombol mundur untuk menutupnya.
+Permintaan pemilik 21 Nov 2026 (tangkapan layar contoh RPS): jendela baru tampak seperti aplikasi, sehingga pengguna ragu menutupnya.
+- Penampil berkas (penampil(), tutupPenampil(), lihatBerkasUrl()): lapisan penuh di atas halaman berisi nama berkas, tombol "Kembali ke aplikasi", Unduh, "Buka di jendela baru"
+  (cadangan bila berkas tidak tampil), dan ✕. Menutup penampil tidak menutup laci yang sedang terbuka. Tombol mundur browser/mouse juga menutupnya (riwayat penampil sendiri).
+- Dipakai untuk semua tempat yang dulu membuka jendela baru: bukti kegiatan, Portofolio MK, Bank Dokumen, dokumen biodata/portofolio, praktisi, masukan, Laporan GKM,
+  bukti status mahasiswa, tindak lanjut, berkas rapat, dan contoh PDF Portofolio MK. Berkas selain PDF/gambar tetap diunduh; tautan ke situs lain tetap dibuka di browser.
+- Contoh PDF dibuat ulang dengan judul dokumen ("Contoh RPS", dst.; sebelumnya penampil PDF menulis "rps.html").
+- Tanpa perubahan server maupun struktur data. Rollback ke v0.48.1 aman.
+- Uji: 874 + 44 uji server lulus (4 uji baru di uji-v482-bagian.mjs; uji contoh PDF v0.45.0 disesuaikan). Uji tampilan (server lokal, dosen): contoh RPS dan kontrak kuliah
+  yang diunggah tampil di penampil dengan nama berkasnya; tutup dengan Kembali ke aplikasi, ✕, Esc, dan tombol mundur, laci Portofolio MK tetap terbuka.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.48.1 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.48.1 (tampilan docs/ dan server Apps Script Produksi deployment @31): tombol unduhan aplikasi dihapus, semua unduhan lewat tombol unduhan browser.
 - Tidak ada perubahan struktur data. Rollback ke v0.48.0 cukup tampilan (tag v0.48.0) dan deployment @30.

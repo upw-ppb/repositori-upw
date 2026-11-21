@@ -61,6 +61,6 @@ export async function jalankan({ g, cek, ok, salah, tKps, tDsn, tAdm, tM }) {
   cek("templat RPS mencantumkan kehadiran minimal dari data bersama", tp.includes("kehadiran minimal 80%"));
   // Contoh PDF & tampilan
   const pdf = ["rps", "kontrak", "rubrik"].map(n => fs.readFileSync(`web/contoh/${n}.pdf`).slice(0, 5).toString());
-  cek("contoh berupa PDF (dibuka di tab baru), tanpa tombol unduh contoh Word/Excel dan tanpa lembar Excel portofolio", pdf.every(p => p === "%PDF-") && /href="contoh\/\$\{j\}\.pdf/.test(app) && !/mkpContoh/.test(app) && !/data-j="porto"/.test(app));
+  cek("contoh berupa PDF (dibuka di penampil aplikasi sejak v0.48.2), tanpa tombol unduh contoh Word/Excel dan tanpa lembar Excel portofolio", pdf.every(p => p === "%PDF-") && /contoh\/\$\{d\.j\}\.pdf/.test(app) && !/mkpContoh/.test(app) && !/data-j="porto"/.test(app));
   cek("tampilan: keterangan jalur Download Template SIAKAD dan unggah setelah perkuliahan selesai", app.includes("Kelas Kuliah → Nilai Perkuliahan → Upload Excel → Download Template") && app.includes("setelah perkuliahan selesai"));
 }

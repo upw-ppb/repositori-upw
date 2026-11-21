@@ -60,7 +60,7 @@ function htmlTabel(t, media) {
   }).join("")}</tr>`).join("");
   return `<table class="${tanpa ? "tanpa" : ""}">${h}</table>`;
 }
-async function keHtml(blob, lanskap) {
+async function keHtml(blob, lanskap, judul) {
   const ambil = await ctx.UPW_ZIP.buka(await blob.arrayBuffer(), "Word"), doc = await ambil("word/document.xml"), rel = (await ambil("word/_rels/document.xml.rels")) || "";
   const media = {};
   // gambar: UPW_ZIP.buka mengembalikan teks, jadi gambar diambil dari logo sumber (nama media sama)
@@ -70,7 +70,7 @@ async function keHtml(blob, lanskap) {
   const blok = []; const re = /<w:tbl>[\s\S]*?<\/w:tbl>|<w:p[ >][\s\S]*?<\/w:p>|<w:p\/>/g; let m;
   // susun blok tingkat atas berurutan (tabel tidak bersarang di dokumen rps.js)
   while ((m = re.exec(body))) blok.push(m[0].startsWith("<w:tbl>") ? htmlTabel(m[0], media) : m[0] === "<w:p/>" ? "<p>&nbsp;</p>" : htmlPar(m[0], media));
-  return `<!doctype html><html lang="id"><head><meta charset="utf-8"><style>
+  return `<!doctype html><html lang="id"><head><meta charset="utf-8"><title>${esc(judul)}</title><style>
     @page { size: A4 ${lanskap ? "landscape" : "portrait"}; margin: ${lanskap ? "1.8cm 1.5cm" : "2cm"}; }
     body { font-family: "Times New Roman", Times, serif; font-size: 10pt; margin: 0; }
     table { border-collapse: collapse; width: 100%; table-layout: fixed; margin: 0; page-break-inside: auto; }
@@ -81,9 +81,9 @@ async function keHtml(blob, lanskap) {
 }
 fs.mkdirSync(KELUAR, { recursive: true });
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "contoh-pdf-"));
-const dok = [["rps", U.buat(C.rps, logo), true], ["kontrak", U.kontrak(Rc, C.rps, logo, C.kontrak), false], ["rubrik", U.rubrik(Rc, C.rps, logo, { hanyaBerubrik: true, lms: C.kontrak.lms }), true]];
-for (const [n, blob, lanskap] of dok) {
-  const html = path.join(tmp, n + ".html"); fs.writeFileSync(html, await keHtml(blob, lanskap));
+const dok = [["rps", U.buat(C.rps, logo), true, "Contoh RPS"], ["kontrak", U.kontrak(Rc, C.rps, logo, C.kontrak), false, "Contoh kontrak kuliah"], ["rubrik", U.rubrik(Rc, C.rps, logo, { hanyaBerubrik: true, lms: C.kontrak.lms }), true, "Contoh rubrik penilaian"]];
+for (const [n, blob, lanskap, judul] of dok) {
+  const html = path.join(tmp, n + ".html"); fs.writeFileSync(html, await keHtml(blob, lanskap, judul));
   execFileSync(CHROME, ["--headless=new", "--disable-gpu", "--no-pdf-header-footer", `--print-to-pdf=${path.join(KELUAR, n + ".pdf")}`, "file://" + html], { stdio: "ignore" });
   console.log(n + ".pdf", fs.statSync(path.join(KELUAR, n + ".pdf")).size, "byte");
 }
