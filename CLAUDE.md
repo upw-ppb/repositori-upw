@@ -356,6 +356,8 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   cplMkSekunder/cplMkAlasan/rapikanKodeCpl/jsonCplMk (gas/Rps.js); aksi dp.cplMkImpor {baris[{no, semester, kode, nama, primer, sek, alasan}], simpan} (cocok kode/kode kelompok/nama;
   pratinjau tanpa simpan). Tabel 4 hanya CPL utama; rps.js periksa: R.cplSek tidak dianggap di luar penetapan. Tampilan: panelCplImpor, bacaPemetaanCpl, lembarPemetaanCpl
   (unduh + rekap per CPL), centang data-cplsek di laciCplMk. Berkas pemetaan prodi (49 MK, 68 CPL) diunggah KPS/Admin lewat panel itu di Produksi. Uji: alat/uji/uji-v48-bagian.mjs.
+- v0.48.1 (21 Nov 2026, Uji Coba): permintaan pemilik — tombol/daftar unduhan aplikasi (v0.25.2) dan jendela showSaveFilePicker (v0.22.0) DIHAPUS. simpanBerkas = a[download] biasa
+  agar berkas tampil di tombol unduhan Chrome/Edge (pemilik membuka berkas/Finder dari sana). JANGAN tambahkan lagi daftar unduhan sendiri atau jendela Simpan ke…. Uji: uji-v481-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

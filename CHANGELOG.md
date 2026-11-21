@@ -3,6 +3,19 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.48.1 — 21 Nov 2026 — Uji Coba
+Ringkas: Tombol unduhan di dalam aplikasi dihapus; semua berkas diunduh biasa oleh browser sehingga muncul di tombol unduhan Chrome/Edge (buka berkas atau tampilkan di Finder).
+Permintaan pemilik 21 Nov 2026 (tangkapan layar): tombol unduhan aplikasi tidak bisa membuka Finder; yang diperlukan tombol unduhan Chrome di bilah judul, yang kini sudah tampil.
+- Dihapus: tombol Unduhan dan kotak "Unduhan terakhir" di bilah atas (v0.25.2) beserta daftarnya di penyimpanan browser (dibersihkan otomatis saat aplikasi dibuka).
+- simpanBerkas kini selalu unduhan biasa browser. Jendela "Simpan ke…" di aplikasi terpasang (v0.22.0) juga dihapus, karena berkas yang disimpan lewat jendela itu
+  tidak tercatat di tombol unduhan Chrome. Bila ingin memilih folder setiap kali, nyalakan "Tanyakan lokasi penyimpanan" di setelan Download Chrome.
+- Panduan Info: topik "Unduhan dan letak berkas" dan "Mengenal tampilan aplikasi" diperbarui; penanda nomor 3 (tombol unduhan) di gambar Beranda dihapus
+  (gambar lama masih memperlihatkan ikonnya tanpa nomor).
+- Tanpa perubahan server maupun struktur data (VERSI_SERVER hanya dinaikkan). Rollback ke v0.48.0 aman.
+- Uji: 870 + 44 uji server lulus (2 uji baru di uji-v481-bagian.mjs). Uji tampilan (server lokal): bilah atas hanya ← → Info Keluar, daftar unduhan lama terhapus,
+  unduhan pemetaan CPL memakai unduhan biasa browser; tanpa galat konsol.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.48.0 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.48.0 (tampilan docs/ dan server Apps Script Produksi deployment @30): pembebanan CPL per MK dari Excel (CPL utama, penunjang, rasional),
   unduh pemetaan CPL–MK dan rekap per CPL.
