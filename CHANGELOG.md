@@ -3,6 +3,11 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.48.2 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.48.2 (tampilan docs/ dan server Apps Script Produksi deployment @32): PDF dan gambar dibuka di penampil di dalam aplikasi.
+- Tidak ada perubahan struktur data. Rollback ke v0.48.1 cukup tampilan (tag v0.48.1) dan deployment @31.
+- Penyetuju: pemilik, di chat 21 Nov 2026: "Setuju tayang v0.48.2".
+
 ## v0.48.2 — 21 Nov 2026 — Uji Coba
 Ringkas: PDF dan gambar dibuka di dalam aplikasi (bukan jendela baru), dengan tombol Kembali ke aplikasi, ✕, Esc, atau tombol mundur untuk menutupnya.
 Permintaan pemilik 21 Nov 2026 (tangkapan layar contoh RPS): jendela baru tampak seperti aplikasi, sehingga pengguna ragu menutupnya.
