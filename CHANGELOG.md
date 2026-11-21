@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.48.0 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.48.0 (tampilan docs/ dan server Apps Script Produksi deployment @30): pembebanan CPL per MK dari Excel (CPL utama, penunjang, rasional),
+  unduh pemetaan CPL–MK dan rekap per CPL.
+- Tidak ada perubahan struktur data. Rollback ke v0.47.0 cukup tampilan (tag v0.47.0) dan deployment @29; penetapan CPL utama tetap terbaca, penunjang dan rasional diabaikan.
+- Data pembebanan tidak ikut dikirim: KPS/Admin Prodi mengunggah berkas pemetaan prodi sekali di Produksi (Data Prodi › Kurikulum › Pembebanan CPL per MK (Excel)).
+- Penyetuju: pemilik, di chat 21 Nov 2026: "Setuju tayang v0.48.0".
+
 ## v0.48.0 — 21 Nov 2026 — Uji Coba
 Ringkas: Pembebanan CPL per mata kuliah dari Excel prodi (CPL utama, penunjang, rasional) dengan pratinjau; unduh pemetaan CPL–MK dan rekap per CPL.
 Permintaan pemilik 21 Nov 2026 ("apakah anda bisa menambahkan pembebanan CPL prodi kepada masing - masing MK? sudah kami tentukan sekarang"), berkas pemetaan 49 MK.
