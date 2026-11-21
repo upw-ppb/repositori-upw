@@ -380,10 +380,11 @@ function periksa(D, R) {
     if (!takDikenal.length && !salah.length) ok(`${D.cpl.length} CPL prodi dibebankan dan sesuai daftar CPL kurikulum.`);
   }
   if (R && R.cplMk && R.cplMk.length && D.cpl.length) {   // v0.46.0: dibanding CPL yang ditetapkan prodi untuk MK ini
-    const diRps = new Set(D.cpl.map(c => String(c.ref || "").toUpperCase())), tetap = new Set(R.cplMk);
-    const kurang = R.cplMk.filter(k => !diRps.has(k)), lebih = [...diRps].filter(k => k && !tetap.has(k));
+    // v0.48.0: CPL penunjang (R.cplSek) boleh ikut dimuat di RPS; yang wajib hanya CPL utama (primer)
+    const diRps = new Set(D.cpl.map(c => String(c.ref || "").toUpperCase())), sek = R.cplSek || [], tetap = new Set(R.cplMk.concat(sek));
+    const kurang = R.cplMk.filter(k => !diRps.has(k)), lebih = [...diRps].filter(k => k && !tetap.has(k)), ikutSek = sek.filter(k => diRps.has(k));
     if (kurang.length || lebih.length) wajib(`CPL di RPS berbeda dengan CPL yang ditetapkan prodi untuk MK ini (${R.cplMk.join(", ")})${kurang.length ? `; belum dimuat: ${kurang.join(", ")}` : ""}${lebih.length ? `; di luar penetapan: ${lebih.join(", ")}` : ""}.`);
-    else ok("CPL di RPS sama dengan penetapan prodi untuk MK ini.");
+    else ok("CPL di RPS sama dengan penetapan prodi untuk MK ini" + (ikutSek.length ? ` (termasuk CPL penunjang ${ikutSek.join(", ")})` : "") + ".");
   }
   if (R && R.unit && R.unit.length && isi(D.bahan)) {
     const b = String(D.bahan).replace(/\s/g, "").toUpperCase(), tak = R.unit.filter(u => u.k && !b.includes(String(u.k).replace(/\s/g, "").toUpperCase()));

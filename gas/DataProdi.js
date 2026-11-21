@@ -213,11 +213,11 @@ function aksiDpData(d, token) {
   var rpsAkhir = rpsTerakhirPerMk();   // v0.42.0: unsur CPL dan RPS dari RPS Word terbaca terakhir
   var semua_ = mks.map(function (m) { var x = Object.assign({}, m); delete x._r; x.sks = sksMk(m);
     var rp = rpsAkhir[m.kode]; if (rp) { x.rpsBaca = { semester: rp.semester, label: labelSmt(rp.semester), unsur: Object.keys(unsurCplRps(rp.data)) }; }
-    x.unitKomp = unitMk(m); x.unitBawaan = m.unitKomp === null; x.cplMk = cplMkDitetapkan(m);
+    x.unitKomp = unitMk(m); x.unitBawaan = m.unitKomp === null; x.cplMk = cplMkDitetapkan(m); x.cplSek = cplMkSekunder(m); x.cplAlasan = cplMkAlasan(m);
     return x; });
   return {
     bolehUbah: punyaPeran(p, PERAN_DP_UBAH),
-    bolehImporTim: punyaPeran(p, PERAN_TIM_IMPOR),
+    bolehImporTim: punyaPeran(p, PERAN_TIM_IMPOR), bolehCplMk: punyaPeran(p, PERAN_CPL_MK),
     mk: semua_, jamPerSks: JAM_PER_SKS,
     praktisi: semuaPraktisi().map(function (x) { var b = x._bukti; delete x._r; delete x._bukti; x.bukti = buktiPraktisiKeKlien(b); x.memenuhi = praktisiMemenuhi(x); return x; }),
     slotBuktiPraktisi: SLOT_BUKTI_PRAKTISI,

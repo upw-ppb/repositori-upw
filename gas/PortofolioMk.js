@@ -242,7 +242,7 @@ function aksiMkpDetail(d, token) {
     var e = isiUnit(s0, u).rps, k = (hasil.kelas || []).filter(function (v) { return v.k === u.k; })[0];
     if (k) k.rpsBaca = e && e.t === "file" && peta[e.fileId] ? { data: peta[e.fileId].data, semester: peta[e.fileId].semester, diubah: peta[e.fileId].diubah } : null;
   });
-  hasil.cplProdi = CPL_PRODI; hasil.kualifikasiMk = kualifikasiMk(x.mk.semester); hasil.cplMk = cplMkDitetapkan(x.mk); hasil.unitMk = unitMk(x.mk);
+  hasil.cplProdi = CPL_PRODI; hasil.kualifikasiMk = kualifikasiMk(x.mk.semester); hasil.cplMk = cplMkDitetapkan(x.mk); hasil.cplSek = cplMkSekunder(x.mk); hasil.unitMk = unitMk(x.mk);
   return Object.assign(hasil, refMkp());
 }
 

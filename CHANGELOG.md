@@ -3,6 +3,24 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.48.0 — 21 Nov 2026 — Uji Coba
+Ringkas: Pembebanan CPL per mata kuliah dari Excel prodi (CPL utama, penunjang, rasional) dengan pratinjau; unduh pemetaan CPL–MK dan rekap per CPL.
+Permintaan pemilik 21 Nov 2026 ("apakah anda bisa menambahkan pembebanan CPL prodi kepada masing - masing MK? sudah kami tentukan sekarang"), berkas pemetaan 49 MK.
+- **CPL utama dan penunjang**: MataKuliah.cplMk (JSON yang sudah ada) kini juga menyimpan sek (CPL sekunder/penunjang), alasan (rasional), dan sumber ("impor").
+  CPL utama (primer) tetap di cpl: dipakai templat RPS, pemeriksaan RPS (wajib dimuat), dan Tabel 4. CPL penunjang boleh dicantumkan di RPS tanpa dianggap di luar penetapan,
+  dan tidak ikut Tabel 4.
+- **Impor dari Excel** (aksi dp.cplMkImpor, KPS/Admin Prodi/Super Admin): membaca lembar berjudul kolom Kode MK, Nama Mata Kuliah, CPL Primer, CPL Sekunder, Rasional.
+  MK dicocokkan dengan kode (termasuk kode kelompok MK pilihan "231041217 / 231041215 / 231041216"), lalu nama. Pratinjau menandai MK tidak ditemukan, MK ganda, kode CPL tidak dikenal,
+  CPL di primer dan sekunder sekaligus, CPL prodi yang belum menjadi CPL utama di MK mana pun, dan MK aplikasi yang tidak ada di berkas. Terapkan mengganti penetapan MK yang ada di berkas saja.
+- **Unduh pemetaan saat ini** (Excel): lembar "Pemetaan CPL-MK" (format sama dengan berkas impor) dan "Rekap per CPL" (MK yang mengukur dan menunjang tiap CPL).
+- Laci CPL & unit: centang "penunjang" per CPL (saling meniadakan dengan CPL utama) dan isian rasional. Kolom CPL di Kurikulum: "n CPL utama + m penunjang".
+- Pemeriksaan berkas pemetaan prodi: 49 MK, 68 CPL tercakup sebagai CPL utama, semua kode CPL sah. Catatan: di SK kurikulum kode CATC "PSD" dipakai dua kali (Praktik Sistem Reservasi
+  dan Pengelolaan SDM); berkas pemetaan memakai PSR untuk Praktik Sistem Reservasi. Aplikasi mencocokkan dengan kode MK resmi, jadi tidak terpengaruh.
+- Tanpa perubahan struktur data (tanpa kolom baru). Versi lama (v0.47.0) tetap bisa membaca data baru: hanya CPL utama yang dibaca, penunjang dan rasional diabaikan.
+- Uji: 868 + 44 uji server lulus (16 uji baru di uji-v48-bagian.mjs). Uji tampilan (server lokal, KPS): unggah berkas pemetaan prodi → 49 baris cocok, diterapkan ke 49 MK,
+  laci PDM menampilkan P12, KK10, KK23 (utama) + KU3 (penunjang) dan rasional, unduhan Excel dua lembar; tanpa galat konsol.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.47.0 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.47.0 (tampilan docs/ dan server Apps Script Produksi deployment @29): ubah nama, nonaktifkan/aktifkan kembali, dan hapus akun yang belum dipakai
   dari daftar akun (hapus dan nonaktifkan hanya Super Admin).

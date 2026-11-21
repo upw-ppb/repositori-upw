@@ -104,7 +104,7 @@ function aksiMkpRpsRef(d, token) {
   var m = x.mk, g = u.g ? (m.kelompok || []).filter(function (y) { return y.n.toUpperCase() === u.g; })[0] : null;
   return { semester: smt, labelSemester: labelSmt(smt), kunci: u.k, labelKelas: labelUnit(x, u),
     mk: { kode: g && g.kode ? g.kode : m.kode, nama: m.nama + (g ? " (" + g.n + ")" : ""), semester: m.semester, sksKuliah: m.sksKuliah, sksSeminar: m.sksSeminar, sksPraktik: m.sksPraktik, sks: sksMk(m) },
-    tim: tim, otorisasi: rpsOtorisasi(), cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL, kualifikasi: kualifikasiMk(m.semester), cplMk: cplMkDitetapkan(m), unitKomp: unitMk(m),
+    tim: tim, otorisasi: rpsOtorisasi(), cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL, kualifikasi: kualifikasiMk(m.semester), cplMk: cplMkDitetapkan(m), cplSek: cplMkSekunder(m), unitKomp: unitMk(m),
     terakhir: akhir ? { semester: akhir.semester, labelSemester: labelSmt(akhir.semester), data: akhir.data } : null };
 }
 
@@ -112,6 +112,22 @@ function aksiMkpRpsRef(d, token) {
 var PERAN_CPL_MK = ["kps", "admin", "superadmin"];
 function unitMk(m) { return Array.isArray(m.unitKomp) ? m.unitKomp : unitMkBawaan(m.nama); }
 function cplMkDitetapkan(m) { return m.cplMk && Array.isArray(m.cplMk.cpl) ? m.cplMk.cpl : []; }
+/** v0.48.0: CPL penunjang (sekunder) dan rasional pembebanan; CPL utama (primer, wajib diukur di RPS) tetap di cplMk.cpl. */
+function cplMkSekunder(m) { return m.cplMk && Array.isArray(m.cplMk.sek) ? m.cplMk.sek : []; }
+function cplMkAlasan(m) { return m.cplMk ? teks(m.cplMk.alasan) : ""; }
+/** Rapikan daftar kode CPL: huruf besar, tanpa duplikat, harus ada di CPL_PRODI, urut S, KU, P, KK. */
+function rapikanKodeCpl(daftar) {
+  var sah = {}; CPL_PRODI.forEach(function (c) { sah[c.k] = 1; });
+  var l = (daftar || []).map(function (k) { return String(k).toUpperCase().replace(/\s+/g, ""); }).filter(function (k, i, a) { return k && a.indexOf(k) === i; });
+  l.forEach(function (k) { if (!sah[k]) throw galat("Kode CPL tidak dikenal: " + k); });
+  return l.sort(function (a, b) { var ua = UNSUR_URUT.indexOf(a.replace(/\d+/, "")), ub = UNSUR_URUT.indexOf(b.replace(/\d+/, "")); return ua - ub || Number(a.replace(/\D/g, "")) - Number(b.replace(/\D/g, "")); });
+}
+function jsonCplMk(p, cpl, sek, alasan, sumber) {
+  sek = sek.filter(function (k) { return cpl.indexOf(k) < 0; });
+  var o = { cpl: cpl, oleh: p.id, olehNama: p.nama, pada: hariIni() };
+  if (sek.length) o.sek = sek; if (alasan) o.alasan = potong(alasan, 600).trim(); if (sumber) o.sumber = sumber;
+  return cpl.length ? JSON.stringify(o) : "";
+}
 function unsurKodeCpl(kode) { var u = {}; kode.forEach(function (k) { var x = String(k).match(/^(KU|KK|S|P)\d+/); if (x) u[x[1]] = true; }); return u; }
 var STOP_USULAN = ["dan", "yang", "dalam", "pada", "tentang", "tata", "cara", "konsep", "teoritis", "menguasai", "mampu", "pelaksanaan", "tugas", "bidang", "tour",
   "travel", "perjalanan", "wisata", "untuk", "serta", "dengan", "secara", "dari", "atau", "praktik", "pengelolaan"];
@@ -136,7 +152,7 @@ function aksiDpCplMk(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_DP_LIHAT);
   var m = cariMkKode(d.kode);
-  return { kode: m.kode, nama: m.nama, semester: m.semester, cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL, ditetapkan: cplMkDitetapkan(m), oleh: m.cplMk ? teks(m.cplMk.olehNama) : "",
+  return { kode: m.kode, nama: m.nama, semester: m.semester, cplProdi: CPL_PRODI, unsurCpl: UNSUR_CPL, ditetapkan: cplMkDitetapkan(m), sekunder: cplMkSekunder(m), alasan: cplMkAlasan(m), sumber: m.cplMk ? teks(m.cplMk.sumber) : "", oleh: m.cplMk ? teks(m.cplMk.olehNama) : "",
     pada: m.cplMk ? teks(m.cplMk.pada) : "", unit: unitMk(m), unitBawaan: m.unitKomp === null, usulan: usulanCplMk(m), boleh: punyaPeran(p, PERAN_CPL_MK) };
 }
 /** Simpan penetapan CPL (d.cpl = [kode], [] = hapus penetapan) dan/atau unit kompetensi (d.unit = [{k, en, id}] | d.unitBawaan = true). */
@@ -145,11 +161,10 @@ function aksiDpCplMkSimpan(d, token) {
   wajibPeran(p, PERAN_CPL_MK);
   var m = cariMkKode(d.kode), o = {};
   if (Array.isArray(d.cpl)) {
-    var sah = {}; CPL_PRODI.forEach(function (c) { sah[c.k] = 1; });
-    var l = d.cpl.map(function (k) { return String(k).toUpperCase().trim(); }).filter(function (k, i, a) { return a.indexOf(k) === i; });
-    l.forEach(function (k) { if (!sah[k]) throw galat("Kode CPL tidak dikenal: " + k); });
-    l.sort(function (a, b) { var ua = UNSUR_URUT.indexOf(a.replace(/\d+/, "")), ub = UNSUR_URUT.indexOf(b.replace(/\d+/, "")); return ua - ub || Number(a.replace(/\D/g, "")) - Number(b.replace(/\D/g, "")); });
-    o.cplMk = l.length ? JSON.stringify({ cpl: l, oleh: p.id, olehNama: p.nama, pada: hariIni() }) : "";
+    var l = rapikanKodeCpl(d.cpl);
+    // v0.48.0: CPL penunjang dan rasional ikut disimpan; bila tidak dikirim, nilai lama dipertahankan
+    var sek = Array.isArray(d.sek) ? rapikanKodeCpl(d.sek) : cplMkSekunder(m), al = d.alasan !== undefined ? teks(d.alasan) : cplMkAlasan(m);
+    o.cplMk = jsonCplMk(p, l, sek, al, "");
   }
   if (d.unitBawaan) o.unitKomp = "";
   else if (Array.isArray(d.unit)) {
@@ -164,3 +179,55 @@ function aksiDpCplMkSimpan(d, token) {
   return aksiDpCplMk({ kode: m.kode }, token);
 }
 var UNSUR_URUT = ["S", "KU", "P", "KK"];
+/* ---------- v0.48.0: impor pembebanan CPL per MK dari Excel (lembar "Pemetaan CPL-MK" prodi) ---------- */
+function namaMkBaku(s) { return String(s || "").toLowerCase().replace(/\([^)]*\)/g, " ").replace(/&/g, " dan ").replace(/[^a-z0-9]+/g, " ").trim(); }
+/**
+ * d.baris = [{no, kode ("231041217 / 231041215"), nama, primer: [..] | "P1, KK2", sek, alasan}], d.simpan = true untuk menerapkan.
+ * MK dicocokkan dengan kode (termasuk kode kelompok paralel), lalu dengan nama. Tanpa d.simpan hanya pratinjau.
+ */
+function aksiDpCplMkImpor(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_CPL_MK);
+  var baris = Array.isArray(d.baris) ? d.baris : [];
+  if (!baris.length) throw galat("Tidak ada baris pemetaan yang terbaca.");
+  if (baris.length > 200) throw galat("Maksimal 200 baris.");
+  var mks = semuaMk(), perKode = {}, perNama = {};
+  mks.forEach(function (m) {
+    [m.kode].concat((m.kelompok || []).map(function (g) { return g.kode; })).forEach(function (k) { k = String(k || "").toUpperCase().trim(); if (k) perKode[k] = m; });
+    var n = namaMkBaku(m.nama); (perNama[n] = perNama[n] || []).push(m);
+  });
+  var daftarKode = function (v) { return (Array.isArray(v) ? v : String(v || "").split(/[,;]/)).map(function (k) { return String(k).trim(); }).filter(Boolean); };
+  var dipakai = {}, hasil = [], tercakup = {};
+  baris.forEach(function (b, i) {
+    var r = { no: teks(b.no) || String(i + 1), kode: potong(b.kode, 80), nama: potong(b.nama, 160), galat: [], catatan: [] };
+    var kodes = String(b.kode || "").split(/[\/,;]/).map(function (k) { return k.trim().toUpperCase(); }).filter(Boolean), m = null, cara = "";
+    kodes.some(function (k) { if (perKode[k]) { m = perKode[k]; cara = "kode"; return true; } });
+    if (!m) { var c = perNama[namaMkBaku(b.nama)] || []; if (c.length === 1) { m = c[0]; cara = "nama"; } else if (c.length > 1) r.galat.push("Nama cocok dengan " + c.length + " MK; tulis kode MK."); }
+    if (!m && !r.galat.length) r.galat.push("Mata kuliah tidak ditemukan di kurikulum aplikasi (kode " + (kodes.join(", ") || "-") + ").");
+    if (m && dipakai[m.kode]) r.galat.push("MK " + m.kode + " sudah dipetakan di baris " + dipakai[m.kode] + ".");
+    var pr = [], sk = [];
+    try { pr = rapikanKodeCpl(daftarKode(b.primer)); } catch (e) { r.galat.push("CPL utama: " + e.message); }
+    try { sk = rapikanKodeCpl(daftarKode(b.sek)); } catch (e) { r.galat.push("CPL penunjang: " + e.message); }
+    if (!pr.length && !r.galat.length) r.galat.push("CPL utama (primer) kosong.");
+    var dua = sk.filter(function (k) { return pr.indexOf(k) >= 0; });
+    if (dua.length) { r.catatan.push(dua.join(", ") + " tertulis di primer dan penunjang; dihitung sebagai primer."); sk = sk.filter(function (k) { return pr.indexOf(k) < 0; }); }
+    if (m) { r.mk = { kode: m.kode, nama: m.nama, semester: m.semester, cara: cara, lama: cplMkDitetapkan(m) };
+      if (cara === "nama") r.catatan.push("Dicocokkan dengan nama; kode di berkas berbeda dengan kode di aplikasi (" + m.kode + ").");
+      if (b.semester && Number(String(b.semester).replace(/\D/g, "")) && Number(String(b.semester).replace(/\D/g, "")) !== Number(m.semester)) r.catatan.push("Semester di berkas " + String(b.semester).replace(/\D/g, "") + ", di aplikasi " + m.semester + ".");
+    }
+    r.primer = pr; r.sek = sk; r.alasan = potong(b.alasan, 600).trim();
+    if (m && !r.galat.length) { dipakai[m.kode] = r.no; r._m = m; pr.forEach(function (k) { tercakup[k] = 1; }); }
+    hasil.push(r);
+  });
+  var siap = hasil.filter(function (r) { return r._m; });
+  var out = { baris: hasil.map(function (r) { var x = Object.assign({}, r); delete x._m; return x; }), siap: siap.length, gagal: hasil.length - siap.length,
+    tanpaBaris: mks.filter(function (m) { return !dipakai[m.kode]; }).map(function (m) { return { kode: m.kode, nama: m.nama, semester: m.semester, ditetapkan: cplMkDitetapkan(m).length > 0 }; }),
+    tidakTercakup: CPL_PRODI.filter(function (c) { return !tercakup[c.k]; }).map(function (c) { return c.k; }), diterapkan: 0 };
+  if (d.simpan) {
+    if (!siap.length) throw galat("Tidak ada baris yang bisa diterapkan.");
+    kunciTulis(function () { siap.forEach(function (r) { ubah("MataKuliah", r._m._r, { cplMk: jsonCplMk(p, r.primer, r.sek, r.alasan, "impor") }); }); });
+    catat(p.id, "dp.cplMkImpor", { mk: siap.length, gagal: out.gagal });
+    out.diterapkan = siap.length;
+  }
+  return out;
+}

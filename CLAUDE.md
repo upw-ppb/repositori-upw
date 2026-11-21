@@ -352,6 +352,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - v0.47.0 (21 Nov 2026, Uji Coba): gas/Akun.js aksi admin.ubahNama (superadmin semua; admin hanya akun berperan tepat "mahasiswa"), admin.statusAkun (superadmin; nonaktif → hapusSemuaSesi),
   admin.hapusAkun (superadmin; d.konfirmasi = username; rujukanAkun(id) memindai semua tabel SKEMA + biodata kecuali Pengguna, Log, TABEL_PRIBADI_AKUN; dirujuk → {dihapus:false, rujukan}).
   superAdminAktif() melindungi Super Admin terakhir. Tampilan: laciAkunKelola (jenis "akunKelola"), LABEL_TABEL_AKUN. Uji: alat/uji/uji-v47-bagian.mjs (pakai NIM uji yang belum dipakai uji lain).
+- v0.48.0 (21 Nov 2026, Uji Coba): pembebanan CPL per MK. MataKuliah.cplMk JSON {cpl (utama/primer), sek (penunjang), alasan, sumber "impor", oleh, olehNama, pada} — TANPA kolom baru.
+  cplMkSekunder/cplMkAlasan/rapikanKodeCpl/jsonCplMk (gas/Rps.js); aksi dp.cplMkImpor {baris[{no, semester, kode, nama, primer, sek, alasan}], simpan} (cocok kode/kode kelompok/nama;
+  pratinjau tanpa simpan). Tabel 4 hanya CPL utama; rps.js periksa: R.cplSek tidak dianggap di luar penetapan. Tampilan: panelCplImpor, bacaPemetaanCpl, lembarPemetaanCpl
+  (unduh + rekap per CPL), centang data-cplsek di laciCplMk. Berkas pemetaan prodi (49 MK, 68 CPL) diunggah KPS/Admin lewat panel itu di Produksi. Uji: alat/uji/uji-v48-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
