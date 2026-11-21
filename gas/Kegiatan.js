@@ -13,7 +13,10 @@ var PERAN_LIHAT_SEMUA = ["superadmin", "admin", "kps"];
 
 function benar(v) { return v === true || v === "TRUE"; }
 function jsonDari(v, bawaan) { if (v === "" || v === null || v === undefined) return bawaan; try { return JSON.parse(v); } catch (e) { return bawaan; } }
-function hariIni() { return Utilities.formatDate(new Date(), "Asia/Makassar", "yyyy-MM-dd"); }
+/** v0.49.0: tanggal WITA (UTC+8, tanpa musim panas) dihitung di JavaScript; Utilities.formatDate memanggil layanan Google dan lambat bila
+    dipakai ribuan kali per permintaan (dua kali untuk setiap kegiatan). Hasil sama dengan formatDate(v, "Asia/Makassar", "yyyy-MM-dd"). */
+function tglWita(d) { return new Date(d.getTime() + 8 * 3600000).toISOString().slice(0, 10); }
+function hariIni() { return tglWita(new Date()); }
 function tanggalSah(s) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
   var d = new Date(s + "T12:00:00Z");
@@ -21,7 +24,7 @@ function tanggalSah(s) {
 }
 function keTanggal(s) { return new Date(s + "T12:00:00+08:00"); }
 function teksTgl(v) {
-  if (v instanceof Date) return Utilities.formatDate(v, "Asia/Makassar", "yyyy-MM-dd");
+  if (v instanceof Date) return isNaN(v) ? "" : tglWita(v);
   return teks(v);
 }
 
@@ -121,7 +124,7 @@ function barisKegiatan(k) {
 function simpanKegiatan(k) {
   var obj = barisKegiatan(k);
   if (k._r) {
-    delete _isi["Kegiatan"]; // tulis langsung: buang isi sementara (v0.21.0)
+    delete _isi["Kegiatan"]; tandaiBerubah("Kegiatan"); // tulis langsung: buang isi sementara (v0.21.0), tandai data berubah (v0.49.0)
     var sh = sheet("Kegiatan");
     sh.getRange(k._baris, 1, 1, kolomDari("Kegiatan").length).setValues([barisDari("Kegiatan", obj)]);
   } else tambah("Kegiatan", obj);

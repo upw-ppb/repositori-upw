@@ -205,7 +205,7 @@ function aksiPenilaianData(d, token) {
   wajibPeran(p, PERAN_NILAI);
   var ts = d.ts ? Number(d.ts) : tsAwal();
   if (!(ts >= 2000 && ts < 2100)) throw galat("TS tidak valid.");
-  var h = hitungPenilaian(ts);
+  var h = simpananJson("nilai:" + ts, function () { return hitungPenilaian(ts); });   // v0.49.0
   h.tsTersimpan = tsAwal(); h.bolehTarget = punyaPeran(p, ["admin", "superadmin"]);
   return h;
 }

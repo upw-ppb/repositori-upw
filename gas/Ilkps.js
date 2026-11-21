@@ -119,7 +119,7 @@ function aksiIlkpsData(d, token) {
   wajibPeran(p, PERAN_ILKPS);
   var ts = d.ts ? Number(d.ts) : tsAwal();
   if (!(ts >= 2000 && ts < 2100)) throw galat("TS tidak valid.");
-  var h = susunIlkps(ts);
+  var h = simpananJson("ilkps:" + ts, function () { return susunIlkps(ts); });   // v0.49.0: dipakai bersama sampai data berubah
   catatAsesor(p, "ilkps", { ts: ts });
   h.tsTersimpan = tsAwal();
   h.bolehAtur = punyaPeran(p, ["admin", "superadmin"]);

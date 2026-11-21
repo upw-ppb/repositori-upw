@@ -3,6 +3,28 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.49.0 — 21 Nov 2026 — Uji Coba
+Ringkas: Aplikasi lebih ringan dan tahan lama: permintaan bersamaan digabung, Penilaian/iLKPS/Kesiapan disimpan sementara, dan perawatan harian menjaga spreadsheet jauh dari batas 10 juta sel Google.
+Permintaan pemilik 21 Nov 2026 ("ukur semua halaman dulu … saya masih tetap ingin menggunakan skema gratis ini … bagaimana jika … 3-5 tahun kedepan", lalu "Ya, kerjakan").
+- Pengukuran (alat/uji/ukur-halaman.js: setiap halaman per peran dengan jeda 2 dtk per permintaan seperti Apps Script; alat/uji/ukur-beban.mjs: kode server asli dengan data
+  tiruan 1/3/5 tahun: 75 mhs/angkatan, 25 dosen/tendik, 1.200 kegiatan dan ±60.000 baris log per tahun). Biaya tetap Apps Script terukur 1,5–2,6 dtk per permintaan.
+  Koreksi: angka 5 tahun yang dilaporkan sebelum rilis ini terlalu besar karena tiruan Utilities.formatDate di alat uji sangat lambat; tiruan diperbaiki.
+- Perawatan harian (gas/Perawatan.js; dijalankan permintaan "saya"/"masuk" pertama setiap hari, tanpa pemicu terjadwal, tidak pernah menggagalkan permintaan):
+  sesi dan kode kedaluwarsa > 1 hari dihapus; Log > 365 hari dipindah ke spreadsheet terpisah "Repositori UPW — Arsip Log" (lembar per tahun, maks 20.000 baris per hari);
+  kolom kosong dan baris kosong (disisakan 50) setiap lembar dibuang SEMINGGU SEKALI (perawatan pertama di server Uji Coba sungguhan memakan ±16 dtk; harian dibuat ringan:
+  log hanya dibaca seluruhnya bila baris teratas sudah lebih dari setahun). Perkiraan 5 tahun: 10,9 juta sel → ±0,6 juta sel. Super Admin: Riwayat Versi › Kesehatan data
+  (persentase batas, lembar terbesar, Jalankan perawatan sekarang; aksi admin.rawat). tambahBanyak kini menambah baris lembar bila perlu.
+- Permintaan gabungan: tampilan menggabungkan permintaan yang dikirim bersamaan menjadi satu aksi "banyak" (maks 12 butir; masuk/keluar/siapkan tidak digabung; tiap butir
+  berhasil/gagal sendiri). Membuka aplikasi: 5 permintaan → 2. Kegiatan (referensi + daftar) dan Biodata pegawai (biodata + dokumen) dimuat bersamaan: 2 putaran → 1.
+  Bila server lama belum mengenal "banyak", tampilan mengirim satu per satu.
+- Simpanan hasil (gas/Simpanan.js): Penilaian, Tabel iLKPS, dan Kesiapan akreditasi disimpan di CacheService dan dipakai bersama semua pengguna sampai data berubah
+  (setiap penulisan tabel selain Log/Sesi/Kode mengganti versiData) atau 15 menit / hari berganti.
+- Tanggal WITA tanpa Utilities.formatDate untuk setiap kegiatan (tglWita); Log Super Admin hanya membaca 200 baris terakhir (semuaAkhir).
+- Tanpa perubahan struktur data (tanpa kolom/tabel baru). Rollback ke v0.48.2 aman; log yang sudah diarsipkan tetap di spreadsheet Arsip Log.
+- Uji: 895 + 44 uji server lulus (21 uji baru di uji-v49-bagian.mjs). Server Uji Coba sungguhan: ping v0.49.0, aksi banyak 3 butir ±2,6 dtk, permintaan biasa ±1,9 dtk. Uji tampilan (server lokal): membuka aplikasi 2 permintaan, Kegiatan 1 putaran (±2 dtk, sebelumnya ±4),
+  Kesehatan data dan Jalankan perawatan sekarang berfungsi; penjelajah menu Super Admin, KPS/Dosen, Admin Prodi, Mahasiswa tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.48.2 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.48.2 (tampilan docs/ dan server Apps Script Produksi deployment @32): PDF dan gambar dibuka di penampil di dalam aplikasi.
 - Tidak ada perubahan struktur data. Rollback ke v0.48.1 cukup tampilan (tag v0.48.1) dan deployment @31.

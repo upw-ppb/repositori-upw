@@ -3,7 +3,7 @@
  * Semua permintaan masuk lewat doPost dengan badan JSON: { aksi, token, data }.
  * Jawaban selalu JSON: { ok: true, ... } atau { ok: false, galat: "pesan untuk pengguna" }.
  */
-var VERSI_SERVER = "0.48.2";
+var VERSI_SERVER = "0.49.0";
 
 function doGet() {
   return jawab({ ok: true, layanan: "Repositori Akreditasi UPW", versi: VERSI_SERVER, lingkungan: lingkungan() });
@@ -15,18 +15,39 @@ function doPost(e) {
     bersihkanCache();
     var badan = JSON.parse((e && e.postData && e.postData.contents) || "{}");
     var aksi = String(badan.aksi || "");
-    var fn = AKSI[aksi];
-    if (!fn) throw galat("Aksi tidak dikenal: " + aksi);
-    if (aksi !== "ping" && aksi !== "siapkan") pastikanSkema();
-    hasil = fn(badan.data || {}, badan.token || "");
-    if (!hasil || typeof hasil !== "object") hasil = {};
-    hasil.ok = true;
-  } catch (err) {
-    var pesan = err && err.pengguna ? err.message : "Terjadi kesalahan pada server. Coba lagi beberapa saat lagi.";
-    if (!(err && err.pengguna)) console.error(err && err.stack || err);
-    hasil = { ok: false, galat: pesan };
-  }
+    hasil = aksi === "banyak" ? jalankanBanyak(badan) : jalankanSatu(aksi, badan.data || {}, badan.token || "");
+  } catch (err) { hasil = jawabanGalat(err); }
+  try { catatPerubahan(); } catch (e2) { console.error("versiData gagal diperbarui", e2); }
   return jawab(hasil);
+}
+function jawabanGalat(err) {
+  var pesan = err && err.pengguna ? err.message : "Terjadi kesalahan pada server. Coba lagi beberapa saat lagi.";
+  if (!(err && err.pengguna)) console.error(err && err.stack || err);
+  return { ok: false, galat: pesan };
+}
+function jalankanSatu(aksi, data, token) {
+  var fn = AKSI[aksi];
+  if (!fn) throw galat("Aksi tidak dikenal: " + aksi);
+  if (aksi !== "ping" && aksi !== "siapkan") pastikanSkema();
+  if (aksi === "saya" || aksi === "masuk") rawatBilaPerlu();   // v0.49.0: perawatan harian (Perawatan.js)
+  var h = fn(data, token);
+  if (!h || typeof h !== "object") h = {};
+  h.ok = true;
+  return h;
+}
+/**
+ * v0.49.0: beberapa permintaan dalam SATU panggilan (tampilan menggabungkan permintaan yang dikirim bersamaan). Mengurangi waktu tunggu dan
+ * jumlah proses bersamaan (Apps Script membatasi ±30 proses bersamaan per akun pemilik). Setiap butir berhasil/gagal sendiri-sendiri.
+ */
+var TANPA_GABUNG = { banyak: 1, masuk: 1, siapkan: 1, keluar: 1 }, MAKS_GABUNG = 12;
+function jalankanBanyak(badan) {
+  var daftar = Array.isArray(badan.daftar) ? badan.daftar : [];
+  if (!daftar.length || daftar.length > MAKS_GABUNG) throw galat("Permintaan gabungan tidak sah.");
+  return { ok: true, hasil: daftar.map(function (x) {
+    var a = String(x && x.aksi || "");
+    if (TANPA_GABUNG[a]) return { ok: false, galat: "Aksi " + a + " tidak bisa digabung." };
+    try { return jalankanSatu(a, (x && x.data) || {}, badan.token || ""); } catch (err) { return jawabanGalat(err); }
+  }) };
 }
 
 function jawab(obj) {
@@ -190,6 +211,7 @@ var AKSI = {
   "dp.cplMk": aksiDpCplMk,
   "dp.cplMkSimpan": aksiDpCplMkSimpan,
   "dp.cplMkImpor": aksiDpCplMkImpor,
+  "admin.rawat": aksiAdminRawat,
   "bank.data": aksiBankData,
   "bank.unggah": aksiBankUnggah,
   "bank.hapus": aksiBankHapus,

@@ -88,7 +88,7 @@ function konfig() { return PropertiesService.getScriptProperties(); }
 var _prop = null, _isi = {};
 function prop(k) { if (!_prop) _prop = konfig().getProperties(); return _prop[k] || null; }
 function setelPropUlang() { _prop = null; }
-function bersihkanCache() { _prop = null; _isi = {}; _buku = null; }
+function bersihkanCache() { _prop = null; _isi = {}; _buku = null; _berubah = false; }
 function lingkungan() { return prop("LINGKUNGAN") || "belum-disiapkan"; }
 function modeUji() { return lingkungan() === "uji"; }
 
@@ -120,6 +120,15 @@ function semua(nama) {
   });
 }
 
+/** v0.49.0: n baris terakhir saja (untuk tabel panjang seperti Log), tanpa membaca seluruh lembar. */
+function semuaAkhir(nama, n) {
+  var kolom = kolomDari(nama), sh = sheet(nama), akhir = sh.getLastRow(), mulai = Math.max(2, akhir - n + 1);
+  if (akhir < 2) return [];
+  return sh.getRange(mulai, 1, akhir - mulai + 1, kolom.length).getValues().map(function (r, i) {
+    var o = { _baris: mulai + i }; kolom.forEach(function (k, j) { o[k] = r[j]; }); return o;
+  });
+}
+
 function cari(nama, fn) { var l = semua(nama); for (var i = 0; i < l.length; i++) if (fn(l[i])) return l[i]; return null; }
 
 /**
@@ -129,19 +138,20 @@ function cari(nama, fn) { var l = semua(nama); for (var i = 0; i < l.length; i++
 function amankan(v) { return typeof v === "string" && /^[=+\-@0-9]/.test(v) ? "'" + v : v; }
 function barisDari(nama, obj) { return kolomDari(nama).map(function (k) { return obj[k] === undefined || obj[k] === null ? "" : amankan(obj[k]); }); }
 
-function tambah(nama, obj) { delete _isi[nama]; sheet(nama).appendRow(barisDari(nama, obj)); }
+function tambah(nama, obj) { delete _isi[nama]; tandaiBerubah(nama); sheet(nama).appendRow(barisDari(nama, obj)); }
 
 function tambahBanyak(nama, daftar) {
   if (!daftar.length) return;
-  delete _isi[nama];
+  delete _isi[nama]; tandaiBerubah(nama);
   var kolom = kolomDari(nama), sh = sheet(nama);
-  var nilai = daftar.map(function (o) { return barisDari(nama, o); });
-  sh.getRange(sh.getLastRow() + 1, 1, nilai.length, kolom.length).setValues(nilai);
+  var nilai = daftar.map(function (o) { return barisDari(nama, o); }), akhir = sh.getLastRow();
+  pastikanBaris(sh, akhir + nilai.length);   // v0.49.0: lembar dirapikan perawatan harian, jadi baris kosong tidak selalu cukup
+  sh.getRange(akhir + 1, 1, nilai.length, kolom.length).setValues(nilai);
 }
 
 /** Perbarui kolom tertentu pada baris objek (hasil semua/cari). */
 function ubah(nama, obj, perubahan) {
-  delete _isi[nama];
+  delete _isi[nama]; tandaiBerubah(nama);
   var kolom = kolomDari(nama), sh = sheet(nama), ks = Object.keys(perubahan);
   ks.forEach(function (k) { if (kolom.indexOf(k) < 0) throw new Error("Kolom tidak ada: " + nama + "." + k); });
   if (ks.length > 3) {
@@ -156,7 +166,7 @@ function ubah(nama, obj, perubahan) {
   });
 }
 
-function hapusBaris(nama, obj) { delete _isi[nama]; sheet(nama).deleteRow(obj._baris); }
+function hapusBaris(nama, obj) { delete _isi[nama]; tandaiBerubah(nama); sheet(nama).deleteRow(obj._baris); }
 
 function kunciTulis(fn) {
   var kunci = LockService.getScriptLock();

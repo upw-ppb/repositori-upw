@@ -220,7 +220,11 @@ function saranData(m) {
 function aksiKesiapanData(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_GKM_LIHAT);
-  var ts = tsAwal(), X = konteksNilai(ts), H = hitungPenilaian(ts, X), M = {};
+  var ts = tsAwal();
+  return simpananJson("kesiapan:" + ts, function () { return susunKesiapan(ts); });   // v0.49.0: sama untuk semua pengguna, dihitung ulang bila data berubah
+}
+function susunKesiapan(ts) {
+  var X = konteksNilai(ts), H = hitungPenilaian(ts, X), M = {};
   MATRIKS.forEach(function (m) { M[m.n] = m; });
   var butir = function (r) { return { n: r.n, nm: r.nm, t: r.t, skor: r.skor, gain: r.gain, info: r.info, s4: r.s4, sr: r.sr, saran: saranData(M[r.n]) }; };
   var kosongT = Object.keys(X.T).map(function (k) { return X.T[k]; }).filter(function (t) {

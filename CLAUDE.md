@@ -362,6 +362,13 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   window.open("", "_blank")), mengembalikan pengendali w.tampil(url, nama, mime)/w.location.href/w.close(); elemen .penampil di luar render(); history.pushState {pen:1}, popstate/Esc/✕
   menutup tanpa menutup laci. lihatBerkasUrl(url) mengambil berkas statis jadi Blob (server lokal mengirim PDF sebagai octet-stream). JANGAN membuka PDF/gambar di jendela baru lagi.
   Uji: uji-v482-bagian.mjs.
+- v0.49.0 (21 Nov 2026, Uji Coba): kinerja & umur panjang (pemilik tetap memakai Apps Script gratis). gas/Perawatan.js: rawatBilaPerlu() di jalankanSatu untuk "saya"/"masuk"
+  (sekali sehari, Script Property RAWAT_TERAKHIR/RAWAT_HASIL, tryLock): bersihkanKedaluwarsa(Sesi/Kode), arsipkanLog() → buku ARSIP_LOG_ID "Log <tahun>" (cek baris teratas dulu); MINGGUAN
+  (RAWAT_UKURAN_TERAKHIR, RAWAT_SEL): rapikanUkuran() (deleteColumns/deleteRows, sisa 50 baris) + hitungSel() (batas 10 jt sel; perawatan pertama di server sungguhan ±16 dtk), aksi admin.rawat (panelRawat di Riwayat Versi). WAJIB: tulis banyak baris lewat tambahBanyak/
+  tulisUlangTabel (pastikanBaris), JANGAN getRange di luar getMaxRows. gas/Simpanan.js: tandaiBerubah (Db.js tambah/ubah/hapusBaris + tulis langsung Kegiatan) → versiData
+  baru di akhir doPost; simpananJson(nama, fn) untuk ilkps/nilai/kesiapan (keluaran HARUS sama untuk semua pengguna). doPost: jalankanSatu / jalankanBanyak (aksi "banyak", maks 12).
+  Tampilan: api() mengantre lalu kirimAntre/kirimGabung (TANPA_GABUNG). tglWita() menggantikan Utilities.formatDate per baris. Alat ukur: alat/uji/ukur-halaman.js (window.ukurHalaman)
+  dan ukur-beban.mjs (UKUR_HANYA, UKUR_RAWAT). Tiruan: ukuran lembar, buku arsip terpisah, CacheService getAll/putAll + batas 100 KB. Uji: uji-v49-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

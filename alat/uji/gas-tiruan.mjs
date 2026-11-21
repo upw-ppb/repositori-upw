@@ -22,33 +22,45 @@ export function buatGas(folderGas, opsi = {}) {
     if (/^=/.test(v)) return "#RUMUS!";
     return v;
   };
-  function Sheet(nama) { this.nama = nama; sheets[nama] = sheets[nama] || []; this.maxCol = 26; }
+  // v0.49.0: ukuran lembar (baris/kolom) dicatat per buku agar perawatan anggaran sel bisa diuji; arsip = buku terpisah (SpreadsheetApp.create).
+  const ukuran = {}, buku2 = {};
+  function Sheet(nama, st) { this.st = st || sheets; this.nama = nama; this.st[nama] = this.st[nama] || []; const u = ukuran[this.kunci()] = ukuran[this.kunci()] || { col: 26, row: 1000 }; this.u = u; }
   Sheet.prototype = {
-    get rows() { return sheets[this.nama]; },
+    kunci() { return (this.st === sheets ? "" : "a:") + this.nama; },
+    get rows() { return this.st[this.nama]; },
+    get maxCol() { return this.u.col; }, set maxCol(v) { this.u.col = v; },
     getName() { return this.nama; },
-    setName(n) { sheets[n] = sheets[this.nama]; delete sheets[this.nama]; this.nama = n; return this; },
-    getLastRow() { return this.rows.length; },
+    setName(n) { this.st[n] = this.st[this.nama]; delete this.st[this.nama]; ukuran[(this.st === sheets ? "" : "a:") + n] = this.u; this.nama = n; return this; },
+    getLastRow() { let n = this.rows.length; while (n > 0 && !(this.rows[n - 1] || []).some(v => v !== "" && v !== undefined)) n--; return n; },
     getLastColumn() { return this.rows.reduce((m, r) => Math.max(m, r.reduce((a, v, i) => v !== "" && v !== undefined ? i + 1 : a, 0)), 0); },
     getMaxColumns() { return Math.max(this.maxCol, this.getLastColumn()); },
+    getMaxRows() { return Math.max(this.u.row, this.rows.length); },
+    deleteColumns(c, n) { if (c <= this.getLastColumn()) throw new Error("tiruan: kolom berisi tidak boleh dihapus"); this.u.col = Math.max(this.getMaxColumns() - n, 1); },
+    deleteRows(r, n) { if (r <= this.getLastRow()) throw new Error("tiruan: baris berisi tidak boleh dihapus"); this.rows.splice(r - 1, n); this.u.row = Math.max(this.getMaxRows() - n, this.rows.length); },
     insertColumnsAfter(c, n) { this.maxCol += n; },
+    insertRowsAfter(r, n) { this.u.row = this.getMaxRows() + n; },
     setFrozenRows() {},
-    appendRow(r) { this.rows.push(r.map(masukan)); },
+    appendRow(r) { const n = this.getLastRow(); this.rows.splice(n, this.rows.length - n); this.rows.push(r.map(masukan)); if (this.rows.length > this.u.row) this.u.row = this.rows.length; },
     deleteRow(i) { this.rows.splice(i - 1, 1); },
     getRange(r, c, nr = 1, nc = 1) {
       const sh = this;
       return {
         getValues() { const o = []; for (let i = 0; i < nr; i++) { const row = sh.rows[r - 1 + i] || []; const x = []; for (let j = 0; j < nc; j++) x.push(row[c - 1 + j] ?? ""); o.push(x); } return o; },
-        setValues(v) { v.forEach((row, i) => { const ri = r - 1 + i; while (sh.rows.length <= ri) sh.rows.push([]); row.forEach((x, j) => { sh.rows[ri][c - 1 + j] = masukan(x); }); }); return this; },
+        setValues(v) { if (r - 1 + v.length > sh.getMaxRows()) throw new Error("tiruan: rentang di luar ukuran lembar (" + (r - 1 + v.length) + " > " + sh.getMaxRows() + " baris)");
+          v.forEach((row, i) => { const ri = r - 1 + i; while (sh.rows.length <= ri) sh.rows.push([]); row.forEach((x, j) => { sh.rows[ri][c - 1 + j] = masukan(x); }); }); return this; },
         setValue(x) { return this.setValues([[x]]); },
+        getValue() { return this.getValues()[0][0]; },
+        clearContent() { for (let i = 0; i < nr; i++) { const row = sh.rows[r - 1 + i]; if (row) for (let j = 0; j < nc; j++) row[c - 1 + j] = ""; } return this; },
         setFontWeight() { return this; }, setBackground() { return this; }
       };
     }
   };
-  const bukuObj = { getId: () => "ss1", getUrl: () => "https://contoh/ss1",
-    getSheets: () => Object.keys(sheets).map(n => new Sheet(n)),
-    getSheetByName: n => (n in sheets ? new Sheet(n) : null),
-    insertSheet: n => new Sheet(n),
-    deleteSheet: s => { delete sheets[s.nama]; } };
+  const bukuDari = (st, idb) => ({ getId: () => idb, getUrl: () => "https://contoh/" + idb,
+    getSheets: () => Object.keys(st).map(n => new Sheet(n, st)),
+    getSheetByName: n => (n in st ? new Sheet(n, st) : null),
+    insertSheet: n => new Sheet(n, st),
+    deleteSheet: s => { delete st[s.nama]; } });
+  const bukuObj = bukuDari(sheets, "ss1");
   const folder = (nama) => { const f = { id: id("f"), nama, anak: [], file: [],
     getId: () => f.id, getName: () => f.nama, getUrl: () => "https://contoh/" + f.id,
     createFolder: n => { const c = folder(n); f.anak.push(c); return c; },
@@ -63,19 +75,23 @@ export function buatGas(folderGas, opsi = {}) {
   files["ss1"] = berkas("Spreadsheet"); files["ss1"].id = "ss1";
 
   const zona = "Asia/Makassar";
+  const fmtSimpan = {};
   const fmt = (d, tz, pola) => {
-    const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: tz || zona, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
-      .formatToParts(d).map(x => [x.type, x.value]));
+    const f = fmtSimpan[tz || zona] || (fmtSimpan[tz || zona] = new Intl.DateTimeFormat("en-GB", { timeZone: tz || zona, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }));
+    const p = Object.fromEntries(f.formatToParts(d).map(x => [x.type, x.value]));
     return pola.replace("yyyy", p.year).replace("MM", p.month).replace("dd", p.day).replace("HH", p.hour).replace("mm", p.minute)
       .replace(/\bM\b/, String(Number(p.month)));
   };
   const keBuffer = x => Buffer.isBuffer(x) ? x : Array.isArray(x) ? Buffer.from(x.map(b => b & 255)) : Buffer.from(String(x), "utf8");
   const ctx = {
     console, Date: opsi.Date || Date, JSON, Math, Object, Array, String, Number, Boolean, RegExp, Error, isNaN, parseInt, Buffer,
-    SpreadsheetApp: { openById: () => bukuObj, create: () => { new Sheet("Sheet1"); return bukuObj; }, getActive: () => bukuObj },
+    SpreadsheetApp: { openById: i => buku2[i] ? buku2[i].b : bukuObj, getActive: () => bukuObj,
+      create: n => { if (!/Arsip/i.test(String(n))) { new Sheet("Sheet1"); return bukuObj; }   /* buku data utama; buku arsip dibuat terpisah */ const i = "ss" + (++idSeq), st = { Sheet1: [] }; buku2[i] = { nama: n, st, b: bukuDari(st, i) }; files[i] = berkas(n); files[i].id = i; return buku2[i].b; } },
     PropertiesService: { getScriptProperties: () => ({ getProperties: () => Object.assign({}, props), getProperty: k => props[k] ?? null, setProperty: (k, v) => { props[k] = String(v); }, setProperties: o => Object.entries(o).forEach(([k, v]) => { props[k] = String(v); }) }) },
-    CacheService: { getScriptCache: () => ({ get: k => cache[k] ?? null, put: (k, v) => { cache[k] = v; }, remove: k => { delete cache[k]; } }) },
-    LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
+    CacheService: { getScriptCache: () => ({ get: k => cache[k] ?? null, put: (k, v) => { if (String(v).length > 100000) throw new Error("tiruan: nilai cache > 100 KB"); cache[k] = v; }, remove: k => { delete cache[k]; },
+      getAll: ks => Object.fromEntries(ks.filter(k => k in cache).map(k => [k, cache[k]])), putAll: o => Object.entries(o).forEach(([k, v]) => { if (String(v).length > 100000) throw new Error("tiruan: nilai cache > 100 KB"); cache[k] = v; }),
+      removeAll: ks => ks.forEach(k => delete cache[k]) }) },
+    LockService: { getScriptLock: () => ({ waitLock() {}, tryLock() { return true; }, releaseLock() {} }) },
     Utilities: {
       getUuid: () => crypto.randomUUID(),
       base64EncodeWebSafe: b => keBuffer(b).toString("base64").replace(/\+/g, "-").replace(/\//g, "_"),
@@ -96,5 +112,5 @@ export function buatGas(folderGas, opsi = {}) {
   const kode = fs.readdirSync(folderGas).filter(f => f.endsWith(".js")).sort().map(f => "/* " + f + " */\n" + fs.readFileSync(path.join(folderGas, f), "utf8")).join("\n");
   vm.runInContext(kode, ctx, { filename: "gas-gabungan.js" });
   const panggil = (aksi, data, token) => JSON.parse(ctx.doPost({ postData: { contents: JSON.stringify({ aksi, data, token }) } }).isi);
-  return { ctx, panggil, sheets, props, surat, files };
+  return { ctx, panggil, sheets, props, surat, files, ukuran, buku2, cache };
 }

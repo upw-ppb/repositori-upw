@@ -428,7 +428,7 @@ export const topik = [
       "Centang beberapa kegiatan lalu <b>Hapus terpilih</b> (mis. data uji coba).", "Tab <b>Terhapus</b>: kegiatan yang dihapus bisa <b>Dipulihkan</b>.", "<b>Unduh Excel</b> untuk arsip."] },
   { id: "riwayat-versi", kat: "kelola", p: ["superadmin"], menu: "versi", j: "Riwayat Versi, cadangan, dan Log aktivitas", r: "Catatan setiap rilis, tombol cadangan, dan log siapa melakukan apa.",
     kw: "cadangan backup versi rilis log aktivitas",
-    l: ["<b>Riwayat Versi</b>: isi setiap rilis aplikasi dan siapa yang menyetujui.", "<b>Buat cadangan sekarang</b>: salinan spreadsheet dan daftar file Drive.",
+    l: ["<b>Riwayat Versi</b>: isi setiap rilis aplikasi dan siapa yang menyetujui.", "<b>Buat cadangan sekarang</b>: salinan spreadsheet dan daftar file Drive.", "<b>Kesehatan data</b>: berapa persen batas Google Sheets (10 juta sel) yang terpakai. Server merawatnya otomatis setiap hari (sesi/kode kedaluwarsa dihapus, log > 1 tahun dipindah ke spreadsheet Arsip Log, baris/kolom kosong dibuang); tombol <b>Jalankan perawatan sekarang</b> untuk menjalankannya segera.",
       "<b>Log aktivitas</b>: siapa melakukan apa dan kapan (200 terbaru)."] },
   { id: "asesor", kat: "dasar", p: ["asesor"], mulai: ["asesor"], j: "Panduan asesor", r: "Akses baca saja: Tabel iLKPS, kegiatan disetujui, Bank Dokumen.",
     g: ["ilkps"], kw: "asesor visitasi lihat bukti",

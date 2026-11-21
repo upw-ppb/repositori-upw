@@ -242,7 +242,7 @@ function aksiAdminPeran(d, token) {
 function aksiAdminLog(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, ["superadmin"]);
-  var l = semua("Log").slice(-200).reverse(), org = {};
+  var l = semuaAkhir("Log", 200).reverse(), org = {};   // v0.49.0: hanya 200 baris terakhir yang dibaca
   semua("Pengguna").forEach(function (x) { org[x.id] = { username: String(x.username), nama: x.nama }; });
   return { log: l.map(function (x) {
     var o = org[x.userId] || {};
