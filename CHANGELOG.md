@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.49.0 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.49.0 (tampilan docs/ dan server Apps Script Produksi deployment @33): perawatan harian/mingguan anggaran sel, permintaan gabungan, simpanan hasil berat.
+- Perawatan pertama dipicu langsung setelah rilis (permintaan tanpa login, 16,5 dtk) agar tidak dialami pengguna; permintaan berikutnya ±1,8–2,1 dtk.
+- Tidak ada perubahan struktur data. Rollback ke v0.48.2 cukup tampilan (tag v0.48.2) dan deployment @32; baris/kolom kosong yang dibuang tidak perlu dikembalikan,
+  log yang sudah diarsipkan tetap di spreadsheet Arsip Log.
+- Penyetuju: pemilik, di chat 21 Nov 2026: "Setuju tayang v0.49.0".
+
 ## v0.49.0 — 21 Nov 2026 — Uji Coba
 Ringkas: Aplikasi lebih ringan dan tahan lama: permintaan bersamaan digabung, Penilaian/iLKPS/Kesiapan disimpan sementara, dan perawatan harian menjaga spreadsheet jauh dari batas 10 juta sel Google.
 Permintaan pemilik 21 Nov 2026 ("ukur semua halaman dulu … saya masih tetap ingin menggunakan skema gratis ini … bagaimana jika … 3-5 tahun kedepan", lalu "Ya, kerjakan").
