@@ -3,6 +3,11 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.48.1 — 21 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.48.1 (tampilan docs/ dan server Apps Script Produksi deployment @31): tombol unduhan aplikasi dihapus, semua unduhan lewat tombol unduhan browser.
+- Tidak ada perubahan struktur data. Rollback ke v0.48.0 cukup tampilan (tag v0.48.0) dan deployment @30.
+- Penyetuju: pemilik, di chat 21 Nov 2026: "Setuju tayang v0.48.1".
+
 ## v0.48.1 — 21 Nov 2026 — Uji Coba
 Ringkas: Tombol unduhan di dalam aplikasi dihapus; semua berkas diunduh biasa oleh browser sehingga muncul di tombol unduhan Chrome/Edge (buka berkas atau tampilkan di Finder).
 Permintaan pemilik 21 Nov 2026 (tangkapan layar): tombol unduhan aplikasi tidak bisa membuka Finder; yang diperlukan tombol unduhan Chrome di bilah judul, yang kini sudah tampil.
