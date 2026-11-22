@@ -369,6 +369,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   baru di akhir doPost; simpananJson(nama, fn) untuk ilkps/nilai/kesiapan (keluaran HARUS sama untuk semua pengguna). doPost: jalankanSatu / jalankanBanyak (aksi "banyak", maks 12).
   Tampilan: api() mengantre lalu kirimAntre/kirimGabung (TANPA_GABUNG). tglWita() menggantikan Utilities.formatDate per baris. Alat ukur: alat/uji/ukur-halaman.js (window.ukurHalaman)
   dan ukur-beban.mjs (UKUR_HANYA, UKUR_RAWAT). Tiruan: ukuran lembar, buku arsip terpisah, CacheService getAll/putAll + batas 100 KB. Uji: uji-v49-bagian.mjs.
+- v0.49.1 (22 Nov 2026, Uji Coba): DIAMATI di Produksi: sesekali satu permintaan ke Apps Script TIDAK PERNAH dijawab (> 7 menit). Tampilan: kirimMentah(badan, batas) + AbortController
+  (BATAS_BACA 30 dtk, BATAS_TULIS 120 dtk, BATAS_BESAR 300 dtk), kirimAman (kirim ulang sekali HANYA aksi baca: AKSI_BACA/bolehUlang), sekali() → S.gagalMuat {kunci, pesan, view}
+  → kotakGagalMuat() + AKSI.cobaMuat. JANGAN membuat permintaan tanpa batas waktu; aksi tulis baru JANGAN cocok dengan AKSI_BACA. Diagnosis Produksi: pemilik masuk sendiri
+  di panel browser, lalu bungkus window.fetch untuk merekam aksi/waktu/jawaban (tanpa kata sandi). Uji lokal "server tidak menjawab": web/lambat.js (localStorage gantung,
+  gantungSelalu, jeda) disisipkan di index.html salinan /tmp. Uji: uji-v491-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

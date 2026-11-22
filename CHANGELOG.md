@@ -3,6 +3,22 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.49.1 — 22 Nov 2026 — Uji Coba
+Ringkas: Halaman tidak lagi "Memuat…" selamanya: permintaan yang tidak dijawab server Google dibatalkan setelah 30 detik dan dikirim ulang otomatis, lalu muncul tombol Coba lagi.
+Laporan pemilik 22 Nov 2026: Survei, Tabel iLKPS, Dokumen dosen, dan Pengguna "Memuat…" hingga ±30 menit, kadang "Tidak dapat terhubung ke server", padahal internet lancar.
+- Diagnosis (pemilik masuk di panel browser; permintaan direkam): server Produksi sehat (permintaan 2–5 dtk; membaca spreadsheet ±2 dtk), tetapi SESEKALI satu permintaan
+  tidak pernah dijawab (bank.data tanpa jawaban > 7 menit, padahal Apps Script menghentikan kode setelah 6 menit; permintaan yang sama dikirim ulang selesai dalam 5,1 dtk).
+  Jadi permintaan hilang di jaringan/infrastruktur Google, bukan tertahan kode aplikasi. Kelemahan aplikasi (sejak awal): fetch tanpa batas waktu dan sekali() tidak mencoba lagi,
+  sehingga satu permintaan yang hilang membuat halaman "Memuat…" selamanya. Belum dapat dipastikan apakah v0.49.0 membuat kejadian ini lebih sering; permintaan yang macet
+  saat diamati adalah permintaan tunggal (bukan gabungan).
+- Perbaikan tampilan: kirimMentah memakai AbortController (baca 30 dtk, tulis 120 dtk, berkas > 500 KB 300 dtk); kirimAman mengirim ulang sekali permintaan BACA (AKSI_BACA/bolehUlang);
+  permintaan tulis tidak dikirim ulang otomatis (pesan meminta memeriksa apakah sudah tersimpan). Gabungan yang macet: butir baca dikirim ulang satu per satu.
+  sekali() mencatat kegagalan (S.gagalMuat) → kotak "Data belum berhasil dimuat … Coba lagi" di atas halaman.
+- Tanpa perubahan server (VERSI_SERVER hanya dinaikkan) maupun struktur data. Rollback ke v0.49.0 aman.
+- Uji: 901 + 44 uji server lulus (6 uji baru di uji-v491-bagian.mjs). Uji tampilan lokal dengan server tiruan yang sengaja tidak menjawab: Bank Dokumen dibatalkan dan dikirim ulang
+  lalu terbuka; Survei yang dua kali tidak dijawab menampilkan kotak Coba lagi, dan Coba lagi membuka halaman setelah server normal.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.49.0 — 21 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.49.0 (tampilan docs/ dan server Apps Script Produksi deployment @33): perawatan harian/mingguan anggaran sel, permintaan gabungan, simpanan hasil berat.
 - Perawatan pertama dipicu langsung setelah rilis (permintaan tanpa login, 16,5 dtk) agar tidak dialami pengguna; permintaan berikutnya ±1,8–2,1 dtk.
