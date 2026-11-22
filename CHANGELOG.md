@@ -3,6 +3,11 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.49.1 — 22 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.49.1 (tampilan docs/ dan server Apps Script Produksi deployment @34): batas waktu tunggu, kirim ulang permintaan baca, tombol Coba lagi.
+- Tidak ada perubahan struktur data. Rollback ke v0.49.0 cukup tampilan (tag v0.49.0) dan deployment @33.
+- Penyetuju: pemilik, di chat 22 Nov 2026: "Setuju tayang v0.49.1".
+
 ## v0.49.1 — 22 Nov 2026 — Uji Coba
 Ringkas: Halaman tidak lagi "Memuat…" selamanya: permintaan yang tidak dijawab server Google dibatalkan setelah 30 detik dan dikirim ulang otomatis, lalu muncul tombol Coba lagi.
 Laporan pemilik 22 Nov 2026: Survei, Tabel iLKPS, Dokumen dosen, dan Pengguna "Memuat…" hingga ±30 menit, kadang "Tidak dapat terhubung ke server", padahal internet lancar.
