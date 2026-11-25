@@ -374,6 +374,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   → kotakGagalMuat() + AKSI.cobaMuat. JANGAN membuat permintaan tanpa batas waktu; aksi tulis baru JANGAN cocok dengan AKSI_BACA. Diagnosis Produksi: pemilik masuk sendiri
   di panel browser, lalu bungkus window.fetch untuk merekam aksi/waktu/jawaban (tanpa kata sandi). Uji lokal "server tidak menjawab": web/lambat.js (localStorage gantung,
   gantungSelalu, jeda) disisipkan di index.html salinan /tmp. Uji: uji-v491-bagian.mjs.
+- v0.50.0 (25 Nov 2026, Uji Coba): survei Tahap 1. gas/SurveiTemplat.js (TEMPLAT_SURVEI 9 templat; atribut soal jelas/var/ind/na/lab/pent/seg/nps/bagian; meta.pengantar/skala;
+  LABEL_SKALA; JELAS_TAMBAHAN). gas/Survei.js: Survei.pengisi + Survei.meta (VERSI_SKEMA 32, migrasiSurveiAnonim), sudahMengisi = pengisi; jawaban anonim TANPA userId/kunci/jam dan
+  tanpa catat(); MIN_ANONIM 3, MIN_KELOMPOK 5; hitungTarget (Prmin/Slovin), analisisSurvei (α, IPA, kelompok, NPS), survei.pengisi/ingatkan (Pengingat jenis "survei:<id>"),
+  JADWAL_SURVEI + kalenderSurvei + survei.jadwal/siapkan/kalender/jadwalSelesai. PERAN_SURVEI_UBAH + kps. Tampilan: htmlSoal(soal, likert, label), kepalaSurvei, panelJadwalSurvei
+  (Beranda), laciSvPengisi, htmlAnalisis, svSimpanMulai. JANGAN menambah identitas/jam ke jawaban anonim. Tahap 2 (belum): EDOM per kelas/dosen, tracer → data Lulusan.
+  Uji: uji-v50-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

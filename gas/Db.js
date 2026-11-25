@@ -35,7 +35,8 @@ var SKEMA = {
   Penerimaan: ["tahun", "dayaTampung", "pendaftar", "lulusSeleksi", "diterima", "diubah"],
   Dana: ["ta", "jenis", "upps", "ps", "diubah"],
   /* v0.11.0 */
-  Survei: ["id", "judul", "tujuan", "sasaran", "buka", "tutup", "anonim", "status", "pertanyaan", "kode", "tindakLanjut", "dibuat", "oleh", "diubah", "dihapus"],
+  Survei: ["id", "judul", "tujuan", "sasaran", "buka", "tutup", "anonim", "status", "pertanyaan", "kode", "tindakLanjut", "dibuat", "oleh", "diubah", "dihapus",
+           /* v0.50.0 */ "pengisi", "meta"],
   Jawaban: ["id", "survei", "userId", "kunci", "jawaban", "waktu"],
   /* v0.12.0 */
   SkorGpm: ["ts", "butir", "skor", "catatan", "oleh", "waktu"],
@@ -72,7 +73,7 @@ var SKEMA = {
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 31;
+var VERSI_SKEMA = 32;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
@@ -228,6 +229,7 @@ function pastikanSkema() {
 
 /** Pengisian data untuk kolom baru. */
 function migrasiData(dari) {
+  if (dari < 32 && dari > 0) migrasiSurveiAnonim();   // v0.50.0: daftar pengisi terpisah, jawaban anonim tanpa kunci/jam (Survei.js)
   if (dari < 26 && dari > 0) {
     // v0.36.0: MK bernama Magang / Tugas Akhir / Skripsi / PKL ditandai "tanpa dosen pengampu" (keputusan pemilik 19 Nov 2026). Admin bisa mengubahnya di Kurikulum.
     semua("MataKuliah").forEach(function (r) { if (!r.dihapus && String(r.tanpaTim) === "" && POLA_TANPA_TIM.test(String(r.nama || ""))) ubah("MataKuliah", r, { tanpaTim: true }); });

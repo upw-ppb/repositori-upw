@@ -151,7 +151,10 @@ export const topik = [
       "Boleh lampirkan tangkapan layar atau PDF (maks. 5 MB).", "Status dan tanggapan prodi tampil di Info › Masukan saya."] },
   { id: "survei-isi", kat: "dasar", p: ["mahasiswa", "dosen", "tendik"], j: "Mengisi survei dari prodi", r: "Survei yang terbuka untuk Anda muncul di Beranda.",
     kw: "kuesioner angket kepuasan isi survei",
-    l: ["Bila ada survei untuk Anda, kartunya muncul di Beranda.", "Tekan kartu, jawab pertanyaan, lalu <b>Kirim</b>. Survei anonim tidak mencatat nama Anda."] },
+    l: ["Bila ada survei untuk Anda, kartunya muncul di Beranda.", "Baca pengantar dan <b>arti nilai 1–4</b> di atas formulir. Di bawah setiap pertanyaan ada penjelasan apa yang dinilai beserta contohnya.",
+      "Bila Anda tidak mengalami hal yang ditanyakan, pilih <b>Tidak tahu / tidak berlaku</b> (bila tersedia), jangan menebak.", "Tekan <b>Kirim jawaban</b>."],
+    tips: ["Survei <b>anonim</b>: nama Anda tidak disimpan bersama jawaban dan tidak ada yang dapat melihat siapa menjawab apa, termasuk dosen dan pengelola. Aplikasi hanya mencatat bahwa Anda sudah mengisi.",
+      "Pengingat survei di Beranda hilang sendiri setelah Anda mengisi."] },
 
   /* ---------------- KEGIATAN ---------------- */
   { id: "kegiatan-daftar", kat: "kegiatan", p: PEG, menu: "kegiatan", j: "Daftar kegiatan", r: "Semua kegiatan yang Anda ajukan atau yang menandai Anda.", g: ["kegiatan-daftar"],
@@ -351,10 +354,16 @@ export const topik = [
       "Tab <b>Riwayat keputusan</b>: semua keputusan surat dan verifikasi data, bisa disaring per tahun dan diunduh Excel."] },
   { id: "survei-kelola", kat: "data", p: ["admin", "superadmin", "kps", "gkm"], menu: "survei", j: "Survei: membuat, membuka, dan melihat hasil", r: "Buat dari templat, buka untuk sasaran, lihat rekap.",
     kw: "buat survei kepuasan tabel 11 tabel 22 alumni pengguna lulusan",
-    l: ["Buka <b>Survei</b> → buat baru atau dari templat (Tabel 22 kepuasan mahasiswa, Tabel 11 pengguna lulusan).",
-      "Atur sasaran (mahasiswa, dosen, tendik, publik), anonim atau tidak, tanggal tutup, lalu <b>Buka</b>.",
-      "Untuk alumni/pengguna lulusan, bagikan <b>tautan publik</b> (tanpa login).", "Lihat rekap jawaban dan isi tindak lanjut."],
-    tips: ["Survei perlu tanggal tutup sebelum dibuka.", "Membuat dan mengubah survei: Admin Prodi dan Super Admin; KPS dan GKM melihat hasil."] },
+    l: ["Kartu <b>Jadwal survei yang dianjurkan</b> di Beranda dan di menu Survei menunjukkan survei apa yang perlu dijalankan dan kapan (dihitung dari tanggal mulai perkuliahan dan instrumen LAMWisata).",
+      "Tekan <b>Siapkan survei</b>: templat, sasaran, anonim/beridentitas, dan tanggal sudah terisi. Periksa sekilas, lalu <b>Simpan &amp; mulai survei</b>.",
+      "Sembilan templat: kepuasan mahasiswa (Tabel 22), pengguna lulusan (Tabel 11), tracer study (pertanyaan inti Kemdiktisaintek), layanan kemahasiswaan, dosen, tendik, mitra, exit survey, dan masukan kurikulum. Setiap pertanyaan punya penjelasan, variabel, dan kode indikator.",
+      "Bilah kemajuan menunjukkan jawaban terkumpul terhadap <b>target minimal</b> (rumus instrumen untuk tracer/pengguna lulusan; sampel Slovin galat 5% untuk survei lain) dan target ideal.",
+      "<b>Siapa yang sudah/belum mengisi</b>: daftar tanpa jawaban, tombol <b>Kirim pengingat</b> (muncul di Beranda responden), dan salin daftar yang belum.",
+      "Untuk alumni, pengguna lulusan, dan mitra, bagikan <b>tautan publik</b> (tanpa login).",
+      "<b>Hasil &amp; analisis</b>: rata-rata, SD, % puas, indeks 0–100, Cronbach α per variabel, analisis kepentingan–kinerja (IPA), perbandingan kelompok, NPS; ekspor Excel berisi data mentah berkode untuk analisis lanjutan. Isi rencana tindak lanjut per aspek (Tabel 11/22)."],
+    tips: ["Survei anonim: hasil baru tampil setelah minimal 3 orang mengisi; kelompok pembanding di bawah 5 orang disembunyikan. Jawaban perorangan tidak pernah dapat dihubungkan dengan nama.",
+      "Tracer study, pengguna lulusan, mitra, dan masukan kurikulum memang beridentitas karena instrumen menghitungnya per lulusan atau per lembaga; jawaban tetap tidak terlihat oleh dosen.",
+      "Tanggal mulai perkuliahan Ganjil/Genap diatur di menu Survei › Jadwal survei.", "Membuat dan memulai survei: Admin Prodi, KPS, Super Admin; GKM melihat hasil."] },
 
   /* ---------------- DATA PRODI ---------------- */
   { id: "mk-mahasiswa", kat: "kegiatan", p: ["mahasiswa"], menu: "mkm", j: "Mata Kuliah Saya: mata kuliah dan dosen pengajar",

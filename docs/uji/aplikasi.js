@@ -435,8 +435,8 @@ function hBeranda() {
     <li>Tautan bukti di Excel ekspor prodi (kolom "Tautan bukti") juga membuka kegiatan yang sama setelah Anda masuk.</li>
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
-   ${panelSurveiSaya()}${panelTugas()}${panelKesiapan()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.49.1: halaman tidak lagi <b>Memuat…</b> selamanya bila server Google tidak menjawab: permintaan dibatalkan setelah 30 detik dan dikirim ulang otomatis, lalu muncul tombol <b>Coba lagi</b>. v0.49.0: aplikasi <b>lebih ringan dan tahan lama</b>: permintaan yang bersamaan digabung (membuka aplikasi kini 2 permintaan, bukan 5), Penilaian/iLKPS/Kesiapan disimpan sementara sampai data berubah, dan server merawat spreadsheet setiap hari agar tidak menyentuh batas 10 juta sel Google (Super Admin: Riwayat Versi › Kesehatan data). v0.48.2: PDF dan gambar kini dibuka <b>di dalam aplikasi</b>, dengan tombol <b>Kembali ke aplikasi</b> (juga ✕, Esc, atau tombol mundur). v0.48.1: tombol unduhan di dalam aplikasi dihapus; berkas yang diunduh kini muncul di <b>tombol unduhan Chrome/Edge</b> (bisa dibuka langsung atau ditampilkan di Finder). v0.48.0: <b>Pembebanan CPL per MK dari Excel</b> (Data Prodi › Kurikulum): CPL utama (wajib diukur di RPS), CPL penunjang, dan rasional untuk semua MK sekaligus, dengan pratinjau dan unduhan pemetaan + rekap per CPL. v0.47.0: tombol <b>Ubah nama / hapus</b> di daftar akun (Super Admin: ubah nama, nonaktifkan, hapus akun yang belum dipakai; Admin Prodi: ubah nama mahasiswa). v0.46.0: <b>CPL yang dibebankan per MK</b> ditetapkan KPS/Admin Prodi dan <b>unit kompetensi</b> per MK (Data Prodi › Kurikulum › CPL &amp; unit), dipakai templat dan pemeriksaan RPS serta Tabel 4; <b>Cocokkan dengan PDDikti</b> di Status dosen. v0.45.0: <b>nilai dari SIAKAD</b> (unggah template nilai per kelas, dibaca dan diperiksa otomatis), contoh dalam <b>PDF</b> (dibuka langsung), dan <b>Data bersama templat</b> (LMS, tempat, batas umpan balik, keterlambatan, peraturan akademik). v0.44.0: <b>Contoh</b> di setiap bagian Portofolio MK (contoh RPS, kontrak, rubrik, dan lembar penilaian lengkap) dan <b>saran penelitian/PkM tim</b> yang cocok dengan RPS untuk catatan integrasi. v0.43.1: keterangan <b>urutan pengisian</b> Portofolio MK (RPS dulu, lalu templat kontrak, rubrik, dan lembar penilaian). v0.43.0: templat <b>kontrak kuliah</b>, <b>rubrik penilaian</b>, dan <b>lembar portofolio penilaian (Excel)</b> terisi dari RPS; RPS resmi PDF + Word sumber untuk pemeriksaan; catatan <b>tanda tangan</b>; kualifikasi/jenjang dan jam sajian otomatis. v0.42.0: <b>templat RPS terisi otomatis</b> dan <b>pembaca RPS Word</b> di Portofolio MK (pemeriksaan butir 8, saran metode, CPL Tabel 4 otomatis), daftar 68 CPL prodi, Otorisasi templat RPS di Data Prodi › Kurikulum. v0.41.0: <b>unduh semua bukti Portofolio MK (ZIP)</b> per semester, per mata kuliah, atau per kelas (Data Prodi › Portofolio MK dan laci mata kuliah). v0.40.0: <b>Portofolio MK per kelas</b> (setiap kelas terpisah dan hanya terlihat oleh tim kelas itu; RPS bersama hanya untuk tim yang sama), dosen hanya melihat <b>peserta kelasnya</b>. v0.39.2: templat tim pengajar menerima <b>nama yang diketik</b> (tanpa gelar, inisial, NIP, atau minimal 2 kata nama) dengan tanda "Terbaca sebagai", dan pratinjau menampilkan <b>beban SKS per orang</b>. v0.39.1: Tabel 4 iLKPS menulis <b>semua kode kelompok</b> MK pilihan (mis. 231041217 / 231041215 / 231041216) dalam satu baris. v0.39.0: <b>peserta kelas</b> (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa; juga lewat Excel), menu <b>Mata Kuliah Saya</b> untuk mahasiswa (MK dan dosen pengajar); SKS dibagi ke semua anggota tim termasuk praktisi. v0.38.0: <b>MK pilihan dengan kelompok paralel</b> (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok. v0.37.0: tombol <b>Edit</b> pada riwayat status mahasiswa (ganti SK yang salah, perbaiki tanggal/alasan/status; tercatat di Log). v0.36.1: templat tim pengajar selalu berisi <b>baris kelas A dan B</b> per mata kuliah, dan daftar nama selalu terbaru. v0.36.0: penanda <b>tanpa dosen pengampu</b> untuk Magang dan Tugas Akhir di Kurikulum. v0.35.0: <b>templat Excel tim pengajar</b> (KPS dan Admin Prodi) dengan hitungan <b>beban SKS per dosen</b> otomatis. v0.34.0: <b>kop surat prodi</b> di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM. v0.33.0: <b>saran butir Matriks otomatis</b> saat mengetik agenda rapat, tindak lanjut, keputusan risalah, nama dokumen Bank, dan judul kegiatan, serta kotak <b>Cari butir</b> di Penilaian. v0.32.0: <b>risalah rapat</b> per agenda (keputusan otomatis jadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen. v0.31.0: menu <b>Rapat &amp; Tindak Lanjut</b>: undangan rapat dari KPS (surat PDF bertanda tangan, notifikasi dan jawaban kehadiran peserta) dan daftar tindak lanjut sampai terverifikasi. v0.30.0: tombol <b>i</b> berisi definisi dan kriteria skor instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain. v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${panelSurveiSaya()}${panelTugas()}${panelJadwalSurvei(true)}${panelKesiapan()}
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.50.0: <b>Survei</b> lengkap: 9 templat sesuai instrumen dengan penjelasan di setiap pertanyaan, <b>jadwal survei yang dianjurkan</b> di Beranda (Siapkan → Mulai survei), target responden, daftar siapa yang sudah/belum mengisi beserta pengingat, survei anonim yang benar-benar anonim, dan analisis hasil (Cronbach α, IPA, NPS). v0.49.1: halaman tidak lagi <b>Memuat…</b> selamanya bila server Google tidak menjawab: permintaan dibatalkan setelah 30 detik dan dikirim ulang otomatis, lalu muncul tombol <b>Coba lagi</b>. v0.49.0: aplikasi <b>lebih ringan dan tahan lama</b>: permintaan yang bersamaan digabung (membuka aplikasi kini 2 permintaan, bukan 5), Penilaian/iLKPS/Kesiapan disimpan sementara sampai data berubah, dan server merawat spreadsheet setiap hari agar tidak menyentuh batas 10 juta sel Google (Super Admin: Riwayat Versi › Kesehatan data). v0.48.2: PDF dan gambar kini dibuka <b>di dalam aplikasi</b>, dengan tombol <b>Kembali ke aplikasi</b> (juga ✕, Esc, atau tombol mundur). v0.48.1: tombol unduhan di dalam aplikasi dihapus; berkas yang diunduh kini muncul di <b>tombol unduhan Chrome/Edge</b> (bisa dibuka langsung atau ditampilkan di Finder). v0.48.0: <b>Pembebanan CPL per MK dari Excel</b> (Data Prodi › Kurikulum): CPL utama (wajib diukur di RPS), CPL penunjang, dan rasional untuk semua MK sekaligus, dengan pratinjau dan unduhan pemetaan + rekap per CPL. v0.47.0: tombol <b>Ubah nama / hapus</b> di daftar akun (Super Admin: ubah nama, nonaktifkan, hapus akun yang belum dipakai; Admin Prodi: ubah nama mahasiswa). v0.46.0: <b>CPL yang dibebankan per MK</b> ditetapkan KPS/Admin Prodi dan <b>unit kompetensi</b> per MK (Data Prodi › Kurikulum › CPL &amp; unit), dipakai templat dan pemeriksaan RPS serta Tabel 4; <b>Cocokkan dengan PDDikti</b> di Status dosen. v0.45.0: <b>nilai dari SIAKAD</b> (unggah template nilai per kelas, dibaca dan diperiksa otomatis), contoh dalam <b>PDF</b> (dibuka langsung), dan <b>Data bersama templat</b> (LMS, tempat, batas umpan balik, keterlambatan, peraturan akademik). v0.44.0: <b>Contoh</b> di setiap bagian Portofolio MK (contoh RPS, kontrak, rubrik, dan lembar penilaian lengkap) dan <b>saran penelitian/PkM tim</b> yang cocok dengan RPS untuk catatan integrasi. v0.43.1: keterangan <b>urutan pengisian</b> Portofolio MK (RPS dulu, lalu templat kontrak, rubrik, dan lembar penilaian). v0.43.0: templat <b>kontrak kuliah</b>, <b>rubrik penilaian</b>, dan <b>lembar portofolio penilaian (Excel)</b> terisi dari RPS; RPS resmi PDF + Word sumber untuk pemeriksaan; catatan <b>tanda tangan</b>; kualifikasi/jenjang dan jam sajian otomatis. v0.42.0: <b>templat RPS terisi otomatis</b> dan <b>pembaca RPS Word</b> di Portofolio MK (pemeriksaan butir 8, saran metode, CPL Tabel 4 otomatis), daftar 68 CPL prodi, Otorisasi templat RPS di Data Prodi › Kurikulum. v0.41.0: <b>unduh semua bukti Portofolio MK (ZIP)</b> per semester, per mata kuliah, atau per kelas (Data Prodi › Portofolio MK dan laci mata kuliah). v0.40.0: <b>Portofolio MK per kelas</b> (setiap kelas terpisah dan hanya terlihat oleh tim kelas itu; RPS bersama hanya untuk tim yang sama), dosen hanya melihat <b>peserta kelasnya</b>. v0.39.2: templat tim pengajar menerima <b>nama yang diketik</b> (tanpa gelar, inisial, NIP, atau minimal 2 kata nama) dengan tanda "Terbaca sebagai", dan pratinjau menampilkan <b>beban SKS per orang</b>. v0.39.1: Tabel 4 iLKPS menulis <b>semua kode kelompok</b> MK pilihan (mis. 231041217 / 231041215 / 231041216) dalam satu baris. v0.39.0: <b>peserta kelas</b> (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa; juga lewat Excel), menu <b>Mata Kuliah Saya</b> untuk mahasiswa (MK dan dosen pengajar); SKS dibagi ke semua anggota tim termasuk praktisi. v0.38.0: <b>MK pilihan dengan kelompok paralel</b> (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok. v0.37.0: tombol <b>Edit</b> pada riwayat status mahasiswa (ganti SK yang salah, perbaiki tanggal/alasan/status; tercatat di Log). v0.36.1: templat tim pengajar selalu berisi <b>baris kelas A dan B</b> per mata kuliah, dan daftar nama selalu terbaru. v0.36.0: penanda <b>tanpa dosen pengampu</b> untuk Magang dan Tugas Akhir di Kurikulum. v0.35.0: <b>templat Excel tim pengajar</b> (KPS dan Admin Prodi) dengan hitungan <b>beban SKS per dosen</b> otomatis. v0.34.0: <b>kop surat prodi</b> di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM. v0.33.0: <b>saran butir Matriks otomatis</b> saat mengetik agenda rapat, tindak lanjut, keputusan risalah, nama dokumen Bank, dan judul kegiatan, serta kotak <b>Cari butir</b> di Penilaian. v0.32.0: <b>risalah rapat</b> per agenda (keputusan otomatis jadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen. v0.31.0: menu <b>Rapat &amp; Tindak Lanjut</b>: undangan rapat dari KPS (surat PDF bertanda tangan, notifikasi dan jawaban kehadiran peserta) dan daftar tindak lanjut sampai terverifikasi. v0.30.0: tombol <b>i</b> berisi definisi dan kriteria skor instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain. v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -590,6 +590,7 @@ function laci() {
   if (L.jenis === "svHasil") return laciSvHasil();
   if (L.jenis === "svTautan") return laciSvTautan();
   if (L.jenis === "svIsi") return laciSvIsi();
+  if (L.jenis === "svPengisi") return laciSvPengisi();
   if (L.jenis === "gpm") return laciGpm();
   if (L.jenis === "ded") return laciDed();
   if (L.jenis === "mkp") return laciMkp();
@@ -4481,7 +4482,7 @@ document.addEventListener("change", e => {
 
 /* --- Survei (v0.11.0) --- */
 const ST_SV = { draf: ["Draf", "s-draf"], dibuka: ["Dibuka", "s-disetujui"], terjadwal: ["Terjadwal", "s-diajukan"], ditutup: ["Ditutup", "s-draf"] };
-const TIPE_L = { likert: "Skala 4 (Kurang–Sangat baik)", pilihan: "Pilihan ganda", centang: "Kotak centang", singkat: "Isian singkat", paragraf: "Paragraf" };
+const TIPE_L = { likert: "Skala 4 (1–4)", pilihan: "Pilihan ganda", centang: "Kotak centang", singkat: "Isian singkat", paragraf: "Paragraf" };
 const tautanSurvei = kode => location.origin + location.pathname + "?survei=" + encodeURIComponent(kode);
 function panelSurveiSaya() {
   const l = S.svSaya || [];
@@ -4489,18 +4490,24 @@ function panelSurveiSaya() {
     <div class="meta"><span>${s.jumlahSoal} pertanyaan</span><span>${s.anonim ? "Anonim: nama Anda tidak disimpan" : "Dengan identitas"}</span>${s.tutup ? `<span>Ditutup ${esc(tglPendek(s.tutup))}</span>` : ""}</div></div>
     <button class="btn primary sm" data-act="svIsiBuka" data-id="${s.id}">Isi sekarang</button></div>`).join("")}</div></section>` : "";
 }
-/** Formulir jawaban (dipakai pengisian dengan login dan halaman publik). */
-function htmlSoal(soal, likert) {
+/** Formulir jawaban (dipakai pengisian dengan login dan halaman publik). v0.50.0: judul bagian, penjelasan per pertanyaan, label skala per pertanyaan,
+    dan pilihan "Tidak tahu / tidak berlaku" (nilai 0, tidak dihitung). */
+function htmlSoal(soal, likert, label) {
   return soal.map((q, i) => {
-    const nm = "sq-" + q.id, w = q.wajib ? wajib : "";
+    const nm = "sq-" + q.id, w = q.wajib ? wajib : "", lab = (label && label[q.lab]) || likert;
     let isi;
-    if (q.t === "likert") isi = `<div class="likert" role="radiogroup" aria-label="${esc(q.teks)}">${likert.map((l, k) => `<label><input type="radio" name="${nm}" value="${k + 1}"><span>${esc(l)}</span></label>`).join("")}</div>`;
+    if (q.t === "likert") isi = `<div class="likert${q.na ? " na" : ""}" role="radiogroup" aria-label="${esc(q.teks)}">${lab.map((l, k) => `<label><input type="radio" name="${nm}" value="${k + 1}"><span class="num">${k + 1}</span><span>${esc(l)}</span></label>`).join("")}${q.na ? `<label class="tt"><input type="radio" name="${nm}" value="0"><span>Tidak tahu / tidak berlaku</span></label>` : ""}</div>`;
     else if (q.t === "pilihan") isi = `<div class="classgrid">${q.opsi.map(o => `<label><input type="radio" name="${nm}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("")}</div>`;
     else if (q.t === "centang") isi = `<div class="classgrid">${q.opsi.map(o => `<label><input type="checkbox" name="${nm}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("")}</div>`;
     else if (q.t === "singkat") isi = `<input id="${nm}" type="text" maxlength="300" aria-label="${esc(q.teks)}">`;
     else isi = `<textarea id="${nm}" rows="3" maxlength="3000" aria-label="${esc(q.teks)}"></textarea>`;
-    return `<div class="soal"><div class="small"><b>${i + 1}. ${esc(q.teks)}</b>${w}</div>${isi}</div>`;
+    return `${q.bagian ? `<h3 class="sv-bagian">${esc(q.bagian)}</h3>` : ""}<div class="soal"><div class="small"><b>${i + 1}. ${esc(q.teks)}</b>${w}</div>${q.jelas ? `<div class="sv-jelas">${esc(q.jelas)}</div>` : ""}${isi}</div>`;
   }).join("");
+}
+/** Pengantar dan arti skala di atas formulir. */
+function kepalaSurvei(s) {
+  return `${s.pengantar ? `<div class="callout small sv-pengantar">${esc(s.pengantar)}</div>` : ""}
+    ${(s.skala || []).length && (s.soal || []).some(q => q.t === "likert") ? `<div class="small sv-skala"><b>Arti nilai pada skala 1–4:</b><ul>${s.skala.map(t => `<li>${esc(t)}</li>`).join("")}</ul><span class="muted">Bila Anda tidak mengalami atau tidak tahu, pilih "Tidak tahu / tidak berlaku" (bila tersedia) agar penilaian tidak menebak.</span></div>` : ""}`;
 }
 function kumpulkanJawaban(soal) {
   const j = {};
@@ -4530,13 +4537,15 @@ async function kirimJawaban(act, fn) {
     toast(e.message);
   }
 }
+const TEKS_ANONIM = "Survei ini <b>anonim</b>: nama Anda tidak disimpan bersama jawaban, dan tidak ada seorang pun, termasuk dosen dan pengelola, yang dapat melihat siapa menjawab apa. Aplikasi hanya mencatat bahwa Anda sudah mengisi agar tidak terisi dua kali.";
 function laciSvIsi() {
   const L = S.laci, s = L.s;
   if (!s) return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Isi survei"><div class="memuat">Memuat…</div></div></div>`;
-  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Isi survei" style="width:min(680px,100%)">
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Isi survei" style="width:min(720px,100%)">
    <div class="dh"><h2>${esc(s.judul)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
-   <div class="callout small">${s.anonim ? "Survei ini <b>anonim</b>: nama Anda tidak disimpan bersama jawaban. Aplikasi hanya mencatat bahwa Anda sudah mengisi agar tidak terisi dua kali." : "Survei ini <b>dengan identitas</b>: jawaban tersimpan bersama nama akun Anda."}${s.tutup ? " Ditutup " + esc(tglPanjang(s.tutup)) + "." : ""}</div>
-   ${htmlSoal(s.soal, s.likert)}<p id="svGalat" class="galat" role="alert" hidden></p><div class="row" style="justify-content:flex-end;margin-top:auto">${tombol("svIsiKirim", "Kirim jawaban")}</div></div></div>`;
+   ${s.pengantar ? "" : `<div class="callout small">${s.anonim ? TEKS_ANONIM : "Survei ini <b>dengan identitas</b>: jawaban tersimpan bersama nama akun Anda."}</div>`}
+   ${kepalaSurvei(s)}<div class="small muted">${s.tutup ? "Ditutup " + esc(tglPanjang(s.tutup)) + "." : ""}</div>
+   ${htmlSoal(s.soal, s.likert, s.label)}<p id="svGalat" class="galat" role="alert" hidden></p><div class="row" style="justify-content:flex-end;margin-top:auto">${tombol("svIsiKirim", "Kirim jawaban")}</div></div></div>`;
 }
 function layarSurveiPublik() {
   const P = S.svPub;
@@ -4546,55 +4555,95 @@ function layarSurveiPublik() {
   if (P.terkirim) return `<div class="survei-publik">${kepala}<section class="panel"><h1 style="font-size:1.3rem">Terima kasih</h1><p>Jawaban Anda untuk survei <b>${esc(P.data.judul)}</b> sudah kami terima. Masukan Anda membantu Prodi UPW meningkatkan mutu lulusan dan layanan.</p></section></div>`;
   const s = P.data;
   return `<div class="survei-publik">${kepala}<section class="panel" style="display:flex;flex-direction:column;gap:12px"><h1 style="font-size:1.3rem">${esc(s.judul)}</h1>
-    <p class="small muted">${s.anonim ? "Survei anonim." : "Mohon isi identitas pada pertanyaan yang tersedia."}${s.tutup ? " Survei ditutup " + esc(tglPanjang(s.tutup)) + "." : ""} Skala: 1 Kurang · 2 Cukup · 3 Baik · 4 Sangat baik.</p>
-    ${htmlSoal(s.soal, s.likert)}
+    ${kepalaSurvei(s)}<p class="small muted">${s.pengantar ? "" : s.anonim ? "Survei anonim. " : "Mohon isi identitas pada pertanyaan yang tersedia. "}${s.tutup ? "Survei ditutup " + esc(tglPanjang(s.tutup)) + "." : ""}</p>
+    ${htmlSoal(s.soal, s.likert, s.label)}
     <div class="jebakan" aria-hidden="true"><label>Situs web <input id="svSitus" type="text" tabindex="-1" autocomplete="off"></label></div>
     <p id="svGalat" class="galat" role="alert" hidden></p><div class="row" style="justify-content:flex-end">${tombol("svPubKirim", "Kirim jawaban")}</div></section>
     <p class="small muted" style="text-align:center">Repositori Akreditasi UPW · data hanya dipakai untuk penjaminan mutu prodi.</p></div>`;
 }
+/** Bilah kemajuan terhadap target responden (v0.50.0). */
+function kemajuanSurvei(s) {
+  const T = s.sasaranTarget || {}, n = s.jumlahJawaban || 0;
+  if (!T.min) return `<div class="small muted" style="margin-top:6px">${n} jawaban. ${esc(T.dasar || "")}</div>`;
+  const pct = Math.min(100, Math.round(n / T.min * 100)), capai = n >= T.min;
+  return `<div class="small num" style="margin-top:6px">${n} jawaban · minimal <b>${T.min}</b> · ideal ${T.ideal} dari populasi ${T.populasi} ${capai ? '<span class="chip s-disetujui">target minimal tercapai</span>' : `<span class="muted">(kurang ${T.min - n})</span>`}</div>
+    <div class="bar" style="margin-top:4px;max-width:360px"><i style="width:${pct}%"></i></div><div class="hint">${esc(T.dasar)}</div>`;
+}
+/** Kartu rekomendasi jadwal survei (Beranda Admin Prodi, KPS, Super Admin, GKM, dan atas halaman Survei). */
+const ST_JADWAL = { segera: ["Segera", "s-diajukan"], sekarang: ["Waktunya sekarang", "s-revisi"], terlewat: ["Terlewat", "s-ditolak"], draf: ["Draf siap diperiksa", "s-diajukan"], berjalan: ["Sedang berjalan", "s-disetujui"] };
+function panelJadwalSurvei(diBeranda) {
+  if (!["admin", "kps", "superadmin", "gkm"].includes(peranAktif())) return "";
+  const J = S.svJadwal;
+  if (!J) { sekali("svJadwal", async () => { S.svJadwal = await api("survei.jadwal"); render(); }); return diBeranda ? "" : `<section class="panel"><h2>Jadwal survei</h2><div class="memuat" style="min-height:40px">Memuat…</div></section>`; }
+  const l = J.jadwal; if (!l.length && diBeranda) return "";
+  return `<section class="panel"${diBeranda ? ' style="border-color:var(--gold)"' : ""}><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 style="margin:0">Jadwal survei yang dianjurkan</h2>${diBeranda ? `<button class="btn sm" data-go="survei">Buka menu Survei</button>` : ""}</div>
+   <p class="small muted">Dihitung dari kalender akademik (mulai kuliah Ganjil ${esc(J.kalender.ganjil.split("-").reverse().join("/"))}, Genap ${esc(J.kalender.genap.split("-").reverse().join("/"))}) dan instrumen LAMWisata. Tekan <b>Siapkan survei</b>: templat, sasaran, dan tanggal sudah terisi; periksa sekilas lalu tekan <b>Mulai survei</b>.</p>
+   ${l.length ? `<div class="list">${l.map(x => { const [lb, c] = ST_JADWAL[x.status] || [x.status, "s-draf"];
+     return `<div class="item"><div class="body"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><div class="title">${esc(x.judul)}</div><span class="chip ${c}">${lb}</span></div>
+       <div class="meta"><span class="num">${esc(tglPendek(x.mulai))} – ${esc(tglPendek(x.selesai))}</span><span>${esc(x.periode)}</span>${x.jumlahPengisi != null && x.status === "berjalan" ? `<span>${x.jumlahPengisi} sudah mengisi</span>` : ""}</div>
+       <div class="small muted">${esc(x.ket)}</div>
+       ${J.bolehUbah ? `<div class="row" style="margin-top:6px;flex-wrap:wrap">${x.templat ? (x.surveiId ? `<button class="btn sm" data-act="svJadwalBuka" data-id="${x.surveiId}">${x.status === "draf" ? "Periksa & mulai" : "Lihat survei"}</button>` : tombol("svSiapkan", "Siapkan survei", "sm primary", `data-k="${esc(x.kunci)}"`)) : ""}
+         <button class="btn sm" data-act="svJadwalSelesai" data-k="${esc(x.kunci)}">Tandai selesai</button></div>` : ""}</div></div>`; }).join("")}</div>` : `<div class="empty small">Tidak ada survei yang dianjurkan dalam 3 minggu ke depan.</div>`}
+   ${!diBeranda && J.bolehUbah ? `<details style="margin-top:8px"><summary class="small" style="cursor:pointer;color:var(--brand)">Atur tanggal mulai perkuliahan</summary>
+     <div class="row" style="flex-wrap:wrap;align-items:flex-end;margin-top:6px"><div class="field"><label for="kalG" class="small">Mulai kuliah Ganjil (BB-TT)</label><input id="kalG" type="text" value="${esc(J.kalender.ganjil)}" placeholder="09-01" style="width:110px"></div>
+     <div class="field"><label for="kalN" class="small">Mulai kuliah Genap (BB-TT)</label><input id="kalN" type="text" value="${esc(J.kalender.genap)}" placeholder="02-01" style="width:110px"></div>${tombol("svKalender", "Simpan", "sm")}</div>
+     <span class="hint">Minggu ke-7–8 dan ke-14–16 dihitung dari tanggal ini.</span></details>` : ""}</section>`;
+}
 function hSurvei() {
   if (!S.sv) { sekali("sv", async () => { S.sv = await api("survei.daftar"); render(); }); return `<div class="memuat">Memuat survei…</div>`; }
   const V = S.sv, ub = V.bolehUbah, dis = S.sibuk ? "disabled" : "";
-  return `<div class="head"><div><h1>Survei</h1><p>Buat survei kepuasan dengan templat sesuai instrumen. Survei bertujuan <b>Tabel 22</b> dan <b>Tabel 11</b> otomatis mengisi Tabel iLKPS pada tahun akademik saat survei dibuka. Responden yang punya akun melihat survei di Beranda; alumni dan pengguna lulusan memakai tautan tanpa login.</p><div style="margin-top:6px">${iTombol("b42,b71,b78,t11,t22")}</div></div>
+  if (S.svBukaId) { const s = V.survei.find(x => x.id === S.svBukaId); S.svBukaId = null; if (s) setTimeout(() => AKSI.svUbah({ id: s.id }), 0); }
+  return `<div class="head"><div><h1>Survei</h1><p>Buat survei dengan templat sesuai instrumen. Survei bertujuan <b>Tabel 22</b> dan <b>Tabel 11</b> otomatis mengisi Tabel iLKPS pada tahun akademik saat survei dibuka. Responden yang punya akun melihat survei di Beranda; alumni, pengguna lulusan, dan mitra memakai tautan tanpa login. Jawaban survei anonim tidak dapat dilihat siapa pengisinya oleh siapa pun.</p><div style="margin-top:6px">${iTombol("b42,b71,b78,t11,t22")}</div></div>
     ${ub ? `<button class="btn primary" data-act="svBaru">+ Buat survei</button>` : ""}</div>
-   <section class="panel"><div class="list">${V.survei.map(s => { const [l, c] = ST_SV[s.statusEfektif] || [s.statusEfektif, "s-draf"], pct = s.target ? Math.min(100, Math.round(s.jumlahJawaban / s.target * 100)) : null;
+   ${panelJadwalSurvei(false)}
+   <section class="panel"><div class="list">${V.survei.map(s => { const [l, c] = ST_SV[s.statusEfektif] || [s.statusEfektif, "s-draf"], internal = s.sasaran.some(x => x !== "publik");
      return `<div class="item"><div class="body"><div class="row" style="justify-content:space-between;gap:8px"><div class="title">${esc(s.judul)}</div><span class="chip ${c}">${l}</span></div>
       <div class="meta"><span class="tag t">${esc(s.labelTujuan)}</span><span>${s.sasaran.map(x => esc(V.sasaran[x] || x)).join(", ")}</span><span class="num">${s.buka ? esc(tglPendek(s.buka)) : "?"} – ${s.tutup ? esc(tglPendek(s.tutup)) : "?"}</span><span>${s.anonim ? "Anonim" : "Dengan identitas"}</span><span>${s.pertanyaan.length} pertanyaan</span></div>
-      ${s.status !== "draf" ? `<div class="small num" style="margin-top:6px">${s.jumlahJawaban} jawaban${s.target ? ` dari ${s.target} sasaran (${pct}%)` : ""}</div>${pct !== null ? `<div class="bar" style="margin-top:4px;max-width:320px"><i style="width:${pct}%"></i></div>` : ""}` : ""}
+      ${s.status !== "draf" ? kemajuanSurvei(s) : ""}
       <div class="row" style="margin-top:8px;flex-wrap:wrap">
-       ${ub ? `<button class="btn sm" data-act="svUbah" data-id="${s.id}" ${dis}>${s.status === "draf" ? "Ubah" : "Ubah judul/tanggal"}</button>` : ""}
-       ${ub && s.status === "draf" ? `<button class="btn sm primary" data-act="svStatus" data-id="${s.id}" data-a="buka" ${dis}>Buka survei</button><button class="btn sm bad" data-act="svStatus" data-id="${s.id}" data-a="hapus" ${dis}>Hapus</button>` : ""}
+       ${ub ? `<button class="btn sm" data-act="svUbah" data-id="${s.id}" ${dis}>${s.status === "draf" ? "Periksa / ubah" : "Ubah judul/tanggal"}</button>` : ""}
+       ${ub && s.status === "draf" ? `<button class="btn sm primary" data-act="svStatus" data-id="${s.id}" data-a="buka" ${dis}>Mulai survei</button><button class="btn sm bad" data-act="svStatus" data-id="${s.id}" data-a="hapus" ${dis}>Hapus</button>` : ""}
        ${s.status !== "draf" && s.sasaran.includes("publik") ? `<button class="btn sm primary" data-act="svTautan" data-id="${s.id}">Tautan &amp; bagikan</button>` : ""}
-       ${s.status !== "draf" ? `<button class="btn sm" data-act="svHasil" data-id="${s.id}" ${dis}>Hasil</button>` : ""}
+       ${s.status !== "draf" && internal ? `<button class="btn sm" data-act="svPengisi" data-id="${s.id}" ${dis}>Siapa yang sudah/belum mengisi</button>` : ""}
+       ${s.status !== "draf" ? `<button class="btn sm" data-act="svHasil" data-id="${s.id}" ${dis}>Hasil &amp; analisis</button>` : ""}
        ${ub && s.status === "dibuka" ? `<button class="btn sm" data-act="svStatus" data-id="${s.id}" data-a="tutup" ${dis}>Tutup</button>` : ""}
        ${ub && s.status === "ditutup" ? `<button class="btn sm" data-act="svStatus" data-id="${s.id}" data-a="buka" ${dis}>Buka lagi</button>` : ""}</div></div></div>`; }).join("")
-     || `<div class="empty">Belum ada survei. ${ub ? "Tekan <b>+ Buat survei</b> dan pilih templat." : ""}</div>`}</div></section>
+     || `<div class="empty">Belum ada survei. ${ub ? "Tekan <b>Siapkan survei</b> pada jadwal di atas, atau <b>+ Buat survei</b> dan pilih templat." : ""}</div>`}</div></section>
    ${S.laci ? "" : galatHtml()}`;
 }
-function svBaru(t) { return t ? JSON.parse(JSON.stringify(Object.assign({ buka: "", tutup: "" }, t))) : { judul: "", tujuan: "lainnya", sasaran: [], buka: "", tutup: "", anonim: true, pertanyaan: [] }; }
+function svBaru(t) { return t ? JSON.parse(JSON.stringify(Object.assign({ buka: "", tutup: "", meta: {} }, t))) : { judul: "", tujuan: "lainnya", sasaran: [], buka: "", tutup: "", anonim: true, pertanyaan: [], meta: {} }; }
 function laciSvForm() {
   const V = S.sv, f = S.svForm, terkunci = f.status && f.status !== "draf", asp = f.tujuan === "t22" ? V.aspek.t22 : f.tujuan === "t11" ? V.aspek.t11 : [], dis = terkunci ? "disabled" : "";
-  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Survei" style="width:min(760px,100%)">
-   <div class="dh"><h2>${f.id ? "Ubah survei" : "Buat survei"}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
-   ${terkunci ? `<div class="callout small">Survei sudah dibuka: hanya <b>judul</b> dan <b>tanggal ditutup</b> yang bisa diubah, agar jawaban yang sudah masuk tetap sebanding.</div>`
+  const m = f.meta || {}, perluPopulasi = f.sasaran.includes("publik") && !["t11", "tracer"].includes(f.tujuan);
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Survei" style="width:min(820px,100%)">
+   <div class="dh"><h2>${f.id ? (terkunci ? "Ubah survei" : "Periksa survei") : "Buat survei"}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   ${terkunci ? `<div class="callout small">Survei sudah dibuka: hanya <b>judul</b>, <b>tanggal ditutup</b>, dan <b>jumlah populasi</b> yang bisa diubah, agar jawaban yang sudah masuk tetap sebanding.</div>`
      : `<div class="picker"><b>Mulai dari templat sesuai instrumen</b><div class="row small" style="flex-wrap:wrap">${Object.entries(V.templat).map(([k, t]) => `<button class="btn sm" data-act="svTemplat" data-k="${k}">${esc(V.tujuan[t.tujuan] || t.judul)}</button>`).join("")}</div>
-       <span class="hint">Templat memakai skala Kurang–Cukup–Baik–Sangat baik dan aspek sesuai Tabel iLKPS, sehingga hasilnya langsung terhitung. Memilih templat mengganti pertanyaan yang ada.</span></div>`}
+       <span class="hint">Setiap templat memuat variabel, kode indikator, dan penjelasan per pertanyaan; skala 1–4 sesuai Tabel iLKPS. Memilih templat mengganti pertanyaan yang ada.</span></div>`}
    <div class="field"><label for="svJudul">Judul survei${wajib}</label><input id="svJudul" data-svf="judul" type="text" value="${esc(f.judul)}" placeholder="Contoh: Kepuasan mahasiswa Ganjil 2026/2027"></div>
    <div class="grid g3" style="gap:10px"><div class="field"><label for="svTujuan">Dipakai untuk</label><select id="svTujuan" data-svs="tujuan" ${dis}>${Object.entries(V.tujuan).map(([k, l]) => `<option value="${k}" ${f.tujuan === k ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></div>
     <div class="field"><label for="svBuka">Dibuka</label><input id="svBuka" data-svf="buka" type="date" value="${esc(f.buka || "")}" ${dis}></div>
     <div class="field"><label for="svTutup">Ditutup${wajib}</label><input id="svTutup" data-svf="tutup" type="date" value="${esc(f.tutup || "")}"></div></div>
    <div class="field"><span style="font-weight:600;font-size:.82rem">Sasaran responden${wajib}</span><div class="classgrid">${Object.entries(V.sasaran).map(([k, l]) => `<label><input type="checkbox" data-svsas="${k}" ${f.sasaran.includes(k) ? "checked" : ""} ${dis}><span>${esc(l)}</span></label>`).join("")}</div></div>
-   <label class="row small" style="gap:8px;flex-wrap:nowrap"><input type="checkbox" data-svcek="anonim" ${f.anonim ? "checked" : ""} ${dis} style="flex:none"><span>Jawaban anonim (nama responden tidak disimpan)</span></label>
-   <div class="picker"><b>Pertanyaan (${f.pertanyaan.length})</b>
-    ${f.pertanyaan.map((q, i) => `<div class="soal"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><span class="small muted">${i + 1}. ${TIPE_L[q.t]}</span>
+   <label class="row small" style="gap:8px;flex-wrap:nowrap"><input type="checkbox" data-svcek="anonim" ${f.anonim ? "checked" : ""} ${dis} style="flex:none"><span>Jawaban anonim (tidak ada yang bisa melihat siapa menjawab apa; hanya tercatat siapa yang sudah mengisi). Jangan dipakai untuk tracer study, pengguna lulusan, mitra, dan masukan kurikulum: instrumen memerlukan identitasnya.</span></label>
+   ${perluPopulasi ? `<div class="field"><label for="svPop">Jumlah populasi responden (mis. jumlah mitra aktif)</label><input id="svPop" data-svm="populasi" type="number" min="0" value="${esc(m.populasi ?? "")}" style="width:160px"><span class="hint">Dipakai menghitung target minimal responden (rumus Slovin, galat 5%).</span></div>` : ""}
+   ${terkunci ? "" : `<div class="field"><label for="svPeng">Pengantar untuk responden</label><textarea id="svPeng" data-svm="pengantar" rows="3" placeholder="Tujuan survei, kerahasiaan, dan perkiraan waktu pengisian">${esc(m.pengantar || "")}</textarea></div>`}
+   <div class="picker"><b>Pertanyaan (${f.pertanyaan.length})</b> <span class="hint">Buka "Penjelasan &amp; analisis" pada tiap pertanyaan untuk mengubah penjelasan, variabel, dan kode indikator.</span>
+    ${f.pertanyaan.map((q, i) => `${q.bagian ? `<div class="small" style="font-weight:700;margin-top:6px">${esc(q.bagian)}</div>` : ""}<div class="soal"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><span class="small muted">${i + 1}. ${TIPE_L[q.t]}${q["var"] ? ` · ${esc(q["var"])}` : ""}${q.ind ? ` · <span class="mono">${esc(q.ind)}</span>` : ""}</span>
       ${terkunci ? "" : `<div class="row"><button class="btn sm" data-act="svNaik" data-i="${i}" ${i ? "" : "disabled"} aria-label="Naikkan">↑</button><button class="btn sm" data-act="svTurun" data-i="${i}" ${i < f.pertanyaan.length - 1 ? "" : "disabled"} aria-label="Turunkan">↓</button><button class="btn sm bad" data-act="svHapusQ" data-i="${i}">Hapus</button></div>`}</div>
       <input type="text" data-svq="${i}" value="${esc(q.teks)}" placeholder="Tulis pertanyaan" aria-label="Pertanyaan ${i + 1}" ${dis}>
       ${q.t === "pilihan" || q.t === "centang" ? `<textarea data-svo="${i}" rows="3" placeholder="Satu pilihan per baris" aria-label="Pilihan jawaban ${i + 1}" ${dis}>${esc((q.opsi || []).join("\n"))}</textarea>` : ""}
       <div class="row small" style="flex-wrap:wrap;gap:12px"><label class="row" style="gap:6px"><input type="checkbox" data-svw="${i}" ${q.wajib ? "checked" : ""} ${dis}> Wajib</label>
+       ${q.t === "likert" ? `<label class="row" style="gap:6px"><input type="checkbox" data-svna="${i}" ${q.na ? "checked" : ""} ${dis}> Ada pilihan "Tidak tahu"</label>` : ""}
        ${q.t === "likert" && asp.length ? `<label class="row" style="gap:6px">Aspek <select data-sva="${i}" style="width:auto" ${dis}><option value="">– tidak dihitung –</option>${asp.map((a, k) => `<option value="${k}" ${q.aspek === k ? "selected" : ""}>${esc(a)}</option>`).join("")}</select></label>` : ""}
-       ${q.t === "singkat" && f.tujuan === "t11" ? `<label class="row" style="gap:6px"><input type="checkbox" data-svth="${i}" ${q.peran === "tahunLulus" ? "checked" : ""} ${dis}> Ini pertanyaan tahun lulus alumni (Ref 11a)</label>` : ""}</div></div>`).join("")}
+       ${q.t === "singkat" && f.tujuan === "t11" ? `<label class="row" style="gap:6px"><input type="checkbox" data-svth="${i}" ${q.peran === "tahunLulus" ? "checked" : ""} ${dis}> Ini pertanyaan tahun lulus alumni (Ref 11a)</label>` : ""}</div>
+      <details class="small"${q.jelas ? "" : ""}><summary style="cursor:pointer;color:var(--brand)">Penjelasan &amp; analisis${q.jelas ? "" : " (belum ada penjelasan)"}</summary>
+       <div class="field"><label class="small">Penjelasan untuk responden</label><textarea data-svj="${i}" rows="2" maxlength="800" ${dis} placeholder="Apa yang dinilai dan contohnya">${esc(q.jelas || "")}</textarea></div>
+       <div class="grid g3" style="gap:8px"><div class="field"><label class="small">Judul bagian (opsional)</label><input type="text" data-svb="${i}" value="${esc(q.bagian || "")}" ${dis}></div>
+        <div class="field"><label class="small">Variabel / dimensi</label><input type="text" data-svv="${i}" value="${esc(q["var"] || "")}" ${dis}></div>
+        <div class="field"><label class="small">Kode indikator</label><input type="text" data-svi="${i}" value="${esc(q.ind || "")}" maxlength="20" ${dis}></div></div></details></div>`).join("")}
     ${terkunci ? "" : `<div class="row small" style="flex-wrap:wrap">Tambah: ${Object.entries(TIPE_L).map(([k, l]) => `<button class="btn sm" data-act="svTambahQ" data-t="${k}">${l.split(" (")[0]}</button>`).join("")}</div>`}</div>
-   ${galatHtml()}<div class="row" style="justify-content:flex-end;margin-top:auto">${tombol("svSimpan", f.id ? "Simpan" : "Simpan draf")}</div></div></div>`;
+   ${galatHtml()}<div class="row" style="justify-content:flex-end;margin-top:auto;flex-wrap:wrap">${tombol("svSimpan", f.id ? "Simpan" : "Simpan draf", terkunci ? "primary" : "")}${terkunci ? "" : tombol("svSimpanMulai", "Simpan & mulai survei")}</div></div></div>`;
 }
 function laciSvTautan() {
   const s = S.sv.survei.find(x => x.id === S.laci.id), url = tautanSurvei(s.kode);
@@ -4604,31 +4653,67 @@ function laciSvTautan() {
    <p class="small">${esc(s.judul)}</p>
    <div class="field"><label for="svUrl">Tautan survei (tanpa login)</label><div class="row" style="flex-wrap:nowrap"><input id="svUrl" type="text" readonly value="${esc(url)}" class="mono"><button class="btn" data-act="svSalin">Salin</button></div>
     <span class="hint">Siapa pun yang memegang tautan bisa mengisi selama survei dibuka${s.tutup ? " (sampai " + esc(tglPanjang(s.tutup)) + ")" : ""}. Setelah ditutup, tautan menampilkan pesan bahwa survei sudah ditutup.</span></div>
+   ${s.sasaranTarget && s.sasaranTarget.min ? `<div class="callout small">Target: minimal <b>${s.sasaranTarget.min}</b> jawaban (ideal ${s.sasaranTarget.ideal}). Saat ini ${s.jumlahJawaban}.</div>` : ""}
    <div class="field"><label for="svPesan">Contoh pesan</label><textarea id="svPesan" rows="4" readonly>${esc(pesan)}</textarea></div>
    <div class="row" style="flex-wrap:wrap"><a class="btn primary" href="https://wa.me/?text=${encodeURIComponent(pesan)}" target="_blank" rel="noopener noreferrer">Bagikan lewat WhatsApp</a><a class="btn" href="mailto:?subject=${encodeURIComponent("Survei " + s.judul)}&body=${encodeURIComponent(pesan)}">Kirim lewat email</a><a class="btn" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Buka pratinjau</a></div></div></div>`;
+}
+/** Daftar sudah/belum mengisi (tanpa jawaban) + pengingat Beranda (v0.50.0). */
+function laciSvPengisi() {
+  const P = S.laci.p;
+  if (!P) return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Pengisi survei"><div class="memuat">Memuat…</div></div></div>`;
+  const belum = P.orang.filter(x => !x.sudah), q = (S.laci.q || "").toLowerCase(), tampil = P.orang.filter(x => !q || (x.nama + " " + x.username + " " + x.kelompok).toLowerCase().includes(q));
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Pengisi survei" style="width:min(700px,100%)">
+   <div class="dh"><h2>Pengisi: ${esc(P.judul)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <div class="callout small">Daftar ini hanya menunjukkan <b>siapa yang sudah dan belum mengisi</b>, untuk diingatkan. Jawaban tidak pernah dapat dihubungkan dengan nama.</div>
+   <div class="row" style="justify-content:space-between;flex-wrap:wrap"><span><b>${P.sudah}</b> dari ${P.total} sudah mengisi (${P.total ? Math.round(P.sudah / P.total * 100) : 0}%)${P.publik ? " · ditambah jawaban lewat tautan publik" : ""}</span>
+    <div class="row" style="flex-wrap:wrap">${P.bolehIngatkan && belum.length ? tombol("svIngatkan", `Kirim pengingat ke ${belum.filter(x => !x.diingatkan).length} orang`, "sm primary") : ""}<button class="btn sm" data-act="svSalinBelum">Salin daftar yang belum</button></div></div>
+   <span class="hint">Pengingat muncul di Beranda masing-masing (tanpa email) dan hilang sendiri setelah orang itu mengisi.</span>
+   <input type="search" id="svCariP" placeholder="Cari nama, NIM/NIP, angkatan" value="${esc(S.laci.q || "")}">
+   <div class="tbl-wrap gulir tinggi"><table><thead><tr><th>Nama</th><th>NIM/NIP</th><th>Kelompok</th><th>Status</th></tr></thead><tbody>
+   ${tampil.map(x => `<tr><td class="small">${esc(x.nama)}</td><td class="small mono">${esc(x.username)}</td><td class="small">${esc(x.kelompok || x.jenis)}</td><td>${x.sudah ? '<span class="chip s-disetujui">Sudah</span>' : `<span class="chip s-revisi">Belum</span>${x.diingatkan ? ' <span class="small muted">diingatkan</span>' : ""}`}</td></tr>`).join("")}</tbody></table></div></div></div>`;
+}
+const angka1 = v => v == null ? "–" : Number(v).toLocaleString("id-ID", { maximumFractionDigits: 2 });
+function htmlAnalisis(H) {
+  const A = H.analisis; if (!A) return "";
+  const alpha = a => a && a.alpha != null ? `${angka1(a.alpha)} ${a.alpha >= 0.7 ? '<span class="muted">(andal)</span>' : '<span style="color:var(--bad)">(&lt; 0,7)</span>'}` : '<span class="muted">–</span>';
+  const tVar = A.variabel.length ? `<div class="tbl-wrap"><table><thead><tr><th>Variabel</th><th>Butir</th><th>Rata-rata (1–4)</th><th>SD</th><th>% puas (3–4)</th><th>Indeks 0–100</th><th>Cronbach α</th></tr></thead><tbody>
+     ${A.variabel.map(v => `<tr><td class="small">${esc(v["var"])}</td><td class="small num">${v.butir}</td><td class="small num">${angka1(v.rata)}</td><td class="small num">${angka1(v.sd)}</td><td class="small num">${angka1(v.puas)}</td><td class="small num">${angka1(v.indeks)}</td><td class="small">${alpha(v.alpha)}</td></tr>`).join("")}
+     <tr><td class="small"><b>Keseluruhan</b></td><td></td><td class="small num"><b>${angka1(A.keseluruhan.rata)}</b></td><td class="small num">${angka1(A.keseluruhan.sd)}</td><td></td><td class="small num"><b>${angka1(A.keseluruhan.indeks)}</b></td><td class="small">${alpha(A.keseluruhan.alpha)}</td></tr></tbody></table></div>` : "";
+  const tIpa = A.ipa.length ? `<div class="picker"><b>Analisis kepentingan–kinerja (IPA)</b><span class="hint">Kuadran I (penting tetapi kinerja rendah) = prioritas perbaikan utama; II = pertahankan; III = prioritas rendah; IV = sumber daya mungkin berlebih.</span>
+     <div class="tbl-wrap"><table><thead><tr><th>Variabel</th><th>Kepentingan</th><th>Kinerja</th><th>Kesenjangan</th><th>Kuadran</th></tr></thead><tbody>${A.ipa.map(r => `<tr><td class="small">${esc(r["var"])}</td><td class="small num">${angka1(r.kepentingan)}</td><td class="small num">${angka1(r.kinerja)}</td><td class="small num" ${r.kesenjangan < 0 ? 'style="color:var(--bad)"' : ""}>${angka1(r.kesenjangan)}</td><td class="small"><b>${esc(r.kuadran)}</b></td></tr>`).join("")}</tbody></table></div></div>` : "";
+  const tKel = A.kelompok.filter(k => k.isi.length).map(k => `<div class="picker"><b>Perbandingan kelompok: ${esc(k.teks)}</b><span class="hint">Kelompok dengan kurang dari ${H.minKelompok} pengisi disembunyikan agar tidak bisa ditebak.</span>
+     <div class="tbl-wrap"><table><thead><tr><th>Kelompok</th><th>n</th>${A.namaVar.map(v => `<th>${esc(v)}</th>`).join("")}</tr></thead><tbody>${k.isi.map(g => `<tr><td class="small">${esc(g.opsi)}</td><td class="small num">${g.n}</td>${g.tersembunyi ? `<td class="small muted" colspan="${A.namaVar.length}">disembunyikan (n &lt; ${H.minKelompok})</td>` : g.rata.map(v => `<td class="small num">${angka1(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`).join("");
+  const tNps = A.nps.filter(x => x.n).map(x => `<div class="picker"><b>Net Promoter Score: ${x.nps}</b> <span class="small muted">(${x.n} jawaban)</span><div class="small">Promotor (9–10) ${angka1(x.promotor)}% · pasif (7–8) ${angka1(x.pasif)}% · detraktor (0–6) ${angka1(x.detraktor)}%</div><span class="hint">${esc(x.teks)}. NPS = % promotor − % detraktor (rentang −100 s.d. 100).</span></div>`).join("");
+  return `<div class="picker"><b>Ringkasan per variabel</b><span class="hint">Rata-rata tidak menghitung "tidak tahu". Indeks = (rata-rata − 1) ÷ 3 × 100. Cronbach α ≥ 0,7 menandakan butir dalam satu variabel konsisten (andal), sebagai bukti uji reliabilitas instrumen (butir 78).</span>${tVar}</div>${tIpa}${tKel}${tNps}`;
 }
 function laciSvHasil() {
   const H = S.laci.h;
   if (!H) return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Hasil survei"><div class="memuat">Memuat hasil…</div></div></div>`;
   const s = H.survei, ub = S.sv ? S.sv.bolehUbah : false;
-  const isi = H.rekap.map((q, i) => {
-    let b;
-    if (q.t === "likert") b = q.hitung.map((n, k) => ({ l: H.likert[k], n })).reverse().map(x => `<div class="batang"><span style="width:84px">${esc(x.l)}</span><div class="bar"><i style="width:${q.n ? x.n / q.n * 100 : 0}%"></i></div><span class="num" style="width:74px;text-align:right">${x.n} (${q.n ? Math.round(x.n / q.n * 100) : 0}%)</span></div>`).join("")
-      + `<div class="small muted">Rata-rata ${q.rata != null ? q.rata.toLocaleString("id-ID") : "–"} dari 4${q.aspek != null && H.aspek.length ? " · aspek " + esc(H.aspek[q.aspek]) : ""}</div>`;
-    else if (q.hitung) b = q.hitung.map(x => `<div class="batang"><span style="width:140px">${esc(x.opsi)}</span><div class="bar"><i style="width:${q.n ? x.n / q.n * 100 : 0}%"></i></div><span class="num" style="width:40px;text-align:right">${x.n}</span></div>`).join("");
-    else b = q.teksJawaban.length ? `<details><summary class="small" style="cursor:pointer">${q.teksJawaban.length} jawaban</summary><ul class="small" style="margin:6px 0 0 18px;padding:0">${q.teksJawaban.map(v => `<li>${esc(v)}</li>`).join("")}</ul></details>` : `<span class="small muted">Belum ada jawaban.</span>`;
-    return `<div class="soal"><div class="small"><b>${i + 1}. ${esc(q.teks)}</b> <span class="muted">(${q.n} jawaban)</span></div>${b}</div>`;
-  }).join("");
-  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Hasil survei" style="width:min(760px,100%)">
+  if (H.tertahan) return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Hasil survei" style="width:min(640px,100%)">
    <div class="dh"><h2>Hasil: ${esc(s.judul)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
-   <div class="row" style="justify-content:space-between;flex-wrap:wrap"><span class="small"><b>${s.jumlahJawaban}</b> jawaban${s.target ? ` dari ${s.target} sasaran` : ""} · ${esc(s.labelTujuan)}</span><button class="btn sm" data-act="svXlsx">Ekspor Excel</button></div>
-   ${isi}
+   <div class="callout">Baru <b>${s.jumlahJawaban}</b> jawaban. Hasil survei anonim baru ditampilkan setelah minimal <b>${H.minAnonim}</b> orang mengisi, agar jawaban tidak dapat ditebak pengisinya.</div></div></div>`;
+  const isi = H.rekap.map((q, i) => {
+    const lab = (H.label && H.label[q.lab]) || H.likert;
+    let b;
+    if (q.t === "likert") b = q.hitung.map((n, k) => ({ l: (k + 1) + " " + lab[k], n })).reverse().map(x => `<div class="batang"><span style="width:120px">${esc(x.l)}</span><div class="bar"><i style="width:${q.n ? x.n / q.n * 100 : 0}%"></i></div><span class="num" style="width:74px;text-align:right">${x.n} (${q.n ? Math.round(x.n / q.n * 100) : 0}%)</span></div>`).join("")
+      + `<div class="small muted">Rata-rata ${q.rata != null ? q.rata.toLocaleString("id-ID") : "–"} dari 4 · SD ${q.sd != null ? q.sd.toLocaleString("id-ID") : "–"}${q.puas != null ? ` · ${q.puas.toLocaleString("id-ID")}% puas` : ""}${q.na ? ` · ${q.na} tidak tahu` : ""}${q.aspek != null && H.aspek.length ? " · aspek " + esc(H.aspek[q.aspek]) : ""}${q["var"] ? " · " + esc(q["var"]) : ""}</div>`;
+    else if (q.hitung) b = q.hitung.map(x => `<div class="batang"><span style="width:160px">${esc(x.opsi)}</span><div class="bar"><i style="width:${q.n ? x.n / q.n * 100 : 0}%"></i></div><span class="num" style="width:40px;text-align:right">${x.n}</span></div>`).join("");
+    else b = q.teksJawaban.length ? `<details><summary class="small" style="cursor:pointer">${q.teksJawaban.length} jawaban</summary><ul class="small" style="margin:6px 0 0 18px;padding:0">${q.teksJawaban.map(v => `<li>${esc(v)}</li>`).join("")}</ul></details>` : `<span class="small muted">Belum ada jawaban.</span>`;
+    return `${q.bagian ? `<h3 class="sv-bagian">${esc(q.bagian)}</h3>` : ""}<div class="soal"><div class="small"><b>${i + 1}. ${esc(q.teks)}</b> <span class="muted">(${q.n} jawaban)</span></div>${b}</div>`;
+  }).join("");
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Hasil survei" style="width:min(860px,100%)">
+   <div class="dh"><h2>Hasil: ${esc(s.judul)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <div class="row" style="justify-content:space-between;flex-wrap:wrap"><span class="small"><b>${s.jumlahJawaban}</b> jawaban${s.sasaranTarget && s.sasaranTarget.min ? ` · minimal ${s.sasaranTarget.min}, ideal ${s.sasaranTarget.ideal}` : ""} · ${esc(s.labelTujuan)}${s.anonim ? " · anonim" : ""}</span><button class="btn sm" data-act="svXlsx">Ekspor Excel (rekap, variabel, data mentah)</button></div>
+   ${htmlAnalisis(H)}
+   <details><summary style="cursor:pointer;font-weight:700">Rincian per pertanyaan</summary>${isi}</details>
    ${H.aspek.length ? `<div class="picker"><b>Rencana tindak lanjut per aspek</b> <span class="small muted">(kolom terakhir Tabel ${s.tujuan === "t22" ? "22" : "11"})</span>
      ${H.aspek.map((a, k) => `<div class="field"><label for="svTl${k}" class="small">${esc(a)}</label><textarea id="svTl${k}" rows="2" ${ub ? "" : "disabled"}>${esc((s.tindakLanjut || {})[k] || "")}</textarea></div>`).join("")}
      ${ub ? `<div class="row" style="justify-content:flex-end">${tombol("svTlSimpan", "Simpan tindak lanjut")}</div>` : ""}</div>` : ""}
    ${galatHtml()}</div></div>`;
 }
 const svF = () => S.svForm;
+async function bukaSurveiUntukDiperiksa(id) { S.sv = null; S.svJadwal = null; S.svBukaId = id; S.laci = null; S.view = "survei"; render(); }
 Object.assign(AKSI, {
   async svIsiBuka(d) {
     S.laci = { jenis: "svIsi", id: d.id }; S.galat = ""; render();
@@ -4637,16 +4722,16 @@ Object.assign(AKSI, {
   },
   svIsiKirim() {
     const id = S.laci.s.id, soal = S.laci.s.soal;
-    kirimJawaban("svIsiKirim", async () => { const jawaban = kumpulkanJawaban(soal); await api("survei.jawab", { id, jawaban }); S.laci = null; S.svSaya = null; toast("Terima kasih, jawaban Anda tersimpan."); });
+    kirimJawaban("svIsiKirim", async () => { const jawaban = kumpulkanJawaban(soal); await api("survei.jawab", { id, jawaban }); S.laci = null; S.svSaya = null; S.tugas = null; toast("Terima kasih, jawaban Anda tersimpan."); });
   },
   svPubKirim() {
     kirimJawaban("svPubKirim", async () => { const jawaban = kumpulkanJawaban(S.svPub.data.soal); await api("survei.jawabPublik", { kode: S.svPub.kode, jawaban, situs: $("svSitus")?.value || "" }); S.svPub.terkirim = true; window.scrollTo(0, 0); });
   },
   svBaru() { S.svForm = svBaru(); S.laci = { jenis: "svForm" }; S.galat = ""; render(); fokus("svJudul"); },
-  svUbah(d) { S.svForm = JSON.parse(JSON.stringify(S.sv.survei.find(s => s.id === d.id))); S.laci = { jenis: "svForm" }; S.galat = ""; render(); },
+  svUbah(d) { const s = S.sv.survei.find(x => x.id === d.id); if (!s) return; S.svForm = JSON.parse(JSON.stringify(s)); S.svForm.meta = S.svForm.meta || {}; S.laci = { jenis: "svForm" }; S.galat = ""; render(); },
   svTemplat(d) {
     if (svF().pertanyaan.length && !confirm("Ganti pertanyaan yang ada dengan templat?")) return;
-    const f = svF(), t = svBaru(S.sv.templat[d.k]); t.buka = f.buka; t.tutup = f.tutup; t.id = f.id; S.svForm = t; render();
+    const f = svF(), t = svBaru(S.sv.templat[d.k]); t.buka = f.buka; t.tutup = f.tutup; t.id = f.id; if (f.meta && f.meta.jadwal) t.meta.jadwal = f.meta.jadwal; S.svForm = t; render();
   },
   svTambahQ(d) { svF().pertanyaan.push({ t: d.t, teks: "", wajib: d.t === "likert", opsi: d.t === "pilihan" || d.t === "centang" ? [] : undefined }); render(); const el = document.querySelectorAll("[data-svq]"); if (el.length) el[el.length - 1].focus(); },
   svHapusQ(d) { svF().pertanyaan.splice(Number(d.i), 1); render(); },
@@ -4654,12 +4739,17 @@ Object.assign(AKSI, {
   svTurun(d) { const a = svF().pertanyaan, i = Number(d.i); [a[i + 1], a[i]] = [a[i], a[i + 1]]; render(); },
   svSimpan() {
     const f = svF(), data = JSON.parse(JSON.stringify(f));
-    jalankan(async () => { const j = await api("survei.simpan", { data }); S.laci = null; S.svForm = null; S.sv = null; S.ilkps = null; toast(f.id ? "Survei disimpan." : "Draf survei tersimpan. Tekan Buka survei bila sudah siap."); });
+    jalankan(async () => { await api("survei.simpan", { data }); S.laci = null; S.svForm = null; S.sv = null; S.svJadwal = null; S.ilkps = null; toast(f.id ? "Survei disimpan." : "Draf survei tersimpan. Tekan Mulai survei bila sudah siap."); });
+  },
+  svSimpanMulai() {
+    const f = svF(), data = JSON.parse(JSON.stringify(f));
+    if (!confirm("Simpan dan mulai survei ini? Sasaran yang punya akun langsung melihatnya di Beranda (atau mulai tanggal dibuka). Setelah dimulai, pertanyaan tidak bisa diubah.")) return;
+    jalankan(async () => { const j = await api("survei.simpan", { data }); await api("survei.status", { id: j.id, aksi: "buka" }); S.laci = null; S.svForm = null; S.sv = null; S.svJadwal = null; S.svSaya = null; S.ilkps = null; toast("Survei dimulai."); });
   },
   svStatus(d) {
-    const pesan = { buka: "Buka survei ini? Responden sasaran akan melihatnya; setelah dibuka, pertanyaan tidak bisa diubah.", tutup: "Tutup survei ini sekarang?", hapus: "Hapus draf survei ini?" }[d.a];
+    const pesan = { buka: "Mulai survei ini? Responden sasaran akan melihatnya; setelah dimulai, pertanyaan tidak bisa diubah.", tutup: "Tutup survei ini sekarang?", hapus: "Hapus draf survei ini?" }[d.a];
     if (!confirm(pesan)) return;
-    jalankan(async () => { await api("survei.status", { id: d.id, aksi: d.a }).catch(e => { toast(e.message); throw e; }); S.sv = null; S.svSaya = null; S.ilkps = null; toast({ buka: "Survei dibuka.", tutup: "Survei ditutup.", hapus: "Draf dihapus." }[d.a]); });
+    jalankan(async () => { await api("survei.status", { id: d.id, aksi: d.a }).catch(e => { toast(e.message); throw e; }); S.sv = null; S.svJadwal = null; S.svSaya = null; S.ilkps = null; toast({ buka: "Survei dimulai.", tutup: "Survei ditutup.", hapus: "Draf dihapus." }[d.a]); });
   },
   svTautan(d) { S.laci = { jenis: "svTautan", id: d.id }; render(); },
   svSalin() { const v = $("svUrl").value; navigator.clipboard?.writeText(v).then(() => toast("Tautan disalin."), () => { $("svUrl").select(); toast("Pilih tautan lalu salin manual."); }); },
@@ -4667,32 +4757,70 @@ Object.assign(AKSI, {
     S.laci = { jenis: "svHasil", id: d.id }; S.galat = ""; render();
     try { const h = await api("survei.hasil", { id: d.id }); if (S.laci && S.laci.id === d.id) { S.laci.h = h; render(); } } catch (e) { S.laci = null; render(); toast(e.message); }
   },
+  async svPengisi(d) {
+    S.laci = { jenis: "svPengisi", id: d.id }; S.galat = ""; render();
+    try { const p = await api("survei.pengisi", { id: d.id }); if (S.laci && S.laci.id === d.id) { S.laci.p = p; render(); } } catch (e) { S.laci = null; render(); toast(e.message); }
+  },
+  svIngatkan() {
+    const id = S.laci.id;
+    if (!confirm("Kirim pengingat di Beranda kepada semua yang belum mengisi (yang belum pernah diingatkan)?")) return;
+    jalankan(async () => { const j = await api("survei.ingatkan", { id }); const p = await api("survei.pengisi", { id }); if (S.laci && S.laci.id === id) S.laci.p = p; toast(j.terkirim ? `Pengingat terkirim ke ${j.terkirim} orang.` : "Semua yang belum mengisi sudah diingatkan."); });
+  },
+  svSalinBelum() {
+    const l = S.laci.p.orang.filter(x => !x.sudah).map(x => `${x.nama} (${x.username})${x.kelompok ? " – " + x.kelompok : ""}`).join("\n");
+    navigator.clipboard?.writeText(l || "Semua sudah mengisi.").then(() => toast("Daftar yang belum mengisi disalin."), () => toast("Tidak bisa menyalin otomatis."));
+  },
   svTlSimpan() {
     const H = S.laci.h, data = {}; H.aspek.forEach((_, k) => { data[k] = $("svTl" + k).value; });
     jalankan(async () => { await api("survei.tindakLanjut", { id: H.survei.id, data }); H.survei.tindakLanjut = data; S.ilkps = null; toast("Rencana tindak lanjut tersimpan."); });
   },
+  svSiapkan(d) {
+    jalankan(async () => { const j = await api("survei.siapkan", { kunci: d.k }); toast(j.ada ? "Survei untuk jadwal ini sudah ada." : "Draf survei disiapkan dari templat. Periksa lalu tekan Mulai survei."); bukaSurveiUntukDiperiksa(j.id); });
+  },
+  svJadwalBuka(d) { bukaSurveiUntukDiperiksa(d.id); },
+  svJadwalSelesai(d) {
+    if (!confirm("Tandai rekomendasi ini selesai? Kartu ini tidak akan muncul lagi.")) return;
+    jalankan(async () => { S.svJadwal = await api("survei.jadwalSelesai", { kunci: d.k }); toast("Ditandai selesai."); });
+  },
+  svKalender() {
+    const g = ($("kalG")?.value || "").trim(), n = ($("kalN")?.value || "").trim();
+    jalankan(async () => { S.svJadwal = await api("survei.kalender", { ganjil: g, genap: n }); toast("Tanggal mulai perkuliahan disimpan."); });
+  },
   svXlsx() {
-    const H = S.laci.h, s = H.survei;
-    const rk = [["No", "Pertanyaan", "Jenis", "Jumlah jawaban", ...H.likert.slice().reverse(), "Rata-rata"]].concat(H.rekap.map((q, i) => q.t === "likert" ? [i + 1, q.teks, "Skala 4", q.n, ...q.hitung.slice().reverse(), q.rata ?? ""] : [i + 1, q.teks, TIPE_L[q.t], q.n]));
-    const soal = s.pertanyaan, mentah = [["Waktu", ...soal.map((q, i) => (i + 1) + ". " + q.teks)]].concat(H.jawaban.map(r => [new Date(r.waktu).toLocaleString("id-ID"), ...soal.map(q => { const v = r.jawaban[q.id]; return Array.isArray(v) ? v.join("; ") : v ?? ""; })]));
+    const H = S.laci.h, s = H.survei, A = H.analisis;
+    const rk = [["No", "Kode", "Variabel", "Pertanyaan", "Jenis", "n", "4", "3", "2", "1", "Tidak tahu", "Rata-rata", "SD", "% puas"]].concat(H.rekap.map((q, i) => q.t === "likert"
+      ? [i + 1, q.ind || "", q["var"] || "", q.teks, "Skala 4", q.n, ...q.hitung.slice().reverse(), q.na || 0, q.rata ?? "", q.sd ?? "", q.puas ?? ""] : [i + 1, q.ind || "", q["var"] || "", q.teks, TIPE_L[q.t], q.n]));
     const lembar = [{ nama: "Rekap", baris: [[s.judul], [s.labelTujuan + " · " + s.jumlahJawaban + " jawaban · " + (s.anonim ? "anonim" : "dengan identitas")], [], ...rk] }];
-    if (H.jawaban.length) lembar.push({ nama: "Jawaban", baris: mentah });
+    if (A) lembar.push({ nama: "Variabel", baris: [["Variabel", "Butir", "Rata-rata", "SD", "% puas", "Indeks 0-100", "Cronbach alpha", "n alpha"]].concat(A.variabel.map(v => [v["var"], v.butir, v.rata ?? "", v.sd ?? "", v.puas ?? "", v.indeks ?? "", v.alpha ? v.alpha.alpha : "", v.alpha ? v.alpha.n : ""]))
+      .concat(A.ipa.length ? [[], ["IPA", "Kepentingan", "Kinerja", "Kesenjangan", "Kuadran"]].concat(A.ipa.map(r => [r["var"], r.kepentingan, r.kinerja, r.kesenjangan, r.kuadran])) : []) });
+    const soal = s.pertanyaan, kode = q => q.ind || q.id;
+    if (H.jawaban.length) lembar.push({ nama: "Data mentah", baris: [[...(s.anonim ? [] : ["Waktu", "Nama akun"]), ...soal.map(kode)]].concat(H.jawaban.map(r => [...(s.anonim ? [] : [r.waktu ? new Date(r.waktu).toLocaleString("id-ID") : "", r.nama || ""]),
+      ...soal.map(q => { const v = r.jawaban[q.id]; return Array.isArray(v) ? v.join("; ") : v ?? ""; })])) });
+    lembar.push({ nama: "Kode", baris: [["Kode", "Variabel", "Pertanyaan", "Jenis", "Pilihan / skala"]].concat(soal.map(q => [kode(q), q["var"] || "", q.teks, TIPE_L[q.t], q.t === "likert" ? "1–4 (0 = tidak tahu)" : (q.opsi || []).join(" | ")])) });
     unduh(UPW_ZIP.xlsx(lembar), "Survei - " + namaBerkas(s.judul) + ".xlsx");
   }
 });
 document.addEventListener("input", e => {
-  const t = e.target, f = S.svForm; if (!f || !S.laci || S.laci.jenis !== "svForm") return;
+  const t = e.target;
+  if (t.id === "svCariP" && S.laci && S.laci.jenis === "svPengisi") { S.laci.q = t.value; const pos = t.selectionStart; render(); const el = $("svCariP"); if (el) { el.focus(); el.setSelectionRange(pos, pos); } return; }
+  const f = S.svForm; if (!f || !S.laci || S.laci.jenis !== "svForm") return;
   if (t.dataset.svf) f[t.dataset.svf] = t.value;
+  else if (t.dataset.svm) { f.meta = f.meta || {}; f.meta[t.dataset.svm] = t.value; }
   else if (t.dataset.svq !== undefined) f.pertanyaan[+t.dataset.svq].teks = t.value;
   else if (t.dataset.svo !== undefined) f.pertanyaan[+t.dataset.svo].opsi = t.value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+  else if (t.dataset.svj !== undefined) f.pertanyaan[+t.dataset.svj].jelas = t.value;
+  else if (t.dataset.svb !== undefined) f.pertanyaan[+t.dataset.svb].bagian = t.value;
+  else if (t.dataset.svv !== undefined) f.pertanyaan[+t.dataset.svv]["var"] = t.value;
+  else if (t.dataset.svi !== undefined) f.pertanyaan[+t.dataset.svi].ind = t.value;
 });
 document.addEventListener("change", e => {
   const t = e.target, f = S.svForm; if (!f || !S.laci || S.laci.jenis !== "svForm") return;
   if (t.dataset.svf) f[t.dataset.svf] = t.value;
   if (t.dataset.svs) { f[t.dataset.svs] = t.value; render(); }
-  if (t.dataset.svsas) { f.sasaran = t.checked ? [...f.sasaran, t.dataset.svsas] : f.sasaran.filter(x => x !== t.dataset.svsas); }
+  if (t.dataset.svsas) { f.sasaran = t.checked ? [...f.sasaran, t.dataset.svsas] : f.sasaran.filter(x => x !== t.dataset.svsas); render(); }
   if (t.dataset.svcek) f[t.dataset.svcek] = t.checked;
   if (t.dataset.svw !== undefined) f.pertanyaan[+t.dataset.svw].wajib = t.checked;
+  if (t.dataset.svna !== undefined) f.pertanyaan[+t.dataset.svna].na = t.checked;
   if (t.dataset.sva !== undefined) { const q = f.pertanyaan[+t.dataset.sva]; if (t.value === "") delete q.aspek; else q.aspek = Number(t.value); }
   if (t.dataset.svth !== undefined) { const q = f.pertanyaan[+t.dataset.svth]; if (t.checked) q.peran = "tahunLulus"; else delete q.peran; }
 });

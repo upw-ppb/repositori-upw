@@ -3,6 +3,34 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.50.0 — 25 Nov 2026 — Uji Coba
+Ringkas: Survei lengkap: 9 templat berpenjelasan sesuai instrumen, jadwal survei yang dianjurkan di Beranda, target responden, daftar sudah/belum mengisi + pengingat, anonimitas sungguhan, dan analisis hasil.
+Permintaan pemilik 24–25 Nov 2026 (survei poin 1–6; "Setuju dan kerjakan Tahap 1 … pertanyaan dibuat dengan komprehensif sehingga banyak variabel dan indikator yang bisa diukur").
+- Templat (gas/SurveiTemplat.js): kepuasan mahasiswa (Tabel 22: 5 aspek × 5 butir + kepentingan untuk IPA + kelompok semester + NPS), pengguna lulusan (Tabel 11: 7 aspek × 3 butir +
+  identitas instansi/alumni/tahun lulus + kebutuhan kompetensi), tracer study (pertanyaan inti Kemdiktisaintek: F8, F502, F505, F1101, F5D, F14, F15, F17 kompetensi saat lulus vs
+  diperlukan, F2x metode pembelajaran, dll.), layanan kemahasiswaan (butir 65), dosen, tendik, mitra (butir 73), exit survey, masukan kurikulum (butir 7, 3). Setiap butir skala punya
+  penjelasan (jelas), variabel (var), dan kode indikator (ind); pengantar dan arti skala 1–4 per templat; pilihan "Tidak tahu / tidak berlaku" (nilai 0, tidak dihitung).
+  Survei identitas (tracer, pengguna, mitra, kurikulum) beridentitas karena instrumen menghitung per lulusan/lembaga; survei internal anonim. EDOM per kelas menyusul (Tahap 2).
+- Anonimitas (koreksi atas mode lama yang menyimpan kunci tersandi dan jam): kolom Survei.pengisi (daftar id urut abjad) dan Survei.meta (VERSI_SKEMA 32); baris Jawaban survei anonim
+  tanpa userId/kunci/jam (tanggal saja), tanpa Log per pengisian; jawaban mentah anonim diacak dan tanpa waktu/nama. Hasil anonim tampil setelah ≥ 3 pengisi, kelompok pembanding < 5
+  disembunyikan. Migrasi migrasiSurveiAnonim(): pengisi diisi dari kunci lama, lalu kunci dan jam dihapus dan urutan diacak. Batas: pemilik akun Google upw@ secara teknis masih bisa
+  menelusuri lewat riwayat versi spreadsheet.
+- Target responden (hitungTarget): tracer/pengguna lulusan = Prmin instrumen dari lulusan TS-4 s.d. TS-2 (Data Prodi › Lulusan); survei lain = Slovin galat 5% + ideal 70%
+  (populasi akun aktif sasaran, atau isian populasi untuk survei publik). Bilah kemajuan di daftar survei.
+- Daftar sudah/belum mengisi (survei.pengisi, tanpa jawaban) + survei.ingatkan → Pengingat Beranda jenis "survei:<id>", selesai otomatis saat mengisi.
+- Jadwal (JADWAL_SURVEI, Pengaturan kalenderSurvei bawaan Ganjil 09-01 / Genap 02-01): kepuasan mahasiswa minggu 7–8 dan 14–16, exit survey minggu 15–18, tracer + pengguna lulusan
+  Feb–Mei, dosen/tendik/mitra/layanan November, masukan kurikulum Apr–Mei atau 4–1 minggu sebelum rapat IAB terjadwal, tinjauan instrumen dan publikasi Jun–Jul. Kartu di Beranda
+  Admin Prodi/KPS/Super Admin/GKM dan menu Survei; Siapkan survei (survei.siapkan) membuat draf terisi; Simpan & mulai survei; Tandai selesai.
+- Analisis (analisisSurvei): per variabel rata-rata, SD, % puas, indeks 0–100, Cronbach α; keseluruhan; IPA (kepentingan × kinerja, kuadran); perbandingan kelompok; NPS.
+  Ekspor Excel: Rekap, Variabel (+IPA), Data mentah berkode indikator, Kode.
+- Hak: KPS kini boleh membuat dan memulai survei (PERAN_SURVEI_UBAH); GKM melihat. Sasaran baru: mahasiswa semester akhir (7–8).
+- Struktur data berubah (VERSI_SKEMA 32: Survei.pengisi, Survei.meta). Versi lama tetap bisa membaca data, tetapi bila kembali ke versi lama pencegahan mengisi dua kali untuk
+  survei anonim tidak berlaku (kunci lama sudah dihapus); data jawaban tetap aman.
+- Uji: 932 + 44 uji server lulus (uji-v50-bagian.mjs; uji survei v0.11.0 disesuaikan: KPS kini boleh mengelola, templat lama ringkas dipakai untuk uji mekanisme). Uji tampilan lokal:
+  Beranda KPS menampilkan jadwal; Siapkan → draf terisi → Simpan & mulai; mahasiswa mengisi dengan pengantar, arti skala, penjelasan, tidak tahu; daftar pengisi; hasil tertahan < 3;
+  analisis + IPA + NPS; tracer publik 45 pertanyaan di layar ponsel; ekspor Excel 4 lembar; penjelajah menu KPS/Dosen 59 layar tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.49.1 — 22 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.49.1 (tampilan docs/ dan server Apps Script Produksi deployment @34): batas waktu tunggu, kirim ulang permintaan baca, tombol Coba lagi.
 - Tidak ada perubahan struktur data. Rollback ke v0.49.0 cukup tampilan (tag v0.49.0) dan deployment @33.
