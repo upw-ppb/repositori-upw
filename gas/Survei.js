@@ -136,6 +136,7 @@ function surveiKeAdmin(s, jumlah) {
   o.statusEfektif = statusEfektif(s); o.jumlahJawaban = jumlah || 0; o.labelTujuan = TUJUAN_SURVEI[s.tujuan] || s.tujuan;
   o.target = s.sasaran.filter(function (x) { return x !== "publik"; }).length ? semua("Pengguna").filter(function (p) { return p.status === "aktif" && cocokSasaran(s, p); }).length : null;
   o.sasaranTarget = hitungTarget(s); o.jumlahPengisi = (s.pengisi || []).length;
+  var pb = pubSurvei(s.id); o.terbit = !!(pb && pb.status === "terbit"); // v0.52.0
   return o;
 }
 function aksiSurveiDaftar(d, token) {

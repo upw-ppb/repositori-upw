@@ -312,6 +312,7 @@ function aksiTugasSaya(d, token) {
   Object.keys(g).forEach(function (k) { hasil[k] = g[k]; });
   var tr = tugasRapat(p), tt = tugasTl(p); // v0.31.0: undangan rapat dan tindak lanjut
   hasil.undangan = tr.undangan; hasil.tlSaya = tt.tlSaya; hasil.tlVerif = tt.tlVerif;
+  var mu = tugasMutu(p); Object.keys(mu).forEach(function (k) { hasil[k] = mu[k]; }); // v0.52.0: hasil survei dibahas/dipublikasikan
   if (!punyaPeran(p, PERAN_KEGIATAN)) return hasil;
   var idx = indeksOrang(), set = pengaturanSurat(), kini = hariIni();
   semuaKegiatan().forEach(function (k) {

@@ -154,7 +154,7 @@ function aksiRapatDetail(d, token) {
 function bersihRapat(x, idx) {
   var j = jenisRapatDef(x.jenis);
   if (!j) throw galat("Pilih jenis rapat.");
-  var tlAda = {}; semuaTl().forEach(function (t) { tlAda[t.id] = 1; });
+  var tlAda = {}, svAda = {}; semuaTl().forEach(function (t) { tlAda[t.id] = 1; }); semuaSurvei().forEach(function (s) { svAda[s.id] = 1; });
   var o = { jenis: j.k, judul: potong(x.judul, 200).trim(), tgl: teks(x.tgl).trim(), jamMulai: teks(x.jamMulai).trim(), jamSelesai: teks(x.jamSelesai).trim(),
     tempat: potong(x.tempat, 200).trim(), tautan: teks(x.tautan).trim(), pengantar: potong(x.pengantar, 1000).trim(), nomor: potong(x.nomor, 100).trim() };
   if (!o.judul) throw galat("Tulis nama/judul rapat.");
@@ -163,7 +163,7 @@ function bersihRapat(x, idx) {
   if (o.jamMulai && o.jamSelesai && o.jamSelesai <= o.jamMulai) throw galat("Jam selesai harus setelah jam mulai.");
   if (o.tautan && (!/^https:\/\/[^\s<>"]+$/.test(o.tautan) || o.tautan.length > 500)) throw galat("Tautan rapat daring harus diawali https:// dan tanpa spasi.");
   o.agenda = (Array.isArray(x.agenda) ? x.agenda : []).map(function (a) {
-    return { t: potong(a && a.t, 600).trim(), butir: bersihButir(a && a.butir), tl: a && tlAda[a.tl] ? String(a.tl) : "" };
+    return { t: potong(a && a.t, 600).trim(), butir: bersihButir(a && a.butir), tl: a && tlAda[a.tl] ? String(a.tl) : "", sv: a && svAda[a.sv] ? String(a.sv) : "" };
   }).filter(function (a) { return a.t; }).slice(0, 30);
   var pz = x.peserta || {}, kel = {}; daftarKelas(idx).forEach(function (c) { kel[c.key] = 1; });
   o.peserta = {
@@ -324,7 +324,7 @@ function bersihRisalah(x, rp, idx) {
         var pj = teks(k && k.pj), tg = teks(k && k.tenggat).trim();
         if (pj && (!idx.byId[pj] || ["dosen", "tendik"].indexOf(idx.byId[pj].jenis) < 0)) throw galat("Penanggung jawab keputusan harus dosen/tendik.");
         if (tg && !tanggalSah(tg)) throw galat("Tenggat keputusan tidak valid (YYYY-MM-DD).");
-        return { t: potong(k && k.t, 1000).trim(), pj: pj, tenggat: tg, butir: bersihButir(k && k.butir), tl: "" };
+        return { t: potong(k && k.t, 1000).trim(), pj: pj, tenggat: tg, butir: bersihButir(k && k.butir), tl: "", pub: !!(k && k.pub) };
       }).filter(function (k) { return k.t; }).slice(0, 20) };
     }) };
   return o;

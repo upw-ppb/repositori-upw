@@ -3,6 +3,25 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.52.0 — 25 Nov 2026 — Uji Coba
+Ringkas: Menu Hasil Survei untuk semua pengguna (hasil survei yang dipublikasikan dan perbaikan prodi), survei selesai disarankan menjadi agenda rapat, keputusan rapat bisa diumumkan, dan pengingat bila hasil survei belum dibahas/dipublikasikan.
+Permintaan pemilik 25 Nov 2026: "lanjutkan" (survei poin 7: hasil dianalisis dan dipublikasikan di dashboard, mudah diakses dosen dan mahasiswa; poin 8: terhubung dengan rapat
+dan tindak lanjut, semua hasil rapat tertelusur, keputusan yang perlu dipublikasikan masuk dashboard).
+- gas/MutuSurvei.js: ringkasHasil(s) = angka agregat saja (per aspek rata-rata dan % puas, indeks, IPA prioritas, NPS; tracer: waktu tunggu, kesesuaian bidang; EDOM: tingkat prodi,
+  tanpa nama dosen/kelas, jumlah kelas di bawah 3,0 saja). usulanPembahasan(): aspek di bawah Baik 3,0 / 75% puas, prioritas IPA, NPS negatif, ambang butir 39/40, responden di bawah target.
+- Rapat: agenda menyimpan id survei (Rapat.agenda[].sv); formulir rapat menampilkan "Rekomendasi dari hasil survei" (+ Jadikan agenda); risalah: centang "Umumkan" per keputusan
+  (risalah.agenda[].keputusan[].pub). Keduanya di kolom JSON yang sudah ada.
+- Publikasi (tabel baru PublikasiSurvei, VERSI_SKEMA 34): kesimpulan, temuan (terisi otomatis), pembaca (mahasiswa/dosen/tendik), potret angka saat terbit; hanya setelah survei
+  ditutup dan jawaban cukup. "Yang kami lakukan" = keputusan bertanda Umumkan pada agenda survei itu, status dari Tindak Lanjut terkini (tanpa nama penanggung jawab). Tarik/terbitkan ulang.
+  Pembaca dicatat (id saja) → jumlah per kelompok untuk pengelola (bukti butir 78 aspek 6).
+- Menu "Hasil Survei" (semua peran termasuk asesor): publikasi + keputusan rapat yang diumumkan; angka di menu = publikasi baru yang belum dibaca.
+- Beranda pengelola: "Hasil survei belum dibahas di rapat" (Agendakan → undangan terisi) dan "Hasil survei belum dipublikasikan" (setelah dibahas). Survei: tombol Publikasi hasil.
+- Penilaian butir 78: keterangan jumlah kelompok pemangku kepentingan yang terukur, dibahas di rapat, dan dipublikasikan (12 bulan terakhir).
+- Struktur data berubah (VERSI_SKEMA 34: tabel PublikasiSurvei). Versi lama (v0.51.0) tetap bisa membaca data; tabel baru dan tanda sv/pub diabaikan (publikasi tidak tampil).
+- Uji: 976 + 44 uji server lulus (uji-v52-bagian.mjs). Uji tampilan lokal: Beranda KPS → Agendakan → agenda terisi → terbit → risalah dengan Umumkan → final → Publikasi hasil (perbaikan:
+  tabel angka di laci sempat tergencet 2 px) → terbit → mahasiswa melihat di menu Hasil Survei (lebar ponsel tanpa geser), lencana hilang setelah dibaca; penjelajah KPS 65 layar dan mahasiswa 12 layar tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.51.0 — 25 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.51.0 (tampilan docs/ dan server Apps Script Produksi deployment @36): EDOM per mata kuliah, kelas, dan dosen; tracer study diterapkan ke data Lulusan.
 - Struktur data berubah (VERSI_SKEMA 33: tabel PengisiSurvei, kolom Lulusan.tracer). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±22 dtk, permintaan tanpa login).

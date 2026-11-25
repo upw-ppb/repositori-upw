@@ -387,6 +387,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Tampilan: laciSvEdom (pesan wajib "Bagian N (nama), pertanyaan k"; e.no = nomor kotak), laciSvEdomHasil, panelEdomSaya (akhir hMk), laciSvTracer. Uji: uji-v51-bagian.mjs.
   Uji tampilan dengan confirm(): panel browser menolak dialog → set window.confirm = () => true dulu.
 
+- v0.52.0 (25 Nov 2026, Uji Coba): survei poin 7–8. gas/MutuSurvei.js: ringkasHasil/usulanPembahasan, rapatPerSurvei (agenda.sv), keputusanDiumumkan (risalah keputusan.pub + status TL),
+  tabel PublikasiSurvei (VERSI_SKEMA 34; ringkas = potret saat terbit; baca = id pembaca), aksi mutu.usulan/mutu.daftar/mutu.baca/pub.data/pub.simpan/pub.tarik, tugasMutu → Beranda,
+  infoSurvei78 → Penilaian. Tampilan: menu "mutu" (hMutu, label "Hasil Survei"), laciPubForm, panel rekomendasi di laciRapatForm (S.rapatUsulan), centang data-rkpub di risalah.
+  JANGAN publikasikan teks bebas, nilai per dosen/kelas, atau nama PJ. Laci = flex column: .tbl-wrap di dalam laci perlu flex-shrink:0 bila tidak bergulir. Uji: uji-v52-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

@@ -71,11 +71,13 @@ var SKEMA = {
   /* v0.42.0 */
   RpsData: ["semester", "kodeMk", "kunci", "fileId", "data", "oleh", "diubah"],
   /* v0.51.0: unit EDOM yang sudah dinilai per mahasiswa (tanpa nilai; baris dibuat urut id saat survei dimulai) */
-  PengisiSurvei: ["survei", "userId", "unit"]
+  PengisiSurvei: ["survei", "userId", "unit"],
+  /* v0.52.0: publikasi hasil survei (potret angka agregat saat terbit; baca = id pembaca) */
+  PublikasiSurvei: ["id", "survei", "judul", "ringkas", "temuan", "kesimpulan", "sasaran", "status", "terbit", "oleh", "dibuat", "diubah", "baca"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 33;
+var VERSI_SKEMA = 34;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
