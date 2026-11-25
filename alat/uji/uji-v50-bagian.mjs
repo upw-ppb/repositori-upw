@@ -60,7 +60,7 @@ export async function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tS
   cek("data mentah anonim: tanpa waktu/nama", H.jawaban.length === 8 && H.jawaban.every(j => !j.waktu && !j.nama));
   // --- target responden
   const s1 = ok("survei.daftar", {}, tAdm).survei.find(s => s.id === id);
-  cek("target internal: Slovin (galat 5%) dan ideal 70% dari populasi sasaran", s1.sasaranTarget.populasi >= 9 && s1.sasaranTarget.min === Math.ceil(s1.sasaranTarget.populasi / (1 + s1.sasaranTarget.populasi * 0.0025)) && s1.sasaranTarget.ideal === Math.ceil(s1.sasaranTarget.populasi * 0.7));
+  cek("target internal: Slovin (galat 5%) dan ideal 70% (tidak di bawah minimal) dari populasi sasaran", s1.sasaranTarget.populasi >= 9 && s1.sasaranTarget.min === Math.ceil(s1.sasaranTarget.populasi / (1 + s1.sasaranTarget.populasi * 0.0025)) && s1.sasaranTarget.ideal === Math.max(s1.sasaranTarget.min, Math.ceil(s1.sasaranTarget.populasi * 0.7)));
   const ts = C.tsAwal(), tglL = th => new Date(th + "-09-15T00:00:00+08:00");
   const lul = []; for (let i = 0; i < 150; i++) lul.push({ nim: "L" + i, nama: "Lulusan " + i, masuk: ts - 7, tglLulus: tglL(ts - 4 + (i % 3)), ipk: 3.4 });
   lul.forEach(o => g.sheets.Lulusan.push(C.barisDari("Lulusan", o).map(v => typeof v === "string" && v.startsWith("'") ? v.slice(1) : v))); C._isi = {};

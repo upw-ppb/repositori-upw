@@ -381,6 +381,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   (Beranda), laciSvPengisi, htmlAnalisis, svSimpanMulai. JANGAN menambah identitas/jam ke jawaban anonim. Tahap 2 (belum): EDOM per kelas/dosen, tracer → data Lulusan.
   Uji: uji-v50-bagian.mjs.
 
+- v0.51.0 (25 Nov 2026, Uji Coba): survei Tahap 2. gas/Edom.js: unit EDOM = kode|kunci kelas (edomUnitMhs dari Tim pengajar + pesertaMk), tabel PengisiSurvei (VERSI_SKEMA 33; baris
+  dibuat SEKALIGUS urut id saat dibuka: siapkanPengisiEdom), jawaban {u, mk, d{kunciOrang "u:id"|"p:id"}} anonim; survei.edomAmbil/edomJawab/edomHasil, edom.saya (dosen: diri sendiri saja);
+  survei.ambil/jawab menolak EDOM. Templat TEMPLAT_SURVEI.edom (lev "mk"/"dosen"). Lulusan.tracer + survei.tracerTerapkan (petaTracer F502/F14/F5D; ind NIMHSMSMH = NIM).
+  Tampilan: laciSvEdom (pesan wajib "Bagian N (nama), pertanyaan k"; e.no = nomor kotak), laciSvEdomHasil, panelEdomSaya (akhir hMk), laciSvTracer. Uji: uji-v51-bagian.mjs.
+  Uji tampilan dengan confirm(): panel browser menolak dialog → set window.confirm = () => true dulu.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

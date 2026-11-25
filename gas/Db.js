@@ -31,7 +31,7 @@ var SKEMA = {
   TimPengajar: ["semester", "kodeMk", "anggota", "diubah", "oleh", /* v0.28.0 */ "kelas"],
   DosenTs: ["userId", "ta", "ps", "psLain", "luarPt", "penelitian", "pkm", "tambahan", "sesuai", "diubah", /* v0.12.0 */ "dasarSesuai", "linier"],
   /* v0.10.0 */
-  Lulusan: ["nim", "nama", "masuk", "tglLulus", "ipk", "dipesan", "wtBulan", "kesesuaian", "tempatKerja", "diubah", "dihapus"],
+  Lulusan: ["nim", "nama", "masuk", "tglLulus", "ipk", "dipesan", "wtBulan", "kesesuaian", "tempatKerja", "diubah", "dihapus", /* v0.51.0 */ "tracer"],
   Penerimaan: ["tahun", "dayaTampung", "pendaftar", "lulusSeleksi", "diterima", "diubah"],
   Dana: ["ta", "jenis", "upps", "ps", "diubah"],
   /* v0.11.0 */
@@ -69,11 +69,13 @@ var SKEMA = {
   /* v0.39.0 */
   PesertaKelas: ["semester", "kodeMk", "kunci", "userIds", "oleh", "diubah"],
   /* v0.42.0 */
-  RpsData: ["semester", "kodeMk", "kunci", "fileId", "data", "oleh", "diubah"]
+  RpsData: ["semester", "kodeMk", "kunci", "fileId", "data", "oleh", "diubah"],
+  /* v0.51.0: unit EDOM yang sudah dinilai per mahasiswa (tanpa nilai; baris dibuat urut id saat survei dimulai) */
+  PengisiSurvei: ["survei", "userId", "unit"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 32;
+var VERSI_SKEMA = 33;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {

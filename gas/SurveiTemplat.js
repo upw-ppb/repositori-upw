@@ -141,7 +141,7 @@ var TEMPLAT_SURVEI = {
       bag("B. Status dan pekerjaan (kuesioner inti)", [
         qs("pilihan", "Jelaskan status Anda saat ini", "Pilih yang paling sesuai saat mengisi survei ini.", { opsi: ["Bekerja (full time/part time)", "Wiraswasta", "Melanjutkan pendidikan", "Tidak kerja tetapi sedang mencari kerja", "Belum memungkinkan bekerja"], ind: "F8", seg: true }),
         qs("pilihan", "Apakah Anda mendapatkan pekerjaan ≤ 6 bulan setelah lulus (termasuk bekerja sebelum lulus)?", "", { wajib: false, opsi: ["Ya", "Tidak"], ind: "F504" }),
-        qs("pilihan", "Dalam berapa bulan setelah lulus Anda mendapatkan pekerjaan pertama?", "Hitung dari tanggal lulus/yudisium. Pilih \"0 / sebelum lulus\" bila sudah bekerja sebelum lulus. Dipakai untuk waktu tunggu (butir 39).", { wajib: false, opsi: ["0 / sebelum lulus", "1–2 bulan", "3–5 bulan", "6–11 bulan", "12–18 bulan", "Lebih dari 18 bulan", "Belum bekerja"], ind: "F502" }),
+        qs("pilihan", "Dalam berapa bulan setelah lulus Anda mendapatkan pekerjaan pertama?", "Hitung dari tanggal lulus/yudisium. Pilih \"0\" bila sudah bekerja sebelum atau saat lulus. Dipakai untuk waktu tunggu (butir 39, Tabel 10a: kurang dari 3, 3–6, lebih dari 6 bulan).", { wajib: false, opsi: ["0 (sudah bekerja sebelum/saat lulus)", "1 bulan", "2 bulan", "3 bulan", "4 bulan", "5 bulan", "6 bulan", "7–12 bulan", "Lebih dari 12 bulan", "Belum bekerja"], ind: "F502" }),
         qs("pilihan", "Rata-rata pendapatan Anda per bulan (take home pay)", "", { wajib: false, opsi: ["< Rp3 juta", "Rp3–5 juta", "Rp5–7,5 juta", "Rp7,5–10 juta", "> Rp10 juta", "Belum berpendapatan"], ind: "F505" }),
         qs("singkat", "Lokasi tempat kerja (kabupaten/kota, provinsi atau negara)", "", { wajib: false, ind: "F5A" }),
         qs("pilihan", "Jenis perusahaan/instansi tempat Anda bekerja", "", { wajib: false, opsi: ["Instansi pemerintah", "Organisasi non-profit/LSM", "Perusahaan swasta", "Wiraswasta/perusahaan sendiri", "BUMN/BUMD", "Institusi/organisasi multilateral", "Lainnya"], ind: "F1101", seg: true }),
@@ -336,6 +336,40 @@ var TEMPLAT_SURVEI = {
     ]) }
 };
 
+/* ============ 10. EDOM: evaluasi pembelajaran oleh mahasiswa per mata kuliah, per kelas, per dosen (butir 23, 22, 25) ============
+   Formulir khusus: mahasiswa menilai SETIAP mata kuliah yang diikutinya semester itu. lev "mk" = dinilai sekali per mata kuliah/kelas;
+   lev "dosen" = diulang untuk setiap dosen/praktisi dalam tim kelas itu (dari Data Prodi › Tim pengajar dan peserta kelas). */
+TEMPLAT_SURVEI.edom = { judul: "Evaluasi pembelajaran oleh mahasiswa (EDOM)", tujuan: "edom", sasaran: ["mahasiswa"], anonim: true,
+  meta: { skala: SKALA_LAYANAN, pengantar: "EDOM menilai setiap mata kuliah yang Anda ikuti semester ini dan setiap dosen/praktisi pengajarnya. Hasilnya dipakai untuk pemantauan dan evaluasi pembelajaran (butir 23 instrumen LAMWisata) dan menjadi masukan bagi dosen untuk memperbaiki cara mengajar. Isi satu per satu; Anda boleh berhenti dan melanjutkan nanti. " + KERAHASIAAN_ANONIM + " Dosen hanya melihat ringkasan kelasnya bila pengisinya minimal 5 orang, tanpa nama." },
+  pertanyaan: rata([
+    bag("A. Mata kuliah", [
+      sk("RPS dan kontrak kuliah dijelaskan pada pertemuan pertama.", "Anda mengetahui capaian pembelajaran, jadwal materi, bobot penilaian, dan aturan kelas sejak awal.", "Perencanaan", "MK1", { lev: "mk" }),
+      sk("Materi dan kegiatan yang dilaksanakan sesuai RPS.", "Topik per pertemuan berjalan sesuai rencana; perubahan dijelaskan alasannya.", "Perencanaan", "MK2", { lev: "mk" }),
+      sk("Beban tugas sesuai bobot SKS.", "Waktu yang Anda perlukan untuk tugas wajar dibanding SKS mata kuliah (1 SKS ≈ 170 menit belajar per minggu, termasuk tatap muka).", "Beban belajar", "MK3", { lev: "mk" }),
+      sk("Materi relevan dengan kebutuhan industri perjalanan wisata.", "Contoh, kasus, dan praktik mencerminkan pekerjaan nyata.", "Relevansi", "MK4", { lev: "mk" }),
+      sk("Metode pembelajaran (praktik, studi kasus, proyek) membantu saya menguasai kompetensi.", "Bukan hanya ceramah; ada kegiatan yang membuat Anda berlatih.", "Relevansi", "MK5", { lev: "mk" }),
+      sk("Penilaian dilakukan sesuai kriteria/rubrik yang diumumkan.", "Nilai sesuai bobot dan rubrik di kontrak kuliah; tidak ada komponen penilaian yang tiba-tiba muncul.", "Penilaian", "MK6", { lev: "mk" }),
+      sk("Hasil tugas/ujian dikembalikan dengan umpan balik yang membantu.", "Ada penjelasan apa yang sudah baik dan apa yang perlu diperbaiki.", "Penilaian", "MK7", { lev: "mk" }),
+      sk("Media, LMS, dan sarana praktik mata kuliah ini memadai.", "Materi tersedia di LMS, perangkat lunak/laboratorium berfungsi.", "Sarana", "MK8", { lev: "mk", na: true })]),
+    bag("B. Dosen / praktisi pengajar (dinilai untuk setiap pengajar)", [
+      sk("Menguasai materi dan menjawab pertanyaan dengan tepat.", "", "Kompetensi pedagogik", "DS1", { lev: "dosen", na: true }),
+      sk("Menyampaikan materi dengan jelas, runtut, dan mudah dipahami.", "", "Kompetensi pedagogik", "DS2", { lev: "dosen", na: true }),
+      sk("Hadir dan memulai/mengakhiri kelas tepat waktu sesuai jadwal.", "", "Kedisiplinan", "DS3", { lev: "dosen", na: true }),
+      sk("Mendorong diskusi dan memberi kesempatan bertanya.", "", "Interaksi", "DS4", { lev: "dosen", na: true }),
+      sk("Memberi contoh dari praktik industri, penelitian, atau pengabdian.", "", "Interaksi", "DS5", { lev: "dosen", na: true }),
+      sk("Bersikap adil, sopan, dan menghargai mahasiswa.", "", "Kepribadian", "DS6", { lev: "dosen", na: true }),
+      sk("Mudah dihubungi untuk konsultasi di luar kelas.", "", "Kepribadian", "DS7", { lev: "dosen", na: true })]),
+    bag("C. Saran", [qs("paragraf", "Saran untuk mata kuliah ini (tanpa menyebut nama orang)", "Apa yang perlu dipertahankan dan apa yang perlu diperbaiki? Contoh konkret lebih membantu.", { wajib: false, ind: "SRN", lev: "mk" })])
+  ]) };
+var JELAS_EDOM = {
+  DS1: "Pengajar memahami materi secara mendalam dan dapat menjawab pertanyaan. Pilih \"Tidak tahu\" bila pengajar ini hanya mengajar sangat sedikit pertemuan.",
+  DS2: "Penjelasan terstruktur, contoh jelas, dan kecepatan sesuai kemampuan kelas.",
+  DS3: "Kehadiran sesuai jadwal; perubahan jadwal diberitahukan sebelumnya.",
+  DS4: "Suasana kelas membuat Anda berani bertanya dan berpendapat.",
+  DS5: "Materi dikaitkan dengan pengalaman industri atau hasil penelitian/PkM dosen.",
+  DS6: "Perlakuan setara kepada semua mahasiswa, tanpa merendahkan.",
+  DS7: "Merespons pesan atau menyediakan waktu konsultasi dalam waktu wajar." };
+
 /* Penjelasan tambahan untuk setiap pertanyaan skala yang belum berpenjelasan (dipasang saat berkas dimuat), agar semua butir memberi gambaran
    apa yang dinilai dan contohnya. Kunci: templat → kode indikator. */
 var JELAS_TAMBAHAN = {
@@ -420,6 +454,7 @@ var JELAS_TAMBAHAN = {
     KI1: "Industri diminta masukan saat menyusun dan mengevaluasi kurikulum (IAB, lokakarya, survei).",
     KI2: "Keterlibatan praktisi sebagai dosen tamu, tim pengajar, pembimbing magang, dan penguji." }
 };
+JELAS_TAMBAHAN.edom = JELAS_EDOM;
 Object.keys(JELAS_TAMBAHAN).forEach(function (t) {
   (TEMPLAT_SURVEI[t].pertanyaan || []).forEach(function (q) { if (!q.jelas && q.ind && JELAS_TAMBAHAN[t][q.ind]) q.jelas = JELAS_TAMBAHAN[t][q.ind]; });
 });

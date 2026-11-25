@@ -2,7 +2,8 @@
  * Data lulusan, penerimaan mahasiswa (PMB), dan penggunaan dana (v0.10.0). Sumber Tabel iLKPS 8, 9, 10a–c, Ref 11a, 21.
  * Diisi Admin Prodi / Super Admin di Data Prodi; KPS dan asesor melihat lewat Tabel iLKPS.
  * - Tahun lulus = tahun akademik tanggal lulus (Ganjil Juli–Des, Genap Jan–Jun).
- * - Lulusan terlacak = salah satu isian tracer terisi (waktu tunggu, kesesuaian, tempat kerja).
+ * - Lulusan terlacak = salah satu isian tracer terisi (waktu tunggu, kesesuaian, tempat kerja), atau sudah menjawab tracer study di aplikasi
+ *   (kolom tracer = tanggal jawaban; v0.51.0), termasuk yang belum bekerja atau melanjutkan studi.
  * - Masa studi = (tanggal lulus − 1 Agustus tahun masuk) dalam tahun.
  */
 var KESESUAIAN = ["Rendah", "Sedang", "Tinggi"];
@@ -33,11 +34,11 @@ function tglDari(v) {
 function lulusanDari(r) {
   return { _r: r, nim: teks(r.nim), nama: teks(r.nama), masuk: Number(r.masuk) || null, tglLulus: tglDari(r.tglLulus), ipk: r.ipk === "" ? null : Number(r.ipk),
     dipesan: ya(r.dipesan), wtBulan: r.wtBulan === "" || r.wtBulan === null || r.wtBulan === undefined ? null : Number(r.wtBulan),
-    kesesuaian: teks(r.kesesuaian), tempatKerja: teks(r.tempatKerja) };
+    kesesuaian: teks(r.kesesuaian), tempatKerja: teks(r.tempatKerja), tracer: teksTgl(r.tracer) };
 }
 function semuaLulusan() { return semua("Lulusan").filter(function (r) { return !r.dihapus; }).map(lulusanDari).sort(function (a, b) { return b.tglLulus.localeCompare(a.tglLulus) || a.nim.localeCompare(b.nim); }); }
 function taLulus(x) { return x.tglLulus ? semesterInfo(keTanggal(x.tglLulus)).awal : null; }
-function terlacak(x) { return x.wtBulan !== null || !!x.kesesuaian || !!x.tempatKerja; }
+function terlacak(x) { return x.wtBulan !== null || !!x.kesesuaian || !!x.tempatKerja || !!x.tracer; }
 function masaStudi(x) { return x.masuk && x.tglLulus ? (keTanggal(x.tglLulus) - new Date(x.masuk + "-08-01T12:00:00+08:00")) / (365.25 * 864e5) : null; }
 function bulat(n, d) { var f = Math.pow(10, d); return Math.round(n * f) / f; }
 function semuaPenerimaan() { return semua("Penerimaan").map(function (r) { return { _r: r, tahun: Number(r.tahun), dayaTampung: angka(r.dayaTampung, 1e5), pendaftar: angka(r.pendaftar, 1e6), lulusSeleksi: angka(r.lulusSeleksi, 1e5), diterima: angka(r.diterima, 1e5) }; }).sort(function (a, b) { return b.tahun - a.tahun; }); }
@@ -166,7 +167,7 @@ function tabelLulusan(ts) {
     T.push({ kode: kode, judul: judul, bentuk: "daftar", kolom: ["Tahun Lulus", "Jumlah Lulusan", "Jumlah Lulusan yang Terlacak"].concat(kat), baris: baris.concat([jml]), catatan: cat });
   }
   tracer("10a", "Tabel 10.a) Waktu Tunggu Lulusan (Sarjana Terapan)", ["WT < 3 bulan", "3 ≤ WT ≤ 6 bulan", "WT > 6 bulan"],
-    function (x) { return x.wtBulan === null ? -1 : x.wtBulan < 3 ? 0 : x.wtBulan <= 6 ? 1 : 2; }, "Lulusan terlacak = salah satu isian tracer (waktu tunggu, kesesuaian, tempat kerja) terisi.");
+    function (x) { return x.wtBulan === null ? -1 : x.wtBulan < 3 ? 0 : x.wtBulan <= 6 ? 1 : 2; }, "Lulusan terlacak = salah satu isian tracer (waktu tunggu, kesesuaian, tempat kerja) terisi, atau sudah menjawab tracer study di aplikasi (Survei › Terapkan ke data Lulusan).");
   tracer("10b", "Tabel 10.b) Kesesuaian Bidang Kerja Lulusan (Sarjana Terapan)", KESESUAIAN, function (x) { return KESESUAIAN.indexOf(x.kesesuaian); }, "");
   tracer("10c", "Tabel 10.c) Tempat Kerja Lulusan (Sarjana Terapan)", TEMPAT_KERJA, function (x) { return TEMPAT_KERJA.indexOf(x.tempatKerja); }, "");
   var tanggapan = typeof tanggapanPengguna === "function" ? tanggapanPengguna() : {};
@@ -194,4 +195,58 @@ function tabelLulusan(ts) {
     kolom: ["No.", "Jenis Penggunaan", "UPPS TS-2", "UPPS TS-1", "UPPS TS", "UPPS Rata-rata", "PS TS-2", "PS TS-1", "PS TS", "PS Rata-rata"], baris: b21,
     catatan: "Sumber: Data Prodi › Keuangan, per tahun akademik (TS-2 = " + labelTa(ts - 2) + ", TS = " + labelTa(ts) + ")." });
   return T;
+}
+
+/* ---------- v0.51.0: tracer study (survei bertujuan "tracer") → data Lulusan (Tabel 10a–c, butir 38–41) ---------- */
+var PERAN_TRACER_TERAPKAN = ["admin", "superadmin", "kps"];
+/** Pemetaan jawaban tracer ke kolom Lulusan. F502 (bulan) → wtBulan; F14 → kesesuaian (Sangat erat/Erat = Tinggi, Cukup erat = Sedang,
+    Kurang erat/Tidak sama sekali = Rendah); F5D → tempatKerja. Jawaban "Belum bekerja" tidak mengisi waktu tunggu. */
+function petaTracer(jw, ind) {
+  var v = function (k) { return ind[k] ? teks(jw[ind[k]]) : ""; }, o = {};
+  var f502 = v("F502"), m = /^(\d+)/.exec(f502);
+  if (/^0/.test(f502)) o.wtBulan = 0; else if (m && /bulan/.test(f502) && !/–/.test(f502)) o.wtBulan = Number(m[1]); else if (/7–12/.test(f502)) o.wtBulan = 9; else if (/Lebih dari 12/.test(f502)) o.wtBulan = 15;
+  var f14 = v("F14");
+  if (/^(Sangat erat|Erat)$/.test(f14)) o.kesesuaian = "Tinggi"; else if (f14 === "Cukup erat") o.kesesuaian = "Sedang"; else if (/^(Kurang erat|Tidak sama sekali)$/.test(f14)) o.kesesuaian = "Rendah";
+  var tk = tempatKerjaDari(v("F5D")); if (tk) o.tempatKerja = tk;
+  return o;
+}
+/** Pratinjau (tanpa d.simpan) atau terapkan. Satu jawaban terakhir per NIM. Nilai lama yang berbeda hanya ditimpa bila d.timpa. */
+function aksiSurveiTracerTerapkan(d, token) {
+  var p = penggunaDariToken(token);
+  wajibPeran(p, PERAN_TRACER_TERAPKAN);
+  var s = ambilSurvei(String(d.id || ""));
+  if (s.tujuan !== "tracer") throw galat("Hanya survei tracer study yang bisa diterapkan ke data Lulusan.");
+  var ind = {}; s.pertanyaan.forEach(function (q) { if (q.ind) ind[q.ind] = q.id; });
+  if (!ind.NIMHSMSMH) throw galat("Survei ini tidak memuat pertanyaan NIM (kode indikator NIMHSMSMH).");
+  var akhir = {}; jawabanSurvei(s.id).forEach(function (r) {
+    var jw = jsonDari(r.jawaban, {}), nim = teks(jw[ind.NIMHSMSMH]).replace(/\s/g, "");
+    if (!nim) return; var w = r.waktu ? new Date(r.waktu) : new Date(0);
+    if (!akhir[nim] || akhir[nim].w <= w) akhir[nim] = { w: w, jw: jw };
+  });
+  var lul = {}; semua("Lulusan").filter(function (r) { return !r.dihapus; }).forEach(function (r) { lul[teks(r.nim).replace(/^'/, "")] = r; });
+  var kolom = ["wtBulan", "kesesuaian", "tempatKerja"], baris = [];
+  Object.keys(akhir).sort().forEach(function (nim) {
+    var a = akhir[nim], r = lul[nim], usul = petaTracer(a.jw, ind), x = { nim: nim, nama: teks(a.jw[ind.NMMHSMSMH]), status: teks(a.jw[ind.F8]), usulan: usul, tanggal: tglWita(a.w) };
+    if (!r) { x.hasil = "tidak ditemukan"; baris.push(x); return; }
+    var lama = lulusanDari(r); x.namaData = lama.nama; x.lama = { wtBulan: lama.wtBulan, kesesuaian: lama.kesesuaian, tempatKerja: lama.tempatKerja };
+    var beda = kolom.filter(function (k) { return usul[k] !== undefined && x.lama[k] !== null && x.lama[k] !== "" && String(x.lama[k]) !== String(usul[k]); });
+    var baru = kolom.filter(function (k) { return usul[k] !== undefined && (x.lama[k] === null || x.lama[k] === ""); });
+    x.beda = beda; x.baru = baru; x.hasil = beda.length ? "berbeda" : baru.length ? "baru" : "sama"; x._r = r;
+    baris.push(x);
+  });
+  var diterapkan = 0;
+  if (d.simpan) {
+    kunciTulis(function () {
+      baris.forEach(function (x) {
+        if (!x._r) return;
+        var o = { tracer: x.tanggal, diubah: new Date() };
+        kolom.forEach(function (k) { if (x.usulan[k] !== undefined && (x.baru.indexOf(k) >= 0 || (d.timpa && x.beda.indexOf(k) >= 0))) o[k] = x.usulan[k]; });
+        ubah("Lulusan", x._r, o); diterapkan++;
+      });
+    });
+    catat(p.id, "tracer.terapkan", { id: s.id, jumlah: diterapkan, timpa: !!d.timpa });
+  }
+  baris.forEach(function (x) { delete x._r; });
+  return { baris: baris, diterapkan: diterapkan, ditemukan: baris.filter(function (x) { return x.hasil !== "tidak ditemukan"; }).length,
+    tidakDitemukan: baris.filter(function (x) { return x.hasil === "tidak ditemukan"; }).length, berbeda: baris.filter(function (x) { return x.hasil === "berbeda"; }).length };
 }

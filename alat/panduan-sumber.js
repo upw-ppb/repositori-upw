@@ -155,6 +155,12 @@ export const topik = [
       "Bila Anda tidak mengalami hal yang ditanyakan, pilih <b>Tidak tahu / tidak berlaku</b> (bila tersedia), jangan menebak.", "Tekan <b>Kirim jawaban</b>."],
     tips: ["Survei <b>anonim</b>: nama Anda tidak disimpan bersama jawaban dan tidak ada yang dapat melihat siapa menjawab apa, termasuk dosen dan pengelola. Aplikasi hanya mencatat bahwa Anda sudah mengisi.",
       "Pengingat survei di Beranda hilang sendiri setelah Anda mengisi."] },
+  { id: "edom-isi", kat: "dasar", p: ["mahasiswa"], j: "Mengisi EDOM (evaluasi dosen oleh mahasiswa)", r: "Nilai setiap mata kuliah dan setiap pengajarnya, satu per satu.",
+    kw: "edom evaluasi dosen oleh mahasiswa nilai dosen kuesioner mata kuliah",
+    l: ["Saat EDOM dibuka, kartunya muncul di Beranda. Tekan <b>Nilai mata kuliah</b>.", "Daftar berisi mata kuliah Anda semester ini beserta pengajarnya. Tekan <b>Nilai</b> pada satu mata kuliah.",
+      "Isi <b>Bagian 1</b> (mata kuliah), lalu satu bagian untuk <b>setiap dosen/praktisi</b> pengajar. Pengajar yang jarang/tidak pernah mengajar Anda: pilih <b>Tidak tahu / tidak berlaku</b>.",
+      "Tulis saran bila ada, lalu <b>Kirim penilaian mata kuliah ini</b>. Ulangi untuk mata kuliah berikutnya; Anda boleh berhenti dan melanjutkan nanti."],
+    tips: ["EDOM <b>anonim</b>: nama Anda tidak disimpan bersama penilaian. Dosen hanya melihat ringkasan kelasnya bila pengisinya minimal 5 orang.", "Setiap mata kuliah hanya bisa dinilai sekali."] },
 
   /* ---------------- KEGIATAN ---------------- */
   { id: "kegiatan-daftar", kat: "kegiatan", p: PEG, menu: "kegiatan", j: "Daftar kegiatan", r: "Semua kegiatan yang Anda ajukan atau yang menandai Anda.", g: ["kegiatan-daftar"],
@@ -364,6 +370,19 @@ export const topik = [
     tips: ["Survei anonim: hasil baru tampil setelah minimal 3 orang mengisi; kelompok pembanding di bawah 5 orang disembunyikan. Jawaban perorangan tidak pernah dapat dihubungkan dengan nama.",
       "Tracer study, pengguna lulusan, mitra, dan masukan kurikulum memang beridentitas karena instrumen menghitungnya per lulusan atau per lembaga; jawaban tetap tidak terlihat oleh dosen.",
       "Tanggal mulai perkuliahan Ganjil/Genap diatur di menu Survei › Jadwal survei.", "Membuat dan memulai survei: Admin Prodi, KPS, Super Admin; GKM melihat hasil."] },
+  { id: "edom-kelola", kat: "data", p: ["admin", "superadmin", "kps", "gkm"], menu: "survei", j: "EDOM per mata kuliah, kelas, dan dosen", r: "Evaluasi pembelajaran butir 23: hasil per pengajar dan per kelas.",
+    kw: "edom evaluasi dosen oleh mahasiswa hasil per dosen per kelas butir 23 monev pembelajaran",
+    l: ["Jadwal menganjurkan EDOM <b>tengah semester</b> (minggu 7–8) dan <b>akhir semester</b> (minggu 14–16). Tekan <b>Siapkan survei</b>, periksa, lalu <b>Simpan &amp; mulai survei</b>.",
+      "Mata kuliah, kelas, dan pengajar diambil otomatis dari <b>Data Prodi › Tim pengajar</b> semester itu; peserta dari Peserta kelas (atau mahasiswa aktif angkatan/kelas yang mengambil). Lengkapi tim pengajar sebelum EDOM dibuka.",
+      "<b>Hasil &amp; analisis</b> EDOM: tab <b>Per pengajar</b> (rata-rata, indeks 0–100, per butir DS1–DS7) dan <b>Per kelas</b> (rata-rata mata kuliah, per pengajar, saran mahasiswa). Ekspor Excel.",
+      "Daftar pengisi menunjukkan berapa mata kuliah yang sudah dinilai setiap mahasiswa; mahasiswa dihitung selesai setelah menilai semua mata kuliahnya."],
+    tips: ["Kelas dengan kurang dari 5 pengisi tidak ditampilkan (juga kepada dosen) agar penilaian tidak bisa ditebak.", "Dosen melihat hasil dirinya sendiri di <b>Mata Kuliah Saya</b>, tidak melihat nilai rekan setimnya."] },
+  { id: "tracer-terapkan", kat: "data", p: ["admin", "superadmin", "kps"], menu: "survei", j: "Menerapkan tracer study ke data Lulusan", r: "Isi waktu tunggu, kesesuaian bidang, dan tempat kerja lulusan dari jawaban tracer.",
+    kw: "tracer study lulusan waktu tunggu kesesuaian bidang tempat kerja terlacak tabel 10a 10b 10c",
+    l: ["Di menu Survei, pada survei tracer study tekan <b>Terapkan ke data Lulusan</b>.", "Pratinjau mencocokkan NIM dengan Data Prodi › Lulusan: <b>Diisi baru</b>, <b>Sudah sama</b>, <b>Berbeda dengan data</b>, atau <b>NIM tidak ada</b>.",
+      "Tekan <b>Terapkan</b>. Tanpa centang <b>Timpa</b>, hanya isian kosong yang diisi; dengan centang, data yang berbeda diganti jawaban tracer.",
+      "Lulusan yang menjawab dihitung <b>terlacak</b> (Tabel 10a–10c, butir 38–41)."],
+    tips: ["Impor dulu data lulusan (NIM, nama, tanggal lulus) di Data Prodi › Lulusan agar NIM alumni bisa dicocokkan.", "\"7–12 bulan\" dicatat 9 bulan, \"lebih dari 12 bulan\" dicatat 15 bulan."] },
 
   /* ---------------- DATA PRODI ---------------- */
   { id: "mk-mahasiswa", kat: "kegiatan", p: ["mahasiswa"], menu: "mkm", j: "Mata Kuliah Saya: mata kuliah dan dosen pengajar",

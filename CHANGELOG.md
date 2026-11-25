@@ -3,6 +3,27 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.51.0 — 25 Nov 2026 — Uji Coba
+Ringkas: EDOM per mata kuliah, kelas, dan dosen (anonim; hasil per pengajar dan per kelas, dosen melihat hasilnya di Mata Kuliah Saya) dan tracer study yang bisa diterapkan ke Data Prodi › Lulusan.
+Permintaan pemilik 25 Nov 2026: "lanjut tahap 2" (survei Tahap 2: EDOM per kelas/dosen; tracer → data Lulusan).
+- Templat EDOM (gas/SurveiTemplat.js): 8 butir mata kuliah (perencanaan, pelaksanaan, beban, relevansi industri, metode, penilaian, umpan balik, sarana; MK1–MK8), 7 butir per pengajar
+  (DS1–DS7: pedagogik, kedisiplinan, interaksi, kepribadian; "tidak tahu" untuk pengajar yang jarang masuk), saran terbuka; semua berpenjelasan. Selalu anonim.
+- gas/Edom.js: unit penilaian = mata kuliah × kelas (atau kelompok) semester itu, pengajar dari Tim pengajar (dosen + praktisi), peserta dari Peserta kelas atau mahasiswa aktif angkatan
+  yang mengambil. Tabel baru PengisiSurvei (survei, userId, unit = daftar unit yang sudah dinilai; dibuat sekaligus urut id saat survei dimulai sehingga urutan baris tidak membocorkan
+  siapa mengisi kapan). Jawaban per unit {u, mk, d} tanpa id/kunci/jam dan tanpa Log. Setelah semua unit dinilai → Survei.pengisi + pengingat selesai.
+  Hasil: per kelas (n, rata-rata MK per butir, per pengajar, saran diacak) dan per pengajar (rata-rata, indeks 0–100, per variabel dan butir); kelas < 5 pengisi disembunyikan.
+  Aksi survei.edomAmbil/edomJawab/edomHasil (pengelola) dan edom.saya (dosen: hanya dirinya di kelas yang ia ajar).
+- Jadwal: EDOM tengah semester (minggu 7–8) dan akhir semester (minggu 14–16); Siapkan mengisi semester dari jadwal.
+- Tracer → Lulusan (gas/Lulusan.js, kolom baru Lulusan.tracer): survei.tracerTerapkan {id, simpan, timpa} (Admin Prodi, Super Admin, KPS). Jawaban terakhir per NIM; F502 → waktu tunggu
+  (7–12 bulan = 9, > 12 bulan = 15), F14 → kesesuaian (Sangat erat/Erat = Tinggi, Cukup erat = Sedang, Kurang/Tidak = Rendah), F5D → tingkat tempat kerja; lulusan yang menjawab
+  dihitung terlacak. Pratinjau (baru/sama/berbeda/NIM tidak ditemukan), tanpa timpa hanya mengisi yang kosong. Pilihan F502 tracer kini rentang tetap (0, 1–6 bulan, 7–12, > 12, belum bekerja).
+- Perbaikan kecil: target ideal survei tidak lagi lebih kecil dari target minimal; untuk EDOM kemajuan dihitung dari mahasiswa yang sudah menilai semua mata kuliahnya.
+- Struktur data berubah (VERSI_SKEMA 33: tabel PengisiSurvei, kolom Lulusan.tracer). Versi lama (v0.50.0) tetap bisa membaca data (tabel/kolom baru diabaikan); survei EDOM yang dibuat
+  di v0.51.0 akan tampil sebagai survei biasa yang tidak bisa diisi dengan benar di versi lama, jadi bila rollback sebaiknya EDOM yang berjalan ditutup dulu.
+- Uji: 952 + 44 uji server lulus (uji-v51-bagian.mjs). Uji tampilan lokal: mahasiswa mengisi EDOM per mata kuliah (pesan wajib menyebut bagian dan nama pengajar), hasil KPS per pengajar/kelas
+  + ekspor Excel, panel EDOM dosen di Mata Kuliah Saya, tracer terapkan tanpa/dengan timpa; penjelajah menu KPS 59 layar dan mahasiswa 11 layar tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.50.0 — 25 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.50.0 (tampilan docs/ dan server Apps Script Produksi deployment @35): survei lengkap (9 templat, jadwal di Beranda, target, pengisi + pengingat,
   anonimitas, analisis).

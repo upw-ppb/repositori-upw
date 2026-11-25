@@ -22,7 +22,7 @@ var LIKERT = ["Kurang", "Cukup", "Baik", "Sangat baik"];
 var ASPEK_22 = ["Keandalan (reliability)", "Daya tanggap (responsiveness)", "Kepastian (assurance)", "Empati (empathy)", "Tangible (sarana dan prasarana)"];
 var ASPEK_11 = ["Etika", "Keahlian pada bidang ilmu (kompetensi utama)", "Kemampuan berbahasa asing", "Penggunaan teknologi informasi", "Kemampuan berkomunikasi", "Kerjasama", "Pengembangan diri"];
 var TUJUAN_SURVEI = { t22: "Tabel 22 · Kepuasan mahasiswa", t11: "Tabel 11 · Kepuasan pengguna lulusan", tracer: "Tracer study (butir 38–41)", layanan: "Layanan kemahasiswaan (butir 65)",
-  mitra: "Kepuasan mitra kerja sama", dosen: "Kepuasan dosen", tendik: "Kepuasan tendik", exit: "Kepuasan lulusan / exit survey", kurikulum: "Masukan kurikulum (butir 7, 3)", lainnya: "Lainnya" };
+  mitra: "Kepuasan mitra kerja sama", dosen: "Kepuasan dosen", tendik: "Kepuasan tendik", exit: "Kepuasan lulusan / exit survey", kurikulum: "Masukan kurikulum (butir 7, 3)", edom: "EDOM per mata kuliah dan dosen (butir 23)", lainnya: "Lainnya" };
 var MIN_ANONIM = 3, MIN_KELOMPOK = 5;
 
 /* ---------- baca ---------- */
@@ -90,7 +90,7 @@ function hitungTarget(s) {
   }
   var n = internal ? semua("Pengguna").filter(function (p) { return p.status === "aktif" && cocokSasaran(s, p); }).length : Number(s.meta.populasi) || 0;
   if (!n) return { populasi: 0, min: null, ideal: null, dasar: internal ? "Belum ada akun aktif yang cocok dengan sasaran." : "Isi jumlah populasi (mis. jumlah mitra aktif) di formulir survei agar target bisa dihitung." };
-  return { populasi: n, min: Math.min(n, slovin(n)), ideal: Math.ceil(n * 0.7), dasar: "Instrumen tidak menetapkan angka; dipakai sampel minimal Slovin (galat 5%) dari populasi " + n + ", target ideal 70%." };
+  return { populasi: n, min: Math.min(n, slovin(n)), ideal: Math.max(Math.min(n, slovin(n)), Math.ceil(n * 0.7)), dasar: "Instrumen tidak menetapkan angka; dipakai sampel minimal Slovin (galat 5%) dari populasi " + n + ", target ideal 70% (tidak kurang dari minimal)." + (s.tujuan === "edom" ? " Untuk EDOM dihitung mahasiswa yang sudah menilai SEMUA mata kuliahnya." : "") };
 }
 
 /* ---------- pengelolaan ---------- */
@@ -120,6 +120,7 @@ function bersihSoal(list, tujuan) {
     var ind = potong(x.ind, 20).trim().replace(/[^A-Za-z0-9_]/g, ""); if (ind) o.ind = ind;
     if (t === "likert") { if (x.na) o.na = true; if (LABEL_SKALA[x.lab] && x.lab !== "puas") o.lab = x.lab; var pt = potong(x.pent, 80).trim(); if (pt) o.pent = pt; }
     if (t === "pilihan") { if (x.seg) o.seg = true; if (x.nps) o.nps = true; }
+    if (x.lev === "mk" || x.lev === "dosen") o.lev = x.lev;   // v0.51.0: EDOM (dinilai per mata kuliah / per pengajar)
     return o;
   });
 }
@@ -166,6 +167,7 @@ function aksiSurveiSimpan(d, token) {
       o.tujuan = tujuan; o.sasaran = JSON.stringify(sasaran); o.anonim = !!x.anonim; o.pertanyaan = JSON.stringify(bersihSoal(x.pertanyaan, tujuan));
       o.meta = JSON.stringify(bersihMeta(x.meta, lama ? lama.meta : {}));
       if (o.anonim && JSON.parse(o.pertanyaan).some(function (q) { return q.peran === "tahunLulus"; })) throw galat("Survei anonim tidak boleh memuat pertanyaan identitas (tahun lulus alumni). Matikan pilihan anonim atau hapus pertanyaan itu.");
+      if (tujuan === "edom") { var mm = JSON.parse(o.meta); if (!/^\d{4}-[12]$/.test(mm.semester || "")) mm.semester = semesterInfo(buka ? keTanggal(buka) : new Date()).kode; o.meta = JSON.stringify(mm); o.anonim = true; }
       if (lama) ubah("Survei", lama._r, o);
       else { o.id = "s" + acak(10); o.status = "draf"; o.kode = acak(12); o.tindakLanjut = "{}"; o.dibuat = new Date(); o.oleh = p.id; o.dihapus = ""; o.pengisi = "[]"; tambah("Survei", o); x.id = o.id; }
     }
@@ -184,6 +186,7 @@ function aksiSurveiStatus(d, token) {
       if (!s.tutup) throw galat("Isi tanggal ditutup sebelum membuka survei.");
       if (s.tutup < hariIni()) throw galat("Tanggal ditutup sudah lewat. Perpanjang dulu tanggal ditutup.");
       ubah("Survei", s._r, { status: "dibuka", buka: s.buka || hariIni(), diubah: new Date() });
+      if (s.tujuan === "edom") siapkanPengisiEdom(s);   // v0.51.0 (Edom.js)
     } else if (aksi === "tutup") {
       if (s.status !== "dibuka") throw galat("Survei ini belum dibuka.");
       ubah("Survei", s._r, { status: "ditutup", tutup: s.tutup && s.tutup < hariIni() ? s.tutup : hariIni(), diubah: new Date() });
@@ -214,12 +217,13 @@ function aksiSurveiSaya(d, token) {
   var p = penggunaDariToken(token);
   if (p.status !== "aktif" || p.wajibGanti === true || p.wajibGanti === "TRUE") return { survei: [] };
   return { survei: semuaSurvei().filter(function (s) { return statusEfektif(s) === "dibuka" && cocokSasaran(s, p) && !sudahMengisi(p, s); })
-    .map(function (s) { return { id: s.id, judul: s.judul, tutup: s.tutup, anonim: s.anonim, jumlahSoal: s.pertanyaan.length }; }) };
+    .map(function (s) { return { id: s.id, judul: s.judul, tutup: s.tutup, anonim: s.anonim, jumlahSoal: s.pertanyaan.length, edom: s.tujuan === "edom" }; }) };
 }
 function aksiSurveiAmbil(d, token) {
   var p = penggunaDariToken(token), s = ambilSurvei(String(d.id || ""));
   if (statusEfektif(s) !== "dibuka" || !cocokSasaran(s, p)) throw galat("Survei ini tidak terbuka untuk Anda.");
   if (sudahMengisi(p, s)) throw galat("Anda sudah mengisi survei ini. Terima kasih.");
+  if (s.tujuan === "edom") throw galat("EDOM diisi per mata kuliah lewat formulir EDOM.");
   return { survei: surveiKeResponden(s) };
 }
 function aksiSurveiPublik(d) {
@@ -254,6 +258,7 @@ function aksiSurveiJawab(d, token) {
     var s = ambilSurvei(String(d.id || ""));
     if (statusEfektif(s) !== "dibuka" || !cocokSasaran(s, p)) throw galat("Survei ini tidak terbuka untuk Anda.");
     if (sudahMengisi(p, s)) throw galat("Anda sudah mengisi survei ini.");
+    if (s.tujuan === "edom") throw galat("EDOM diisi per mata kuliah lewat formulir EDOM.");
     var isi = JSON.stringify(periksaJawaban(s, d.jawaban));
     if (s.anonim) tambah("Jawaban", { id: "j" + acak(10), survei: s.id, userId: "", kunci: "", jawaban: isi, waktu: hariIni() });   // tanpa id, kunci, dan jam
     else tambah("Jawaban", { id: "j" + acak(10), survei: s.id, userId: p.id, kunci: kunciResponden(p, s), jawaban: isi, waktu: new Date() });
@@ -292,6 +297,10 @@ function aksiSurveiPengisi(d, token) {
   }).sort(function (a, b) { return (a.sudah - b.sudah) || a.kelompok.localeCompare(b.kelompok) || a.nama.localeCompare(b.nama); });
   var ping = {}; semua("Pengingat").filter(function (r) { return !r.selesai && r.jenis === "survei:" + s.id; }).forEach(function (r) { ping[r.untuk] = 1; });
   l.forEach(function (x) { x.diingatkan = !!ping[x.id]; });
+  if (s.tujuan === "edom") {   // v0.51.0: berapa mata kuliah yang sudah dinilai (tanpa nilai)
+    var unitSel = {}; semua("PengisiSurvei").filter(function (r) { return r.survei === s.id; }).forEach(function (r) { unitSel[r.userId] = jsonDari(r.unit, []).length; });
+    l.forEach(function (x) { x.mkDinilai = unitSel[x.id] || 0; });
+  }
   return { id: s.id, judul: s.judul, orang: l, sudah: l.filter(function (x) { return x.sudah; }).length, total: l.length, publik: s.sasaran.indexOf("publik") >= 0,
     bolehIngatkan: punyaPeran(p, PERAN_SURVEI_UBAH) };
 }
@@ -440,6 +449,8 @@ function tglGeser(t, n) { var d = new Date(t + "T12:00:00Z"); d.setUTCDate(d.get
 var JADWAL_SURVEI = [
   { k: "kmhs1", t: "t22", per: "smt", m: 42, s: 55, l: "Kepuasan mahasiswa ke-1 (tengah semester, minggu 7–8)", ket: "Butir 71 meminta analisis dan tindak lanjut minimal 2 kali per semester." },
   { k: "kmhs2", t: "t22", per: "smt", m: 91, s: 111, l: "Kepuasan mahasiswa ke-2 (akhir semester, minggu 14–16)", ket: "Hasil dibahas di rapat evaluasi semester." },
+  { k: "edom1", t: "edom", per: "smt", m: 42, s: 55, l: "EDOM tengah semester (minggu 7–8)", ket: "Evaluasi per mata kuliah dan dosen; hasil dibahas sebelum UAS (butir 23)." },
+  { k: "edom2", t: "edom", per: "smt", m: 91, s: 111, l: "EDOM akhir semester (minggu 14–16)", ket: "Termasuk monev penilaian (butir 25 C) dan umpan balik untuk dosen." },
   { k: "exit", t: "exit", per: "smt", m: 98, s: 125, l: "Exit survey mahasiswa semester akhir (menjelang yudisium)", ket: "Kepuasan lulusan (butir 78)." },
   { k: "tracer", t: "tracer", per: "genap", bm: "02-01", bs: "05-31", l: "Tracer study lulusan TS-4 s.d. TS-2", ket: "Setiap tahun (butir 38); persentase responden minimal menentukan skor butir 39–41." },
   { k: "t11", t: "t11", per: "genap", bm: "02-01", bs: "05-31", l: "Kepuasan pengguna lulusan", ket: "Bobot survei tertinggi (butir 42); dijalankan bersama tracer study." },
@@ -494,7 +505,7 @@ function aksiSurveiSiapkan(d, token) {
   return kunciTulis(function () {
     var o = { id: "s" + acak(10), judul: t.judul + " · " + j.periode, tujuan: t.tujuan, sasaran: JSON.stringify(t.sasaran), buka: buka, tutup: tutup, anonim: !!t.anonim, status: "draf",
       pertanyaan: JSON.stringify(bersihSoal(t.pertanyaan, t.tujuan)), kode: acak(12), tindakLanjut: "{}", dibuat: new Date(), oleh: p.id, dihapus: "", pengisi: "[]",
-      meta: JSON.stringify(Object.assign({}, t.meta || {}, { jadwal: j.kunci })) };
+      meta: JSON.stringify(Object.assign({}, t.meta || {}, { jadwal: j.kunci }, t.tujuan === "edom" ? { semester: j.kunci.slice(-6) } : {})) };
     tambah("Survei", o);
     catat(p.id, "survei.siapkan", { id: o.id, jadwal: j.kunci });
     return { id: o.id };
