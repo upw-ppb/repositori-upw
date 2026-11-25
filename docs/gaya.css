@@ -360,3 +360,12 @@ body.pen-buka{overflow:hidden}
 .pen-gambar{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:12px}
 .pen-gambar img{max-width:100%;max-height:100%;object-fit:contain;background:#fff}
 @media (max-width:640px){.pen-bar .pen-kembali span{display:none}.pen-aksi a:last-child{display:none}}
+
+/* v0.50.0: survei — judul bagian, penjelasan, arti skala, pilihan "tidak tahu" */
+.sv-bagian{font-size:.95rem;margin:14px 0 2px;color:var(--brand)}
+.sv-jelas{font-size:.8rem;color:var(--muted);margin:2px 0 6px;line-height:1.45}
+.sv-skala ul{margin:4px 0 4px 18px;padding:0}
+.sv-pengantar{white-space:pre-line}
+.likert label .num{font-weight:700}
+.likert.na{grid-template-columns:repeat(4,minmax(0,1fr))}
+.likert .tt{grid-column:1/-1;flex-direction:row;justify-content:center;color:var(--muted)}

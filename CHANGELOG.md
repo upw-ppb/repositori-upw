@@ -3,6 +3,13 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.50.0 — 25 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.50.0 (tampilan docs/ dan server Apps Script Produksi deployment @35): survei lengkap (9 templat, jadwal di Beranda, target, pengisi + pengingat,
+  anonimitas, analisis).
+- Struktur data berubah (VERSI_SKEMA 32: Survei.pengisi, Survei.meta). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±21 dtk, permintaan tanpa login).
+  Rollback ke v0.49.1: tampilan (tag v0.49.1) dan deployment @34; data tetap terbaca, tetapi pencegahan mengisi dua kali untuk survei anonim tidak berlaku di versi lama.
+- Penyetuju: pemilik, di chat 25 Nov 2026: "Setuju tayang v0.50.0".
+
 ## v0.50.0 — 25 Nov 2026 — Uji Coba
 Ringkas: Survei lengkap: 9 templat berpenjelasan sesuai instrumen, jadwal survei yang dianjurkan di Beranda, target responden, daftar sudah/belum mengisi + pengingat, anonimitas sungguhan, dan analisis hasil.
 Permintaan pemilik 24–25 Nov 2026 (survei poin 1–6; "Setuju dan kerjakan Tahap 1 … pertanyaan dibuat dengan komprehensif sehingga banyak variabel dan indikator yang bisa diukur").
