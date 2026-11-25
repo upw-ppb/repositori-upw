@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.52.0 — 25 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.52.0 (tampilan docs/ dan server Apps Script Produksi deployment @37): menu Hasil Survei, publikasi hasil survei, rekomendasi agenda rapat, keputusan "Umumkan".
+- Struktur data berubah (VERSI_SKEMA 34: tabel PublikasiSurvei). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±20 dtk, permintaan tanpa login).
+  Rollback ke v0.51.0: tampilan (tag v0.51.0) dan deployment @36; data tetap terbaca, menu Hasil Survei tidak tampil.
+- Penyetuju: pemilik, di chat 25 Nov 2026: "Setuju tayang v0.52.0".
+
 ## v0.52.0 — 25 Nov 2026 — Uji Coba
 Ringkas: Menu Hasil Survei untuk semua pengguna (hasil survei yang dipublikasikan dan perbaikan prodi), survei selesai disarankan menjadi agenda rapat, keputusan rapat bisa diumumkan, dan pengingat bila hasil survei belum dibahas/dipublikasikan.
 Permintaan pemilik 25 Nov 2026: "lanjutkan" (survei poin 7: hasil dianalisis dan dipublikasikan di dashboard, mudah diakses dosen dan mahasiswa; poin 8: terhubung dengan rapat
