@@ -71,9 +71,12 @@ export async function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD
   const blob = await ctx.UPW_RPS.capSah(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length), { qr, kode: "SAH-2611-ABCDEF12", url: "https://contoh/?cek=SAH-2611-ABCDEF12", judul: "RPS Uji",
     tanda: { dosen: { nama: "Dosen Uji", nomor: "1", sebagai: "Dosen pengampu", waktu: "26 Nov 2026 10.00" }, kps: { nama: "KPS Uji", nomor: "2", sebagai: "KPS", waktu: "26 Nov 2026 11.00" } } });
   const ambil = await ctx.UPW_ZIP.buka(await blob.arrayBuffer(), "Word"), doc = await ambil("word/document.xml"), rel = await ambil("word/_rels/document.xml.rels");
-  cek("QR dibubuhkan: [TTE: Dosen Pengampu] diganti gambar + keterangan, lembar pengesahan + kode di akhir, gambar dan relasi ada",
-    !/\[TTE:/.test(doc) && /Ditandatangani secara elektronik/.test(doc) && /PENGESAHAN ELEKTRONIK/.test(doc) && /SAH-2611-ABCDEF12/.test(doc) && /rIdUpwTte/.test(rel) && ambil.daftar.includes("word/media/upw-tte-qr.png")
+  cek("QR dibubuhkan: penanda [TTE: Dosen Pengampu · …] (walau terpecah oleh Word) diganti gambar + keterangan, catatan TTE hilang, lembar pengesahan + kode di akhir, gambar dan relasi ada",
+    !/\[TTE:/.test(doc) && !/Catatan TTE/.test(doc) && /Ditandatangani secara elektronik/.test(doc) && /PENGESAHAN ELEKTRONIK/.test(doc) && /SAH-2611-ABCDEF12/.test(doc) && /rIdUpwTte/.test(rel) && ambil.daftar.includes("word/media/upw-tte-qr.png")
     && /Sebagian tempat tanda tangan/.test(doc));
+  const tpl = await ctx.UPW_RPS.buat(ctx.UPW_RPS.kosong({ mk: { nama: "Uji", kode: "X1", semester: 1 }, cplProdi: [], tim: [], otorisasi: {} }, [], "1 Januari 2027"), null);
+  const at = await ctx.UPW_ZIP.buka(await tpl.arrayBuffer(), "Word"), dt = await at("word/document.xml");
+  cek("templat RPS: tiga penanda TTE bersorot kuning + catatan untuk dosen", (dt.match(/\[TTE: [^\]]*jangan dihapus\]/g) || []).length === 3 && /w:highlight w:val="yellow"/.test(dt) && /\[Catatan TTE\]/.test(dt));
   const pv = await ctx.UPW_RPS.pratinjauDocx(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length));
   cek("pratinjau Word menjadi HTML", /<p>rps uji cap<\/p>/.test(pv));
 }

@@ -3,6 +3,15 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.54.1 — 26 Nov 2026 — Uji Coba
+Ringkas: Tempat tanda tangan elektronik di templat RPS dan kontrak kini bersorot kuning dengan keterangan, dan hilang sendiri pada dokumen jadi.
+Catatan pemilik 26 Nov 2026 (poin 3): "apakah bisa diberikan tanda atau keterangan? tetapi saat menjadi dokumen jadi, tanda ini otomatis juga akan hilang".
+- Templat: penanda "[TTE: <peran> · … jangan dihapus]" bersorot kuning (huruf kecil, cokelat) + paragraf "[Catatan TTE] …" penjelasan untuk dosen di bawah tabel tanda tangan.
+- capSah: peran dibaca dari teks sebelum "·" (penanda lama "[TTE: Ketua Jurusan]" tetap dikenali; penanda yang dipecah Word oleh pemeriksa ejaan juga dikenali); paragraf
+  "[Catatan TTE]" dibuang dari dokumen jadi. Diperiksa pada templat RPS dan kontrak asli: tiga tanda tangan terpasang, penanda dan catatan tidak tersisa.
+- Struktur data tidak berubah. Uji: 1015 + 44 lulus.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.54.0 — 26 Nov 2026 — Uji Coba
 Ringkas: Tanda tangan elektronik RPS (dosen → KPS → Ketua Jurusan) dan kontrak kuliah (dosen → perwakilan mahasiswa → KPS) dengan QR di Word, peran Ketua Jurusan, RPS/kontrak hanya Word templat, lampiran pengajuan ikut surat tugas.
 Permintaan pemilik 26 Nov 2026: "Kerjakan v0.54.0" dengan catatan (1) lampiran masuk surat tugas, tanpa kop dan tanda tangan; (2) SK Direktur/manual SPMI tidak mengatur bentuk tanda tangan

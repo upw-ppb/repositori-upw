@@ -24,12 +24,14 @@ const PEACH = "FBE4D5", ABU = "E7E6E6";
 
 /* ---------- penulis Word ---------- */
 function run(t, o = {}) {
-  const pr = (o.b ? "<w:b/>" : "") + (o.i ? "<w:i/>" : "") + (o.warna ? `<w:color w:val="${o.warna}"/>` : "") + `<w:sz w:val="${Math.round((o.ukuran || 10) * 2)}"/><w:szCs w:val="${Math.round((o.ukuran || 10) * 2)}"/>`;
+  const pr = (o.b ? "<w:b/>" : "") + (o.i ? "<w:i/>" : "") + (o.warna ? `<w:color w:val="${o.warna}"/>` : "") + (o.sorot ? `<w:highlight w:val="${o.sorot}"/>` : "") + `<w:sz w:val="${Math.round((o.ukuran || 10) * 2)}"/><w:szCs w:val="${Math.round((o.ukuran || 10) * 2)}"/>`;
   return `<w:r><w:rPr>${pr}</w:rPr><w:t xml:space="preserve">${x(t)}</w:t></w:r>`;
 }
 function par(t, o = {}) {
   const petunjuk = KOSONG.test(String(t ?? "")) && String(t ?? "").trim();
-  const ro = petunjuk ? Object.assign({}, o, { i: 1, warna: "808080", b: 0 }) : o;
+  // v0.54.1: penanda tempat tanda tangan elektronik disorot kuning agar terlihat dan tidak terhapus; hilang otomatis di dokumen jadi (capSah).
+  const tte = /^\s*\[\s*(TTE\s*:|Catatan TTE)/i.test(String(t ?? ""));
+  const ro = tte ? Object.assign({}, o, { i: 1, warna: "7F6000", b: 0, sorot: "yellow", ukuran: Math.min(o.ukuran || 10, 8) }) : petunjuk ? Object.assign({}, o, { i: 1, warna: "808080", b: 0 }) : o;
   return `<w:p><w:pPr><w:spacing w:before="${o.sebelum || 0}" w:after="${o.sesudah ?? 0}" w:line="240" w:lineRule="auto"/>${o.halamanBaru ? "<w:pageBreakBefore/>" : ""}${o.rata ? `<w:jc w:val="${o.rata}"/>` : ""}</w:pPr>${t === "" || t == null ? "" : run(t, ro)}</w:p>`;
 }
 const pars = (t, o) => (Array.isArray(t) ? t : String(t ?? "").split("\n")).map(s => par(s, o)).join("") || par("", o);
@@ -210,12 +212,12 @@ function buat(D, logo) {
   // Otorisasi
   h.push(par("OTORISASI", { b: 1, sesudah: 120, ukuran: 11 }));
   // v0.54.0: "[TTE: …]" = tempat tanda tangan elektronik (QR) yang dibubuhkan aplikasi setelah RPS disahkan; jangan dihapus.
-  const ttd = (jab, orang, tte) => `${jab}\n[TTE: ${tte}]\n\n${orang.map(o => (o.nama || "[Nama]") + (o.nip ? `\nNIP: ${o.nip}` : "")).join("\n\n")}`;
+  const ttd = (jab, orang, tte) => `${jab}\n[TTE: ${tte} · QR tanda tangan elektronik terisi otomatis saat disahkan, jangan dihapus]\n\n${orang.map(o => (o.nama || "[Nama]") + (o.nip ? `\nNIP: ${o.nip}` : "")).join("\n\n")}`;
   h.push(tabel(bagi(LEBAR, 3), [{ c: [
     { t: ttd((O.kajur && O.kajur.jabatan) || "Ketua Jurusan", [O.kajur || {}], "Ketua Jurusan"), rata: "center" },
     { t: ttd((O.kps && O.kps.jabatan) || "Koordinator Program Studi", [O.kps || {}], "Koordinator Program Studi"), rata: "center" },
     { t: ttd("Dosen Pengampu Mata Kuliah", (O.pengembang || []).length ? O.pengembang : [{}], "Dosen Pengampu"), rata: "center" }] }], { tanpaGaris: 1 }));
-  h.push(par("Tanda tangan elektronik (QR) dibubuhkan otomatis oleh Repositori UPW setelah RPS diajukan dan disahkan. Jangan menghapus tulisan [TTE: …] di atas.", { i: 1, ukuran: 8, warna: "808080", sebelum: 80 }));
+  h.push(par("[Catatan TTE] Tulisan bersorot kuning di atas adalah tempat tanda tangan elektronik (QR) yang dibubuhkan Repositori UPW setelah RPS disahkan. Jangan dihapus atau dipindah; tulisan ini hilang sendiri pada dokumen jadi.", { sebelum: 80 }));
   return paket(h, { lanskap: true, judul: "RPS " + (M.nama || ""), penanda: PENANDA, media });
 }
 
@@ -562,10 +564,10 @@ function kontrak(R, D, logo, I0 = {}) {
   h.push(par(I.tempatTgl || "[Tempat], [tanggal pertemuan pertama]", { rata: "right", sesudah: 120 }));
   const dsn = (R.tim || []).filter(t => !t.praktisi)[0] || {};
   h.push(tabel(bagi(W, 3), [{ c: [
-    { t: `Dosen Pengampu\n[TTE: Dosen Pengampu]\n\n${dsn.nama || "[Nama]"}\nNIP: ${dsn.nip || "[NIP]"}`, rata: "center" },
-    { t: "Perwakilan Mahasiswa\n[TTE: Perwakilan Mahasiswa]\n\n[Nama]\nNIM: [NIM]", rata: "center" },
-    { t: `Mengetahui,\n${O.kpsJabatan || "Koordinator Program Studi"}\n[TTE: Koordinator Program Studi]\n\n${O.kpsNama || "[Nama]"}\nNIP: ${O.kpsNip || "[NIP]"}`, rata: "center" }] }], { tanpaGaris: 1 }));
-  h.push(par("Tanda tangan elektronik (QR) dibubuhkan otomatis oleh Repositori UPW setelah kontrak disetujui. Jangan menghapus tulisan [TTE: …] di atas.", { i: 1, ukuran: 8, warna: "808080", sebelum: 80 }));
+    { t: `Dosen Pengampu\n[TTE: Dosen Pengampu · terisi otomatis, jangan dihapus]\n\n${dsn.nama || "[Nama]"}\nNIP: ${dsn.nip || "[NIP]"}`, rata: "center" },
+    { t: "Perwakilan Mahasiswa\n[TTE: Perwakilan Mahasiswa · terisi otomatis, jangan dihapus]\n\n[Nama]\nNIM: [NIM]", rata: "center" },
+    { t: `Mengetahui,\n${O.kpsJabatan || "Koordinator Program Studi"}\n[TTE: Koordinator Program Studi · terisi otomatis, jangan dihapus]\n\n${O.kpsNama || "[Nama]"}\nNIP: ${O.kpsNip || "[NIP]"}`, rata: "center" }] }], { tanpaGaris: 1 }));
+  h.push(par("[Catatan TTE] Tulisan bersorot kuning di atas adalah tempat tanda tangan elektronik (QR) yang dibubuhkan Repositori UPW setelah kontrak disetujui. Jangan dihapus atau dipindah; tulisan ini hilang sendiri pada dokumen jadi.", { sebelum: 80 }));
   return paket(h, { judul: "Kontrak Perkuliahan " + R.mk.nama, penanda: "UPW-KONTRAK v1", media });
 }
 /** o.hanyaBerubrik: hanya komponen yang punya p.rubrik ([{k, l:[4 deskripsi], b}]) — dipakai untuk contoh. */
@@ -658,8 +660,10 @@ async function capSah(buf, I) {
   if (!/xmlns:wp=/.test(doc.slice(0, 2000))) doc = doc.replace(/<w:document\b/, '<w:document xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"');
   if (!/xmlns:r=/.test(doc.slice(0, 2000))) doc = doc.replace(/<w:document\b/, '<w:document xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"');
   doc = doc.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, p => {
-    const m = teksPar(p).match(/\[\s*TTE\s*:\s*([^\]]+)\]/i); if (!m) return p;
-    const k = LABEL_TTE[m[1].trim().toLowerCase()], s = k && I.tanda[k];
+    const tp = teksPar(p);
+    if (/\[\s*Catatan TTE\s*\]/i.test(tp)) return "";   // catatan untuk dosen: tidak ikut dokumen jadi
+    const m = tp.match(/\[\s*TTE\s*:\s*([^\]]+)\]/i); if (!m) return p;
+    const k = LABEL_TTE[m[1].split(/[·—–;,(]/)[0].trim().toLowerCase()], s = k && I.tanda[k];
     if (!s) return parKecil("");
     dipakai.add(k);
     return parGbr(rid, 1.6, "TTE " + k, ++n) + parKecil(`Ditandatangani secara elektronik`, { b: 1 }) + parKecil(`${s.waktu} · ${I.kode}`);

@@ -19,6 +19,6 @@ export function docxUji(jenis, tambahan) {
   return zipBuf([
     ["[Content_Types].xml", '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="xml" ContentType="application/xml"/></Types>'],
     ["docProps/core.xml", `<?xml version="1.0"?><cp:coreProperties xmlns:cp="x" xmlns:dc="y"><dc:description>${penanda}</dc:description></cp:coreProperties>`],
-    ["word/document.xml", `<?xml version="1.0"?><w:document ${W}><w:body><w:p><w:r><w:t>${jenis} ${tambahan || ""}</w:t></w:r></w:p><w:p><w:r><w:t>[TTE: Dosen Pengampu]</w:t></w:r></w:p><w:sectPr/></w:body></w:document>`]
+    ["word/document.xml", `<?xml version="1.0"?><w:document ${W}><w:body><w:p><w:r><w:t>${jenis} ${tambahan || ""}</w:t></w:r></w:p><w:p><w:r><w:t>[TTE: Dosen </w:t></w:r><w:proofErr w:type="spellStart"/><w:r><w:t>Pengampu · terisi otomatis, jangan dihapus]</w:t></w:r></w:p><w:p><w:r><w:t>[Catatan TTE] Jangan dihapus.</w:t></w:r></w:p><w:sectPr/></w:body></w:document>`]
   ]).toString("base64");
 }
