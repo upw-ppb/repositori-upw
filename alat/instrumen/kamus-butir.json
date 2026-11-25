@@ -306,7 +306,11 @@
   "peta kurikulum",
   "struktur kurikulum",
   "review kurikulum",
-  "pemutakhiran kurikulum"
+  "pemutakhiran kurikulum",
+  "benchmarking kurikulum",
+  "studi banding kurikulum",
+  "benchmark kurikulum",
+  "kurikulum kampus lain"
  ],
  "8": [
   "rps",
@@ -480,7 +484,8 @@
   "kkn",
   "pkl",
   "praktik kerja lapangan",
-  "pkl di industri"
+  "pkl di industri",
+  "magang industri"
  ],
  "25": [
   "penilaian pembelajaran",
@@ -779,7 +784,11 @@
   "kerja sama penelitian",
   "kerja sama pkm",
   "kerja sama internasional",
-  "penandatanganan mou"
+  "penandatanganan mou",
+  "kerja sama magang",
+  "kerja sama industri",
+  "kerja sama biro perjalanan",
+  "mitra magang"
  ],
  "60": [
   "pengawasan",

@@ -77,7 +77,9 @@ function buatMesin(D) {
   };
   const IB = indeks(D.butir, { kamus: 4, nm: 3.5, el: 2.5, ind: 1.2, s4: 1.2, sr: 1.2, skor: 0.5, ket: 0.5 });
   const IJ = indeks(D.jenis, { kamus: 3.5, l: 3.5, kw: 3, cth: 1.5, ex: 1 });
-  function cari(I, teks, saring, n) {
+  /** opsi.konteks = kode yang sudah pasti relevan dari konteks (jenis rapat, butir agenda): nilainya dikali 1,4 bila ada kecocokan teks (tidak menambah yang tidak cocok). */
+  function cari(I, teks, saring, n, opsi) {
+    const konteks = new Set((opsi && opsi.konteks) || []);
     const q = norm(teks); if (!q.length) return [];
     const akhirSedang = !/\s$/.test(String(teks)), qk = q.map(x => x[0]);
     const hasil = I.L.filter(x => !saring || saring(x.d)).map(x => {
@@ -91,7 +93,13 @@ function buatMesin(D) {
           for (const [z, w] of x.m) if (z.startsWith(k) && z !== k) { s += 0.5 * I.idf(z) * w; alasan.add(asli + "…"); break; }
         }
       });
-      x.frs.forEach(f => { for (let i = 0; i + f.k.length <= qk.length; i++) if (f.k.every((t, j) => qk[i + j] === t)) { s += 3 * f.k.length; alasan.add(f.teks); break; } });
+      const qs = new Set(qk);
+      x.frs.forEach(f => {
+        let utuh = false; for (let i = 0; i + f.k.length <= qk.length; i++) if (f.k.every((t, j) => qk[i + j] === t)) { utuh = true; break; }
+        if (utuh) { s += 3 * f.k.length; alasan.add(f.teks); }
+        else if (f.k.every(t => qs.has(t))) { s += 1.5 * f.k.length; alasan.add(f.teks); }   // v0.53.0: kata frasa ada semua walau tidak berurutan
+      });
+      if (s > 0 && konteks.has(x.d.n !== undefined ? x.d.n : x.d.k)) { s *= 1.4; alasan.add("sesuai jenis rapat/agenda"); }
       return { x, s, alasan: [...alasan] };
     }).filter(h => h.s > 0).sort((a, b) => b.s - a.s);
     if (!hasil.length) return [];
@@ -99,7 +107,7 @@ function buatMesin(D) {
     return hasil.filter(h => h.s >= Math.max(6, 0.3 * top)).slice(0, n || 5);
   }
   return {
-    butir: (teks, n) => cari(IB, teks, null, n).map(h => ({ n: h.x.d.n, nm: h.x.d.nm, skor: Math.round(h.s * 10) / 10, alasan: h.alasan.slice(0, 4) })),
+    butir: (teks, n, opsi) => cari(IB, teks, null, n, opsi).map(h => ({ n: h.x.d.n, nm: h.x.d.nm, skor: Math.round(h.s * 10) / 10, alasan: h.alasan.slice(0, 4) })),
     jenis: (teks, kode, n) => cari(IJ, teks, kode ? d => kode.includes(d.k) : null, n).map(h => ({ k: h.x.d.k, l: h.x.d.l, skor: Math.round(h.s * 10) / 10, alasan: h.alasan.slice(0, 4) })),
     butirJenis: k => (D.peta[k] || []).slice(),
     norm

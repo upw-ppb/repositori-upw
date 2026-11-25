@@ -3,6 +3,28 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.53.0 — 26 Nov 2026 — Uji Coba
+Ringkas: Lampiran opsional untuk KPS saat mengajukan surat tugas, pencarian jenis kegiatan lebih luas (benchmarking untuk dosen), saran butir rapat memakai konteks, tautan rapat daring bisa diklik di undangan, daftar akun urut NIM tanpa melompat saat mencentang.
+Catatan pemilik 26 Nov 2026 (poin 1–6; poin 7 tanda tangan elektronik RPS/kontrak dijawab sebagai saran, belum dikerjakan).
+- Centang di daftar panjang: render() kini mempertahankan posisi gulir kotak .gulir, main, dan halaman bila halaman yang sama digambar ulang (sebelumnya kotak daftar akun kembali ke atas).
+- Daftar akun (Pengguna): urutan bawaan NIM/NIP (sebelumnya nama).
+- Lampiran pengajuan surat (gas/LampiranAju.js, kolom baru Kegiatan.lampiranAju, VERSI_SKEMA 35): Proposal / Jadwal / Undangan penyelenggara / TOR / Lainnya, berkas ≤ 10 MB atau
+  tautan https, maks. 5; ditambah/dihapus pengaju selama surat belum diputuskan (draf, menunggu KPS, revisi, ditunda); dilihat pengaju, peserta, KPS, pengelola. Di formulir (diunggah saat
+  disimpan/diajukan), di detail kegiatan, dan di Antrean KPS. Bukan bukti kegiatan dan tidak masuk lampiran surat. Riwayat kegiatan mencatat tambah/hapus.
+- Undangan rapat: tautan rapat daring menjadi tautan yang bisa diklik (juga di PDF hasil cetak; diperiksa: PDF Chrome memuat anotasi /URI).
+- Pencarian jenis kegiatan: penyebab kasus "benchmarking kurikulum" = jenis Benchmarking / studi banding hanya untuk Admin Prodi sehingga tidak tampil bagi dosen. Kini dosen boleh
+  mengajukannya (IAB, PPEPP, lokakarya kurikulum tetap Admin). Pencarian menggabungkan cocok kata dengan mesin saran (sinonim, imbuhan, salah ketik), menampilkan jenis milik Admin
+  sebagai keterangan, dan menunjukkan butir instrumen terkait kata kunci.
+- Saran butir (alat/saran-mesin.js): konteks jenis rapat (agenda) dan butir agenda (keputusan risalah) menaikkan butir yang cocok (×1,4, tanpa menambah yang tidak cocok); frasa kamus
+  dihitung walau katanya tidak berurutan; keputusan pendek memakai teks agendanya; saran sisa yang nilainya < 45% saran terbaik tidak ditampilkan. Kamus: benchmarking kurikulum → 7,
+  kerja sama magang/biro perjalanan → 59, magang industri → 24. Set uji bertambah 27 kalimat agenda rapat: 97/97 benar di 3 teratas, 91 di urutan pertama.
+  Batas jujur: mesin ini tetap tanpa AI (pencocokan istilah berbobot), jadi kalimat yang memakai istilah di luar kamus masih bisa meleset; tambah istilahnya di kamus-butir.json.
+- Struktur data berubah (VERSI_SKEMA 35: kolom Kegiatan.lampiranAju di akhir). Versi lama tetap membaca data; lampiran pengajuan tidak tampil di versi lama.
+- Uji: 992 + 44 uji server lulus (uji-v53-bagian.mjs). Uji tampilan lokal: centang/lepas centang di daftar 44 mahasiswa (posisi gulir dan letak kotak di layar tetap), urut NIM,
+  dosen mencari "benchmarking kurikulum" → Benchmarking teratas + butir 7, lampiran PDF di formulir terunggah saat Ajukan, tautan dari detail, lihat PDF di penampil, KPS melihat 2 lampiran,
+  saran agenda rapat jenis kurikulum, tautan undangan; penjelajah KPS 60 layar tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.52.0 — 25 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.52.0 (tampilan docs/ dan server Apps Script Produksi deployment @37): menu Hasil Survei, publikasi hasil survei, rekomendasi agenda rapat, keputusan "Umumkan".
 - Struktur data berubah (VERSI_SKEMA 34: tabel PublikasiSurvei). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±20 dtk, permintaan tanpa login).

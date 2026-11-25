@@ -392,6 +392,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   infoSurvei78 → Penilaian. Tampilan: menu "mutu" (hMutu, label "Hasil Survei"), laciPubForm, panel rekomendasi di laciRapatForm (S.rapatUsulan), centang data-rkpub di risalah.
   JANGAN publikasikan teks bebas, nilai per dosen/kelas, atau nama PJ. Laci = flex column: .tbl-wrap di dalam laci perlu flex-shrink:0 bila tidak bergulir. Uji: uji-v52-bagian.mjs.
 
+- v0.53.0 (26 Nov 2026, Uji Coba): catatan pemilik. render() mempertahankan scrollTop .gulir/main/window bila S.view sama. PF_AWAL urut "nim". gas/LampiranAju.js + Kegiatan.lampiranAju
+  (VERSI_SKEMA 35; aksi kegiatan.lampiranUnggah/Hapus/Lihat; ST_LAMPIRAN_AJU; kegiatanKeKlien → lampiranAju/bisaLampiranAju). Tampilan: f.lampBaru (diunggah di kirimForm), blokLampiranAju,
+  daftarLampiranAju (antrean KPS). Undangan: tautan <a href>. Jenis benchmark who + dosen; kegiatan.ref hanyaAdmin; kandidatJenis = cocok kata + UPW_SARAN.jenis. saran-mesin: opsi.konteks,
+  frasa tak berurutan; htmlSaran: konteks dari jenis rapat/agenda, saring < 0,45 × terbaik. Uji: uji-v53-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

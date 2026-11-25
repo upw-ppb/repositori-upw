@@ -725,6 +725,7 @@ var JENIS_KEG = [
   "l": "Benchmarking / studi banding",
   "t": "DED butir 1",
   "who": [
+   "dosen",
    "admin"
   ],
   "ex": "Contoh: Studi banding ke prodi pariwisata terakreditasi Unggul",
@@ -738,7 +739,7 @@ var JENIS_KEG = [
    "Benchmarking kurikulum dengan kampus luar negeri",
    "Kunjungan benchmarking SPMI"
   ],
-  "kw": "benchmark benchmarking studi banding",
+  "kw": "benchmark benchmarking studi banding kunjungan kampus lain perguruan tinggi lain kurikulum",
   "fx": []
  },
  {

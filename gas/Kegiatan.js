@@ -104,7 +104,7 @@ function kegiatanDari(r) {
     perluST: benar(r.perluST), tempat: teks(r.tempat), aktivitas: teks(r.aktivitas), ket: teks(r.ket), bentuk: teks(r.bentuk), kegDosen: teks(r.kegDosen),
     st: r.st, status: r.status, riwayat: jsonDari(r.riwayat, []), kodeSurat: teks(r.kodeSurat), tglSurat: r.tglSurat ? new Date(r.tglSurat).toISOString() : "",
     kpsId: teks(r.kpsId), lampiran: jsonDari(r.lampiran, null), dibuat: r.dibuat, diubah: r.diubah, dihapus: r.dihapus,
-    bukti: jsonDari(r.bukti, {}), verifId: teks(r.verifId), tglVerif: r.tglVerif ? new Date(r.tglVerif).toISOString() : "" };
+    bukti: jsonDari(r.bukti, {}), verifId: teks(r.verifId), tglVerif: r.tglVerif ? new Date(r.tglVerif).toISOString() : "", lampiranAju: jsonDari(r.lampiranAju, []) };
 }
 function semuaKegiatan() { return semua("Kegiatan").filter(function (r) { return !r.dihapus; }).map(kegiatanDari); }
 function ambilKegiatan(id) {
@@ -119,7 +119,7 @@ function barisKegiatan(k) {
     aktivitas: k.aktivitas, ket: k.ket, bentuk: k.bentuk, kegDosen: k.kegDosen, st: k.st, status: k.status, riwayat: JSON.stringify(k.riwayat),
     kodeSurat: k.kodeSurat, tglSurat: k.tglSurat ? new Date(k.tglSurat) : "", kpsId: k.kpsId, lampiran: k.lampiran ? JSON.stringify(k.lampiran) : "",
     dibuat: k.dibuat || new Date(), diubah: new Date(), dihapus: "",
-    bukti: JSON.stringify(k.bukti || {}), verifId: k.verifId || "", tglVerif: k.tglVerif ? new Date(k.tglVerif) : "" };
+    bukti: JSON.stringify(k.bukti || {}), verifId: k.verifId || "", tglVerif: k.tglVerif ? new Date(k.tglVerif) : "", lampiranAju: JSON.stringify(k.lampiranAju || []) };
 }
 function simpanKegiatan(k) {
   var obj = barisKegiatan(k);
@@ -191,6 +191,7 @@ function kegiatanKeKlien(k, p, idx, lengkap, set) {
   var bk = buktiKeKlien(k, p, idx, set, lengkap);
   Object.keys(bk).forEach(function (c) { o[c] = bk[c]; });
   if (lengkap) o.lampiran = k.st === "terbit" && k.lampiran ? k.lampiran : lampiranSurat(k, idx, set);
+  o.lampiranAju = lampiranAjuKeKlien(k, p, idx); o.bisaLampiranAju = bolehUbahLampiranAju(k, p); // v0.53.0
   return o;
 }
 
@@ -269,7 +270,7 @@ function aksiKegiatanRef(d, token) {
   var idx = indeksOrang(), set = pengaturanSurat();
   return {
     peran: peran, kelompok: kel,
-    jenis: JENIS_KEG.map(function (j) { return { k: j.k, l: j.l, t: j.t, ex: j.ex, bukti: j.bukti, cth: j.cth, kw: j.kw, fx: j.fx, boleh: kel ? j.who.indexOf(kel) >= 0 : false }; }),
+    jenis: JENIS_KEG.map(function (j) { return { k: j.k, l: j.l, t: j.t, ex: j.ex, bukti: j.bukti, cth: j.cth, kw: j.kw, fx: j.fx, boleh: kel ? j.who.indexOf(kel) >= 0 : false, hanyaAdmin: j.who.join() === "admin" }; }),
     gcet: GCET, gcetKw: GCET_KW, tingkat: TINGKAT, tanpaSt: TANPA_ST,
     pegawai: idx.pegawai.map(function (o) { return { id: o.id, nama: o.nama, username: o.username, jenis: o.jenis, inisial: o.inisial }; }),
     mhs: idx.mhs.filter(function (m) { return m.statusMhs === "A"; }).map(function (m) { return { id: m.id, nama: m.nama, username: m.username, masuk: m.masuk, kelas: m.kelas, semester: semesterMhs(m.masuk) }; }),
