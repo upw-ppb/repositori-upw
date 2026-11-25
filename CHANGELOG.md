@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.51.0 — 25 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.51.0 (tampilan docs/ dan server Apps Script Produksi deployment @36): EDOM per mata kuliah, kelas, dan dosen; tracer study diterapkan ke data Lulusan.
+- Struktur data berubah (VERSI_SKEMA 33: tabel PengisiSurvei, kolom Lulusan.tracer). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±22 dtk, permintaan tanpa login).
+  Rollback ke v0.50.0: tampilan (tag v0.50.0) dan deployment @35; data tetap terbaca, tetapi EDOM yang sedang berjalan perlu ditutup dulu.
+- Penyetuju: pemilik, di chat 25 Nov 2026: "Setuju tayang v0.51.0".
+
 ## v0.51.0 — 25 Nov 2026 — Uji Coba
 Ringkas: EDOM per mata kuliah, kelas, dan dosen (anonim; hasil per pengajar dan per kelas, dosen melihat hasilnya di Mata Kuliah Saya) dan tracer study yang bisa diterapkan ke Data Prodi › Lulusan.
 Permintaan pemilik 25 Nov 2026: "lanjut tahap 2" (survei Tahap 2: EDOM per kelas/dosen; tracer → data Lulusan).
