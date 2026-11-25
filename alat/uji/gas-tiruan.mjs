@@ -1,3 +1,4 @@
+import zlib from "node:zlib";
 // Tiruan layanan Google Apps Script di Node, untuk menjalankan kode server asli (gas/*.js) secara lokal.
 import fs from "node:fs";
 import path from "node:path";
@@ -96,7 +97,16 @@ export function buatGas(folderGas, opsi = {}) {
       getUuid: () => crypto.randomUUID(),
       base64EncodeWebSafe: b => keBuffer(b).toString("base64").replace(/\+/g, "-").replace(/\//g, "_"),
       computeHmacSha256Signature: (v, k) => Array.from(crypto.createHmac("sha256", keBuffer(k)).update(keBuffer(v)).digest()).map(b => (b << 24) >> 24),
-      newBlob: (s, mime, nama) => { const by = typeof s === "string" ? Array.from(Buffer.from(s, "utf8")) : Array.from(s).map(b => (b << 24) >> 24); return { getBytes: () => by.slice(), getContentType: () => mime || "", getName: () => nama || "" }; },
+      newBlob: (s, mime, nama) => { const by = typeof s === "string" ? Array.from(Buffer.from(s, "utf8")) : Array.from(s).map(b => (b << 24) >> 24); return { getBytes: () => by.slice(), getContentType: () => mime || "", getName: () => nama || "", getDataAsString: () => keBuffer(by).toString("utf8") }; },
+      DigestAlgorithm: { SHA_256: "sha256" },
+      computeDigest: (alg, b) => Array.from(crypto.createHash(alg).update(keBuffer(typeof b === "string" ? Buffer.from(b, "utf8") : b)).digest()).map(v => (v << 24) >> 24),
+      /* tiruan Utilities.unzip: ZIP tersimpan atau deflate (v0.54.0) */
+      unzip: blob => { const u = keBuffer(blob.getBytes()), h = []; let e = -1; for (let i = u.length - 22; i >= 0; i--) if (u.readUInt32LE(i) === 0x06054b50) { e = i; break; }
+        if (e < 0) throw new Error("tiruan: bukan zip"); let q = u.readUInt32LE(e + 16); const n = u.readUInt16LE(e + 10);
+        for (let k = 0; k < n; k++) { const m = u.readUInt16LE(q + 10), besar = u.readUInt32LE(q + 20), nl = u.readUInt16LE(q + 28), el = u.readUInt16LE(q + 30), cl = u.readUInt16LE(q + 32), lok = u.readUInt32LE(q + 42);
+          const nama = u.subarray(q + 46, q + 46 + nl).toString("utf8"), awal = lok + 30 + u.readUInt16LE(lok + 26) + u.readUInt16LE(lok + 28), data = u.subarray(awal, awal + besar);
+          const isi = m === 0 ? Buffer.from(data) : zlib.inflateRawSync(data); h.push({ getName: () => nama, getBytes: () => Array.from(isi).map(v => (v << 24) >> 24), getDataAsString: () => isi.toString("utf8") }); q += 46 + nl + el + cl; }
+        return h; },
       base64Decode: t => Array.from(Buffer.from(String(t), "base64")).map(b => (b << 24) >> 24),
       base64Encode: b => keBuffer(b).toString("base64"),
       formatDate: fmt

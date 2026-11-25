@@ -3,6 +3,27 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.54.0 — 26 Nov 2026 — Uji Coba
+Ringkas: Tanda tangan elektronik RPS (dosen → KPS → Ketua Jurusan) dan kontrak kuliah (dosen → perwakilan mahasiswa → KPS) dengan QR di Word, peran Ketua Jurusan, RPS/kontrak hanya Word templat, lampiran pengajuan ikut surat tugas.
+Permintaan pemilik 26 Nov 2026: "Kerjakan v0.54.0" dengan catatan (1) lampiran masuk surat tugas, tanpa kop dan tanda tangan; (2) SK Direktur/manual SPMI tidak mengatur bentuk tanda tangan
+dokumen internal prodi; (3) karena QR tidak bisa ditempel ke PDF, RPS/kontrak hanya diunggah sebagai templat Word yang sudah diisi.
+- gas/Pengesahan.js: entri rps/kontrak berpenanda templat (tpl, hash SHA-256 berkas asli) + sah {st, kode SAH-YYMM-XXXXXXXX, ttd, mhsId, baca, riw}. Aksi mkp.sahAjukan (pengampu utama;
+  kontrak: perwakilan dari peserta kelas), mkp.sahPutus (setuju/revisi wajib catatan; giliran KPS/Ketua Jurusan/perwakilan), mkp.sahBaca (mahasiswa peserta), mkp.sahBerkas (Word asli +
+  data penanda tangan), sah.daftar; tugasSah → Beranda; ?cek=SAH-… (cekPengesahan). RPS bersama: satu pengesahan untuk kelas-kelas setim. Word baru → persetujuan gugur.
+  Data tersimpan di kolom isi PortofolioMk yang sudah ada (tanpa kolom baru).
+- Unggah RPS/kontrak: hanya .docx dari templat aplikasi (penanda UPW-RPS v1 / UPW-KONTRAK v1 diperiksa di server dengan Utilities.unzip); PDF dan tautan ditolak. Data lama tetap terbaca.
+- Templat RPS dan kontrak: tempat tanda tangan "[TTE: …]". docs/uji/rps.js capSah(): di browser, mengganti setiap [TTE: …] dengan QR + "Ditandatangani secara elektronik" (waktu, kode)
+  dan menambah lembar PENGESAHAN ELEKTRONIK (penanda tangan, QR, kode) di akhir; pratinjauDocx() menampilkan isi Word di laci. zip.js: bukaZip().daftar/.biner.
+- Peran baru "kajur" (Ketua Jurusan); akun kajur-saja tidak dihitung sebagai dosen prodi (jenis "lain"). Menu "RPS & Kontrak" (dosen, mahasiswa, KPS, Ketua Jurusan, pengelola).
+- Surat tugas: halaman LAMPIRAN PENGAJUAN setelah surat, tanpa kop dan tanda tangan; gambar dicetak utuh, PDF/Word dicantumkan (peramban tidak bisa menggabungkan isi PDF tanpa pustaka
+  luar), tombol Unduh lampiran (ZIP) berisi berkas aslinya bernomor.
+- Struktur data: tidak berubah (VERSI_SKEMA tetap 35). Rollback ke v0.53.0: data tetap terbaca; status pengesahan diabaikan dan akun berperan hanya kajur tidak bisa dipakai di versi lama.
+- Uji: 1014 + 44 uji server lulus (uji-v54-bagian.mjs; uji lama RPS/kontrak diubah memakai Word templat, alat/uji/bantu-docx.mjs; tiruan Utilities.unzip/computeDigest). Uji tampilan lokal:
+  unduh templat RPS & kontrak → unggah Word → pratinjau + pemeriksaan otomatis → ajukan → KPS setuju (Beranda) → Ketua Jurusan sahkan → unduh Word bertanda tangan (3 QR di tempat
+  [TTE: …], lembar pengesahan, PNG QR sah) → ?cek=SAH-… menampilkan penanda tangan dan sidik berkas; surat tugas + lampiran (1 kop, gambar tercetak) + ZIP; penjelajah dosen 41, Ketua
+  Jurusan 6, mahasiswa 13 layar tanpa masalah. Word bertanda tangan dibaca oleh macOS (textutil/Quick Look), belum dibuka di Microsoft Word asli.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.53.0 — 26 Nov 2026 — Uji Coba
 Ringkas: Lampiran opsional untuk KPS saat mengajukan surat tugas, pencarian jenis kegiatan lebih luas (benchmarking untuk dosen), saran butir rapat memakai konteks, tautan rapat daring bisa diklik di undangan, daftar akun urut NIM tanpa melompat saat mencentang.
 Catatan pemilik 26 Nov 2026 (poin 1–6; poin 7 tanda tangan elektronik RPS/kontrak dijawab sebagai saran, belum dikerjakan).

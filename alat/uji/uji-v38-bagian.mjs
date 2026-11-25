@@ -1,3 +1,4 @@
+import { docxUji } from "./bantu-docx.mjs";
 // Uji v0.38.0: MK pilihan dengan kelompok paralel (Bahasa Asing Pilihan: Jepang / Jerman / Perancis) — kurikulum, tim per kelas×kelompok, EWMP SKS penuh,
 // impor Excel, Portofolio MK per kelompok.
 import fs from "node:fs";
@@ -35,15 +36,15 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tD2 }) {
   const pdf = s => Buffer.concat([Buffer.from("%PDF-1.4\n" + s), Buffer.alloc(40)]).toString("base64");
   // v0.40.0: Portofolio MK per kelas (kunci "A/JEPANG"); RPS bersama hanya untuk kelas dengan tim yang sama (Jepang A dan B, sama-sama dsn).
   cek("dosen tidak bisa mengisi kelas/kelompok yang tidak ia ajar", /tidak mengajar/.test(salah("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JERMAN", nama: "rps.pdf", isi: pdf("x") }, tDsn)));
-  let D = ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JEPANG", nama: "RPS Jepang.pdf", isi: pdf("jp") }, tDsn);
+  let D = ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JEPANG", nama: "RPS Jepang.docx", isi: docxUji("rps", "RPS Jepang") }, tDsn);
   const kj = k => D.kelas.find(x => x.k === k);
   cek("RPS Jepang: satu unggahan untuk kelas A dan B (tim sama); dosen hanya melihat kelas yang ia ajar; MK belum lengkap", D.kelas.map(x => x.k).join() === "A/JEPANG,B/JEPANG"
-    && kj("A/JEPANG").rps.nama === "RPS Jepang.pdf" && kj("B/JEPANG").rps.nama === "RPS Jepang.pdf" && kj("A/JEPANG").rpsBersama.join() === "B/JEPANG" && !D.lengkap.includes("rps"));
-  ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JERMAN", tautan: "https://drive.google.com/rps-jerman" }, tD2);
+    && kj("A/JEPANG").rps.nama === "RPS Jepang.docx" && kj("B/JEPANG").rps.nama === "RPS Jepang.docx" && kj("A/JEPANG").rpsBersama.join() === "B/JEPANG" && !D.lengkap.includes("rps"));
+  ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JERMAN", nama: "dok.docx", isi: docxUji("rps", "https://drive.google.com/rps-jerman") }, tD2);
   ok("mkp.metode", { semester: smt, kode: "231041217", kunci: "A/JERMAN", metode: ["Case based learning"] }, tD2);
-  D = ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/PERANCIS", nama: "RPS Perancis.pdf", isi: pdf("fr") }, tKps);
+  D = ok("mkp.unggah", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/PERANCIS", nama: "RPS Perancis.docx", isi: docxUji("rps", "RPS Perancis") }, tKps);
   cek("semua kelas punya RPS → RPS MK lengkap; metode per kelas (hanya Jerman) → belum lengkap", D.lengkap.includes("rps") && kj("A/JERMAN").metode.v.join() === "Case based learning" && !D.lengkap.includes("metode"));
-  cek("lihat RPS kelas lain oleh pengelola; hapus RPS Jepang menghapus dari kelas A dan B", ok("mkp.lihat", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JERMAN" }, tKps).url === "https://drive.google.com/rps-jerman"
+  cek("lihat RPS kelas lain oleh pengelola; hapus RPS Jepang menghapus dari kelas A dan B", ok("mkp.lihat", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JERMAN" }, tKps).nama === "dok.docx"
     && (() => { const H = ok("mkp.hapus", { semester: smt, kode: "231041217", komp: "rps", kunci: "A/JEPANG" }, tDsn); return !H.kelas.find(x => x.k === "A/JEPANG").rps && !H.kelas.find(x => x.k === "B/JEPANG").rps; })());
   // Kelompok dihapus dari kurikulum → baris kelompok diabaikan (data tidak dihapus).
   ok("dp.mkSimpan", { data: { kode: "231041217", nama: "Bahasa Asing Pilihan Kepemanduan Dasar", semester: 3, sksKuliah: 2, kelompok: "" } }, tAdm);

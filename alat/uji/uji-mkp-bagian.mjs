@@ -1,3 +1,4 @@
+import { docxUji } from "./bantu-docx.mjs";
 // Uji v0.14.0: Portofolio Mata Kuliah.
 export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA }) {
   console.log("24. Portofolio MK");
@@ -19,14 +20,15 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   cek("pengingat RPS di tugas.saya", ok("tugas.saya", {}, tDsn).mkpBelumRps.map(x => x.kode).join() === kd);
   cek("anggota tidak bisa unggah RPS", /pengampu utama/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "rps.pdf", isi: pdf() }, tD2)));
   cek("bukan anggota tim ditolak", /bukan anggota|Hanya anggota/.test(salah("mkp.unggah", { semester: kini, kode: kd2, komp: "rps", nama: "rps.pdf", isi: pdf() }, tDsn)));
-  cek("isi palsu ditolak", /tidak sesuai/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "rps.pdf", isi: Buffer.from("<html>").toString("base64") }, tDsn)));
+  cek("isi palsu ditolak", /tidak sesuai/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "rps.docx", isi: Buffer.from("<html>").toString("base64") }, tDsn)));
   cek("komponen tak dikenal ditolak", /tidak dikenal/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "x", nama: "a.pdf", isi: pdf() }, tDsn)));
-  let D = ok("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "RPS Pengantar.pdf", isi: pdf() }, tDsn);
-  const f1 = Object.values(g.files).find(f => /RPS terbaru - kelas [A-Z0-9]+ - RPS Pengantar\.pdf/.test(f.nama || ""));
+  let D = ok("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "RPS Pengantar.docx", isi: docxUji("rps", "RPS Pengantar") }, tDsn);
+  const f1 = Object.values(g.files).find(f => /RPS terbaru - kelas [A-Z0-9]+ - RPS Pengantar\.docx/.test(f.nama || ""));
   cek("RPS terunggah ke Drive Bukti/Portofolio MK/<semester>/<MK>", D.rps && D.rps.t === "file" && f1 && f1.folder && /UPW|Pengantar|Travel/.test(f1.folder.nama), f1 && f1.folder && f1.folder.nama);
-  D = ok("mkp.unggah", { semester: kini, kode: kd, komp: "rps", tautan: "https://drive.google.com/rps-baru" }, tDsn);
-  cek("ganti RPS dengan tautan: file lama dibuang", D.rps.t === "tautan" && D.rps.url === "https://drive.google.com/rps-baru" && f1.terbuang === true);
-  cek("tautan harus https", /https/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "kontrak", tautan: "http://x" }, tDsn)));
+  D = ok("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "dok.docx", isi: docxUji("rps", "https://drive.google.com/rps-baru") }, tDsn);
+  cek("ganti RPS dengan Word baru: file lama dibuang", D.rps.t === "file" && D.rps.nama === "dok.docx" && f1.terbuang === true);
+  cek("v0.54.0: RPS/kontrak tidak menerima tautan atau PDF", /templat Word/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "kontrak", tautan: "https://x.id" }, tDsn))
+    && /templat Word/.test(salah("mkp.unggah", { semester: kini, kode: kd, komp: "rps", nama: "rps.pdf", isi: pdf() }, tDsn)));
   ok("mkp.unggah", { semester: kini, kode: kd, komp: "rubrik", nama: "rubrik.pdf", isi: pdf() }, tDsn);
   cek("metode: hanya pengampu utama", /pengampu utama/.test(salah("mkp.metode", { semester: kini, kode: kd, metode: ["Case based learning"] }, tD2)));
   D = ok("mkp.metode", { semester: kini, kode: kd, metode: ["Case based learning", "Bukan metode", "Case based learning"], lain: "Simulasi GDS" }, tDsn);

@@ -150,7 +150,8 @@ function infoMkpTs(ts) {
 function entriKeKlien(e, idx) {
   if (!e) return null;
   var o = idx.byId[e.o], x = { t: e.t, nama: e.nama || "", ukuran: e.ukuran || 0, url: e.t === "tautan" ? e.url : "", ket: e.ket || "", teks: e.teks || "",
-    id: e.id || "", o: e.o, oleh: o ? o.nama : "", w: e.w || "", ttd: e.ttd || null, keg: e.keg || "", kj: e.kj || "", kjn: e.kjn || "" };
+    id: e.id || "", o: e.o, oleh: o ? o.nama : "", w: e.w || "", ttd: e.ttd || null, keg: e.keg || "", kj: e.kj || "", kjn: e.kjn || "",
+    tpl: !!e.tpl, sah: sahKeKlien(e, idx) };
   return x;
 }
 function metodeKeKlien(m, idx) { return m ? { v: m.v || [], lain: m.lain || "", oleh: (idx.byId[m.o] || {}).nama || "", w: m.w || "" } : { v: [], lain: "" }; }
@@ -282,7 +283,8 @@ function aksiMkpUnggah(d, token) {
   if (!c || (c.jenis !== "dok" && c.jenis !== "daftar")) throw galat("Jenis dokumen tidak dikenal.");
   var x = ambilMkp(smt, kode, p, true), u = unitSasaran(x, d, p, c, true);
   var target = c.k === "rps" ? kunciRpsBersama(x, u) : [u.k];
-  var entri, file = null, rpsJson = c.k === "rps" && d.tautan === undefined ? bersihRpsData(d.rps) : null;
+  var entri, file = null, rpsJson = c.k === "rps" && d.tautan === undefined ? bersihRpsData(d.rps) : null, sahKomp = KOMP_SAH.indexOf(c.k) >= 0;
+  if (sahKomp && (d.tautan !== undefined || !/\.docx$/i.test(teks(d.nama)))) throw galat((c.k === "rps" ? "RPS" : "Kontrak kuliah") + " diunggah sebagai templat Word aplikasi yang sudah diisi (.docx), agar bisa diperiksa dan ditandatangani secara elektronik.");
   if (d.tautan !== undefined) {
     var url = teks(d.tautan).trim();
     if (!/^https:\/\/[^\s<>"]+$/.test(url) || url.length > 500) throw galat("Tautan harus diawali https:// dan tanpa spasi.");
@@ -295,8 +297,10 @@ function aksiMkpUnggah(d, token) {
     var bytes = Utilities.base64Decode(isi);
     if (bytes.length > BUKTI_MAKS) throw galat("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai Tautan.");
     if (!isiSesuai(eks, bytes)) throw galat("Isi file tidak sesuai dengan jenisnya (." + eks + "). Simpan ulang file dari aplikasi aslinya, lalu coba lagi.");
+    var hash = sahKomp ? periksaWordSah(c.k, bytes, mime) : "";   // v0.54.0: harus templat aplikasi; sidik berkas untuk verifikasi
     file = folderMkp(smt, x.mk).createFile(Utilities.newBlob(bytes, mime, namaAman(c.l + " - " + labelUnit(x, u) + " - " + nama)));
     entri = { t: "file", fileId: file.getId(), nama: nama, mime: mime, ukuran: bytes.length };
+    if (sahKomp) { entri.tpl = true; entri.hash = hash; }
   }
   if (c.jenis === "daftar") entri.ket = potong(d.ket, 200).trim();
   entri.o = p.id; entri.w = new Date().toISOString();

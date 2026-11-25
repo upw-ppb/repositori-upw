@@ -397,6 +397,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   daftarLampiranAju (antrean KPS). Undangan: tautan <a href>. Jenis benchmark who + dosen; kegiatan.ref hanyaAdmin; kandidatJenis = cocok kata + UPW_SARAN.jenis. saran-mesin: opsi.konteks,
   frasa tak berurutan; htmlSaran: konteks dari jenis rapat/agenda, saring < 0,45 × terbaik. Uji: uji-v53-bagian.mjs.
 
+- v0.54.0 (26 Nov 2026, Uji Coba): pengesahan elektronik. gas/Pengesahan.js (KOMP_SAH rps/kontrak, PENANDA_SAH, ALUR_SAH, entri.tpl/hash/sah; aksi mkp.sahAjukan/sahPutus/sahBaca/sahBerkas,
+  sah.daftar → daftarSah(p); tugasSah; cekPengesahan "SAH-…"). mkp.unggah rps/kontrak: hanya .docx templat (periksaWordSah, Utilities.unzip + computeDigest). Peran "kajur" di PERAN_SAH.
+  Tampilan: menu "sah" (hSah, laciSahLihat, sahMkpHtml, qrPng, AKSI.sahUnduh → UPW_RPS.capSah); templat berisi "[TTE: Ketua Jurusan|Koordinator Program Studi|Dosen Pengampu|Perwakilan
+  Mahasiswa]" (JANGAN ubah teks penanda ini). Surat tugas: halamanLampiranAju/gambarLampiranAju, lampAjuZip. Uji: uji-v54-bagian.mjs + alat/uji/bantu-docx.mjs (docxUji).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

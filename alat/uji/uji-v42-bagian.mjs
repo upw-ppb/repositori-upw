@@ -1,3 +1,4 @@
+import { docxUji } from "./bantu-docx.mjs";
 // Uji v0.42.0: CPL prodi, otorisasi RPS, templat RPS terisi (rps.js), pembaca RPS Word, pemeriksaan butir 8, saran metode, RpsData, centang CPL Tabel 4.
 // Memakai MK UPW992 (dosen uji mengajar kelas A dan B, tim sama) dari uji v0.40.0.
 import fs from "node:fs";
@@ -78,6 +79,6 @@ export async function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM }) 
   cek("Data Prodi › Kurikulum: unsur CPL dan RPS dari RPS terbaca", mkDp.rpsBaca && mkDp.rpsBaca.unsur.sort().join() === "KK,KU,P,S" && mkDp.rpsBaca.semester === kini);
   // Unggah PDF RPS (tanpa baca) tidak menghapus hasil baca lama, tetapi tidak lagi ditampilkan untuk file baru
   const pdf = Buffer.concat([Buffer.from("%PDF-1.4\n"), Buffer.alloc(40)]).toString("base64");
-  const Dp = ok("mkp.unggah", { semester: kini, kode: "UPW992", komp: "rps", kunci: "A", nama: "RPS.pdf", isi: pdf }, tDsn);
+  const Dp = ok("mkp.unggah", { semester: kini, kode: "UPW992", komp: "rps", kunci: "A", nama: "RPS.docx", isi: docxUji("rps", "RPS") }, tDsn);
   cek("RPS diganti PDF: hasil baca tidak ditampilkan untuk file baru", Dp.kelas.every(k => !k.rpsBaca));
 }

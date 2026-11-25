@@ -391,6 +391,7 @@ function aksiKpsPutuskan(d, token) {
 function aksiSuratCek(d) {
   var kode = String(d.kode || "").trim().toUpperCase();
   if (/^UND-\d{4}-[0-9A-F]{8}$/.test(kode)) return cekUndangan(kode); // v0.31.0: undangan rapat
+  if (/^SAH-\d{4}-[0-9A-F]{8}$/.test(kode)) return cekPengesahan(kode); // v0.54.0: RPS / kontrak kuliah
   if (!/^UPW-\d{4}-[0-9A-F]{8}$/.test(kode)) return { sah: false };
   var r = cari("Kegiatan", function (x) { return x.kodeSurat === kode; });
   if (!r || r.dihapus || r.st !== "terbit") return { sah: false };

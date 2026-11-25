@@ -1,3 +1,4 @@
+import { docxUji } from "./bantu-docx.mjs";
 // Uji v0.43.0: kualifikasi/jenjang per semester, jam sajian, RPS resmi PDF + Word sumber, centang tanda tangan, skala nilai,
 // templat kontrak kuliah, rubrik, dan lembar portofolio penilaian (Tahap 2). Memakai UPW992 dari uji v0.40/v0.42.
 import fs from "node:fs";
@@ -18,9 +19,9 @@ export async function jalankan({ g, cek, ok, salah, tKps, tDsn, tAdm, tM }) {
   vm.runInContext(fs.readFileSync("web/zip.js", "utf8"), ctx); vm.runInContext(fs.readFileSync("web/rps.js", "utf8"), ctx);
   const U = ctx.UPW_RPS, R2 = ok("mkp.rpsRef", { semester: kini, kode: "UPW992", kunci: "A" }, tDsn), D = R2.terakhir.data;
   let Dt = ok("mkp.detail", { semester: kini, kode: "UPW992", kunci: "A" }, tDsn);
-  cek("RPS resmi PDF belum punya hasil baca", /\.pdf$/.test(Dt.kelas[0].rps.nama) && Dt.kelas.every(k => !k.rpsBaca));
+  cek("RPS Word tanpa hasil baca belum punya hasil baca", /\.docx$/.test(Dt.kelas[0].rps.nama) && Dt.kelas.every(k => !k.rpsBaca));
   Dt = ok("mkp.rpsBaca", { semester: kini, kode: "UPW992", kunci: "A", rps: JSON.stringify(D) }, tDsn);
-  cek("Word sumber: hasil baca menempel pada RPS PDF di kelas A dan B (RPS bersama), file PDF tetap", Dt.kelas.every(k => k.rpsBaca && k.rpsBaca.data.cpl.length === 4 && /\.pdf$/.test(k.rps.nama)));
+  cek("Word sumber: hasil baca menempel pada RPS PDF di kelas A dan B (RPS bersama), file PDF tetap", Dt.kelas.every(k => k.rpsBaca && k.rpsBaca.data.cpl.length === 4 && /\.docx$/.test(k.rps.nama)));
   cek("Word sumber: isi tidak terbaca ditolak; mahasiswa ditolak", /tidak terbaca/.test(salah("mkp.rpsBaca", { semester: kini, kode: "UPW992", kunci: "A", rps: "{}" }, tDsn))
     && !!salah("mkp.rpsBaca", { semester: kini, kode: "UPW992", rps: JSON.stringify(D) }, tM));
   // Tanda tangan
@@ -29,10 +30,10 @@ export async function jalankan({ g, cek, ok, salah, tKps, tDsn, tAdm, tM }) {
   cek("tanda tangan kontrak sebelum diunggah ditolak; jenis tak dikenal ditolak", /belum diunggah/.test(salah("mkp.ttd", { semester: kini, kode: "UPW991", kunci: "A", komp: "kontrak", ttd: { dosen: true } }, tDsn))
     && /tidak dikenal/.test(salah("mkp.ttd", { semester: kini, kode: "UPW992", komp: "integ", ttd: {} }, tDsn)));
   const pdf = Buffer.concat([Buffer.from("%PDF-1.4\n"), Buffer.alloc(40)]).toString("base64");
-  ok("mkp.unggah", { semester: kini, kode: "UPW992", komp: "kontrak", kunci: "A", nama: "Kontrak.pdf", isi: pdf }, tDsn);
+  ok("mkp.unggah", { semester: kini, kode: "UPW992", komp: "kontrak", kunci: "A", nama: "Kontrak.docx", isi: docxUji("kontrak", "Kontrak") }, tDsn);
   Dt = ok("mkp.ttd", { semester: kini, kode: "UPW992", kunci: "A", komp: "kontrak", ttd: { dosen: true, mhs: true, kps: true } }, tDsn);
   cek("centang tanda tangan kontrak hanya untuk kelas itu", Dt.kelas.find(k => k.k === "A").kontrak.ttd.mhs === true && (!Dt.kelas.find(k => k.k === "B").kontrak || !Dt.kelas.find(k => k.k === "B").kontrak.ttd));
-  ok("mkp.unggah", { semester: kini, kode: "UPW992", komp: "kontrak", kunci: "A", nama: "Kontrak2.pdf", isi: pdf }, tDsn);
+  ok("mkp.unggah", { semester: kini, kode: "UPW992", komp: "kontrak", kunci: "A", nama: "Kontrak2.docx", isi: docxUji("kontrak", "Kontrak2") }, tDsn);
   cek("mengganti dokumen menghapus centang tanda tangan lama", !ok("mkp.detail", { semester: kini, kode: "UPW992", kunci: "A" }, tDsn).kelas.find(k => k.k === "A").kontrak.ttd);
   // Waktu & kualifikasi di templat
   cek("waktu bawaan: teori 1 JP/sks + PT + KM, praktik 2 JP/sks + PT/KM", U.waktuBawaan({ sksT: 2, sksP: 0 }) === "TM: 2 JP × 50' = 100'\nPT: 2 × 60'\nKM: 2 × 60'" && U.waktuBawaan({ sksT: 0, sksP: 2 }) === "Praktik: 4 JP × 50' = 200'\nPT/KM: 2 × 70'");

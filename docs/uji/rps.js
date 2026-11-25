@@ -209,11 +209,13 @@ function buat(D, logo) {
   h.push(par("Catatan: Nilai UAS untuk vokasi 30% teori dan 70% praktik; nilai UJK terintegrasi dengan nilai praktik. Rincian instrumen (soal, rubrik, lembar observasi) dilampirkan pada portofolio penilaian mata kuliah." + (D.hadirMin ? ` Syarat mengikuti UAS: kehadiran minimal ${D.hadirMin}%.` : ""), { i: 1, ukuran: 9, sebelum: 80, sesudah: 240 }));
   // Otorisasi
   h.push(par("OTORISASI", { b: 1, sesudah: 120, ukuran: 11 }));
-  const ttd = (jab, orang) => `${jab}\n\n\n\n${orang.map(o => (o.nama || "[Nama]") + (o.nip ? `\nNIP: ${o.nip}` : "")).join("\n\n")}`;
+  // v0.54.0: "[TTE: …]" = tempat tanda tangan elektronik (QR) yang dibubuhkan aplikasi setelah RPS disahkan; jangan dihapus.
+  const ttd = (jab, orang, tte) => `${jab}\n[TTE: ${tte}]\n\n${orang.map(o => (o.nama || "[Nama]") + (o.nip ? `\nNIP: ${o.nip}` : "")).join("\n\n")}`;
   h.push(tabel(bagi(LEBAR, 3), [{ c: [
-    { t: ttd((O.kajur && O.kajur.jabatan) || "Ketua Jurusan", [O.kajur || {}]), rata: "center" },
-    { t: ttd((O.kps && O.kps.jabatan) || "Koordinator Program Studi", [O.kps || {}]), rata: "center" },
-    { t: ttd("Dosen Pengampu Mata Kuliah", (O.pengembang || []).length ? O.pengembang : [{}]), rata: "center" }] }], { tanpaGaris: 1 }));
+    { t: ttd((O.kajur && O.kajur.jabatan) || "Ketua Jurusan", [O.kajur || {}], "Ketua Jurusan"), rata: "center" },
+    { t: ttd((O.kps && O.kps.jabatan) || "Koordinator Program Studi", [O.kps || {}], "Koordinator Program Studi"), rata: "center" },
+    { t: ttd("Dosen Pengampu Mata Kuliah", (O.pengembang || []).length ? O.pengembang : [{}], "Dosen Pengampu"), rata: "center" }] }], { tanpaGaris: 1 }));
+  h.push(par("Tanda tangan elektronik (QR) dibubuhkan otomatis oleh Repositori UPW setelah RPS diajukan dan disahkan. Jangan menghapus tulisan [TTE: …] di atas.", { i: 1, ukuran: 8, warna: "808080", sebelum: 80 }));
   return paket(h, { lanskap: true, judul: "RPS " + (M.nama || ""), penanda: PENANDA, media });
 }
 
@@ -560,9 +562,10 @@ function kontrak(R, D, logo, I0 = {}) {
   h.push(par(I.tempatTgl || "[Tempat], [tanggal pertemuan pertama]", { rata: "right", sesudah: 120 }));
   const dsn = (R.tim || []).filter(t => !t.praktisi)[0] || {};
   h.push(tabel(bagi(W, 3), [{ c: [
-    { t: `Dosen Pengampu\n\n\n\n${dsn.nama || "[Nama]"}\nNIP: ${dsn.nip || "[NIP]"}`, rata: "center" },
-    { t: "Perwakilan Mahasiswa\n\n\n\n[Nama]\nNIM: [NIM]", rata: "center" },
-    { t: `Mengetahui,\n${O.kpsJabatan || "Koordinator Program Studi"}\n\n\n${O.kpsNama || "[Nama]"}\nNIP: ${O.kpsNip || "[NIP]"}`, rata: "center" }] }], { tanpaGaris: 1 }));
+    { t: `Dosen Pengampu\n[TTE: Dosen Pengampu]\n\n${dsn.nama || "[Nama]"}\nNIP: ${dsn.nip || "[NIP]"}`, rata: "center" },
+    { t: "Perwakilan Mahasiswa\n[TTE: Perwakilan Mahasiswa]\n\n[Nama]\nNIM: [NIM]", rata: "center" },
+    { t: `Mengetahui,\n${O.kpsJabatan || "Koordinator Program Studi"}\n[TTE: Koordinator Program Studi]\n\n${O.kpsNama || "[Nama]"}\nNIP: ${O.kpsNip || "[NIP]"}`, rata: "center" }] }], { tanpaGaris: 1 }));
+  h.push(par("Tanda tangan elektronik (QR) dibubuhkan otomatis oleh Repositori UPW setelah kontrak disetujui. Jangan menghapus tulisan [TTE: …] di atas.", { i: 1, ukuran: 8, warna: "808080", sebelum: 80 }));
   return paket(h, { judul: "Kontrak Perkuliahan " + R.mk.nama, penanda: "UPW-KONTRAK v1", media });
 }
 /** o.hanyaBerubrik: hanya komponen yang punya p.rubrik ([{k, l:[4 deskripsi], b}]) — dipakai untuk contoh. */
@@ -629,5 +632,63 @@ function portoXlsx(R, D, peserta) {
     ["Peserta diambil dari Peserta kelas di aplikasi pada saat diunduh."]], lebar: [120] });
   return lembar;
 }
-G.UPW_RPS = { buat, kosong, baca, periksa, saranMetode, ringkas, waktuBawaan, PENANDA, kontrak, rubrik, portoXlsx };
+/* ---------- v0.54.0: tanda tangan elektronik pada Word yang diunggah, dan pratinjau Word ---------- */
+const LABEL_TTE = { "ketua jurusan": "kajur", "koordinator program studi": "kps", "dosen pengampu": "dosen", "perwakilan mahasiswa": "mhs" };
+const teksPar = p => (p.match(/<w:t[^>]*>[^<]*<\/w:t>/g) || []).map(t => t.replace(/<[^>]+>/g, "")).join("");
+function parGbr(rid, cm, nama, n) {
+  const c = Math.round(cm * 360000);
+  return `<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${c}" cy="${c}"/><wp:docPr id="${n}" name="${nama}"/>`
+    + `<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${n}" name="${nama}.png"/><pic:cNvPicPr/></pic:nvPicPr>`
+    + `<pic:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="${rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${c}" cy="${c}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+}
+const parKecil = (t, o = {}) => `<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="${o.rata || "center"}"/></w:pPr><w:r><w:rPr>${o.b ? "<w:b/>" : ""}<w:sz w:val="${o.sz || 14}"/><w:szCs w:val="${o.sz || 14}"/></w:rPr><w:t xml:space="preserve">${x(t)}</w:t></w:r></w:p>`;
+/** Bubuhkan tanda tangan elektronik ke Word yang diunggah (berkas aslinya tidak diubah selain pengganti "[TTE: …]" dan lembar verifikasi di akhir).
+ *  I = { qr: Uint8Array PNG, kode, url, judul, tanda: { kajur|kps|dosen|mhs: { nama, nomor, sebagai, waktu } } } → Blob .docx */
+async function capSah(buf, I) {
+  const ambil = await G.UPW_ZIP.buka(buf, "Word (.docx)"), f = {};
+  for (const n of ambil.daftar) f[n] = await ambil.biner(n);
+  const dek = new TextDecoder(), enk = new TextEncoder();
+  if (!f["word/document.xml"]) throw new Error("Berkas bukan dokumen Word (.docx) yang sah.");
+  let doc = dek.decode(f["word/document.xml"]), rels = dek.decode(f["word/_rels/document.xml.rels"] || enk.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>'));
+  let ct = dek.decode(f["[Content_Types].xml"]);
+  const rid = "rIdUpwTte", n0 = 7300, dipakai = new Set(); let n = n0;
+  if (!rels.includes(`Id="${rid}"`)) rels = rels.replace("</Relationships>", `<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/upw-tte-qr.png"/></Relationships>`);
+  if (!/Extension="png"/i.test(ct)) ct = ct.replace("</Types>", '<Default Extension="png" ContentType="image/png"/></Types>');
+  // Body tidak boleh berisi namespace gambar yang belum dideklarasikan: pakai namespace lokal pada elemen (a:, pic:) dan pastikan wp:/r: ada di akar.
+  if (!/xmlns:wp=/.test(doc.slice(0, 2000))) doc = doc.replace(/<w:document\b/, '<w:document xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"');
+  if (!/xmlns:r=/.test(doc.slice(0, 2000))) doc = doc.replace(/<w:document\b/, '<w:document xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"');
+  doc = doc.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, p => {
+    const m = teksPar(p).match(/\[\s*TTE\s*:\s*([^\]]+)\]/i); if (!m) return p;
+    const k = LABEL_TTE[m[1].trim().toLowerCase()], s = k && I.tanda[k];
+    if (!s) return parKecil("");
+    dipakai.add(k);
+    return parGbr(rid, 1.6, "TTE " + k, ++n) + parKecil(`Ditandatangani secara elektronik`, { b: 1 }) + parKecil(`${s.waktu} · ${I.kode}`);
+  });
+  const baris = Object.keys(I.tanda).map(k => I.tanda[k]);
+  const tbl = `<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/><w:tblBorders><w:top w:val="single" w:sz="4" w:color="999999"/><w:bottom w:val="single" w:sz="4" w:color="999999"/><w:insideH w:val="single" w:sz="4" w:color="999999"/></w:tblBorders></w:tblPr>`
+    + baris.map(s => `<w:tr>${[s.sebagai, s.nama + (s.nomor ? " (" + s.nomor + ")" : ""), s.waktu].map(t => `<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr>${parKecil(t, { rata: "left", sz: 16 })}</w:tc>`).join("")}</w:tr>`).join("") + `</w:tbl>`;
+  const lembar = parKecil("PENGESAHAN ELEKTRONIK", { b: 1, sz: 18, rata: "left" }) + parKecil(`${I.judul}. Disahkan melalui Repositori UPW; persetujuan berikut tercatat di sistem.`, { rata: "left", sz: 16 }) + tbl
+    + parGbr(rid, 2.2, "QR verifikasi", ++n) + parKecil(`Kode verifikasi ${I.kode} · pindai QR atau buka ${I.url}`, { sz: 14 })
+    + (baris.length > dipakai.size ? parKecil("Sebagian tempat tanda tangan elektronik (TTE) tidak ditemukan pada dokumen; persetujuan tercatat pada lembar ini.", { sz: 14 }) : "");
+  const i = doc.lastIndexOf("<w:sectPr");
+  doc = i > 0 ? doc.slice(0, i) + `<w:p><w:r><w:br w:type="page"/></w:r></w:p>` + lembar + doc.slice(i) : doc.replace("</w:body>", lembar + "</w:body>");
+  f["word/document.xml"] = enk.encode(doc); f["word/_rels/document.xml.rels"] = enk.encode(rels); f["[Content_Types].xml"] = enk.encode(ct); f["word/media/upw-tte-qr.png"] = I.qr;
+  const zip = G.UPW_ZIP.zip(Object.keys(f).map(nama => ({ nama, data: f[nama] })));
+  return typeof Blob !== "undefined" ? new Blob([zip], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }) : zip;
+}
+/** Pratinjau isi Word sebagai HTML sederhana (paragraf dan tabel), untuk membaca RPS/kontrak tanpa mengunduh. */
+async function pratinjauDocx(buf) {
+  const ambil = await G.UPW_ZIP.buka(buf, "Word (.docx)"), doc = await ambil("word/document.xml");
+  if (!doc) throw new Error("Berkas bukan dokumen Word (.docx) yang sah.");
+  const body = (doc.match(/<w:body>([\s\S]*)<\/w:body>/) || [])[1] || doc, h = [];
+  const re = /<w:tbl>|<\/w:tbl>|<w:p[ >][\s\S]*?<\/w:p>/g; let d = 0, a = -1, m;
+  while ((m = re.exec(body))) {
+    if (m[0] === "<w:tbl>") { if (d === 0) a = m.index; d++; continue; }
+    if (m[0] === "</w:tbl>") { d--; if (d === 0) { const rows = tabelDari(body.slice(a, m.index + 8));
+      h.push(`<div class="tbl-wrap" style="flex-shrink:0"><table class="docx">${rows.map(r => `<tr>${r.filter(c => !c.vm).map(c => `<td${c.sp > 1 ? ` colspan="${c.sp}"` : ""}>${x(c.t).replace(/\n/g, "<br>")}</td>`).join("")}</tr>`).join("")}</table></div>`); } continue; }
+    if (d === 0) { const t = teksSel(m[0]); h.push(t ? `<p>${x(t).replace(/\n/g, "<br>")}</p>` : ""); }
+  }
+  return h.join("");
+}
+G.UPW_RPS = { buat, kosong, baca, periksa, saranMetode, ringkas, waktuBawaan, PENANDA, kontrak, rubrik, portoXlsx, capSah, pratinjauDocx };
 })();

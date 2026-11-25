@@ -313,6 +313,7 @@ function aksiTugasSaya(d, token) {
   var tr = tugasRapat(p), tt = tugasTl(p); // v0.31.0: undangan rapat dan tindak lanjut
   hasil.undangan = tr.undangan; hasil.tlSaya = tt.tlSaya; hasil.tlVerif = tt.tlVerif;
   var mu = tugasMutu(p); Object.keys(mu).forEach(function (k) { hasil[k] = mu[k]; }); // v0.52.0: hasil survei dibahas/dipublikasikan
+  var ts = tugasSah(p); Object.keys(ts).forEach(function (k) { hasil[k] = ts[k]; }); // v0.54.0: pengesahan RPS / kontrak
   if (!punyaPeran(p, PERAN_KEGIATAN)) return hasil;
   var idx = indeksOrang(), set = pengaturanSurat(), kini = hariIni();
   semuaKegiatan().forEach(function (k) {
