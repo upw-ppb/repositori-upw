@@ -3,6 +3,24 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.55.0 — 26 Nov 2026 — Uji Coba
+Ringkas: Mesin PDF buatan sendiri: surat tugas + semua lampiran menjadi satu PDF; RPS dan kontrak kuliah yang sah menjadi PDF bertanda tangan elektronik; Pratinjau PDF.
+Permintaan pemilik 26 Nov 2026: lampiran PDF/Word langsung menjadi satu PDF tanpa pustaka tambahan; RPS/kontrak yang sah berupa PDF; pilihan pemilik "Bagaimana jika kita coba yang B?"
+(mesin sendiri, bukan konversi Google).
+- docs/uji/pdf.js (dimuat saat dibutuhkan, tanpa pustaka/layanan luar): PdfTulis (objek, xref, huruf standar Times/Helvetica/Courier dengan lebar diukur dari huruf setara di
+  browser, gambar JPEG, tautan, kompresi Flate); dariHtml (browser menata HTML, lalu setiap kata, latar, garis, gambar, SVG/QR, tautan ditulis ke PDF pada posisi yang sama; halaman A4
+  dipotong di antara baris, baris tabel tidak dipotong kecuali sangat tinggi, pemisah halaman dihormati, huruf di luar WinAnsi diganti sebelum ditata); docxKeHtml (Word → HTML: paragraf,
+  huruf, ukuran, warna, sorot, perataan, inden, spasi, tabel dengan lebar kolom, sel gabung, arsiran, gambar, ukuran/arah kertas dan margin); gabung (menyalin halaman PDF lain apa
+  adanya: xref biasa, xref stream, object stream, prediktor PNG; PDF terkunci ditolak).
+  Pendekatan "mesin sendiri" diterapkan pada isi Word yang diunggah dosen (bukan hanya data terbaca), agar tidak ada isi yang hilang dan hasilnya tetap pasti.
+- Surat tugas: Unduh PDF (surat + lampiran) = surat (kop hanya halaman pertama) + daftar lampiran tanpa kop/ttd + isi lampiran (PDF digabung, Word disusun ulang, gambar dicetak);
+  Excel/PowerPoint dicantumkan saja. Cetak lewat browser dan ZIP berkas asli tetap ada sebagai cadangan.
+- RPS/kontrak sah: Unduh PDF bertanda tangan (Word asli + QR → PDF). Pratinjau PDF sebelum sah. Templat RPS: nama Ketua Jurusan otomatis dari akun berperan kajur bila belum diatur.
+- Diperiksa: PDF hasil dibuka dan dirender oleh macOS PDFKit (RPS 6 halaman, surat + 4 lampiran 11 halaman: PDF modern, PDF macOS, Word, gambar); penggabungan PDF klasik, modern
+  (xref/object stream), macOS, dan Chrome. Belum diuji: PDF dari Microsoft Word/aplikasi pemindai sungguhan (bila ada yang gagal digabung, aplikasi memberi tahu dan ZIP tetap tersedia).
+- Struktur data tidak berubah. Uji: 1023 + 44 lulus (uji-v55-bagian.mjs, alat/uji/bantu-pdf.mjs); penjelajah KPS 62 layar tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.54.1 — 26 Nov 2026 — Uji Coba
 Ringkas: Tempat tanda tangan elektronik di templat RPS dan kontrak kini bersorot kuning dengan keterangan, dan hilang sendiri pada dokumen jadi.
 Catatan pemilik 26 Nov 2026 (poin 3): "apakah bisa diberikan tanda atau keterangan? tetapi saat menjadi dokumen jadi, tanda ini otomatis juga akan hilang".

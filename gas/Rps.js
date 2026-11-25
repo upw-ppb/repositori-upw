@@ -19,6 +19,9 @@ function rpsOtorisasi() {
   h.skala = skalaNilai(h.skalaNilai);
   if (!h.tempat) h.tempat = pengaturanSurat().tempat;
   if (!h.kpsNama) { var k = pengaturanSurat().kps; if (k) { h.kpsNama = k.nama; h.kpsNip = k.nip; h.kpsDariAkun = true; } }
+  // v0.55.0: Ketua Jurusan kosong = akun aktif berperan kajur (bila tepat satu)
+  if (!h.kajurNama) { var kj = semua("Pengguna").filter(function (x) { return x.status === "aktif" && peranDari(x).indexOf("kajur") >= 0; });
+    if (kj.length === 1) { h.kajurNama = teks(kj[0].nama); h.kajurNip = teks(kj[0].username); h.kajurDariAkun = true; } }
   return h;
 }
 /** Simpan otorisasi RPS (Admin Prodi / Super Admin). Tanpa d.simpan → hanya baca. */

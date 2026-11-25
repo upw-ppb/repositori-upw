@@ -402,6 +402,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Tampilan: menu "sah" (hSah, laciSahLihat, sahMkpHtml, qrPng, AKSI.sahUnduh → UPW_RPS.capSah); templat berisi "[TTE: Ketua Jurusan|Koordinator Program Studi|Dosen Pengampu|Perwakilan
   Mahasiswa]" (JANGAN ubah teks penanda ini). Surat tugas: halamanLampiranAju/gambarLampiranAju, lampAjuZip. Uji: uji-v54-bagian.mjs + alat/uji/bantu-docx.mjs (docxUji).
 
+- v0.55.0 (26 Nov 2026, Uji Coba): docs/uji/pdf.js = mesin PDF sendiri (UPW_PDF: PdfTulis, dariHtml(tulis, html, {lebar, tinggi, margin, marginAtasPertama}), docxKeHtml(buf) →
+  {html, lebar, tinggi, margin}, gabung(tulis, u8), bukaPdf); dimuat malas (muatPdf). JANGAN ganti dengan pustaka luar/konversi Google tanpa izin pemilik. Surat: AKSI.unduhSuratPdf;
+  RPS/kontrak sah: sahUnduh → capSah → tambahDocxKePdf; sahPratinjauPdf. Uji visual: kirim PDF ke penerima terima.py (serve_forever) lalu render dengan swift PDFKit. Uji: uji-v55-bagian.mjs + bantu-pdf.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.
