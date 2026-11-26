@@ -72,6 +72,7 @@ export function buatGas(folderGas, opsi = {}) {
   const berkas = (nama, isi = "", mime = "") => { const b = { id: id("b"), nama, isi, mime, terbuang: false, getId: () => b.id, getName: () => b.nama, getSize: () => Array.isArray(isi) ? isi.length : String(isi).length,
     setTrashed: v => { b.terbuang = !!v; }, getMimeType: () => b.mime, getBlob: () => ({ getBytes: () => Array.isArray(isi) ? isi.slice() : Array.from(Buffer.from(String(isi))), getContentType: () => b.mime, getName: () => b.nama }),
     getLastUpdated: () => new Date(), getUrl: () => "https://contoh/" + b.id,
+    getAs: m => { if (b.mime !== "application/vnd.google-apps.document" || m !== "application/pdf") throw new Error("Mengonversikan tidak didukung."); return { getBytes: () => Array.isArray(isi) ? isi.slice() : Array.from(Buffer.from(String(isi))) }; },
     moveTo: f => { f.file.push(b); }, makeCopy: (n, f) => { const c = berkas(n, JSON.stringify(sheets)); f.file.push(c); return c; } }; files[b.id] = b; return b; };
   files["ss1"] = berkas("Spreadsheet"); files["ss1"].id = "ss1";
 
@@ -112,6 +113,8 @@ export function buatGas(folderGas, opsi = {}) {
       formatDate: fmt
     },
     MailApp: { sendEmail: o => surat.push(o), getRemainingDailyQuota: () => 1500 },
+    // v0.58.0: layanan lanjutan Drive v3 (OCR ke Google Dokumen). Tiruan: isi "hasil OCR" = isi berkas asli; ocrGagal = true → galat.
+    Drive: { ocrGagal: false, Files: { create: (res, blob, opt) => { if (ctx.Drive.ocrGagal) throw new Error("OCR gagal (tiruan)"); const b = berkas(res.name, blob.getBytes(), res.mimeType); b.ocr = opt; return { id: b.id }; } } },
     DriveApp: { createFolder: n => folder(n), getFolderById: i => files[i], getFileById: i => files[i], getRootFolder: () => folder("root") },
     MimeType: { CSV: "text/csv" },
     ContentService: { MimeType: { JSON: "json" }, createTextOutput: t => ({ isi: t, setMimeType() { return this; } }) },

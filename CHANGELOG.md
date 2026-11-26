@@ -3,6 +3,23 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.58.0 — 26 Nov 2026 — Uji Coba
+Ringkas: Kalender Akademik di Beranda semua pengguna; Admin Prodi mengunggah PDF kalender resmi, tanggalnya dibaca otomatis, diperiksa lalu disetujui; jadwal survei dan hari libur mengikuti kalender resmi.
+Permintaan pemilik 26 Nov 2026: "Silahkan lanjutkan" (tempat unggah kalender untuk Admin, tampil di Beranda semua pengguna) dan "apakah bisa … aplikasi langsung membaca
+tanggal-tanggal penting ini? jadi admin tinggal mereview dan merubah jika ada yang salah … langsung klik disetujui".
+- gas/Kalender.js + tabel KalenderAkademik (VERSI_SKEMA 38; satu baris per semester: berkas, tabel per minggu, hari libur, status draf/terbit, penyetuju, riwayat berkas).
+  Aksi kalender.unggah (Admin Prodi/Super Admin; PDF/JPG/PNG ≤ 10 MB → Drive "Kalender Akademik"), kalender.simpan (draf/setujui), kalender.status (sembunyikan/hapus),
+  kalender.data (semua pengguna: kalender terbit semester lalu/berjalan/berikutnya; Admin: semua termasuk draf), kalender.lihat.
+- Baca otomatis: OCR Google Drive (layanan lanjutan Drive v3 diaktifkan di appsscript.json; TANPA izin/scope baru — ekspor teks langsung butuh izin Dokumen, jadi hasil OCR
+  diambil sebagai PDF teks) → docs/uji/pdf.js teksPdf (teks per baris dari posisi glyph + ToUnicode) → docs/uji/kalender.js (UPW_KALENDER.baca: minggu dari tanggal Senin/Jumat,
+  nomor minggu, kegiatan sebelum minggu 1 / UTS / KIMPA-UAS, hari libur). Diuji pada tiga kalender resmi (Ganjil 2026/2027, Genap 2026/2027, Ganjil 2027/2028): hasil sama
+  dengan dokumen asli. Admin tetap wajib memeriksa; baris tebakan ditandai "?".
+- Beranda: minggu ini (minggu kuliah ke-n / UTS / tidak ada perkuliahan), tiga kegiatan berikutnya, hari libur 2 minggu ke depan, tabel lengkap, dokumen asli, unduh.
+- Jadwal survei (minggu kuliah ke-n) memakai tanggal kuliah resmi bila kalender semester itu disetujui (sebelumnya patokan 1 Sep / 1 Feb). Hari libur kalender ditambahkan ke
+  hitungan hari kerja (batas unggah bukti kegiatan).
+- Rollback ke v0.57.0: tabel KalenderAkademik diabaikan versi lama (data tetap aman); panel kalender hilang, jadwal survei kembali ke patokan lama.
+- Uji: alat/uji/uji-v58-bagian.mjs + alat/uji/kalender-ocr-*.txt (teks OCR, tanpa nama/NIP penanda tangan).
+
 ## v0.57.0 — 26 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.57.0 (tampilan docs/ dan server Apps Script Produksi deployment @40): praktisi berinisial, SK/surat tugas per semester, sertifikat banyak berkas,
   kelengkapan dan pengingat SK di Beranda.

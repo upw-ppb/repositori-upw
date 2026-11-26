@@ -416,6 +416,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Beranda prakTanpaSk (admin/superadmin/kps). Tampilan: prIns, prSkSmt, data-psmt/data-smt/data-eid, labelPrakTim berinisial (+ labelPrakLama di pencocok). Praktisi TETAP tanpa akun
   (keputusan pemilik; bisa dibahas kemudian). Uji: uji-v57-bagian.mjs.
 
+- v0.58.0 (26 Nov 2026, Uji Coba): Kalender Akademik. gas/Kalender.js (KalenderAkademik, VERSI_SKEMA 38; kalender.unggah/simpan/status/data/lihat; PERAN_KALENDER admin/superadmin;
+  tglMingguKuliah(smt, n, akhir) → jadwalSurvei; liburKalender() → pengaturanSurat.libur). OCR: appsscript.json enabledAdvancedServices Drive v3; Drive.Files.create(..., {ocrLanguage:"id"})
+  ke Google Dokumen lalu getAs("application/pdf") (ekspor text/plain GAGAL: butuh alt=media / scope documents — JANGAN tambah scope tanpa izin pemilik; menambah scope = pemilik
+  wajib otorisasi ulang di editor). Tampilan: UPW_PDF.teksPdf (pdf.js), docs/uji/kalender.js (UPW_KALENDER.baca/bacaLibur; muatKal), panelKalender (Beranda), laciKal/laciKalUbah/
+  laciKalLihat (S.kal, S.laci.baris/tebak). Data uji OCR: alat/uji/kalender-ocr-*.txt (jalankan.sh kini menyalin *.txt). PDF kalender asli pemilik ada di ~/Downloads (JANGAN ke repo).
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

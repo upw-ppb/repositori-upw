@@ -472,7 +472,12 @@ function jadwalSurvei() {
   JADWAL_SURVEI.forEach(function (j) {
     smt.forEach(function (sm) {
       var kode = sm.awal + "-" + (sm.ganjil ? 1 : 2), mulai, akhir, kunci;
-      if (j.per === "smt") { var m0 = sm.ganjil ? sm.awal + "-" + kal.ganjil : (sm.awal + 1) + "-" + kal.genap; mulai = tglGeser(m0, j.m); akhir = tglGeser(m0, j.s); kunci = j.k + "-" + kode; }
+      if (j.per === "smt") {
+        // v0.58.0: bila kalender akademik semester itu sudah disetujui, pakai minggu kuliah resmi (minggu ke-n), bukan tanggal patokan
+        var wm = Math.floor(j.m / 7) + 1, ws = Math.floor(j.s / 7) + 1, km = tglMingguKuliah(kode, wm, false);
+        if (km) { mulai = km; akhir = tglMingguKuliah(kode, ws, true); }
+        else { var m0 = sm.ganjil ? sm.awal + "-" + kal.ganjil : (sm.awal + 1) + "-" + kal.genap; mulai = tglGeser(m0, j.m); akhir = tglGeser(m0, j.s); }
+        kunci = j.k + "-" + kode; }
       else if ((j.per === "ganjil") === sm.ganjil) { var th = sm.ganjil ? sm.awal : sm.awal + 1; mulai = th + "-" + j.bm; akhir = th + "-" + j.bs; kunci = j.k + "-" + kode; }
       else return;
       if (j.k === "kurikulum" && rapatIab.length) return;
@@ -492,7 +497,8 @@ function jadwalSurvei() {
 function aksiSurveiJadwal(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_SURVEI_LIHAT);
-  return { jadwal: jadwalSurvei(), kalender: kalenderSurvei(), bolehUbah: punyaPeran(p, PERAN_SURVEI_UBAH), hariIni: hariIni() };
+  return { jadwal: jadwalSurvei(), kalender: kalenderSurvei(), bolehUbah: punyaPeran(p, PERAN_SURVEI_UBAH), hariIni: hariIni(),
+    kalenderResmi: semuaKalender().filter(function (k) { return k.status === "terbit"; }).map(function (k) { return labelSmt(k.semester); }) };   // v0.58.0
 }
 /** Buat draf survei dari templat untuk satu rekomendasi jadwal (judul, tanggal, sasaran, anonim terisi). Bila sudah ada, kembalikan yang ada. */
 function aksiSurveiSiapkan(d, token) {

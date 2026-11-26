@@ -152,7 +152,7 @@ function pengaturanSurat() {
     tujuanDosen: teks(m.tujuanDosen) || "Kepala Bagian Administrasi Umum",
     tujuanMhs: teks(m.tujuanMhs) || "Kabag. Administrasi Akademik, Kemahasiswaan dan Kerjasama",
     hk: Math.max(1, Math.min(30, Number(m.batasHariKerja) || 5)),
-    libur: (m.hariLibur instanceof Date ? teksTgl(m.hariLibur) : teks(m.hariLibur)).split(/[\s,;]+/).filter(tanggalSah),
+    libur: (m.hariLibur instanceof Date ? teksTgl(m.hariLibur) : teks(m.hariLibur)).split(/[\s,;]+/).filter(tanggalSah).concat(liburKalender()),   // v0.58.0: + libur kalender akademik
     kps: kps ? { nama: kps.nama, nip: String(kps.username) } : null
   };
 }

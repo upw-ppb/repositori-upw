@@ -475,5 +475,111 @@ async function gabung(tulis, u8) {
   return pages.length;
 }
 
-G.UPW_PDF = { PdfTulis, dariHtml, docxKeHtml, gabung, keWin, bukaPdf, A4 };
+/* ---------- v0.58.0: teks dari PDF (hasil OCR Google Drive; font dengan ToUnicode) ---------- */
+function bytesString(raw) {   // token string PDF "(..)" atau "<..>" → array byte
+  if (raw[0] === "<") { const h = raw.slice(1, -1).replace(/\s+/g, ""); const out = []; for (let i = 0; i < h.length; i += 2) out.push(parseInt((h[i] + (h[i + 1] || "0")), 16)); return out; }
+  const s = raw.slice(1, -1), out = [];
+  for (let i = 0; i < s.length; i++) {
+    let c = s[i];
+    if (c !== "\\") { out.push(c.charCodeAt(0) & 255); continue; }
+    c = s[++i];
+    const esc = { n: 10, r: 13, t: 9, b: 8, f: 12, "(": 40, ")": 41, "\\": 92 };
+    if (c in esc) out.push(esc[c]);
+    else if (/[0-7]/.test(c)) { let o = c; while (o.length < 3 && /[0-7]/.test(s[i + 1])) o += s[++i]; out.push(parseInt(o, 8) & 255); }
+    else if (c === "\r" || c === "\n") { if (c === "\r" && s[i + 1] === "\n") i++; }
+    else if (c !== undefined) out.push(c.charCodeAt(0) & 255);
+  }
+  return out;
+}
+function petaToUnicode(t) {
+  const m = new Map(), hx = h => parseInt(h, 16), keStr = h => { let o = ""; for (let i = 0; i + 4 <= h.length; i += 4) o += String.fromCharCode(hx(h.slice(i, i + 4))); return o || String.fromCharCode(hx(h)); };
+  let lebar = 1;
+  t.replace(/beginbfchar([\s\S]*?)endbfchar/g, (_, b) => { b.replace(/<([0-9a-fA-F]+)>\s*<([0-9a-fA-F]*)>/g, (__, k, v) => { lebar = Math.max(lebar, k.length / 2); m.set(hx(k), keStr(v)); }); });
+  t.replace(/beginbfrange([\s\S]*?)endbfrange/g, (_, b) => {
+    b.replace(/<([0-9a-fA-F]+)>\s*<([0-9a-fA-F]+)>\s*(<[0-9a-fA-F]*>|\[[^\]]*\])/g, (__, a1, a2, v) => {
+      lebar = Math.max(lebar, a1.length / 2); const s0 = hx(a1), s1 = hx(a2);
+      if (v[0] === "[") { const l = v.match(/<([0-9a-fA-F]*)>/g) || []; for (let k = s0; k <= s1 && k - s0 < l.length; k++) m.set(k, keStr(l[k - s0].slice(1, -1))); }
+      else { const h = v.slice(1, -1), basis = hx(h.slice(-4) || "0"), dep = h.slice(0, -4); for (let k = s0; k <= s1 && k - s0 < 65536; k++) m.set(k, (dep ? keStr(dep) : "") + String.fromCharCode(basis + k - s0)); }
+    });
+  });
+  return { m, lebar };
+}
+/** Teks semua halaman PDF, satu baris per perpindahan baris teks. Dipakai membaca hasil OCR kalender akademik. */
+async function teksPdf(u8) {
+  const P = await bukaPdf(u8 instanceof Uint8Array ? u8 : new Uint8Array(u8));
+  const deref = async v => v && v.t === "r" ? ((await P.ambil(v.n)) || {}).v : v;
+  const data = async v => { if (!v || v.t !== "r") return null; const o = await P.ambil(v.n); if (!o || !o.data) return null; return ambilK(o.v, "/Filter") ? await mekar(o.data) : o.data; };
+  const root = await deref(ambilK(P.trailer, "/Root")), hal = [];
+  async function telusur(ref, res, sudah) {
+    if (!ref || ref.t !== "r" || sudah.has(ref.n)) return; sudah.add(ref.n);
+    const o = await P.ambil(ref.n); if (!o || !o.v || o.v.t !== "d") return;
+    const r = o.v.v.has("/Resources") ? o.v.v.get("/Resources") : res, kids = ambilK(o.v, "/Kids");
+    if (kids) { for (const k of (await deref(kids)).v) await telusur(k, r, sudah); } else hal.push({ o, res: r });
+  }
+  await telusur(ambilK(root, "/Pages"), null, new Set());
+  const keluaran = [];
+  for (const h of hal) {
+    const res = await deref(h.res), fonts = await deref(ambilK(res, "/Font")), peta = new Map();
+    if (fonts && fonts.t === "d") for (const [k, v] of fonts.v) {
+      const f = await deref(v), tu = ambilK(f, "/ToUnicode"), sub = (ambilK(f, "/Subtype") || {}).v;
+      const b = tu ? await data(tu) : null, t = b ? petaToUnicode(latin(b)) : { m: new Map(), lebar: 1 };
+      t.w = new Map(); t.dw = 1000;
+      if (sub === "/Type0") {
+        t.lebar = 2; const df = await deref(ambilK(f, "/DescendantFonts")), d0 = df && df.t === "a" ? await deref(df.v[0]) : null;
+        if (d0) { const dw = ambilK(d0, "/DW"); if (dw) t.dw = Number(dw.v); const W = await deref(ambilK(d0, "/W"));
+          if (W && W.t === "a") for (let i = 0; i < W.v.length;) { const c = Number(W.v[i].v), nx = await deref(W.v[i + 1]);
+            if (nx && nx.t === "a") { nx.v.forEach((x, j) => t.w.set(c + j, Number(x.v))); i += 2; } else { const c2 = Number(W.v[i + 1].v), w = Number(W.v[i + 2].v); for (let k2 = c; k2 <= c2 && k2 - c < 65536; k2++) t.w.set(k2, w); i += 3; } } }
+      } else {
+        const fc = Number((ambilK(f, "/FirstChar") || {}).v || 0), W = await deref(ambilK(f, "/Widths")); t.dw = 500;
+        if (W && W.t === "a") W.v.forEach((x, j) => t.w.set(fc + j, Number(x.v)));
+      }
+      peta.set(k, t);
+    }
+    let isi = ambilK(h.o.v, "/Contents"); const bag = [];
+    if (isi && isi.t === "r") { const o = await P.ambil(isi.n); if (o && o.v && o.v.t === "a") isi = o.v; }
+    for (const c of (isi && isi.t === "a" ? isi.v : [isi])) { const d = await data(c); if (d) bag.push(latin(d)); }
+    // posisi tiap potongan teks (matriks teks + lebar glyph) → dikelompokkan per baris (y) dan diurutkan per x
+    const s = bag.join("\n"), L = lexer(s), ops = [], pot = [];
+    let font = null, fs = 10, tc = 0, tw = 0, th = 1, tm = [1, 0, 0, 1, 0, 0], tlm = tm.slice(), tl = 0, ctm = [1, 0, 0, 1, 0, 0]; const tumpuk = [];
+    const kali = (m, n) => [m[0] * n[0] + m[1] * n[2], m[0] * n[1] + m[1] * n[3], m[2] * n[0] + m[3] * n[2], m[2] * n[1] + m[3] * n[3], m[4] * n[0] + m[5] * n[2] + n[4], m[4] * n[1] + m[5] * n[3] + n[5]];
+    const num = k => Number((ops[ops.length - k] || {}).v || 0);
+    const garis = () => { tlm = kali([1, 0, 0, 1, 0, -tl], tlm); tm = tlm.slice(); };
+    const tulisS = raw => { const by = bytesString(raw), f = font || { m: new Map(), lebar: 1, w: new Map(), dw: 500 }; let t = "";
+      const m = kali(tm, ctm), x0 = m[4], y0 = m[5], sk = Math.hypot(m[2], m[3]) || 1;
+      for (let i = 0; i + f.lebar <= by.length; i += f.lebar) { let k = 0; for (let j = 0; j < f.lebar; j++) k = k * 256 + by[i + j];
+        const ch = f.m.has(k) ? f.m.get(k) : f.lebar === 1 ? String.fromCharCode(k) : ""; t += ch;
+        const w = ((f.w.has(k) ? f.w.get(k) : f.dw) / 1000 * fs + tc + (ch === " " ? tw : 0)) * th; tm = kali([1, 0, 0, 1, w, 0], tm); }
+      const m2 = kali(tm, ctm); if (t) pot.push({ x: x0, y: y0, x2: m2[4], fs: fs * sk, t }); };
+    for (;;) {
+      L.lewat(); if (L.pos >= s.length) break;
+      let v; try { v = L.nilai(); } catch (_) { L.pos++; continue; }
+      if (v.t !== "x" || /^[(<]/.test(v.v) || /^[-+.\d]/.test(v.v)) { ops.push(v); continue; }
+      const op = v.v;
+      if (op === "BI") { const e = s.indexOf("EI", L.pos); L.pos = e < 0 ? s.length : e + 2; }
+      else if (op === "q") tumpuk.push(ctm.slice());
+      else if (op === "Q") ctm = tumpuk.pop() || [1, 0, 0, 1, 0, 0];
+      else if (op === "cm") ctm = kali([num(6), num(5), num(4), num(3), num(2), num(1)], ctm);
+      else if (op === "BT") { tm = [1, 0, 0, 1, 0, 0]; tlm = tm.slice(); }
+      else if (op === "Tf") { const n = ops[ops.length - 2]; font = n && n.t === "n" ? peta.get(n.v) || null : null; fs = num(1); }
+      else if (op === "Tc") tc = num(1); else if (op === "Tw") tw = num(1); else if (op === "Tz") th = num(1) / 100; else if (op === "TL") tl = num(1);
+      else if (op === "Td" || op === "TD") { if (op === "TD") tl = -num(1); tlm = kali([1, 0, 0, 1, num(2), num(1)], tlm); tm = tlm.slice(); }
+      else if (op === "Tm") { tlm = [num(6), num(5), num(4), num(3), num(2), num(1)]; tm = tlm.slice(); }
+      else if (op === "T*") garis();
+      else if (op === "Tj" || op === "'" || op === '"') { if (op !== "Tj") garis(); const x = ops[ops.length - 1]; if (x && x.t === "x") tulisS(x.v); }
+      else if (op === "TJ") { const a = ops[ops.length - 1]; if (a && a.t === "a") a.v.forEach(x => { if (x.t === "x" && /^[(<]/.test(x.v)) tulisS(x.v); else if (x.t === "x") tm = kali([1, 0, 0, 1, -Number(x.v) / 1000 * fs * th, 0], tm); }); }
+      ops.length = 0;
+    }
+    // kelompokkan per baris
+    pot.sort((a, b) => b.y - a.y || a.x - b.x);
+    const baris = [];
+    pot.forEach(q => { const b = baris.find(r => Math.abs(r.y - q.y) < Math.max(2, q.fs * 0.4)); if (b) b.p.push(q); else baris.push({ y: q.y, p: [q] }); });
+    baris.sort((a, b) => b.y - a.y);
+    keluaran.push(baris.map(b => { b.p.sort((a, c) => a.x - c.x); let o = "", akhir = null;
+      b.p.forEach(q => { if (akhir !== null && q.x - akhir > q.fs * 0.18 && !/\s$/.test(o)) o += " "; o += q.t; akhir = q.x2; });
+      return o.replace(/\s+/g, " ").trim(); }).filter(Boolean).join("\n"));
+  }
+  return keluaran.join("\n");
+}
+
+G.UPW_PDF = { PdfTulis, dariHtml, docxKeHtml, gabung, keWin, bukaPdf, A4, teksPdf };
 })();

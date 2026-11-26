@@ -74,11 +74,13 @@ var SKEMA = {
   /* v0.51.0: unit EDOM yang sudah dinilai per mahasiswa (tanpa nilai; baris dibuat urut id saat survei dimulai) */
   PengisiSurvei: ["survei", "userId", "unit"],
   /* v0.52.0: publikasi hasil survei (potret angka agregat saat terbit; baca = id pembaca) */
-  PublikasiSurvei: ["id", "survei", "judul", "ringkas", "temuan", "kesimpulan", "sasaran", "status", "terbit", "oleh", "dibuat", "diubah", "baca"]
+  PublikasiSurvei: ["id", "survei", "judul", "ringkas", "temuan", "kesimpulan", "sasaran", "status", "terbit", "oleh", "dibuat", "diubah", "baca"],
+  /* v0.58.0: kalender akademik per semester (baris = tabel per minggu; satu berkas Drive boleh dipakai beberapa semester) */
+  KalenderAkademik: ["semester", "fileId", "nama", "mime", "ukuran", "baris", "libur", "status", "olehUnggah", "diunggah", "disetujuiOleh", "disetujui", "riwayat", "diubah"]
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 37;
+var VERSI_SKEMA = 38;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {

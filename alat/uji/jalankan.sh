@@ -10,7 +10,7 @@ export PATH="$HOME/.local/node/bin:$HOME/.local/bin:$PATH"
 PROYEK="$(cd "$(dirname "$0")/../.." && pwd)"
 KERJA="/tmp/upw-uji"   # tetap, agar .claude/launch.json ("uji-lokal") bisa menjalankannya
 rm -rf "$KERJA"; mkdir -p "$KERJA"
-cp "$PROYEK"/alat/uji/*.mjs "$PROYEK"/alat/uji/*.js "$PROYEK"/alat/uji/*.py "$PROYEK"/alat/uji/*.json "$KERJA"/
+cp "$PROYEK"/alat/uji/*.mjs "$PROYEK"/alat/uji/*.js "$PROYEK"/alat/uji/*.py "$PROYEK"/alat/uji/*.json "$PROYEK"/alat/uji/*.txt "$KERJA"/
 cp -R "$PROYEK/gas" "$KERJA/gas"
 cp -R "$PROYEK/docs/uji" "$KERJA/web"
 cp "$PROYEK/alat/uji/jelajah.js" "$KERJA/web/jelajah.js"
