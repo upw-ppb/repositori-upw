@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.59.0 — 26 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.59.0 (tampilan docs/ dan server Apps Script Produksi deployment @42): Penelitian & PkM dari SINTA (Data Prodi), penanda buku "Tarik ke Repositori UPW",
+  penggabungan tanpa ganda, penandaan dosen otomatis; perbaikan laci yang terhimpit.
+- Struktur data berubah (VERSI_SKEMA 39: Kegiatan.sinta). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (permintaan tanpa login).
+  Rollback ke v0.58.0: tampilan (tag v0.58.0) dan deployment @41; kolom sinta diabaikan versi lama.
+- Setelah tayang: Admin mengisi ID SINTA DTPS lalu menjalankan penarikan pertama (dipandu).
+- Penyetuju: pemilik, di chat 26 Nov 2026: "Setuju Tayang. tapi saya belum paham bagaimana cara kerja penarikan data itu. bimbing saya satu persatu langkahnya nanti."
+
 ## v0.59.0 — 26 Nov 2026 — Uji Coba
 Ringkas: penelitian dan PkM dosen ditarik dari SINTA (tombol Tarik Data SINTA + penanda buku di tab SINTA), satu judul dicatat sekali dan semua dosen tercantum ditandai; dosen melengkapi bukti lalu diverifikasi.
 Permintaan pemilik 26 Nov 2026: "Ya, cara itu" (tombol Tarik Data SINTA untuk Admin/Super Admin; tidak ganda; dosen yang sama ditandai otomatis; satu unggahan bukti; tarikan berkala
