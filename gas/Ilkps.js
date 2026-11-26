@@ -5,7 +5,8 @@
  * Tabel 1–6 (dosen, kurikulum, EWMP) disusun di DataProdi.js; tabel lulusan, keuangan, dan kepuasan belum diisi otomatis.
  */
 var PERAN_ILKPS = ["admin", "superadmin", "kps", "gkm", "asesor"];
-var BARIS_DANA = ["a) Perguruan tinggi b) Mandiri", "Lembaga dalam negeri (diluar PT)", "Lembaga luar negeri"];
+// v0.56.0: DED Tabel 12/17 memisahkan a) Perguruan Tinggi dan b) Mandiri (dana dosen); rumus butir 45/52 menjumlahkan keduanya (NL).
+var BARIS_DANA = ["a) Perguruan Tinggi", "b) Mandiri (dana dosen)", "Lembaga dalam negeri (di luar PT)", "Lembaga luar negeri"];
 var BARIS_PUB14 = ["Jurnal penelitian tidak terakreditasi", "Jurnal penelitian nasional terakreditasi", "Jurnal penelitian internasional",
   "Jurnal penelitian internasional bereputasi", "Seminar wilayah/lokal/perguruan tinggi", "Seminar nasional", "Seminar internasional",
   "Pagelaran/pameran/presentasi dalam forum di tingkat wilayah", "Pagelaran/pameran/presentasi dalam forum di tingkat nasional",
@@ -38,7 +39,9 @@ function dosenKegiatan(k, idx) {
 }
 function mhsKegiatan(k, idx) { return (k.lampiran && k.lampiran.mhs ? k.lampiran.mhs : mhsPeserta(k, idx)).map(function (m) { return m.nama; }); }
 function centangTingkat(t, urut) { return urut.map(function (x) { return t === x ? "V" : ""; }); }
-function barisDana(v) { v = teks(v); return v.indexOf("Dalam negeri") === 0 ? 1 : v.indexOf("Luar negeri") === 0 ? 2 : v ? 0 : -1; }
+function barisDana(v) { v = teks(v); return v.indexOf("Dalam negeri") === 0 ? 2 : v.indexOf("Luar negeri") === 0 ? 3 : v.indexOf("Mandiri") === 0 ? 1 : v ? 0 : -1; }
+/** Data lama "PT / mandiri" (sebelum v0.56.0) dihitung di baris a) sampai dipilah pengaju. */
+function danaLama(kegs) { var n = kegs.filter(function (k) { return /^PT \/ mandiri/i.test(teks(k.isian["Sumber dana"])); }).length; return n ? " " + n + " kegiatan masih berisi \"PT / mandiri\" (data lama) dan dihitung di baris a); pilah menjadi Perguruan Tinggi atau Mandiri lewat detail kegiatan." : ""; }
 
 /** Susun semua tabel. Mengembalikan struktur umum yang dipakai tampilan dan ekspor Excel. */
 function susunIlkps(ts) {
@@ -47,7 +50,7 @@ function susunIlkps(ts) {
   var semuaK = semuaKegiatan().filter(function (k) { var a = taKegiatan(k); return a !== null && a >= ts - 2 && a <= ts && !sis[k.olehId]; });
   var ok = semuaK.filter(function (k) { return k.status === "disetujui"; });
   var proses = function (jenis) { return semuaK.filter(function (k) { return jenis.indexOf(k.jenis) >= 0 && k.status !== "disetujui" && k.status !== "ditolak" && !(k.st === "ditolak_aju"); }).length; };
-  var dari = function (jenis) { return ok.filter(function (k) { return jenis.indexOf(k.jenis) >= 0; }).sort(function (a, b) { return (a.tgl || "").localeCompare(b.tgl || ""); }); };
+  var dari = function (jenis) { return ok.filter(function (k) { return jenis.indexOf(k.jenis) >= 0 && dihitungPkm(k); }).sort(function (a, b) { return (a.tgl || "").localeCompare(b.tgl || ""); }); };
   var kol = function (k) { return tsList.indexOf(taKegiatan(k)); };
   var T = [], catatan;
 
@@ -73,7 +76,7 @@ function susunIlkps(ts) {
       dari([j]), function (k) { return [k.judul, tahunKegiatan(k)].concat(centangTingkat(k.tingkat, TK), [teks(k.isian.Capaian), mhsKegiatan(k, idx).join("; ")]); },
       "Kolom Mahasiswa adalah tambahan aplikasi (tidak ada di format resmi).", [j]);
   });
-  hitung("12", "Tabel 12) Penelitian DTPS", BARIS_DANA, dari(["penelitian"]), function (k) { return barisDana(k.isian["Sumber dana"]); }, "", ["penelitian"]);
+  hitung("12", "Tabel 12) Penelitian DTPS", BARIS_DANA, dari(["penelitian"]), function (k) { return barisDana(k.isian["Sumber dana"]); }, danaLama(dari(["penelitian"])).trim(), ["penelitian"]);
   daftar("13", "Tabel 13) Penelitian DTPS yang Melibatkan Mahasiswa", ["No.", "Nama Dosen", "Tema Penelitian sesuai Roadmap", "Nama Mahasiswa", "Judul Kegiatan", "Tahun (YYYY)"],
     dari(["penelitian"]).filter(function (k) { return mhsKegiatan(k, idx).length; }),
     function (k) { return [dosenKegiatan(k, idx).join("; "), teks(k.isian["Topik peta jalan penelitian"]), mhsKegiatan(k, idx).join("; "), k.judul, tahunKegiatan(k)]; }, "", ["penelitian"]);
@@ -91,7 +94,8 @@ function susunIlkps(ts) {
   daftar("16", "Tabel 16) Karya Ilmiah DTPS yang Disitasi", ["No.", "Nama Dosen", "Judul Artikel yang Disitasi (Jurnal, Volume, Tahun, Nomor, Halaman)", "Jumlah Sitasi"],
     pub.filter(function (k) { return Number(String(k.isian["Jumlah sitasi (Google Scholar)"] || "").replace(/\D/g, "")) > 0; }),
     function (k) { return [dosenKegiatan(k, idx).join("; "), k.judul + (k.isian["Nama jurnal / seminar"] ? ", " + k.isian["Nama jurnal / seminar"] : ""), Number(String(k.isian["Jumlah sitasi (Google Scholar)"]).replace(/\D/g, ""))]; }, "", ["publikasi"]);
-  hitung("17", "Tabel 17) PkM DTPS", BARIS_DANA, dari(["pkm"]), function (k) { return barisDana(k.isian["Sumber dana"]); }, "", ["pkm"]);
+  hitung("17", "Tabel 17) PkM DTPS", BARIS_DANA, dari(["pkm"]), function (k) { return barisDana(k.isian["Sumber dana"]); },
+    ("Satu judul PkM dihitung sekali (tahap pelaksanaan); penjajakan tidak dihitung." + danaLama(dari(["pkm"]))), ["pkm"]);
   daftar("18", "Tabel 18) PkM DTPS yang melibatkan mahasiswa", ["No.", "Nama Dosen", "Tema PkM sesuai Roadmap", "Nama Mahasiswa", "Judul Kegiatan", "Tahun (YYYY)"],
     dari(["pkm"]).filter(function (k) { return mhsKegiatan(k, idx).length; }),
     function (k) { return [dosenKegiatan(k, idx).join("; "), teks(k.isian["Mitra sasaran"]) ? "Mitra: " + teks(k.isian["Mitra sasaran"]) : "", mhsKegiatan(k, idx).join("; "), k.judul, tahunKegiatan(k)]; },

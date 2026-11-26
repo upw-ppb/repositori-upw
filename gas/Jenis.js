@@ -30,7 +30,8 @@ var JENIS_KEG = [
     "l": "Sumber dana",
     "t": "sel",
     "o": [
-     "PT / mandiri",
+     "Perguruan Tinggi",
+     "Mandiri (dana dosen sendiri)",
      "Dalam negeri (Kemdiktisaintek, BRIN, pemda, industri)",
      "Luar negeri"
     ]
@@ -67,13 +68,37 @@ var JENIS_KEG = [
    "Pelatihan bahasa Inggris untuk pemandu lokal",
    "Pelatihan pemasaran digital untuk UMKM pariwisata"
   ],
-  "kw": "pengabdian pkm pendampingan pelatihan masyarakat desa wisata pokdarwis umkm",
+  "kw": "pengabdian pkm pendampingan pelatihan masyarakat desa wisata pokdarwis umkm penjajakan",
   "fx": [
+   {
+    "l": "Tahap PkM",
+    "t": "sel",
+    "o": [
+     "Pelaksanaan",
+     "Penjajakan"
+    ]
+   },
+   {
+    "l": "Skema PkM",
+    "t": "sel",
+    "o": [
+     "PkM bersama prodi (dana PT)",
+     "PkM kampus lintas prodi (dana PT)",
+     "PkM mandiri dosen",
+     "PkM melalui proyek mata kuliah"
+    ]
+   },
+   {
+    "l": "Nomor registrasi P3M / Sinergi",
+    "t": "text",
+    "ph": "Nomor/kode usulan di Sinergi atau surat tugas P3M"
+   },
    {
     "l": "Sumber dana",
     "t": "sel",
     "o": [
-     "PT / mandiri",
+     "Perguruan Tinggi",
+     "Mandiri (dana dosen sendiri)",
      "Dalam negeri",
      "Luar negeri"
     ]

@@ -146,13 +146,13 @@ function dosenTs(ta) {
   semua("DosenTs").filter(function (r) { return Number(r.ta) === ta; }).forEach(function (r) { m[r.userId] = r; });
   return m;
 }
-/** Biodata pegawai berperan dosen, untuk Tabel 1–3, 5, 6. */
-function daftarDosen() {
-  var bio = {};
+/** Biodata pegawai berperan dosen, untuk Tabel 1–3, 5, 6. v0.56.0: status = ketetapan Admin Prodi untuk TA itu (DosenTs.status), cadangan isian lama biodata. */
+function daftarDosen(ta) {
+  var bio = {}, st = petaStatusDosen(ta || semesterInfo().awal);
   semua("BiodataPegawai").forEach(function (b) { bio[b.userId] = b; });
   return semua("Pengguna").filter(function (p) { return p.status !== "nonaktif" && peranDari(p).indexOf("dosen") >= 0 && !akunSistem(p); }).map(function (p) {
     var b = bio[p.id] || {};
-    return { id: p.id, nama: p.nama, nip: String(p.username), nidn: teks(b.nidn), status: teks(b.statusDosen), jabfung: teks(b.jabfung),
+    return { id: p.id, nama: p.nama, nip: String(p.username), nidn: teks(b.nidn), status: st[p.id] ? st[p.id].status : teks(b.statusDosen), statusAdmin: !!st[p.id], jabfung: teks(b.jabfung),
       pendS1: teks(b.pendS1), pendS2: teks(b.pendS2), pendS3: teks(b.pendS3), pddikti: teks(b.pddikti), bidang: teks(b.bidang),
       serdos: teks(b.serdos), sertKomp: teks(b.sertKomp), mkLain: teks(b.mkLain), inisial: teks(b.inisial) };
   }).sort(function (a, b) { return a.nama.localeCompare(b.nama); });
@@ -230,9 +230,10 @@ function aksiDpData(d, token) {
     }),
     salinDari: labelSmt(kodeSmt(Number(smt.slice(0, 4)) - 1, ganjil)),
     ta: ta, labelTa: labelTa(ta),
-    dosenTs: daftarDosen().filter(function (x) { return x.status !== "Dosen industri / praktisi"; }).map(function (x) {
+    statusPilihan: STATUS_DOSEN_ADMIN,
+    dosenTs: daftarDosen(ta).filter(function (x) { return x.status !== "Dosen industri / praktisi"; }).map(function (x) {
       var r = dts[x.id] || {}, a2 = ampu[x.id] || { sks: 0, mkTs: [] };
-      return { id: x.id, nama: x.nama, status: x.status, sksPsHitung: Math.round(a2.sks * 100) / 100, mk: a2.mkTs,
+      return { id: x.id, nama: x.nama, status: x.status, statusAdmin: x.statusAdmin, statusTs: teks(r.status), sksPsHitung: Math.round(a2.sks * 100) / 100, mk: a2.mkTs,
         ps: r.ps === "" || r.ps === undefined ? "" : angka(r.ps), psLain: angka(r.psLain), luarPt: angka(r.luarPt), penelitian: angka(r.penelitian),
         pkm: angka(r.pkm), tambahan: angka(r.tambahan), sesuai: teks(r.sesuai), dasarSesuai: teks(r.dasarSesuai), linier: teks(r.linier) };
     })
@@ -500,8 +501,10 @@ function aksiDpDosenTsSimpan(d, token) {
     penelitian: angka(x.penelitian, 60), pkm: angka(x.pkm, 60), tambahan: angka(x.tambahan, 60),
     sesuai: ["Ya", "Tidak"].indexOf(x.sesuai) >= 0 ? x.sesuai : "", diubah: new Date(),
     dasarSesuai: ["Ya", "Tidak"].indexOf(x.dasarSesuai) >= 0 ? x.dasarSesuai : "", linier: ["Ya", "Tidak"].indexOf(x.linier) >= 0 ? x.linier : "" };
+  if (x.status !== undefined && x.status !== "" && STATUS_DOSEN_ADMIN.indexOf(x.status) < 0) throw galat("Status dosen tidak dikenal.");
   return kunciTulis(function () {
     var r = cari("DosenTs", function (y) { return y.userId === x.userId && Number(y.ta) === ta; });
+    o.status = x.status !== undefined ? x.status : (r ? teks(r.status) : "");   // v0.56.0: ditetapkan Admin Prodi per TA
     if (r) ubah("DosenTs", r, o); else tambah("DosenTs", o);
     catat(p.id, "dp.dosenTs", { userId: x.userId, ta: ta });
     return {};
@@ -511,7 +514,7 @@ function aksiDpDosenTsSimpan(d, token) {
 /* ---------- Tabel iLKPS 1–6 ---------- */
 
 function tabelDosen(ts) {
-  var T = [], mks = semuaMk(), ampu = ampuTs(ts, mks), dosen = daftarDosen(), dts = dosenTs(ts), prak = semuaPraktisi();
+  var T = [], mks = semuaMk(), ampu = ampuTs(ts, mks), dosen = daftarDosen(ts), dts = dosenTs(ts), prak = semuaPraktisi();
   var JA = ["Tenaga Pengajar", "Asisten Ahli", "Lektor", "Lektor Kepala", "Guru Besar"];
   var tetap = dosen.filter(function (x) { return STATUS_TETAP.indexOf(x.status) >= 0; });
   var mkDari_ = function (id) { return (ampu[id] || { mk: [] }).mk.join("; "); };

@@ -31,5 +31,5 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tSA }) {
   for (const ts of [2025, 2026]) { const Q = ok("penilaian.data", { ts }, tAdm); const aneh = Q.rows.filter(r => !isFinite(r.skor) || /NaN|Infinity|undefined/.test(r.info));
     cek("TS " + ts + ": tidak ada skor/keterangan janggal", !aneh.length, aneh.map(r => [r.n, r.info]));
     if (process.env.CETAK) Q.rows.filter(r => r.t !== "m").forEach(r => console.log("     ", ts, r.n, r.t, r.skor, "|", r.info)); }
-  cek("migrasi: SkorGpm, kolom dasarSesuai/linier; SKEMA_VERSI 11", g.sheets.SkorGpm && g.sheets.DosenTs[0].slice(-2).join() === "dasarSesuai,linier" && !!g.props.SKEMA_VERSI);
+  cek("migrasi: SkorGpm, kolom dasarSesuai/linier; SKEMA_VERSI 11", g.sheets.SkorGpm && g.sheets.DosenTs[0].slice(-3, -1).join() === "dasarSesuai,linier" && !!g.props.SKEMA_VERSI);
 }

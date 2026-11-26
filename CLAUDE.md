@@ -406,6 +406,10 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   {html, lebar, tinggi, margin}, gabung(tulis, u8), bukaPdf); dimuat malas (muatPdf). JANGAN ganti dengan pustaka luar/konversi Google tanpa izin pemilik. Surat: AKSI.unduhSuratPdf;
   RPS/kontrak sah: sahUnduh → capSah → tambahDocxKePdf; sahPratinjauPdf. Uji visual: kirim PDF ke penerima terima.py (serve_forever) lalu render dengan swift PDFKit. Uji: uji-v55-bagian.mjs + bantu-pdf.mjs.
 
+- v0.56.0 (26 Nov 2026, Uji Coba): gas/PkmTahap.js (tahapPkm, dihitungPkm dipakai dari() di Ilkps, rangkaianPkm, pilihanPenjajakan, bersihInduk, STATUS_DOSEN_ADMIN, petaStatusDosen).
+  Kegiatan.induk + DosenTs.status (VERSI_SKEMA 36). BARIS_DANA 4 baris (Penilaian: nl = baris 0+1, nn = 2, ni = 3, total = 4). daftarDosen(ta). Biodata isian admin:1 = hanya-baca.
+  Tampilan: blokTahapPkm, rangkaian di laciDetail, select dt-<id>-status. Uji: uji-v56-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

@@ -21,6 +21,7 @@ for (const [u, e] of [["197911302005012001", "kps@contoh.id"], ["199001152015041
   bs.skema.flatMap(x => x.f).filter(f => f.req && f.t !== "ro").forEach(f => { isi[f.k] = f.t === "sel" ? (f.o.includes(BIO[f.k]) ? BIO[f.k] : f.o[0]) : (BIO[f.k] ?? "Isi uji"); }); isi.nama = bs.data.nama;
   ok("biodata.simpan", { data: isi }, tk);
 }
+ok("biodata.massal", { baris: ["197911302005012001", "199001152015041001"].map(nip => ({ nip, statusDosen: "Dosen tetap program studi (DTPS)" })) }, t);   // v0.56.0
 console.log("akun uji siap, kata sandi semua:", SANDI);
 // Data contoh v0.4.0: lomba mahasiswa (pendamping dosen) dan praktik dosen dengan surat terbit.
 const ID = u => g.ctx.cari("Pengguna", x => String(x.username) === u).id;

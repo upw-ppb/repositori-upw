@@ -26,14 +26,14 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA
   ok("kegiatan.simpan", { peran: "dosen", data: { jenis: "penelitian", judul: "Belum diverifikasi", tgl, perluST: false, tingkat: "Nasional" } }, tDsn);
   j = ok("ilkps.data", {}, tAdm);
   const T = Object.fromEntries(j.tabel.map(t => [t.kode, t]));
-  cek("Tabel 12: PT/mandiri TS=1, dalam negeri Maret 2024 = TS-2; jumlah 2; 1 tanpa sumber dana dicatat", T["12"].baris[0][4] === 1 && T["12"].baris[1][2] === 1 && T["12"].baris[3][5] === 2 && /1 kegiatan belum terhitung/.test(T["12"].catatan), T["12"]);
-  cek("Tabel 12: di luar rentang TS tidak dihitung; draf dihitung sebagai proses", T["12"].baris[3][5] === 2 && T["12"].proses >= 1, T["12"].proses);
+  cek("Tabel 12: PT/mandiri TS=1, dalam negeri Maret 2024 = TS-2; jumlah 2; 1 tanpa sumber dana dicatat", T["12"].baris[0][4] === 1 && T["12"].baris[2][2] === 1 && T["12"].baris[4][5] === 2 && /1 kegiatan belum terhitung/.test(T["12"].catatan) && /PT \/ mandiri" \(data lama\)/.test(T["12"].catatan), T["12"]);
+  cek("Tabel 12: di luar rentang TS tidak dihitung; draf dihitung sebagai proses", T["12"].baris[4][5] === 2 && T["12"].proses >= 1, T["12"].proses);
   cek("Tabel 13: dosen, tema, mahasiswa, judul, tahun", JSON.stringify(T["13"].baris[0]) === JSON.stringify([1, "Gede Arya Pratama, S.E., M.M. (contoh)", "Perilaku wisatawan", "Kadek Ayu Lestari (contoh)", "Pola perjalanan wisatawan muda", "2025"]), T["13"].baris);
   cek("Tabel 14: SINTA (baris 2) di TS", T["14"].baris[1][4] === 1 && T["14"].baris[10][5] === 1, T["14"].baris[1]);
   cek("Tabel 19: pameran nasional luaran PkM di TS-2", T["19"].baris[8][2] === 1, T["19"].baris[8]);
   cek("Tabel 15 Bagian-2: hak cipta + nomor", T["15-2"].baris.length === 1 && T["15-2"].baris[0][3] === "Hak cipta · EC00202512345", T["15-2"].baris);
   cek("Tabel 16: artikel disitasi 12 kali", T["16"].baris[0][3] === 12 && /Jurnal Pariwisata/.test(T["16"].baris[0][2]), T["16"].baris);
-  cek("Tabel 17: luar negeri TS; Tabel 18: mitra + mahasiswa", T["17"].baris[2][4] === 1 && T["18"].baris[0][2] === "Mitra: Desa Penglipuran", T["18"].baris);
+  cek("Tabel 17: luar negeri TS; Tabel 18: mitra + mahasiswa", T["17"].baris[3][4] === 1 && T["18"].baris[0][2] === "Mitra: Desa Penglipuran", T["18"].baris);
   cek("Tabel 20-1: mitra, centang internasional, tahun berakhir 2030", JSON.stringify(T["20-1"].baris[0].slice(1, 5)) === JSON.stringify(["ASITA Bali", "V", "", ""]) && T["20-1"].baris[0][9] === "2030", T["20-1"].baris);
   cek("Tabel 23: rekognisi internasional", T["23"].baris[0][6] === "V" && /Keynote/.test(T["23"].baris[0][3]), T["23"].baris);
   cek("id kegiatan per baris (untuk tautan bukti)", T["13"].id.length === 1 && T["12"].idBaris[0].length === 1);

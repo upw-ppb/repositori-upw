@@ -3,6 +3,23 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.56.0 — 26 Nov 2026 — Uji Coba
+Ringkas: PkM bertahap (penjajakan → pelaksanaan = satu judul), sumber dana Perguruan Tinggi dan Mandiri terpisah, skema PkM dan nomor P3M/Sinergi, status dosen ditetapkan Admin Prodi per tahun akademik.
+Permintaan pemilik 26 Nov 2026: "Kerjakan v0.56.0" (rancangan dari pertanyaan jenis PkM, sumber dana PT/Mandiri, rangkaian PkM prodi, status dosen, dosen luar dan praktisi).
+- Dasar instrumen: DED Tabel 12/17 memisahkan a) Perguruan Tinggi dan b) Mandiri (sumber pembiayaan dari DTPS); rumus butir 45/52 menjumlahkannya (NL). Catatan kaki Tabel 17: PkM tercatat
+  di unit pengelola PkM PT. Instrumen menghitung JUDUL PkM.
+- Jenis kegiatan PkM: isian Tahap PkM (Pelaksanaan/Penjajakan), Skema PkM (bersama prodi, kampus lintas prodi, mandiri dosen, proyek mata kuliah), Nomor registrasi P3M/Sinergi; Sumber dana
+  PkM dan penelitian: Perguruan Tinggi / Mandiri (dana dosen sendiri) / Dalam negeri / Luar negeri.
+- gas/PkmTahap.js: Kegiatan.induk (kolom baru) = penjajakan dari sebuah pelaksanaan; penjajakan tidak dihitung di Tabel 17/18 (dihitungPkm); detail kegiatan menampilkan rangkaian dua arah;
+  pilihan penjajakan di kegiatan.ref. Tabel 12/17 kini 4 baris (a, b, dalam negeri, luar negeri); data lama "PT / mandiri" dihitung di baris a) dengan catatan agar dipilah.
+- Status dosen: DosenTs.status (kolom baru) ditetapkan Admin Prodi per TA (Data Prodi › Data dosen TS; pilihan DTPS, dosen tetap PT di luar PS, dosen tidak tetap); daftarDosen(ta) memakai
+  ketetapan TA itu (cadangan: TA sebelumnya, lalu yang paling awal sesudahnya, lalu isian lama biodata). Isian di biodata dosen hanya-baca; impor biodata Admin (termasuk PDDikti) ikut
+  menetapkan status TA berjalan. Dosen industri/praktisi lewat Data Prodi › Praktisi (tidak lagi dipilih sebagai status akun).
+- Struktur data berubah (VERSI_SKEMA 36: Kegiatan.induk, DosenTs.status). Versi lama tetap membaca data; di versi lama penjajakan PkM ikut terhitung dan status dosen kembali dari biodata.
+- Uji: 1036 + 44 lulus (uji-v56-bagian.mjs; uji lama Tabel 12/17 disesuaikan baris baru; status dosen uji ditetapkan lewat impor Admin). Uji tampilan lokal: formulir PkM (isian baru,
+  pilihan penjajakan, keterangan penjajakan), biodata dosen hanya-baca, pilihan status di Data dosen TS; penjelajah Admin 51 layar tanpa masalah.
+- Penyetuju: tidak perlu (Uji Coba).
+
 ## v0.55.0 — 26 Nov 2026 — Produksi
 - Produksi diperbarui dari v0.52.0 ke v0.55.0 (tampilan docs/ dan server Apps Script Produksi deployment @38), sekaligus membawa v0.53.0, v0.54.0, v0.54.1: lampiran untuk KPS,
   pencarian jenis lebih luas, saran butir berkonteks, tautan undangan, urut NIM, gulir tetap; pengesahan elektronik RPS/kontrak + peran Ketua Jurusan; penanda TTE; mesin PDF sendiri.

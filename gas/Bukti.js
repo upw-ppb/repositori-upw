@@ -249,6 +249,7 @@ function aksiKegiatanAkreditasi(d, token) {
     var b = bersihkanAkreditasi(d.data || {}, jenisDef(k.jenis));
     if (!b.tingkat) throw galat("Pilih tingkat kegiatan.");
     k.tingkat = b.tingkat; k.isian = b.isian; k.gcet = b.gcet;
+    if ((d.data || {}).induk !== undefined) k.induk = bersihInduk({ induk: d.data.induk, jenis: k.jenis, isian: k.isian }, k); // v0.56.0
     k.riwayat.push({ w: new Date().toISOString(), o: p.id, a: "akreditasi" });
     simpanKegiatan(k);
     catat(p.id, "kegiatan.akreditasi", { id: k.id });

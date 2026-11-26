@@ -45,6 +45,9 @@ function aksiBiodataMassal(d, token) {
           if (f.k === "nama") nama = bersih; else rekam[f.k] = bersih;
         }); });
         if (b) ubah("BiodataPegawai", b, rekam); else tambah("BiodataPegawai", rekam);
+        // v0.56.0: status dosen dari impor Admin juga menjadi ketetapan TA berjalan
+        if (STATUS_DOSEN_ADMIN.indexOf(teks(r.statusDosen)) >= 0) { var ta0 = semesterInfo().awal, dt = cari("DosenTs", function (y) { return y.userId === p.id && Number(y.ta) === ta0; });
+          if (dt) ubah("DosenTs", dt, { status: teks(r.statusDosen), diubah: kini }); else tambah("DosenTs", { userId: p.id, ta: ta0, status: teks(r.statusDosen), diubah: kini }); }
         var kurang = kurangDari(p, nilaiBiodata(Object.assign({}, p, { nama: nama }), rekam));
         ubah("Pengguna", p, { nama: nama, biodataLengkap: kurang.length === 0, biodataPada: kini, diubahPada: kini });
         ok++;

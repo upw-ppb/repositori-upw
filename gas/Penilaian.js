@@ -27,7 +27,7 @@ function kurang(info) { return { s: 0, info: info, kurang: true }; }
 function konteksNilai(ts) {
   var I = susunIlkps(ts), T = {};
   I.tabel.forEach(function (t) { T[t.kode] = t; });
-  var dosen = daftarDosen(), dts = dosenTs(ts);
+  var dosen = daftarDosen(ts), dts = dosenTs(ts);
   var dtps = dosen.filter(function (x) { return x.status === STATUS_TETAP[0]; });
   var mhsAktif = semua("Pengguna").filter(function (p) { return p.status !== "nonaktif" && peranDari(p).indexOf("mahasiswa") >= 0 && !akunSistem(p) && (p.statusMhs || "A") === "A"; });
   var tsL = [ts - 2, ts - 1, ts];
@@ -114,9 +114,9 @@ function rumusOtomatis(f, X) {
     case "tkp": { var t = T["11"], v = t.baris.slice(0, 7).filter(function (r) { return r[2] + r[3] + r[4] + r[5] > 0; }).map(function (r) { return (4 * r[2] + 3 * r[3] + 2 * r[4] + r[5]) / 100; });
       if (!v.length) return kurang("Belum ada survei pengguna lulusan (Tabel 11)"); var A = rataL(v), r11 = barisJumlah(T.ref11a), adj = sesuaikanResponden(A, r11 ? r11[2] : 0, r11 ? r11[1] : 0, "responden pengguna");
       return { s: adj.s, info: "Skor kepuasan 7 aspek = " + dua(A) + adj.ket, auto: true }; }
-    case "pen": case "pkm": { if (nd) return kurang("NDTPS = 0"); var t = T[f === "pen" ? "12" : "17"], nl = kolomTotal(t, 0), nn = kolomTotal(t, 1), ni = kolomTotal(t, 2), fa = f === "pen" ? [0.05, 0.3, 1] : [0.07, 0.5, 1.5];
+    case "pen": case "pkm": { if (nd) return kurang("NDTPS = 0"); var t = T[f === "pen" ? "12" : "17"], nl = kolomTotal(t, 0) + kolomTotal(t, 1), nn = kolomTotal(t, 2), ni = kolomTotal(t, 3), fa = f === "pen" ? [0.05, 0.3, 1] : [0.07, 0.5, 1.5];
       return { s: riSkor(ni / 3 / n, nn / 3 / n, nl / 3 / n, fa[0], fa[1], fa[2]), info: "Dana luar negeri " + ni + ", dalam negeri " + nn + ", PT/mandiri " + nl + " judul (3 tahun, NDTPS " + n + ")" }; }
-    case "ppdm": case "ppkmdm": { var tot = kolomTotal(T[f === "ppdm" ? "12" : "17"], 3); if (!tot) return kurang("Belum ada " + (f === "ppdm" ? "penelitian" : "PkM") + " DTPS yang disetujui");
+    case "ppdm": case "ppkmdm": { var tot = kolomTotal(T[f === "ppdm" ? "12" : "17"], 4); if (!tot) return kurang("Belum ada " + (f === "ppdm" ? "penelitian" : "PkM") + " DTPS yang disetujui");
       var m = T[f === "ppdm" ? "13" : "18"].baris.length, p = m / tot; return { s: p >= 0.25 ? 4 : 2 + 8 * p, info: (f === "ppdm" ? "PPDM" : "PPkMDM") + " = " + m + "/" + tot + " = " + persen(p) }; }
     case "pub": case "pubpkm": { if (nd) return kurang("NDTPS = 0"); var b = T[f === "pub" ? "14" : "19"].baris, v = function (i) { return b[i][5]; };
       var ri = (v(3) + v(6) + v(9)) / n, rn = (v(1) + v(2) + v(5) + v(8)) / n, rw = (v(0) + v(4) + v(7)) / n, fa = f === "pub" ? [0.2, 2, 4] : [0.01, 0.1, 0.5];

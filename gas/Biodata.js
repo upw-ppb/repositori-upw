@@ -59,7 +59,7 @@ var BIO_PEG = [
     { k: "statusPeg", l: "Status kepegawaian", t: "sel", o: ["PNS", "PPPK", "Pegawai tetap non-ASN", "Pegawai tidak tetap"], other: 1, req: 1 },
     { k: "nidn", l: "NIDN / NIDK / NUPTK", t: "text", untuk: "dosen", hint: "10 digit, lihat di PDDikti atau SISTER" },
     { k: "inisial", l: "Inisial (3 huruf)", t: "text", untuk: "dosen", hint: "Tiga huruf kapital yang dipakai di jadwal kuliah, contoh: GAP" },
-    { k: "statusDosen", l: "Status dosen", t: "sel", untuk: "dosen", req: 1, o: ["Dosen tetap program studi (DTPS)",
+    { k: "statusDosen", l: "Status dosen", t: "sel", untuk: "dosen", admin: 1, hint: "Ditetapkan Admin Prodi per tahun akademik (Data Prodi › Data dosen TS).", o: ["Dosen tetap program studi (DTPS)",
       "Dosen tetap PT di luar program studi", "Dosen tidak tetap", "Dosen industri / praktisi"] },
     { k: "jabfung", l: "Jabatan akademik", t: "sel", untuk: "dosen", req: 1, o: ["Tenaga Pengajar", "Asisten Ahli", "Lektor", "Lektor Kepala", "Guru Besar"],
       hint: "Unggah SK jabatan di Portofolio Saya (menyusul)" },
@@ -213,6 +213,7 @@ function paketBiodata(p, sembunyikanPrivat) {
   if (!j) return { jenis: null };
   var b = ambilBaris(j, p.id), d = nilaiBiodata(p, b), s = semesterInfo(), skema = skemaUntuk(p);
   if (sembunyikanPrivat) skema = skema.filter(function (g) { return !g.priv; });
+  if (j === "pegawai") { var stD = petaStatusDosen(s.awal)[p.id]; if (stD) d.statusDosen = stD.status; }   // v0.56.0
   var hasil = { jenis: j, skema: skema, data: d, lama: b && b.lama ? String(b.lama).split(",").filter(String) : [],
     kurang: kurangDari(p, d), semester: s, diubahPada: b && b.diubahPada ? new Date(b.diubahPada).toISOString() : "" };
   if (j === "mahasiswa") {
@@ -243,7 +244,7 @@ function aksiBiodataSimpan(d, token) {
     var j = jenisBiodata(p);
     if (!j) throw galat("Akun ini tidak memerlukan biodata.");
     var skema = skemaUntuk(p), bersih = {}, kini = new Date();
-    skema.forEach(function (g) { g.f.forEach(function (f) { if (f.t !== "ro") bersih[f.k] = bersihkan(f, masukan[f.k], masukan); }); });
+    skema.forEach(function (g) { g.f.forEach(function (f) { if (f.t !== "ro" && !f.admin) bersih[f.k] = bersihkan(f, masukan[f.k], masukan); }); });   // v0.56.0: isian admin tidak diubah pemilik biodata
     if (!bersih.nama) throw galat("Nama tidak boleh kosong.");
     var tabel = tabelUntuk(j), b = ambilBaris(j, p.id), rekam = { userId: p.id, lama: "", diubahPada: kini };
     var skm = j === "mahasiswa" ? BIO_MHS : BIO_PEG;

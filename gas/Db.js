@@ -18,7 +18,7 @@ var SKEMA = {
   Kegiatan: ["id", "jenis", "jenisLain", "judul", "tgl", "sampai", "tingkat", "olehId", "kelompok", "pegawai", "kelas", "mhs", "excl",
              "pendampingId", "isian", "gcet", "perluST", "tempat", "aktivitas", "ket", "bentuk", "kegDosen", "st", "status", "riwayat",
              "kodeSurat", "tglSurat", "kpsId", "lampiran", "dibuat", "diubah", "dihapus",
-             /* v0.4.0 */ "bukti", "verifId", "tglVerif", /* v0.53.0 */ "lampiranAju"],
+             /* v0.4.0 */ "bukti", "verifId", "tglVerif", /* v0.53.0 */ "lampiranAju", /* v0.56.0 */ "induk"],
   /* v0.5.0 */
   TandaTangan: ["id", "userId", "fileId", "nonce", "cara", "dibuat", "dihapus"],
   /* v0.6.0 */
@@ -29,7 +29,7 @@ var SKEMA = {
   Praktisi: ["id", "nama", "nidk", "perusahaan", "pendidikan", "bidang", "sertifikat", "diubah", "dihapus",
              /* v0.29.0 */ "jabatan", "pengalaman", "memimpinTim", "penerbit", "kerjaSama", "bukti"],
   TimPengajar: ["semester", "kodeMk", "anggota", "diubah", "oleh", /* v0.28.0 */ "kelas"],
-  DosenTs: ["userId", "ta", "ps", "psLain", "luarPt", "penelitian", "pkm", "tambahan", "sesuai", "diubah", /* v0.12.0 */ "dasarSesuai", "linier"],
+  DosenTs: ["userId", "ta", "ps", "psLain", "luarPt", "penelitian", "pkm", "tambahan", "sesuai", "diubah", /* v0.12.0 */ "dasarSesuai", "linier", /* v0.56.0 */ "status"],
   /* v0.10.0 */
   Lulusan: ["nim", "nama", "masuk", "tglLulus", "ipk", "dipesan", "wtBulan", "kesesuaian", "tempatKerja", "diubah", "dihapus", /* v0.51.0 */ "tracer"],
   Penerimaan: ["tahun", "dayaTampung", "pendaftar", "lulusSeleksi", "diterima", "diubah"],
@@ -77,7 +77,7 @@ var SKEMA = {
 };
 
 /** Versi struktur data. Naikkan setiap kali ada tabel atau kolom baru; server menyesuaikan sheet otomatis. */
-var VERSI_SKEMA = 35;
+var VERSI_SKEMA = 36;
 
 /** Kolom suatu tabel. Tabel biodata dibentuk dari skema formulir di Biodata.js. */
 function kolomDari(nama) {
