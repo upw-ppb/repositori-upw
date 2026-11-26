@@ -2,13 +2,13 @@
 export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD2, tSA }) {
   console.log("39. Data dan bukti dosen praktisi; MK diampu TS-2 s.d. TS");
   const pdf = n => Buffer.concat([Buffer.from("%PDF-1.4\n"), Buffer.alloc(n || 50, 65)]).toString("base64");
-  cek("migrasi: kolom praktisi baru di akhir; SKEMA_VERSI 23", g.sheets.Praktisi[0].slice(-6).join() === "jabatan,pengalaman,memimpinTim,penerbit,kerjaSama,bukti" && Number(g.props.SKEMA_VERSI) >= 23);
+  cek("migrasi: kolom praktisi baru di akhir; SKEMA_VERSI 23", g.sheets.Praktisi[0].slice(9, 15).join() === "jabatan,pengalaman,memimpinTim,penerbit,kerjaSama,bukti" && Number(g.props.SKEMA_VERSI) >= 23);
   const dasar = { nama: "Ni Luh Uji Praktisi, S.Par.", perusahaan: "PT Uji Wisata Bali", pendidikan: "S1 Pariwisata", bidang: "Tour operation", sertifikat: "Tour Leader" };
   cek("lama pengalaman harus angka tahun", /angka tahun/.test(salah("dp.praktisiSimpan", { data: { ...dasar, pengalaman: "lima" } }, tAdm)) && /angka tahun/.test(salah("dp.praktisiSimpan", { data: { ...dasar, pengalaman: "99" } }, tAdm)));
   ok("dp.praktisiSimpan", { data: { ...dasar, jabatan: "General Manager", pengalaman: "12", memimpinTim: true, penerbit: "BNSP", kerjaSama: "PKS No. 12/PPB/2026" } }, tAdm);
   let D = ok("dp.data", {}, tAdm), x = D.praktisi.find(p => p.nama === dasar.nama);
   cek("isian baru tersimpan (jabatan, pengalaman, memimpin tim, penerbit, kerja sama)", x && x.jabatan === "General Manager" && x.pengalaman === 12 && x.memimpinTim === true && x.penerbit === "BNSP" && x.kerjaSama === "PKS No. 12/PPB/2026", x);
-  cek("memenuhi kriteria Matriks butir 16; daftar 5 jenis bukti", x.memenuhi === true && D.slotBuktiPraktisi.map(s => s.k).join() === "cv,ijazah,sertifikat,jabatan,kerjasama");
+  cek("memenuhi kriteria Matriks butir 16; daftar jenis bukti (v0.57.0: 7)", x.memenuhi === true && D.slotBuktiPraktisi.map(s => s.k).join() === "cv,ijazah,jabatan,kerjasama,sk,sertifikat,pelatihan");
   ok("dp.praktisiSimpan", { data: { id: x.id, ...dasar, nama: dasar.nama } }, tAdm);
   x = ok("dp.data", {}, tAdm).praktisi.find(p => p.id === x.id);
   cek("simpan tanpa isian baru (tampilan lama) tidak menghapus isian baru", x.jabatan === "General Manager" && x.pengalaman === 12 && x.penerbit === "BNSP");

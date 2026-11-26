@@ -410,6 +410,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Kegiatan.induk + DosenTs.status (VERSI_SKEMA 36). BARIS_DANA 4 baris (Penilaian: nl = baris 0+1, nn = 2, ni = 3, total = 4). daftarDosen(ta). Biodata isian admin:1 = hanya-baca.
   Tampilan: blokTahapPkm, rangkaian di laciDetail, select dt-<id>-status. Uji: uji-v56-bagian.mjs.
 
+- v0.57.0 (26 Nov 2026, Uji Coba): praktisi. Praktisi.inisial (VERSI_SKEMA 37; 3 huruf, unik dengan dosen: pemilikInisial(ins, {u|p}), juga dicek di biodata.simpan saat inisial diubah).
+  SLOT_BUKTI_PRAKTISI punya m: "satu" | "smt" (b.sk = {"2026-1": entri}) | "banyak" (daftar entri ber-id, maks 10); normBuktiPraktisi (sertifikat lama → daftar), entri baru v2:1
+  (kerjasama tanpa v2 = "berkas lama"). dp.praktisiBukti/Lihat menerima semester & eid. kurangPraktisi/praktisiDiTim → dp.data praktisi[].kurang/diTimKini, smtKini; tugasPraktisi →
+  Beranda prakTanpaSk (admin/superadmin/kps). Tampilan: prIns, prSkSmt, data-psmt/data-smt/data-eid, labelPrakTim berinisial (+ labelPrakLama di pencocok). Praktisi TETAP tanpa akun
+  (keputusan pemilik; bisa dibahas kemudian). Uji: uji-v57-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

@@ -315,6 +315,7 @@ function aksiTugasSaya(d, token) {
   hasil.undangan = tr.undangan; hasil.tlSaya = tt.tlSaya; hasil.tlVerif = tt.tlVerif;
   var mu = tugasMutu(p); Object.keys(mu).forEach(function (k) { hasil[k] = mu[k]; }); // v0.52.0: hasil survei dibahas/dipublikasikan
   var ts = tugasSah(p); Object.keys(ts).forEach(function (k) { hasil[k] = ts[k]; }); // v0.54.0: pengesahan RPS / kontrak
+  var tp = tugasPraktisi(p); Object.keys(tp).forEach(function (k) { hasil[k] = tp[k]; }); // v0.57.0: SK praktisi semester berjalan
   if (!punyaPeran(p, PERAN_KEGIATAN)) return hasil;
   var idx = indeksOrang(), set = pengaturanSurat(), kini = hariIni();
   semuaKegiatan().forEach(function (k) {

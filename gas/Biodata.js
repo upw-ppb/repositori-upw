@@ -246,6 +246,15 @@ function aksiBiodataSimpan(d, token) {
     var skema = skemaUntuk(p), bersih = {}, kini = new Date();
     skema.forEach(function (g) { g.f.forEach(function (f) { if (f.t !== "ro" && !f.admin) bersih[f.k] = bersihkan(f, masukan[f.k], masukan); }); });   // v0.56.0: isian admin tidak diubah pemilik biodata
     if (!bersih.nama) throw galat("Nama tidak boleh kosong.");
+    if (bersih.inisial) {   // v0.57.0: inisial dosen tidak boleh sama dengan dosen lain atau praktisi (dipakai di tim pengajar)
+      bersih.inisial = bersih.inisial.trim().toUpperCase();
+      var bl = ambilBaris(j, p.id);
+      if (!bl || teks(bl.inisial).trim().toUpperCase() !== bersih.inisial) {
+        if (!/^[A-Z]{3}$/.test(bersih.inisial)) throw galat("Inisial diisi tepat 3 huruf (A–Z), contoh: GAP.");
+        var pem = pemilikInisial(bersih.inisial, { u: p.id });
+        if (pem) throw galat("Inisial " + bersih.inisial + " sudah dipakai " + pem + ". Pilih inisial lain.");
+      }
+    }
     var tabel = tabelUntuk(j), b = ambilBaris(j, p.id), rekam = { userId: p.id, lama: "", diubahPada: kini };
     var skm = j === "mahasiswa" ? BIO_MHS : BIO_PEG;
     kunciSimpan(skm).concat(kunciSimpan(skm, true)).forEach(function (k) { rekam[k] = bersih[k] !== undefined ? bersih[k] : (b ? b[k] : ""); });

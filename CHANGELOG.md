@@ -3,6 +3,21 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.57.0 — 26 Nov 2026 — Uji Coba
+Ringkas: praktisi punya inisial 3 huruf (unik dengan dosen), SK/surat tugas mengajar per semester, dokumen kerja sama MoU/PKS terpisah, sertifikat profesi dan pelatihan banyak berkas, kolom Kelengkapan, dan pengingat Beranda SK praktisi.
+Permintaan pemilik 26 Nov 2026: "Oke Setuju kerjakan v0.57.0" (slot berkas SK penunjukan, sertifikat pelatihan, dan inisial untuk dosen industri; praktisi tetap tanpa akun).
+- Praktisi.inisial (kolom baru, VERSI_SKEMA 37): tepat 3 huruf, disimpan kapital, tidak boleh sama dengan inisial dosen (BiodataPegawai) atau praktisi lain; dosen juga tidak bisa
+  mengganti inisial biodatanya menjadi inisial yang sudah dipakai (pemeriksaan hanya saat inisial diubah, data lama tidak terganggu). Inisial tampil di tim pengajar ("Nama (INI, praktisi)"),
+  templat Excel tim, dan dikenali pencocok nama saat unggah tim (label templat lama tetap dikenali).
+- Bukti praktisi: CV, ijazah, bukti jabatan, dokumen kerja sama dengan perusahaan (MoU/PKS) = satu berkas; SK penunjukan / surat tugas mengajar = satu berkas PER SEMESTER; sertifikat profesi
+  dan sertifikat pelatihan = banyak berkas (maks. 10). Data lama: sertifikat (satu berkas) dibaca sebagai daftar; berkas di slot lama "Dokumen kerja sama / surat penugasan mengajar" tetap
+  di slot kerja sama dan ditandai "berkas lama" (bila isinya SK, unggah ulang di slot SK).
+- Kelengkapan per praktisi (dp.data praktisi[].kurang/diTimKini): inisial, bukti wajib, berkas sertifikat bila sertifikat diisi, dan SK semester berjalan bila praktisi ada di tim pengajar
+  semester itu. Beranda Admin Prodi, KPS, dan Super Admin: pengingat praktisi mengajar tanpa SK (tugasPraktisi).
+- Rollback ke v0.56.0: tampilan (tag v0.56.0) dan deployment sebelumnya; kolom inisial diabaikan, SK per semester dan daftar sertifikat tidak terbaca benar oleh versi lama (berkas tetap
+  aman di Drive "Praktisi").
+- Uji: alat/uji/uji-v57-bagian.mjs; uji v0.29.0 disesuaikan dengan daftar slot baru.
+
 ## v0.56.0 — 26 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.56.0 (tampilan docs/ dan server Apps Script Produksi deployment @39): PkM bertahap, sumber dana PT/Mandiri terpisah, skema PkM dan nomor P3M/Sinergi,
   status dosen ditetapkan Admin Prodi per tahun akademik.
