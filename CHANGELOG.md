@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.56.0 — 26 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.56.0 (tampilan docs/ dan server Apps Script Produksi deployment @39): PkM bertahap, sumber dana PT/Mandiri terpisah, skema PkM dan nomor P3M/Sinergi,
+  status dosen ditetapkan Admin Prodi per tahun akademik.
+- Struktur data berubah (VERSI_SKEMA 36: Kegiatan.induk, DosenTs.status). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±21 dtk, permintaan tanpa login).
+  Rollback ke v0.55.0: tampilan (tag v0.55.0) dan deployment @38; data tetap terbaca (penjajakan ikut terhitung lagi, status dosen kembali dari biodata).
+- Setelah tayang: Admin Prodi menetapkan status setiap dosen di Data Prodi › Data dosen TS; PkM lama "PT / mandiri" dipilah lewat detail kegiatan.
+- Penyetuju: pemilik, di chat 26 Nov 2026: "Setuju tayang v0.56.0".
+
 ## v0.56.0 — 26 Nov 2026 — Uji Coba
 Ringkas: PkM bertahap (penjajakan → pelaksanaan = satu judul), sumber dana Perguruan Tinggi dan Mandiri terpisah, skema PkM dan nomor P3M/Sinergi, status dosen ditetapkan Admin Prodi per tahun akademik.
 Permintaan pemilik 26 Nov 2026: "Kerjakan v0.56.0" (rancangan dari pertanyaan jenis PkM, sumber dana PT/Mandiri, rangkaian PkM prodi, status dosen, dosen luar dan praktisi).
