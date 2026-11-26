@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.60.0 — 27 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.60.0 (tampilan docs/ dan server Apps Script Produksi deployment @43): publikasi dan sitasi dari SINTA (Garuda, Google Scholar, Scopus, WoS) dan ringkasan
+  profil dosen; draf SINTA tampil di Semua kegiatan Admin/KPS; daftar Kegiatan urut tahun terbaru.
+- Tidak ada perubahan struktur data (VERSI_SKEMA tetap 39), sehingga tidak ada cadangan/migrasi baru. Rollback ke v0.59.0 cukup tampilan (tag v0.59.0) dan deployment @42;
+  publikasi yang sudah ditarik tetap terbaca sebagai kegiatan biasa.
+- Setelah tayang: Admin menarik ulang SINTA sekali agar publikasi, sitasi, dan ringkasan profil masuk.
+- Penyetuju: pemilik, di chat 27 Nov 2026: "Setuju tayang v0.60.0".
+
 ## v0.60.0 — 27 Nov 2026 — Uji Coba
 Ringkas: publikasi dan sitasi dosen ikut ditarik dari SINTA (Garuda, Google Scholar, Scopus, WoS) beserta ringkasan artikel/sitasi/h-index; draf SINTA tampil di Semua kegiatan Admin dan daftar Kegiatan urut tahun terbaru.
 Permintaan pemilik 27 Nov 2026 (catatan setelah penarikan pertama): draf SINTA tidak tampil di Kegiatan bagi Admin; urutan bawaan tahun terbaru di atas seperti SINTA; "Bagaimana dengan
