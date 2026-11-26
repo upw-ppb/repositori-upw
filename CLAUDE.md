@@ -432,6 +432,8 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   Scholar = "N cited", Scopus = "Qn as <tipe>") dan bacaStatSinta (tabel .stat-table di halaman utama profil → Pengaturan sintaStat). gas/Sinta.js kirimPubSinta: kunci "publikasi|judul",
   gabung lintas indeks/profil, sitasi Scholar diperbarui tiap tarikan juga bila disetujui (tarik_<field> = info.w kode → max dalam satu tarikan), isian dosen tidak ditimpa. Kegiatan:
   "Semua kegiatan" memuat draf SINTA; kunciUrutKeg (tgl atau tahun SINTA). Uji: uji-v60-bagian.mjs.
+- v0.60.1 (27 Nov 2026, Uji Coba): tebakLuaranSinta (POLA_JURNAL_PKM / miripJudul dengan PkM dosen) → isian "Luaran dari" (PkM = Tabel 19); sinta.luaran {v, alasan}; hanya draf
+  yang isiannya masih otomatis yang dirapikan. Uji: uji-v601-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

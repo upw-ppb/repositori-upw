@@ -39,7 +39,7 @@ function kodeSintaSah(kode) {
 function sintaKeKlien(k) {
   if (!k) return null;
   if (k.pub) return { pub: 1, tahun: k.tahun, jurnal: k.jurnal || "", doi: k.doi || "", akred: k.akred || "", kuartil: k.kuartil || "", tipe: k.tipe || "", sitasi: k.sitasi === undefined ? null : k.sitasi,
-    sitasiScopus: k.sitasiScopus === undefined ? null : k.sitasiScopus, asal: k.asal || [], penulis: k.penulis || [], url: k.url || "", pada: k.pada, terakhir: k.terakhir };
+    sitasiScopus: k.sitasiScopus === undefined ? null : k.sitasiScopus, luaran: k.luaran || null, asal: k.asal || [], penulis: k.penulis || [], url: k.url || "", pada: k.pada, terakhir: k.terakhir };
   return { ketua: k.ketua, skema: k.skema, sumber: k.sumber, dana: k.dana, tahun: k.tahun, anggota: k.anggota || [], pada: k.pada, terakhir: k.terakhir };
 }
 /* ---------- v0.60.0: publikasi & sitasi (Garuda, Google Scholar, Scopus, WoS di profil SINTA) ---------- */
@@ -56,6 +56,23 @@ function kategoriPubSinta(m) {
     return /conference|proceeding|ISSHP|ISTP|CPCI/i.test(teks(m.tipe)) ? pilih("Seminar internasional") : pilih("Jurnal internasional bereputasi");
   if (/sinta\s*[1-6]/i.test(teks(m.akred))) return pilih("Jurnal nasional terakreditasi");
   return "";
+}
+/* v0.60.1: "Luaran dari" (Tabel 14 = Penelitian, Tabel 19 = PkM) ditebak saat ditarik; dosen dan KPS tetap penentu akhir. */
+var POLA_JURNAL_PKM = /pengabdian|abdimas|abdi\s*masyarakat|kepada\s+masyarakat|pemberdayaan|dedikasi|community\s+(service|engagement|empowerment|development)|\bp\s*k\s*m\b|\bppm\b|\bpkm\b/i;
+var KATA_UMUM_JUDUL = ["dalam", "untuk", "pada", "dengan", "yang", "dari", "melalui", "sebagai", "terhadap", "the", "and", "for", "with", "from", "through", "into", "desa", "village"];
+function kataJudul(t) { return normalJudul(t).split(" ").filter(function (w) { return w.length >= 4 && KATA_UMUM_JUDUL.indexOf(w) < 0; }); }
+function miripJudul(a, b) {
+  var A = kataJudul(a), B = kataJudul(b); if (A.length < 3 || B.length < 3) return 0;
+  var sama = A.filter(function (w, i) { return A.indexOf(w) === i && B.indexOf(w) >= 0; }).length;
+  return sama / Math.min(A.length, B.length);
+}
+/** → {v: "PkM" | "Penelitian", alasan} */
+function tebakLuaranSinta(judul, jurnal, tag, pkm) {
+  var j = (jurnal || []).filter(function (x) { return POLA_JURNAL_PKM.test(teks(x)); })[0];
+  if (j) return { v: "PkM", alasan: "nama jurnal: " + potong(j, 120) };
+  var c = (pkm || []).filter(function (k) { return (tag.indexOf(k.olehId) >= 0 || k.pegawai.some(function (u) { return tag.indexOf(u) >= 0; })) && miripJudul(judul, k.judul) >= 0.6; })[0];
+  if (c) return { v: "PkM", alasan: "judul mirip PkM: " + potong(c.judul, 120) };
+  return { v: "Penelitian", alasan: "" };
 }
 function angkaSitasi(v) { if (v === null || v === undefined || v === "") return null; var n = Math.round(Number(v)); return isFinite(n) && n >= 0 && n < 1e7 ? n : null; }
 /** Satu entri publikasi dari tab SINTA → buat / gabungkan (judul sama dari indeks lain atau profil dosen lain = satu kegiatan). */
@@ -79,6 +96,9 @@ function kirimPubSinta(x, C, h) {
   if (teks(x.akred).trim()) m.akred = potong(x.akred, 40).trim();
   if (teks(x.kuartil).trim()) m.kuartil = potong(x.kuartil, 40).trim();
   if (teks(x.tipe).trim() && (asal === "scopus" || asal === "wos")) m.tipe = potong(x.tipe, 60).trim();
+  var jurnalX = potong(x.jurnal, 300).trim();
+  var tebak = tebakLuaranSinta(judul, [m.jurnal, jurnalX], tag, C.pkm);
+  if (!m.luaran || (m.luaran.v !== "PkM" && tebak.v === "PkM")) m.luaran = tebak;
   if (!m.penulis || !m.penulis.length) m.penulis = (Array.isArray(x.penulis) ? x.penulis : []).slice(0, 40).map(function (a) { return potong(a, 120); });
   if (sit !== null) {
     // judul yang sama di profil beberapa dosen pada tarikan yang sama → ambil angka terbesar; tarikan baru → angka terbaru
@@ -100,6 +120,10 @@ function kirimPubSinta(x, C, h) {
       var kat = kategoriPubSinta(m);
       if (kat && !teks(k.isian["Kategori publikasi"])) k.isian["Kategori publikasi"] = kat;
       if (m.jurnal && !teks(k.isian["Nama jurnal / seminar"])) k.isian["Nama jurnal / seminar"] = m.jurnal;
+      // "Luaran dari" hanya diubah bila masih isian otomatis (data v0.60.0 tanpa catatan = "Penelitian"); pilihan dosen tidak disentuh
+      var otomatis = lama.luaran ? lama.luaran.v : "Penelitian";
+      if (lama.k && teks(k.isian["Luaran dari"]) === otomatis && m.luaran.v !== otomatis) { k.isian["Luaran dari"] = m.luaran.v; cat.push("luaran diubah otomatis menjadi " + m.luaran.v + " (" + m.luaran.alasan + ")"); }
+      else if (teks(k.isian["Luaran dari"]) !== otomatis && !lama.luaran) m.luaran = { v: teks(k.isian["Luaran dari"]), alasan: "", dosen: 1 };
       if ((m.doi || m.url) && !teks(k.isian["DOI / tautan"])) k.isian["DOI / tautan"] = m.doi ? "https://doi.org/" + m.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, "") : m.url;
     }
     k.sinta = JSON.stringify(m);
@@ -107,7 +131,7 @@ function kirimPubSinta(x, C, h) {
     simpanKegiatan(k);
     return;
   }
-  var isian = { "Luaran dari": "Penelitian" }, kat0 = kategoriPubSinta(m);
+  var isian = { "Luaran dari": m.luaran.v }, kat0 = kategoriPubSinta(m);
   if (kat0) isian["Kategori publikasi"] = kat0;
   if (m.jurnal) isian["Nama jurnal / seminar"] = m.jurnal;
   if (m.doi || m.url) isian["DOI / tautan"] = m.doi ? "https://doi.org/" + m.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, "") : m.url;
@@ -203,7 +227,7 @@ function aksiSintaKirim(d) {
     var h = { baru: 0, sudah: 0, tertaut: 0, ditandai: 0, diabaikan: 0, dilewati: 0, sitasi: 0 };
     var tagDari = function (x) { var tag = [], tambahTag = function (s) { var u = keUser[teks(s)]; if (u && tag.indexOf(u) < 0) tag.push(u); };
       tambahTag(x.dari); tambahTag(x.ketuaSinta); (Array.isArray(x.anggota) ? x.anggota : []).forEach(function (a) { tambahTag(a && a.sinta); }); return tag; };
-    var C = { abaikan: abaikan, perKunci: perKunci, perJudul: perJudul, kini: kini, info: info, tag: tagDari };
+    var C = { abaikan: abaikan, perKunci: perKunci, perJudul: perJudul, kini: kini, info: info, tag: tagDari, pkm: semuaK.filter(function (k) { return k.jenis === "pkm"; }) };
     simpanStatSinta(d.statistik, kini);
     item.forEach(function (x) {
       if (x && x.jenis === "publikasi") { kirimPubSinta(x, C, h); return; }
@@ -244,6 +268,7 @@ function aksiSintaKirim(d) {
         dibuat: new Date(), bukti: {}, verifId: "", tglVerif: "", lampiranAju: [], induk: "", sinta: JSON.stringify(meta) };
       simpanKegiatan(baru);
       perKunci[kunci] = ambilKegiatan(baru.id);
+      if (jenis === "pkm") C.pkm.push(perKunci[kunci]);
     });
     if (d.selesai) {
       simpanPengaturan("sintaTerakhir", { w: kini, oleh: info.u, ringkas: d.ringkas && typeof d.ringkas === "object" ? { dosen: Number(d.ringkas.dosen) || 0, item: Number(d.ringkas.item) || 0,

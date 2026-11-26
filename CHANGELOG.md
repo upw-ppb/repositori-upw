@@ -3,6 +3,15 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.60.1 — 27 Nov 2026 — Uji Coba
+Ringkas: publikasi SINTA yang merupakan luaran PkM (jurnal pengabdian atau judul mirip PkM dosen) otomatis bertanda Luaran dari: PkM sehingga masuk Tabel 19, bukan Tabel 14.
+Permintaan pemilik 27 Nov 2026: "bagaimana dengan publikasi yang termasuk sebagai luaran PKM? … agar tidak merusak data di tabel akreditasi." → usulan disetujui: "Ya, kerjakan".
+- gas/Sinta.js: tebakLuaranSinta — POLA_JURNAL_PKM pada nama jurnal (Garuda/Scholar), atau miripJudul ≥ 0,6 dengan PkM dosen tertandai yang sama → "PkM"; selain itu "Penelitian".
+  Catatan sinta.luaran {v, alasan}. Pada tarikan berikutnya draf SINTA yang "Luaran dari"-nya masih isian otomatis dirapikan (termasuk data v0.60.0); pilihan dosen, publikasi yang dicatat
+  dosen sendiri (ditautkan), dan publikasi yang sudah disetujui tidak diubah. Tanpa perubahan struktur data.
+- Tampilan: blok SINTA di detail publikasi menampilkan luaran + alasannya dan meminta dosen memastikan isian "Luaran dari".
+- Uji: alat/uji/uji-v601-bagian.mjs; uji tampilan lokal (detail publikasi jurnal pengabdian).
+
 ## v0.60.0 — 27 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.60.0 (tampilan docs/ dan server Apps Script Produksi deployment @43): publikasi dan sitasi dari SINTA (Garuda, Google Scholar, Scopus, WoS) dan ringkasan
   profil dosen; draf SINTA tampil di Semua kegiatan Admin/KPS; daftar Kegiatan urut tahun terbaru.
