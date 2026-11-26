@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.60.1 — 27 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.60.1 (tampilan docs/ dan server Apps Script Produksi deployment @44): "Luaran dari" publikasi SINTA ditebak otomatis (jurnal pengabdian / judul mirip PkM → PkM, Tabel 19).
+- Tidak ada perubahan struktur data. Rollback ke v0.60.0 cukup tampilan (tag v0.60.0) dan deployment @43.
+- Setelah tayang: Admin menarik ulang SINTA sekali agar draf publikasi v0.60.0 dirapikan.
+- Penyetuju: pemilik, di chat 27 Nov 2026: "Setuju tayang v0.60.1".
+
 ## v0.60.1 — 27 Nov 2026 — Uji Coba
 Ringkas: publikasi SINTA yang merupakan luaran PkM (jurnal pengabdian atau judul mirip PkM dosen) otomatis bertanda Luaran dari: PkM sehingga masuk Tabel 19, bukan Tabel 14.
 Permintaan pemilik 27 Nov 2026: "bagaimana dengan publikasi yang termasuk sebagai luaran PKM? … agar tidak merusak data di tabel akreditasi." → usulan disetujui: "Ya, kerjakan".
