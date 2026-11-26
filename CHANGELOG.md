@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.57.0 — 26 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.57.0 (tampilan docs/ dan server Apps Script Produksi deployment @40): praktisi berinisial, SK/surat tugas per semester, sertifikat banyak berkas,
+  kelengkapan dan pengingat SK di Beranda.
+- Struktur data berubah (VERSI_SKEMA 37: Praktisi.inisial). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±22 dtk, permintaan tanpa login).
+  Rollback ke v0.56.0: tampilan (tag v0.56.0) dan deployment @39; SK per semester dan daftar sertifikat tidak terbaca benar oleh versi lama (berkas tetap di Drive "Praktisi").
+- Setelah tayang: Admin Prodi mengisi inisial setiap praktisi dan mengunggah SK/surat tugas semester berjalan.
+- Penyetuju: pemilik, di chat 26 Nov 2026: "Setuju tayang v0.57.0".
+
 ## v0.57.0 — 26 Nov 2026 — Uji Coba
 Ringkas: praktisi punya inisial 3 huruf (unik dengan dosen), SK/surat tugas mengajar per semester, dokumen kerja sama MoU/PKS terpisah, sertifikat profesi dan pelatihan banyak berkas, kolom Kelengkapan, dan pengingat Beranda SK praktisi.
 Permintaan pemilik 26 Nov 2026: "Oke Setuju kerjakan v0.57.0" (slot berkas SK penunjukan, sertifikat pelatihan, dan inisial untuk dosen industri; praktisi tetap tanpa akun).
