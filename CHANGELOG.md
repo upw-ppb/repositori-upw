@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.58.0 — 26 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.58.0 (tampilan docs/ dan server Apps Script Produksi deployment @41): Kalender Akademik di Beranda, unggah PDF dengan baca tanggal otomatis
+  (OCR Google Drive; layanan lanjutan Drive v3, tanpa izin baru), jadwal survei dan hari libur mengikuti kalender resmi.
+- Struktur data berubah (VERSI_SKEMA 38: tabel KalenderAkademik). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±26 dtk, permintaan tanpa login).
+  Rollback ke v0.57.0: tampilan (tag v0.57.0) dan deployment @40; tabel baru diabaikan versi lama.
+- Setelah tayang: Admin Prodi mengunggah kalender Ganjil 2026/2027 dan "KALENDER AKADEMIK 2027" (Genap 2026/2027 + Ganjil 2027/2028), memeriksa, lalu menyetujui.
+- Penyetuju: pemilik, di chat 26 Nov 2026: "Setuju tayang v0.58.0".
+
 ## v0.58.0 — 26 Nov 2026 — Uji Coba
 Ringkas: Kalender Akademik di Beranda semua pengguna; Admin Prodi mengunggah PDF kalender resmi, tanggalnya dibaca otomatis, diperiksa lalu disetujui; jadwal survei dan hari libur mengikuti kalender resmi.
 Permintaan pemilik 26 Nov 2026: "Silahkan lanjutkan" (tempat unggah kalender untuk Admin, tampil di Beranda semua pengguna) dan "apakah bisa … aplikasi langsung membaca
