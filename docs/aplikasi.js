@@ -3,7 +3,7 @@
 "use strict";
 const K = window.UPW_KONFIG;
 const PERAN_L = { superadmin: "Super Admin", admin: "Admin Prodi", kps: "Koordinator Program Studi", gkm: "GKM (Gugus Kendali Mutu)", kalab: "Kepala Laboratorium",
-  laboran: "Laboran", dosen: "Dosen", tendik: "Tendik", mahasiswa: "Mahasiswa", asesor: "Asesor" };
+  laboran: "Laboran", dosen: "Dosen", tendik: "Tendik", mahasiswa: "Mahasiswa", asesor: "Asesor", kajur: "Ketua Jurusan" };
 
 /* ---------- penyimpanan lokal (aman bila diblokir) ---------- */
 const ls = {
@@ -142,12 +142,13 @@ const I = {
   unduhan: '<path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 19h14"/>',
   gkm: '<path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
   rapat: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h6"/><path d="M15 15l1.5 1.5L19 14"/>',
+  sah: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 15l2 2 4-4"/>',
   mutu: '<path d="M3 20h18"/><path d="M6 16v-5M11 16V7M16 16v-8"/><path d="M14 5l2-2 2 2"/>',
   data: '<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8V12"/>'
 };
 I.mkm = I.mk; // v0.39.0: Mata Kuliah Saya untuk mahasiswa
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
-const MENU_L = { mutu: "Hasil Survei", beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", mkm: "Mata Kuliah Saya", bank: "Bank Dokumen", versi: "Riwayat Versi", lab: "Laboratorium", masukan: "Masukan", data: "Data Terkumpul", gkm: "Laporan GKM", rapat: "Rapat & Tindak Lanjut", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
+const MENU_L = { sah: "RPS & Kontrak", mutu: "Hasil Survei", beranda: "Beranda", kegiatan: "Kegiatan", kps: "Antrean KPS", verif: "Verifikasi", ttd: "Tanda Tangan", porto: "Portofolio", ilkps: "Tabel iLKPS", dprodi: "Data Prodi", setuju: "Kegiatan disetujui", survei: "Survei", penilaian: "Penilaian", ded: "DED", mk: "Mata Kuliah Saya", mkm: "Mata Kuliah Saya", bank: "Bank Dokumen", versi: "Riwayat Versi", lab: "Laboratorium", masukan: "Masukan", data: "Data Terkumpul", gkm: "Laporan GKM", rapat: "Rapat & Tindak Lanjut", biodata: "Biodata", cari: "Cari orang", pengguna: "Pengguna", log: "Log aktivitas", akun: "Akun saya" };
 
 function peranAktif() {
   const r = S.pengguna ? S.pengguna.peran : [];
@@ -172,6 +173,7 @@ function menu() {
   if (["admin", "superadmin", "kps", "dosen"].includes(p)) m.push("verif"); // dosen: sebagai pendamping lomba
   if (p === "kps" || (p === "dosen" && u.bolehTtd && !u.peran.includes("kps"))) m.push("ttd"); // KPS berperan Dosen: menu seperti dosen lain
   if (["kalab", "laboran", "admin", "superadmin", "kps"].includes(p)) m.push("lab");
+  if (["kps", "kajur", "admin", "superadmin", "gkm", "dosen", "mahasiswa"].includes(p)) m.push("sah"); // v0.54.0: pengesahan RPS dan kontrak kuliah
   m.push("mutu"); // v0.52.0: hasil survei yang dipublikasikan + keputusan rapat yang diumumkan (semua pengguna)
   if (u.jenisBiodata) m.push("biodata");
   m.push("cari");
@@ -188,8 +190,15 @@ function render() {
   catatNavigasi();
   // Simpan posisi gulir laci, agar menggambar ulang (misalnya setelah mencentang kelas) tidak melompat ke atas.
   const lama = document.querySelector(".drawer"), gulir = lama ? lama.scrollTop : 0;
+  // v0.53.0: kotak bergulir (.gulir) dan halaman tetap di posisinya bila halaman yang sama digambar ulang (mis. mencentang mahasiswa di daftar panjang).
+  const viewLama = S.view, kotak = [...document.querySelectorAll(".gulir")].map(e => e.scrollTop), main = document.querySelector("main"), mainY = main ? main.scrollTop : 0, winY = window.scrollY;
   gambar();
   const baru = document.querySelector(".drawer"); if (baru && gulir) baru.scrollTop = gulir;
+  if (S.view === viewLama) {
+    document.querySelectorAll(".gulir").forEach((e, i) => { if (kotak[i]) e.scrollTop = kotak[i]; });
+    const m2 = document.querySelector("main"); if (m2 && mainY && m2.scrollTop !== mainY) m2.scrollTop = mainY;
+    if (winY && Math.abs(window.scrollY - winY) > 1) window.scrollTo(0, winY);
+  }
   pasangLihatSandi();
   // Simpan profil terakhir agar muat ulang berikutnya langsung tampil (v0.21.0); diperiksa ulang ke server di belakang.
   try { if (S.token && S.pengguna) { const v = JSON.stringify(S.pengguna); if (v !== simpanProfilTerakhir) { ls.set("profil", v); simpanProfilTerakhir = v; } } } catch (_) {}
@@ -324,6 +333,7 @@ try { Object.keys(localStorage).filter(k => /unduhan:/.test(k)).forEach(k => loc
 /** Angka kecil di menu: hal yang menunggu tindakan. */
 function lencana(v) {
   const t = S.tugas; if (!t) return "";
+  if (v === "sah") { const n = (t.sahGiliran || []).length + (t.sahRevisi || []).length; return n ? `<span class="count num" aria-label="${n} menunggu">${n}</span>` : ""; }
   if (v === "mutu") return t.mutuBaru ? `<span class="count num" aria-label="${t.mutuBaru} baru">${t.mutuBaru}</span>` : "";
   const n = v === "beranda" ? t.tugas.length + (t.undangan || []).length + (t.tlSaya || []).length : v === "verif" ? t.verifikasi : v === "kps" && peranAktif() === "kps" ? t.kps
     : v === "rapat" ? (["kps", "gkm"].includes(peranAktif()) ? t.tlVerif || 0 : 0) + (t.tlSaya || []).filter(x => x.terlambat).length : 0;
@@ -356,6 +366,7 @@ function halaman() {
   if (S.view === "gkm") return hGkm();
   if (S.view === "rapat") return hRapat();
   if (S.view === "mutu") return hMutu();
+  if (S.view === "sah") return hSah();
   if (S.view === "versi") return hRiwayat();
   return hBeranda();
 }
@@ -440,7 +451,7 @@ function hBeranda() {
     <li>Keaslian surat tugas dapat dicek dengan kode verifikasi atau QR pada surat.</li></ol></section>`;
   return `<div class="head"><div><h1>Halo, ${esc(u.nama.split(",")[0])}</h1><p>Anda masuk sebagai <b>${esc(PERAN_L[peranAktif()])}</b>${u.peran.length > 1 ? ". Ganti peran lewat pilihan Peran di bilah atas" : ""}.</p></div></div>
    ${panelSurveiSaya()}${panelTugas()}${panelJadwalSurvei(true)}${panelKesiapan()}
-   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.52.0: menu <b>Hasil Survei</b> untuk semua pengguna (ringkasan hasil survei yang dipublikasikan dan perbaikan yang diputuskan prodi); survei yang selesai <b>disarankan menjadi agenda rapat</b>, keputusan rapat bisa ditandai <b>Umumkan</b>, dan pengingat di Beranda bila hasil survei belum dibahas atau belum dipublikasikan. v0.51.0: <b>EDOM per mata kuliah, kelas, dan dosen</b>: mahasiswa menilai setiap mata kuliahnya dan setiap pengajarnya (anonim), KPS/Admin melihat hasil per pengajar dan per kelas, dosen melihat hasil dirinya di Mata Kuliah Saya; jawaban <b>tracer study</b> kini bisa <b>diterapkan ke Data Prodi › Lulusan</b> (waktu tunggu, kesesuaian bidang, tempat kerja, lulusan terlacak). v0.50.0: <b>Survei</b> lengkap: 9 templat sesuai instrumen dengan penjelasan di setiap pertanyaan, <b>jadwal survei yang dianjurkan</b> di Beranda (Siapkan → Mulai survei), target responden, daftar siapa yang sudah/belum mengisi beserta pengingat, survei anonim yang benar-benar anonim, dan analisis hasil (Cronbach α, IPA, NPS). v0.49.1: halaman tidak lagi <b>Memuat…</b> selamanya bila server Google tidak menjawab: permintaan dibatalkan setelah 30 detik dan dikirim ulang otomatis, lalu muncul tombol <b>Coba lagi</b>. v0.49.0: aplikasi <b>lebih ringan dan tahan lama</b>: permintaan yang bersamaan digabung (membuka aplikasi kini 2 permintaan, bukan 5), Penilaian/iLKPS/Kesiapan disimpan sementara sampai data berubah, dan server merawat spreadsheet setiap hari agar tidak menyentuh batas 10 juta sel Google (Super Admin: Riwayat Versi › Kesehatan data). v0.48.2: PDF dan gambar kini dibuka <b>di dalam aplikasi</b>, dengan tombol <b>Kembali ke aplikasi</b> (juga ✕, Esc, atau tombol mundur). v0.48.1: tombol unduhan di dalam aplikasi dihapus; berkas yang diunduh kini muncul di <b>tombol unduhan Chrome/Edge</b> (bisa dibuka langsung atau ditampilkan di Finder). v0.48.0: <b>Pembebanan CPL per MK dari Excel</b> (Data Prodi › Kurikulum): CPL utama (wajib diukur di RPS), CPL penunjang, dan rasional untuk semua MK sekaligus, dengan pratinjau dan unduhan pemetaan + rekap per CPL. v0.47.0: tombol <b>Ubah nama / hapus</b> di daftar akun (Super Admin: ubah nama, nonaktifkan, hapus akun yang belum dipakai; Admin Prodi: ubah nama mahasiswa). v0.46.0: <b>CPL yang dibebankan per MK</b> ditetapkan KPS/Admin Prodi dan <b>unit kompetensi</b> per MK (Data Prodi › Kurikulum › CPL &amp; unit), dipakai templat dan pemeriksaan RPS serta Tabel 4; <b>Cocokkan dengan PDDikti</b> di Status dosen. v0.45.0: <b>nilai dari SIAKAD</b> (unggah template nilai per kelas, dibaca dan diperiksa otomatis), contoh dalam <b>PDF</b> (dibuka langsung), dan <b>Data bersama templat</b> (LMS, tempat, batas umpan balik, keterlambatan, peraturan akademik). v0.44.0: <b>Contoh</b> di setiap bagian Portofolio MK (contoh RPS, kontrak, rubrik, dan lembar penilaian lengkap) dan <b>saran penelitian/PkM tim</b> yang cocok dengan RPS untuk catatan integrasi. v0.43.1: keterangan <b>urutan pengisian</b> Portofolio MK (RPS dulu, lalu templat kontrak, rubrik, dan lembar penilaian). v0.43.0: templat <b>kontrak kuliah</b>, <b>rubrik penilaian</b>, dan <b>lembar portofolio penilaian (Excel)</b> terisi dari RPS; RPS resmi PDF + Word sumber untuk pemeriksaan; catatan <b>tanda tangan</b>; kualifikasi/jenjang dan jam sajian otomatis. v0.42.0: <b>templat RPS terisi otomatis</b> dan <b>pembaca RPS Word</b> di Portofolio MK (pemeriksaan butir 8, saran metode, CPL Tabel 4 otomatis), daftar 68 CPL prodi, Otorisasi templat RPS di Data Prodi › Kurikulum. v0.41.0: <b>unduh semua bukti Portofolio MK (ZIP)</b> per semester, per mata kuliah, atau per kelas (Data Prodi › Portofolio MK dan laci mata kuliah). v0.40.0: <b>Portofolio MK per kelas</b> (setiap kelas terpisah dan hanya terlihat oleh tim kelas itu; RPS bersama hanya untuk tim yang sama), dosen hanya melihat <b>peserta kelasnya</b>. v0.39.2: templat tim pengajar menerima <b>nama yang diketik</b> (tanpa gelar, inisial, NIP, atau minimal 2 kata nama) dengan tanda "Terbaca sebagai", dan pratinjau menampilkan <b>beban SKS per orang</b>. v0.39.1: Tabel 4 iLKPS menulis <b>semua kode kelompok</b> MK pilihan (mis. 231041217 / 231041215 / 231041216) dalam satu baris. v0.39.0: <b>peserta kelas</b> (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa; juga lewat Excel), menu <b>Mata Kuliah Saya</b> untuk mahasiswa (MK dan dosen pengajar); SKS dibagi ke semua anggota tim termasuk praktisi. v0.38.0: <b>MK pilihan dengan kelompok paralel</b> (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok. v0.37.0: tombol <b>Edit</b> pada riwayat status mahasiswa (ganti SK yang salah, perbaiki tanggal/alasan/status; tercatat di Log). v0.36.1: templat tim pengajar selalu berisi <b>baris kelas A dan B</b> per mata kuliah, dan daftar nama selalu terbaru. v0.36.0: penanda <b>tanpa dosen pengampu</b> untuk Magang dan Tugas Akhir di Kurikulum. v0.35.0: <b>templat Excel tim pengajar</b> (KPS dan Admin Prodi) dengan hitungan <b>beban SKS per dosen</b> otomatis. v0.34.0: <b>kop surat prodi</b> di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM. v0.33.0: <b>saran butir Matriks otomatis</b> saat mengetik agenda rapat, tindak lanjut, keputusan risalah, nama dokumen Bank, dan judul kegiatan, serta kotak <b>Cari butir</b> di Penilaian. v0.32.0: <b>risalah rapat</b> per agenda (keputusan otomatis jadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen. v0.31.0: menu <b>Rapat &amp; Tindak Lanjut</b>: undangan rapat dari KPS (surat PDF bertanda tangan, notifikasi dan jawaban kehadiran peserta) dan daftar tindak lanjut sampai terverifikasi. v0.30.0: tombol <b>i</b> berisi definisi dan kriteria skor instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain. v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
+   ${K.lingkungan === "uji" ? `<div class="callout"><b>${LABEL_VERSI} · Perbaikan dari catatan prodi.</b> Baru di v0.55.0: <b>mesin PDF buatan sendiri</b>: surat tugas dan semua lampirannya (PDF, Word, gambar) diunduh sebagai <b>satu PDF</b>; RPS dan kontrak kuliah yang sah diunduh sebagai <b>PDF bertanda tangan elektronik</b>, dengan Pratinjau PDF sebelum disahkan. v0.54.1: tempat tanda tangan elektronik di templat RPS/kontrak kini <b>bersorot kuning dengan keterangan</b> dan hilang sendiri pada dokumen jadi. v0.54.0: <b>tanda tangan elektronik RPS dan kontrak kuliah</b> (menu RPS &amp; Kontrak): dosen mengajukan, KPS memeriksa, Ketua Jurusan mengesahkan RPS; kontrak disetujui perwakilan mahasiswa dan diketahui KPS; Word yang sah diunduh dengan QR. RPS dan kontrak kini hanya diunggah sebagai templat Word aplikasi. Lampiran pengajuan ikut dicetak setelah surat tugas (tanpa kop dan tanda tangan). v0.53.0: <b>lampiran untuk KPS</b> saat mengajukan surat tugas (proposal, jadwal, undangan); pencarian jenis kegiatan lebih luas (mis. <b>benchmarking kurikulum</b> kini bisa diajukan dosen); saran butir di rapat memperhatikan <b>jenis rapat dan agenda</b>; tautan rapat daring di undangan <b>bisa diklik</b>; daftar akun <b>urut NIM</b> dan tidak melompat ke atas saat mencentang. v0.52.0: menu <b>Hasil Survei</b> untuk semua pengguna (ringkasan hasil survei yang dipublikasikan dan perbaikan yang diputuskan prodi); survei yang selesai <b>disarankan menjadi agenda rapat</b>, keputusan rapat bisa ditandai <b>Umumkan</b>, dan pengingat di Beranda bila hasil survei belum dibahas atau belum dipublikasikan. v0.51.0: <b>EDOM per mata kuliah, kelas, dan dosen</b>: mahasiswa menilai setiap mata kuliahnya dan setiap pengajarnya (anonim), KPS/Admin melihat hasil per pengajar dan per kelas, dosen melihat hasil dirinya di Mata Kuliah Saya; jawaban <b>tracer study</b> kini bisa <b>diterapkan ke Data Prodi › Lulusan</b> (waktu tunggu, kesesuaian bidang, tempat kerja, lulusan terlacak). v0.50.0: <b>Survei</b> lengkap: 9 templat sesuai instrumen dengan penjelasan di setiap pertanyaan, <b>jadwal survei yang dianjurkan</b> di Beranda (Siapkan → Mulai survei), target responden, daftar siapa yang sudah/belum mengisi beserta pengingat, survei anonim yang benar-benar anonim, dan analisis hasil (Cronbach α, IPA, NPS). v0.49.1: halaman tidak lagi <b>Memuat…</b> selamanya bila server Google tidak menjawab: permintaan dibatalkan setelah 30 detik dan dikirim ulang otomatis, lalu muncul tombol <b>Coba lagi</b>. v0.49.0: aplikasi <b>lebih ringan dan tahan lama</b>: permintaan yang bersamaan digabung (membuka aplikasi kini 2 permintaan, bukan 5), Penilaian/iLKPS/Kesiapan disimpan sementara sampai data berubah, dan server merawat spreadsheet setiap hari agar tidak menyentuh batas 10 juta sel Google (Super Admin: Riwayat Versi › Kesehatan data). v0.48.2: PDF dan gambar kini dibuka <b>di dalam aplikasi</b>, dengan tombol <b>Kembali ke aplikasi</b> (juga ✕, Esc, atau tombol mundur). v0.48.1: tombol unduhan di dalam aplikasi dihapus; berkas yang diunduh kini muncul di <b>tombol unduhan Chrome/Edge</b> (bisa dibuka langsung atau ditampilkan di Finder). v0.48.0: <b>Pembebanan CPL per MK dari Excel</b> (Data Prodi › Kurikulum): CPL utama (wajib diukur di RPS), CPL penunjang, dan rasional untuk semua MK sekaligus, dengan pratinjau dan unduhan pemetaan + rekap per CPL. v0.47.0: tombol <b>Ubah nama / hapus</b> di daftar akun (Super Admin: ubah nama, nonaktifkan, hapus akun yang belum dipakai; Admin Prodi: ubah nama mahasiswa). v0.46.0: <b>CPL yang dibebankan per MK</b> ditetapkan KPS/Admin Prodi dan <b>unit kompetensi</b> per MK (Data Prodi › Kurikulum › CPL &amp; unit), dipakai templat dan pemeriksaan RPS serta Tabel 4; <b>Cocokkan dengan PDDikti</b> di Status dosen. v0.45.0: <b>nilai dari SIAKAD</b> (unggah template nilai per kelas, dibaca dan diperiksa otomatis), contoh dalam <b>PDF</b> (dibuka langsung), dan <b>Data bersama templat</b> (LMS, tempat, batas umpan balik, keterlambatan, peraturan akademik). v0.44.0: <b>Contoh</b> di setiap bagian Portofolio MK (contoh RPS, kontrak, rubrik, dan lembar penilaian lengkap) dan <b>saran penelitian/PkM tim</b> yang cocok dengan RPS untuk catatan integrasi. v0.43.1: keterangan <b>urutan pengisian</b> Portofolio MK (RPS dulu, lalu templat kontrak, rubrik, dan lembar penilaian). v0.43.0: templat <b>kontrak kuliah</b>, <b>rubrik penilaian</b>, dan <b>lembar portofolio penilaian (Excel)</b> terisi dari RPS; RPS resmi PDF + Word sumber untuk pemeriksaan; catatan <b>tanda tangan</b>; kualifikasi/jenjang dan jam sajian otomatis. v0.42.0: <b>templat RPS terisi otomatis</b> dan <b>pembaca RPS Word</b> di Portofolio MK (pemeriksaan butir 8, saran metode, CPL Tabel 4 otomatis), daftar 68 CPL prodi, Otorisasi templat RPS di Data Prodi › Kurikulum. v0.41.0: <b>unduh semua bukti Portofolio MK (ZIP)</b> per semester, per mata kuliah, atau per kelas (Data Prodi › Portofolio MK dan laci mata kuliah). v0.40.0: <b>Portofolio MK per kelas</b> (setiap kelas terpisah dan hanya terlihat oleh tim kelas itu; RPS bersama hanya untuk tim yang sama), dosen hanya melihat <b>peserta kelasnya</b>. v0.39.2: templat tim pengajar menerima <b>nama yang diketik</b> (tanpa gelar, inisial, NIP, atau minimal 2 kata nama) dengan tanda "Terbaca sebagai", dan pratinjau menampilkan <b>beban SKS per orang</b>. v0.39.1: Tabel 4 iLKPS menulis <b>semua kode kelompok</b> MK pilihan (mis. 231041217 / 231041215 / 231041216) dalam satu baris. v0.39.0: <b>peserta kelas</b> (otomatis per kelas, diatur per orang, dibagi per kelompok bahasa; juga lewat Excel), menu <b>Mata Kuliah Saya</b> untuk mahasiswa (MK dan dosen pengajar); SKS dibagi ke semua anggota tim termasuk praktisi. v0.38.0: <b>MK pilihan dengan kelompok paralel</b> (Bahasa Asing Pilihan Jepang/Jerman/Perancis): tim per kelas × kelompok, SKS penuh per kelompok, Portofolio MK per kelompok. v0.37.0: tombol <b>Edit</b> pada riwayat status mahasiswa (ganti SK yang salah, perbaiki tanggal/alasan/status; tercatat di Log). v0.36.1: templat tim pengajar selalu berisi <b>baris kelas A dan B</b> per mata kuliah, dan daftar nama selalu terbaru. v0.36.0: penanda <b>tanpa dosen pengampu</b> untuk Magang dan Tugas Akhir di Kurikulum. v0.35.0: <b>templat Excel tim pengajar</b> (KPS dan Admin Prodi) dengan hitungan <b>beban SKS per dosen</b> otomatis. v0.34.0: <b>kop surat prodi</b> di halaman pertama surat tugas, undangan rapat, risalah, daftar hadir, dan Laporan GKM. v0.33.0: <b>saran butir Matriks otomatis</b> saat mengetik agenda rapat, tindak lanjut, keputusan risalah, nama dokumen Bank, dan judul kegiatan, serta kotak <b>Cari butir</b> di Penilaian. v0.32.0: <b>risalah rapat</b> per agenda (keputusan otomatis jadi tindak lanjut), templat Word, daftar hadir PDF, dan pindaian risalah yang otomatis masuk Bank Dokumen. v0.31.0: menu <b>Rapat &amp; Tindak Lanjut</b>: undangan rapat dari KPS (surat PDF bertanda tangan, notifikasi dan jawaban kehadiran peserta) dan daftar tindak lanjut sampai terverifikasi. v0.30.0: tombol <b>i</b> berisi definisi dan kriteria skor instrumen LAMWisata di Penilaian, DED, Bank Dokumen, Tabel iLKPS, Data Prodi, Biodata, dan halaman lain. v0.29.0: <b>data dan bukti dosen praktisi</b> (Data Prodi › Praktisi) dan mata kuliah diampu TS-2 s.d. TS di Tabel 1–3. v0.28.0: <b>tim pengajar per kelas</b> di Data Prodi › Tim pengajar (sama untuk semua kelas, atau berbeda untuk kelas A dan kelas B). v0.27.0: daftar akun bisa disaring dan diurutkan, rekap per angkatan/kelas, <b>Ubah status</b> mahasiswa dengan alasan dan bukti (bisa banyak sekaligus), riwayat versi di Info. v0.26.0: halaman <b>Info</b> berisi 53 topik panduan sesuai peran, 30 gambar asli bertanda (nomor, kotak, panah; klik untuk memperbesar), dan kolom pencarian yang memahami pertanyaan. v0.25.2: tombol <b>← →</b> (kembali/maju) di bilah atas dan ikon <b>Unduhan</b> di pojok kanan atas, seperti di Chrome. v0.25.1: pratinjau impor Excel kini menampilkan <b>semua baris</b> dalam kotak bergulir (dengan nomor baris dan tahun masuk dari NIM); daftar panjang lain (riwayat keputusan, catatan lab, masalah impor) juga lengkap dan bisa digulir. Baru di v0.25.0: panel <b>Kesiapan akreditasi</b> di Beranda (KPS, Admin Prodi, Super Admin, GKM) berisi apa yang kurang dan saran tindakannya; peran baru <b>GKM (Gugus Kendali Mutu)</b> dan menu <b>Laporan GKM</b> per semester; istilah GPM diganti GKM. Di v0.24.0: <b>foto profil</b> (menu Akun saya) dan, untuk Super Admin, menu <b>Data Terkumpul</b> serta tombol <b>Sumber data</b> di setiap butir Penilaian (terima, minta revisi, tolak, hapus, pulihkan). v0.23.1: ikon aplikasi diperbesar (koper dan UPW memenuhi kotak). Baru di v0.23.0: tombol <b>Kirim masukan</b> di Info (masalah, saran, permintaan fitur; boleh lampirkan tangkapan layar), menu Masukan untuk Admin dan Super Admin. Di v0.22.0: gambar panduan bernomor di Info, ikon mata pada kata sandi, persentase biodata dari semua kolom, tombol unggah ijazah mengikuti pendidikan yang diisi, simpan unduhan ke folder pilihan (aplikasi terpasang), pintasan di ikon Dock. Tahap 3–5: tombol <b>Info</b> (ikon i di bilah atas) berisi panduan sesuai peran; dokumen pendukung biodata dosen dan pengingat; riwayat keputusan KPS; tanda tangan di atas nama; menu Laboratorium; tautan bukti di portofolio; aplikasi lebih cepat. Sebelumnya: impor dari Excel dengan templat (akun, biodata dosen, kurikulum, lulusan), unduh daftar akun, Data Prodi › Status dosen; tombol <b>Lihat</b> pada kolom kata sandi, pencarian dosen dengan inisial, angkatan dari NIM, menu mengikuti peran aktif, saran Pasal GCET saat mengetik judul, ikon aplikasi baru.${menu().includes("bank") ? " Sebelumnya: menu <b>Bank Dokumen</b>: 94 slot dokumen mutu untuk 47 butir Matriks yang dinilai GKM, dengan penanggung jawab, masa berlaku, dan riwayat versi; jumlah dokumen berlaku ikut tampil di Penilaian." : ""}${menu().includes("mk") ? " Sebelumnya: menu <b>Mata Kuliah Saya</b> (RPS, kontrak, rubrik, metode, integrasi, bukti pembelajaran)." : ""} Sudah ada juga: <b>DED</b> (narasi 64 butir, unduh Word) dan <b>Penilaian</b> (simulasi 84 butir). <b>Survei:</b> Baru${menu().includes("survei") ? ": menu <b>Survei</b> (templat Tabel 22 kepuasan mahasiswa dan Tabel 11 pengguna lulusan, anonim atau beridentitas, tautan tanpa login untuk alumni dan pengguna, rekap dan tindak lanjut); Tabel iLKPS kini lengkap 33 lembar" : ": survei dari prodi muncul di Beranda bila ada yang terbuka untuk Anda"}.
    Sudah ada: Portofolio Saya (ekspor PDF/Excel/ZIP), kegiatan dan surat tugas dengan QR${u.peran.includes("kps") ? " dan tanda tangan KPS" : ""}, unggah bukti bersama, batas hari kerja dan pengingat, verifikasi data, cek keaslian surat, biodata, pencarian orang.</div>` : ""}
    ${menu().includes("kegiatan") ? `<div class="row"><button class="btn primary" data-go="kegiatan">Buka Kegiatan</button>${menu().includes("kps") ? `<button class="btn" data-go="kps">Buka Antrean KPS</button>` : ""}</div>` : ""}
    <section class="panel"><h2>Akun Anda</h2><div class="tbl-wrap"><table><tbody>
@@ -473,6 +484,10 @@ function panelTugas() {
   // v0.52.0: siklus mutu survei (dibahas di rapat → dipublikasikan)
   if (["kps", "gkm", "admin", "superadmin"].includes(peranAktif())) (t.svBelumDibahas || []).forEach(x => baris.push(`<div class="item" style="cursor:pointer" data-act="rapatBaruSv" data-id="${x.id}"><div class="body"><div class="title">Hasil survei belum dibahas di rapat: ${esc(x.judul)}</div><div class="meta"><span>Ditutup ${esc(tglPendek(x.tutup))} · buat undangan rapat dengan agenda yang disarankan</span></div></div><span class="chip s-revisi">Agendakan</span></div>`));
   if (["kps", "admin", "superadmin"].includes(peranAktif())) (t.svBelumTerbit || []).filter(x => x.dibahas).forEach(x => baris.push(`<div class="item" style="cursor:pointer" data-act="pubBuka" data-id="${x.id}"><div class="body"><div class="title">Hasil survei belum dipublikasikan: ${esc(x.judul)}</div><div class="meta"><span>Sudah dibahas di rapat · umumkan ringkasan dan tindak lanjutnya kepada dosen/mahasiswa (butir 78)</span></div></div><span class="chip s-revisi">Publikasikan</span></div>`));
+  // v0.54.0: pengesahan RPS / kontrak kuliah
+  (t.sahGiliran || []).forEach(x => baris.push(`<div class="item" style="cursor:pointer" data-act="sahBuka" data-s="${x.semester}" data-kode="${esc(x.kode)}" data-kunci="${esc(x.kunci)}" data-komp="${x.komp}"><div class="body"><div class="title">${x.komp === "rps" ? "RPS" : "Kontrak kuliah"} ${esc(x.kode)} · ${esc(x.nama)} (${esc(x.label)})</div><div class="meta"><span>Menunggu ${x.st === "mhs" ? "persetujuan Anda sebagai perwakilan mahasiswa" : x.st === "kajur" ? "pengesahan Anda" : "pemeriksaan Anda"}</span></div></div><span class="chip s-diajukan">Periksa</span></div>`));
+  (t.sahRevisi || []).forEach(x => baris.push(`<div class="item" style="cursor:pointer" data-act="sahBuka" data-s="${x.semester}" data-kode="${esc(x.kode)}" data-kunci="${esc(x.kunci)}" data-komp="${x.komp}"><div class="body"><div class="title">${x.komp === "rps" ? "RPS" : "Kontrak kuliah"} ${esc(x.kode)} · ${esc(x.nama)} (${esc(x.label)}) dikembalikan</div><div class="meta"><span>Baca catatan, perbaiki Word-nya bila perlu, lalu ajukan ulang</span></div></div><span class="chip s-revisi">Revisi</span></div>`));
+  if (t.kontrakBaca) baris.push(`<div class="item" style="cursor:pointer" data-go="sah"><div class="body"><div class="title">${t.kontrakBaca} kontrak kuliah baru untuk Anda baca</div><div class="meta"><span>Rencana penilaian dan aturan perkuliahan semester ini</span></div></div><span class="chip s-diajukan">Baca</span></div>`);
   if (t.mutuBaru) baris.push(`<div class="item" style="cursor:pointer" data-go="mutu"><div class="body"><div class="title">${t.mutuBaru} hasil survei baru dipublikasikan untuk Anda</div><div class="meta"><span>Ringkasan pendapat responden dan perbaikan yang dilakukan prodi</span></div></div><span class="chip s-diajukan">Baca</span></div>`);
   if (t.kps && peranAktif() === "kps") baris.push(`<div class="item" style="cursor:pointer" data-go="kps"><div class="body"><div class="title">${t.kps} pengajuan surat tugas menunggu keputusan Anda</div></div><span class="chip s-diajukan">Antrean KPS</span></div>`);
   return `<section class="panel"><h2>Perlu tindakan (${baris.length})</h2><div class="list">${baris.join("") || `<div class="empty">Tidak ada yang perlu ditindaklanjuti. Bagus!</div>`}</div></section>`;
@@ -603,6 +618,7 @@ function laci() {
   if (L.jenis === "svEdomHasil") return laciSvEdomHasil();
   if (L.jenis === "svTracer") return laciSvTracer();
   if (L.jenis === "pubForm") return laciPubForm();
+  if (L.jenis === "sahLihat") return laciSahLihat();
   if (L.jenis === "gpm") return laciGpm();
   if (L.jenis === "ded") return laciDed();
   if (L.jenis === "mkp") return laciMkp();
@@ -903,7 +919,7 @@ const ST_L = { draf_aju: ["Draf pengajuan", "s-draf"], menunggu_kps: ["Menunggu 
   revisi_aju: ["Perlu revisi pengajuan", "s-revisi"], ditolak_aju: ["Pengajuan ditolak", "s-ditolak"], terbit: ["Surat terbit", "s-disetujui"] };
 const STATUS_L = { draf: ["Draf", "s-draf"], diajukan: ["Menunggu verifikasi data", "s-diajukan"], diajukan_ulang: ["Diajukan ulang", "s-diajukan"], revisi: ["Perlu revisi data", "s-revisi"],
   disetujui: ["Data disetujui", "s-disetujui"], ditolak: ["Data ditolak", "s-ditolak"] };
-const AKSI_L = { buat: "Membuat catatan kegiatan", ajukan: "Mengajukan", ajukan_ulang: "Mengajukan ulang", terbit: "Menyetujui; surat terbit",
+const AKSI_L = { lampiran_aju: "Menambah lampiran pengajuan", lampiran_aju_hapus: "Menghapus lampiran pengajuan", buat: "Membuat catatan kegiatan", ajukan: "Mengajukan", ajukan_ulang: "Mengajukan ulang", terbit: "Menyetujui; surat terbit",
   ditunda: "Menunda pengajuan", revisi_aju: "Meminta revisi", ditolak_aju: "Menolak pengajuan",
   bukti: "Mengunggah bukti", bukti_batal: "Membatalkan bukti", ajukan_data: "Diajukan untuk verifikasi data", ajukan_ulang_data: "Mengajukan ulang data",
   akreditasi: "Melengkapi data akreditasi", disetujui: "Menyetujui data", revisi: "Meminta revisi data", ditolak: "Menolak data", hapus_sa: "Menghapus kegiatan (Super Admin)", pulihkan: "Memulihkan kegiatan" };
@@ -941,7 +957,7 @@ async function muatVerif() {
   return sekali("verif", async () => { S.verif = (await api("verifikasi.antrean")).kegiatan; render(); });
 }
 /** Setelah ada perubahan data: muat ulang daftar, antrean, dan pengingat saat dibutuhkan. */
-function segarkan() { S.rapat = null; S.tl = null; S.rapatRef = null; S.kesiapan = null; S.gkm = null; S.sdata = null; S.mskAdm = null; S.rkep = null; S.lab = null; S.dokd = null; S.dokBio = null; S.sdos = null; S.bank = null; S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
+function segarkan() { S.sah = null; S.rapat = null; S.tl = null; S.rapatRef = null; S.kesiapan = null; S.gkm = null; S.sdata = null; S.mskAdm = null; S.rkep = null; S.lab = null; S.dokd = null; S.dokBio = null; S.sdos = null; S.bank = null; S.mkp = null; S.mkpRekap = null; S.keg = null; S.antrean = null; S.verif = null; S.tugas = null; S.ttd = null; S.porto = null; S.ilkps = null; S.nilai = null; }
 async function muatAntrean() {
   return sekali("antrean", async () => { S.antrean = (await api("kps.antrean")).kegiatan; render(); });
 }
@@ -1071,6 +1087,7 @@ function laciDetail() {
    <div class="tbl-wrap"><table><tbody>${baris.map(([a, b]) => `<tr><td class="small muted" style="width:34%">${a}</td><td class="small">${b}</td></tr>`).join("")}</tbody></table></div>
    <div><h3>Dosen dan tendik (${lp.pegawai.length})</h3><div class="chips" style="margin-top:6px">${lp.pegawai.map(p => `<span class="pchip">${esc(namaPendek(p.nama))} <span class="muted small">${p.jenis === "tendik" ? "tendik" : ""}</span>&nbsp;</span>`).join("") || '<span class="muted small">–</span>'}</div></div>
    <div><h3>Mahasiswa (${lp.mhs.length})</h3>${lp.mhs.length ? `<details style="margin-top:6px"><summary class="small" style="cursor:pointer">Lihat daftar nama</summary><div class="tbl-wrap" style="margin-top:6px"><table><thead><tr><th>NIM</th><th>Nama</th><th>Smt</th><th>Kelas</th></tr></thead><tbody>${lp.mhs.map(m => `<tr><td class="mono small">${esc(m.nim)}</td><td class="small">${esc(m.nama)}</td><td class="small">${esc(m.semester || "–")}</td><td class="small">${esc(m.kelas)}</td></tr>`).join("")}</tbody></table></div></details>` : '<span class="muted small">–</span>'}</div>
+   ${blokLampiranAju(k)}
    ${blokBukti(k)}
    ${k.bisaVerifikasi ? `<div class="picker" style="border-color:var(--brand)"><b>Verifikasi data</b><span class="small muted">Periksa bukti dan isian di atas. Data yang disetujui masuk data akreditasi (Tabel iLKPS).</span>
      <div class="field"><label for="vCat">Catatan untuk pengunggah</label><textarea id="vCat" placeholder="Wajib diisi bila meminta revisi atau menolak"></textarea></div>
@@ -1079,6 +1096,22 @@ function laciDetail() {
    ${galatHtml()}
    ${k.bisaUbah || k.bisaHapus || k.bisaAjukanData || k.bisaUbahAkreditasi ? `<div class="row" style="justify-content:flex-end;margin-top:auto;flex-wrap:wrap">${k.bisaHapus ? tombol("hapusKeg", "Hapus draf", "bad") : ""}${k.bisaUbahAkreditasi ? tombol("ubahAkred", "Lengkapi data akreditasi", "") : ""}${k.bisaUbah ? tombol("ubahKeg", ["revisi_aju", "ditunda"].includes(k.st) ? "Perbaiki dan kirim ulang" : "Ubah", k.bisaAjukanData ? "" : "primary") : ""}${k.bisaAjukanData ? tombol("ajukanData", k.status === "revisi" ? "Ajukan ulang" : "Ajukan verifikasi") : ""}</div>` : ""}
   </div></div>`;
+}
+/** v0.53.0: lampiran pengajuan surat (proposal, jadwal, dll.) — opsional, untuk dibaca KPS sebelum memutuskan. */
+const JENIS_LAMP_AJU = ["Proposal", "Jadwal / rundown", "Undangan / surat dari penyelenggara", "Kerangka acuan (TOR)", "Lainnya"];
+function daftarLampiranAju(k, hapus) {
+  return (k.lampiranAju || []).map(x => `<div class="item"><div class="body"><div class="title">${esc(x.j)}</div><div class="meta"><span>${x.t === "file" ? esc(x.nama) + " · " + ukuranT(x.ukuran) : "Tautan"}</span><span>${esc(namaPendek(x.oleh))}, ${esc(tglJam(x.w))}</span></div></div>
+    <div class="row bk-aksi"><button class="btn sm" data-act="lampAjuLihat" data-id="${k.id}" data-lid="${x.id}">${x.t === "file" ? "Lihat" : "Buka"}</button>${hapus ? `<button class="btn sm bad" data-act="lampAjuHapus" data-id="${k.id}" data-lid="${x.id}" ${S.sibuk ? "disabled" : ""}>Hapus</button>` : ""}</div></div>`).join("");
+}
+function blokLampiranAju(k) {
+  if (!k.perluST || (!(k.lampiranAju || []).length && !k.bisaLampiranAju)) return "";
+  const dis = S.sibuk ? "disabled" : "";
+  return `<div><h3>Lampiran pengajuan (${(k.lampiranAju || []).length})</h3><p class="small muted" style="margin:2px 0 6px">Opsional: proposal, jadwal, undangan dari penyelenggara, atau berkas lain yang membantu KPS memutuskan. Bukan bukti kegiatan dan tidak ikut lampiran surat.</p>
+   <div class="list">${daftarLampiranAju(k, k.bisaLampiranAju)}</div>
+   ${k.bisaLampiranAju && (k.lampiranAju || []).length < 5 ? `<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px"><select id="laJ" style="width:auto">${JENIS_LAMP_AJU.map(j => `<option>${esc(j)}</option>`).join("")}</select>
+     <label class="btn sm" style="cursor:pointer">Pilih berkas…<input type="file" id="laFile" accept="${TERIMA}" hidden ${dis}></label>
+     <input id="laUrl" type="url" placeholder="atau tempel tautan https://" style="width:220px"><button class="btn sm" data-act="lampAjuTautan" ${dis}>Simpan tautan</button></div>
+     <span class="hint">Maksimal 5 lampiran, masing-masing 10 MB.</span>` : ""}</div>`;
 }
 const ukuranT = n => n >= 1048576 ? (n / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
 const TERIMA = ".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx";
@@ -1137,9 +1170,29 @@ function laciSurat() {
   const L = S.laci, k = L.k, dsn = L.w === "dosen";
   return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Pratinjau surat" style="width:min(820px,100%)">
    <div class="dh"><h2>${dsn ? "Pengajuan surat penugasan dosen/tendik" : "Permohonan surat tugas mahasiswa"}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
-   <div class="row"><button class="btn primary" data-act="cetakSurat">${k.st === "terbit" ? "Unduh PDF" : "Unduh draf PDF"}</button><button class="btn" data-act="kembaliDetail">Kembali ke detail</button></div>
-   <p class="small muted">Tekan <b>Unduh PDF</b>, lalu pada jendela cetak pilih <b>Simpan sebagai PDF</b> (Save as PDF). Ukuran kertas A4.</p>
-   <div style="overflow-x:auto;display:flex;flex-direction:column;gap:16px">${kertasSurat(k, L.w)}</div></div></div>`;
+   <div class="row" style="flex-wrap:wrap">${tombol("unduhSuratPdf", (k.st === "terbit" ? "Unduh PDF" : "Unduh draf PDF") + ((k.lampiranAju || []).length ? " (surat + lampiran)" : ""), "primary")}<button class="btn" data-act="cetakSurat">Cetak lewat browser</button><button class="btn" data-act="kembaliDetail">Kembali ke detail</button></div>
+   <p class="small muted">PDF disusun langsung oleh aplikasi (A4)${(k.lampiranAju || []).length ? ", lampiran PDF, Word, dan gambar ikut digabung dalam satu berkas" : ""}. <b>Cetak lewat browser</b> tetap tersedia sebagai cadangan.</p>
+   ${(k.lampiranAju || []).length ? `<div class="callout small">Surat ini disertai <b>${k.lampiranAju.length} lampiran pengajuan</b> setelah halaman surat, tanpa kop dan tanda tangan: daftar lampiran, lalu isi setiap lampiran (PDF dan gambar apa adanya, Word disusun ulang). Excel/PowerPoint hanya dicantumkan.
+     ${(k.lampiranAju || []).some(x => x.t === "file") ? `<button class="btn sm" data-act="lampAjuZip">Unduh berkas asli lampiran (ZIP)</button>` : ""}</div>` : ""}
+   <div style="overflow-x:auto;display:flex;flex-direction:column;gap:16px">${kertasSurat(k, L.w)}${halamanLampiranAju(k, {}, true)}</div></div></div>`;
+}
+/** v0.54.0: halaman lampiran pengajuan setelah surat tugas — tanpa kop dan tanda tangan (permintaan pemilik). g = { id lampiran: data URL gambar }. */
+const GBR_LAMP = /\.(jpe?g|png|webp)$/i;
+const GABUNG_LAMP = /\.(pdf|docx)$/i;
+function halamanLampiranAju(k, g, gabung) {
+  const l = k.lampiranAju || []; if (!l.length) return "";
+  const ket = x => x.t === "tautan" ? `<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer" style="word-break:break-all">${esc(x.url)}</a>` : GBR_LAMP.test(x.nama) || (gabung && GABUNG_LAMP.test(x.nama)) ? "terlampir pada halaman berikut" : "berkas terpisah";
+  return `<div class="kertas" style="page-break-before:always"><p style="text-align:center"><b>LAMPIRAN PENGAJUAN</b><br>${esc(k.judul)}</p>
+    <table class="tabel" style="width:100%;border-collapse:collapse"><thead><tr><th style="border:1px solid #000;padding:4px">No</th><th style="border:1px solid #000;padding:4px">Jenis</th><th style="border:1px solid #000;padding:4px">Berkas</th><th style="border:1px solid #000;padding:4px">Keterangan</th></tr></thead>
+    <tbody>${l.map((x, i) => `<tr><td style="border:1px solid #000;padding:4px;text-align:center">${i + 1}</td><td style="border:1px solid #000;padding:4px">${esc(x.j)}</td><td style="border:1px solid #000;padding:4px">${x.t === "file" ? esc(x.nama) : "Tautan"}</td><td style="border:1px solid #000;padding:4px">${ket(x)}</td></tr>`).join("")}</tbody></table></div>
+    ${l.filter(x => x.t === "file" && GBR_LAMP.test(x.nama) && g[x.id]).map((x, i) => `<div class="kertas" style="page-break-before:always"><p class="small">Lampiran: ${esc(x.j)} · ${esc(x.nama)}</p><img src="${g[x.id]}" alt="${esc(x.nama)}" style="max-width:100%;max-height:24cm;display:block;margin:0 auto"></div>`).join("")}`;
+}
+async function gambarLampiranAju(k) {
+  const g = {};
+  for (const x of (k.lampiranAju || []).filter(y => y.t === "file" && GBR_LAMP.test(y.nama))) {
+    try { const j = await api("kegiatan.lampiranLihat", { id: k.id, lid: x.id }); g[x.id] = `data:${j.mime};base64,${j.isi}`; } catch (e) { toast("Lampiran " + x.nama + " tidak termuat: " + e.message); }
+  }
+  return g;
 }
 
 /* --- formulir --- */
@@ -1182,9 +1235,14 @@ function htmlSaranGcet(f) {
 }
 function kandidatJenis(q) {
   q = (q || "").toLowerCase().trim(); if (q.length < 2) return [];
-  const kata = q.split(/\s+/).filter(w => w.length >= 3);
-  return S.ref.jenis.filter(j => j.boleh).map(j => { const h = (j.l + " " + j.kw + " " + j.cth.join(" ")).toLowerCase(), cocok = []; if (h.includes(q)) cocok.push(q); kata.forEach(w => { if (w !== q && h.includes(w)) cocok.push(w); }); return [j, [...new Set(cocok)]]; })
-    .filter(x => x[1].length).sort((a, b) => b[1].length - a[1].length).slice(0, 3);
+  // v0.53.0: gabungan cocok kata (nama, kata kunci, contoh) dan mesin saran (sinonim, imbuhan, salah ketik); jenis yang hanya dicatat Admin ikut tampil sebagai keterangan.
+  const kata = q.split(/\s+/).filter(w => w.length >= 5 || (w.length >= 3 && !["lain", "dan", "ke", "untuk", "yang", "dari"].includes(w))).filter(w => !["lain", "lainnya"].includes(w)), nilai = new Map();
+  S.ref.jenis.forEach(j => { const h = (j.l + " " + j.kw + " " + j.cth.join(" ")).toLowerCase(), cocok = []; if (h.includes(q)) cocok.push(q); kata.forEach(w => { if (w !== q && h.includes(w)) cocok.push(w); });
+    if (cocok.length) nilai.set(j.k, { j, w: [...new Set(cocok)], s: cocok.length * 3 }); });
+  if (window.UPW_SARAN) UPW_SARAN.jenis(q, null, 6).forEach((x, i) => { const j = S.ref.jenis.find(y => y.k === x.k); if (!j) return; const v = nilai.get(x.k) || { j, w: [], s: 0 }; v.s += x.skor / 4 + (6 - i); v.w = [...new Set(v.w.concat(x.alasan))]; nilai.set(x.k, v); });
+  else muatSaran().then(() => render()).catch(() => {});
+  const atas = Math.max(0, ...[...nilai.values()].map(v => v.s));
+  return [...nilai.values()].filter(v => v.s >= 0.4 * atas && (v.j.boleh || v.j.hanyaAdmin)).sort((a, b) => (b.j.boleh - a.j.boleh) || b.s - a.s).filter((v, i, l) => v.j.boleh ? l.filter(x => x.j.boleh).indexOf(v) < 4 : l.filter(x => !x.j.boleh).indexOf(v) < 2).map(v => [v.j, v.w.slice(0, 4)]);
 }
 function htmlPratinjau(f) {
   const R = S.ref, mhsK = R.kelompok === "mahasiswa", peg = f.pegawai.map(orangId).filter(Boolean), sd = !mhsK && peg.length > 0, sm = mhsTerpilih(f).length > 0;
@@ -1220,7 +1278,9 @@ function laciForm() {
    ${def.cth.length ? `<div class="small" style="margin-top:2px"><span class="muted">Contoh kegiatan jenis ini:</span><ul style="margin:2px 0 0 18px;padding:0">${def.cth.map(c => `<li>${esc(c)}</li>`).join("")}</ul></div>` : ""}</div>
   <details class="picker" ${f.jq ? "open" : ""}><summary style="cursor:pointer" class="small"><b>Bingung memilih jenis?</b> Ketik kata kunci kegiatan Anda</summary>
    <input id="kfJq" type="search" value="${esc(f.jq)}" placeholder="Contoh: dosen tamu, lomba, MoU, desa wisata, magang" aria-label="Cari jenis kegiatan" style="margin-top:8px">
-   ${kandidatJenis(f.jq).map(([j, w]) => `<button class="btn sm" data-act="pilihJenis" data-j="${j.k}" style="justify-content:flex-start;white-space:normal;text-align:left">${esc(j.l)} <span class="muted small">· ${esc(j.t)} · cocok: ${esc(w.join(", "))}</span></button>`).join("")
+   ${kandidatJenis(f.jq).map(([j, w]) => j.boleh ? `<button class="btn sm" data-act="pilihJenis" data-j="${j.k}" style="justify-content:flex-start;white-space:normal;text-align:left">${esc(j.l)} <span class="muted small">· ${esc(j.t)} · cocok: ${esc(w.join(", "))}</span></button>`
+       : `<div class="small muted" style="padding:4px 2px">${esc(j.l)} · ${esc(j.t)}: jenis ini dicatat oleh <b>Admin Prodi</b> (bukan lewat akun Anda). Sampaikan ke Admin, atau pilih jenis lain bila Anda perlu surat tugas pribadi.</div>`).join("")
+     + (f.jq.trim().length >= 4 && window.UPW_SARAN ? (b => b.length ? `<div class="small muted" style="margin-top:4px">Butir instrumen yang terkait kata kunci ini: ${b.map(x => `${x.n}. ${esc(x.nm)} ${iBtn("b" + x.n, x.nm)}`).join("; ")}</div>` : "")(UPW_SARAN.butir(f.jq, 3)) : "")
      || (f.jq.trim().length >= 2 ? `<span class="small muted">Belum ada yang cocok. Pilih "Lainnya" bila jenisnya memang belum tersedia; Admin akan memetakannya.</span>` : "")}
   </details>
   ${f.jenis === "lainnya" ? `<div class="field"><label for="kfJl">Sebutkan jenis kegiatannya${wajib}</label><input id="kfJl" data-kf="jenisLain" type="text" value="${esc(f.jenisLain)}" placeholder="Contoh: Familiarization trip"></div>` : ""}
@@ -1266,6 +1326,10 @@ function laciForm() {
    ${f.perluST ? `<span class="small muted">Bukti diunggah di halaman detail setelah surat tugas terbit, paling lambat ${R.surat.hk} hari kerja setelah kegiatan selesai: surat tugas resmi, laporan, daftar hadir, dokumentasi, dan dokumen sesuai jenis kegiatan.</span>`
      : `${def.bukti.length ? `<div class="small"><span class="muted">Dokumen yang diunggah setelah disimpan:</span><ul style="margin:4px 0 0 18px;padding:0">${def.bukti.map(b => `<li>${esc(b)}</li>`).join("")}</ul></div>` : ""}<span class="small muted">Simpan dulu, lalu unggah bukti di halaman detail dan tekan <b>Ajukan verifikasi</b>.</span>`}</div>
   ${galatHtml()}
+  ${f.perluST ? `<details class="picker" ${(f.lampBaru || []).length ? "open" : ""}><summary class="small" style="cursor:pointer"><b>Lampiran untuk KPS (opsional)</b>${(f.lampBaru || []).length ? ` · ${f.lampBaru.length} berkas akan diunggah` : ""}</summary>
+    <p class="small muted" style="margin:6px 0">Misalnya proposal, jadwal, atau undangan dari penyelenggara. Diunggah saat Anda menekan Simpan/Ajukan; lampiran yang sudah tersimpan dikelola di detail kegiatan. Maks. 5 berkas, 10 MB per berkas.</p>
+    ${(f.lampBaru || []).map((x, i) => `<div class="row small" style="gap:6px;margin:2px 0"><span class="tag">${esc(x.j)}</span> ${esc(x.nama)} · ${ukuranT(x.ukuran)} <button type="button" class="lnk" data-act="lampBaruLepas" data-i="${i}">hapus</button></div>`).join("")}
+    ${(f.lampBaru || []).length < 5 ? `<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px"><select id="kfLampJ" style="width:auto">${JENIS_LAMP_AJU.map(j => `<option>${esc(j)}</option>`).join("")}</select><label class="btn sm" style="cursor:pointer">Pilih berkas…<input type="file" id="kfLamp" accept="${TERIMA}" hidden></label></div>` : ""}</details>` : ""}
   <div class="row" style="justify-content:flex-end;margin-top:auto;flex-wrap:wrap">${f.perluST ? tombol("simpanKeg", "Simpan draf", "") + tombol("kirimKeg", ["revisi_aju", "ditunda"].includes(S.formSt) ? "Kirim ulang ke KPS" : "Ajukan ke KPS") : tombol("simpanKeg", "Simpan, lalu unggah bukti")}</div>
  </div></div>`;
 }
@@ -1296,6 +1360,7 @@ function hKps() {
     <div class="row" style="justify-content:space-between"><div class="title">${esc(k.judul)}</div>${chipKeg(k)}</div>
     <div class="meta"><span>${esc(k.jenisLabel)}</span><span class="num">${esc(rentangPendek(k.tgl, k.sampai))}</span><span>${esc(k.tempat || "")}</span><span>Diajukan oleh ${esc(namaPendek(k.olehNama))}</span><span>${k.lampiran.pegawai.length} dosen/tendik · ${k.lampiran.mhs.length} mahasiswa</span></div>
     ${k.tunggakan && k.tunggakan.length ? `<div class="callout" style="margin-top:8px;border-color:var(--bad)"><b style="color:var(--bad)">Perhatian:</b> pengaju/peserta masih punya ${k.tunggakan.length} kegiatan yang buktinya belum lengkap melewati batas: ${k.tunggakan.map(o => `<a href="#" data-act="bukaKeg" data-id="${o.id}">${esc(o.judul)}</a> (batas ${esc(tglPendek(o.batas))})`).join("; ")}. Anda dapat <b>menunda</b> pengajuan ini sampai bukti tersebut lengkap.</div>` : ""}
+    ${(k.lampiranAju || []).length ? `<div class="small" style="margin-top:8px"><b>Lampiran pengajuan (${k.lampiranAju.length})</b><div class="list">${daftarLampiranAju(k, false)}</div></div>` : ""}
     <div class="row" style="margin-top:8px">${k.lampiran.surat.dosen ? `<button class="btn sm" data-act="kpsSurat" data-id="${k.id}" data-w="dosen">Draf surat dosen/tendik</button>` : ""}${k.lampiran.surat.mhs ? `<button class="btn sm" data-act="kpsSurat" data-id="${k.id}" data-w="mhs">Draf surat mahasiswa</button>` : ""}<button class="btn sm" data-act="bukaKeg" data-id="${k.id}">Detail</button></div>
     <div class="field" style="margin-top:8px"><label for="kc${k.id}">Catatan KPS untuk pengaju</label><textarea id="kc${k.id}" placeholder="Wajib diisi bila menunda, meminta revisi, atau menolak"></textarea></div>
     <div class="row" style="margin-top:6px;flex-wrap:wrap">${tombol("kpsPutus", "Setujui dan terbitkan surat", "ok sm", `data-id="${k.id}" data-k="terbit"`)}${tombol("kpsPutus", "Tunda", "warn sm", `data-id="${k.id}" data-k="ditunda"`)}${tombol("kpsPutus", "Minta revisi", "warn sm", `data-id="${k.id}" data-k="revisi_aju"`)}${tombol("kpsPutus", "Tolak", "bad sm", `data-id="${k.id}" data-k="ditolak_aju"`)}</div>
@@ -1306,9 +1371,12 @@ function hKps() {
 /* --- cek keaslian surat (tanpa login) --- */
 function layarCek() {
   const c = S.cek;
-  return bingkai("Cek keaslian surat", "Masukkan kode verifikasi yang tertera di surat pengantar Koordinator Program Studi.",
-   `<div class="field"><label for="cekKode">Kode verifikasi</label><input id="cekKode" type="text" class="mono" value="${esc(c.kode)}" placeholder="UPW-2611-XXXXXXXX atau UND-2611-XXXXXXXX"></div>
-    ${c.hasil && c.hasil.sah && c.hasil.jenisSurat === "undangan" ? `<div class="auto"><b>Undangan sah${c.hasil.batal ? `, tetapi rapat ini sudah <span style="color:var(--bad)">DIBATALKAN</span>` : ""}.</b> Diterbitkan melalui Repositori UPW pada ${esc(tglSurat(c.hasil.tglSurat))} oleh <b>${esc(c.hasil.kps)}</b>.<br>
+  return bingkai("Cek keaslian surat", "Masukkan kode verifikasi yang tertera di surat tugas, undangan rapat, atau RPS/kontrak kuliah bertanda tangan elektronik.",
+   `<div class="field"><label for="cekKode">Kode verifikasi</label><input id="cekKode" type="text" class="mono" value="${esc(c.kode)}" placeholder="UPW-…, UND-…, atau SAH-2611-XXXXXXXX"></div>
+    ${c.hasil && c.hasil.jenisSurat === "pengesahan" ? `<div class="${c.hasil.sah ? "auto" : "callout"}"><b>${c.hasil.sah ? "Dokumen sah, bertanda tangan elektronik." : "Dokumen terdaftar, tetapi belum/tidak lagi sah (" + esc(c.hasil.status) + ")."}</b><br>
+      ${esc(c.hasil.dokumen)}: <b>${esc(c.hasil.judul)}</b>, kelas ${esc(c.hasil.kelas)}, ${esc(c.hasil.semester)}<br>
+      ${c.hasil.ttd.map(t => `${esc(t.sebagai)}: <b>${esc(t.nama)}</b> · ${esc(tglJam(t.w))}`).join("<br>")}<br><span class="small muted">Sidik berkas asli (SHA-256): <span class="mono" style="word-break:break-all">${esc(c.hasil.hash)}</span></span></div>` :
+    c.hasil && c.hasil.sah && c.hasil.jenisSurat === "undangan" ? `<div class="auto"><b>Undangan sah${c.hasil.batal ? `, tetapi rapat ini sudah <span style="color:var(--bad)">DIBATALKAN</span>` : ""}.</b> Diterbitkan melalui Repositori UPW pada ${esc(tglSurat(c.hasil.tglSurat))} oleh <b>${esc(c.hasil.kps)}</b>.<br>
       Undangan: <b>${esc(c.hasil.judul)}</b><br>${esc(tglPanjang(c.hasil.tgl))}${c.hasil.tempat ? " · " + esc(c.hasil.tempat) : ""}<br>Daftar undangan: ${c.hasil.jumlahUndangan} baris.</div>` :
     c.hasil ? (c.hasil.sah ? `<div class="auto"><b>Surat sah.</b> Diterbitkan melalui Repositori UPW pada ${esc(tglSurat(c.hasil.tglSurat))} dan disetujui oleh <b>${esc(c.hasil.kps)}</b>.<br>
       Kegiatan: <b>${esc(c.hasil.judul)}</b><br>${esc(rentang(c.hasil.tgl, c.hasil.sampai))}${c.hasil.tempat ? " · " + esc(c.hasil.tempat) : ""}<br>Peserta: ${c.hasil.jumlahPegawai} dosen/tendik, ${c.hasil.jumlahMhs} mahasiswa.</div>`
@@ -1328,6 +1396,28 @@ Object.assign(AKSI, {
   },
   async ubahKeg() { if (!S.ref) { await muatRef(); } if (!S.ref) return; S.form = formDari(S.laci.k); S.formSt = S.laci.k.st; S.laci = { jenis: "keg" }; S.galat = ""; render(); },
   hapusKeg: () => { if (!confirm("Hapus draf kegiatan ini?")) return; jalankan(async () => { await api("kegiatan.hapus", { id: S.laci.k.id }); S.laci = null; segarkan(); toast("Draf dihapus."); }); },
+  lampBaruLepas(d) { S.form.lampBaru.splice(Number(d.i), 1); render(); },
+  async lampAjuLihat(d) {
+    const k = S.laci && S.laci.k && S.laci.k.id === d.id ? S.laci.k : (S.antrean || []).find(x => x.id === d.id), x = k && (k.lampiranAju || []).find(y => y.id === d.lid);
+    if (x && x.t === "tautan") { window.open(x.url, "_blank", "noopener,noreferrer"); return; }
+    const w = penampil();
+    try {
+      const j = await api("kegiatan.lampiranLihat", { id: d.id, lid: d.lid });
+      const bin = atob(j.isi), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const blob = new Blob([arr], { type: j.mime }), url = URL.createObjectURL(blob);
+      if (w && /pdf|image/.test(j.mime)) w.tampil(url, j.nama, j.mime); else { if (w) w.close(); simpanBerkas(blob, j.nama); }
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
+    } catch (e) { if (w) w.close(); toast(e.message); }
+  },
+  lampAjuHapus(d) {
+    if (!confirm("Hapus lampiran pengajuan ini?")) return;
+    jalankan(async () => { const j = await api("kegiatan.lampiranHapus", { id: d.id, lid: d.lid }); S.laci.k = j.kegiatan; segarkan(); toast("Lampiran dihapus."); });
+  },
+  lampAjuTautan() {
+    const url = ($("laUrl")?.value || "").trim(), jn = $("laJ")?.value || "Lainnya", id = S.laci.k.id;
+    if (!url) { toast("Tempel tautan dulu."); return; }
+    jalankan(async () => { const j = await api("kegiatan.lampiranUnggah", { id, j: jn, tautan: url }); S.laci.k = j.kegiatan; segarkan(); toast("Tautan lampiran tersimpan."); });
+  },
   simpanKeg: () => kirimForm(false),
   kirimKeg: () => kirimForm(true),
   pilihJenis(d) { gantiJenis(d.j); S.form.jq = ""; render(); },
@@ -1347,7 +1437,30 @@ Object.assign(AKSI, {
   },
   kpsSurat(d) { S.laci = { jenis: "surat", k: S.antrean.find(x => x.id === d.id), w: d.w, dari: "kps" }; render(); },
   kembaliDetail() { const k = S.laci.k; S.laci = { jenis: "kegDetail", id: k.id, k }; render(); },
-  cetakSurat() { cetakSurat(kertasSurat(S.laci.k, S.laci.w)); },
+  async cetakSurat() { const k = S.laci.k, w = S.laci.w; const g = await gambarLampiranAju(k); cetakSurat(kertasSurat(k, w) + halamanLampiranAju(k, g, false)); },
+  unduhSuratPdf() {
+    const k = S.laci.k, w = S.laci.w;
+    jalankan(async () => {
+      await muatPdf();
+      const g = await gambarLampiranAju(k), html = kertasSurat(k, w), berkop = html.includes('class="kop"'), tw = new UPW_PDF.PdfTulis(), cm = 28.3465;
+      await UPW_PDF.dariHtml(tw, html + halamanLampiranAju(k, g, true), { margin: [2.5 * cm, 2.5 * cm, 2.5 * cm, 3 * cm], marginAtasPertama: berkop ? 1 * cm : 2.5 * cm });
+      const gagal = [];
+      for (const x of (k.lampiranAju || []).filter(y => y.t === "file" && GABUNG_LAMP.test(y.nama))) {
+        try { const j = await api("kegiatan.lampiranLihat", { id: k.id, lid: x.id }), b = u8DariB64(j.isi); if (/\.pdf$/i.test(x.nama)) await UPW_PDF.gabung(tw, b); else await tambahDocxKePdf(tw, b.buffer); }
+        catch (e) { gagal.push(x.nama + ": " + e.message); }
+      }
+      simpanBerkas(new Blob([tw.hasil(k.judul)], { type: "application/pdf" }), `${w === "dosen" ? "Surat penugasan" : "Surat tugas mahasiswa"} - ${namaBerkas(k.judul)}.pdf`);
+      if (gagal.length) toast("Sebagian lampiran tidak bisa digabung: " + gagal.join("; ") + ". Gunakan Unduh berkas asli lampiran (ZIP)."); else toast("PDF tersimpan.");
+    });
+  },
+  async lampAjuZip() {
+    const k = S.laci.k, l = (k.lampiranAju || []).filter(x => x.t === "file"); if (!l.length) return;
+    jalankan(async () => {
+      const f = [];
+      for (const [i, x] of l.entries()) { const j = await api("kegiatan.lampiranLihat", { id: k.id, lid: x.id }); const bin = atob(j.isi), arr = new Uint8Array(bin.length); for (let q = 0; q < bin.length; q++) arr[q] = bin.charCodeAt(q); f.push({ nama: `Lampiran ${i + 1} - ${x.j.split(" /")[0]} - ${x.nama}`, data: arr }); }
+      simpanBerkas(UPW_ZIP.zip(f), `Lampiran surat tugas - ${namaBerkas(k.judul)}.zip`);
+    });
+  },
   kpsPutus: d => {
     if (d.k === "terbit" && !confirm("Setujui pengajuan ini dan terbitkan surat? Surat memuat " + (S.tugas && S.tugas.ttd ? "tanda tangan Anda, " : "") + "kode verifikasi dan QR, dan tidak bisa ditarik setelah terbit.")) return;
     jalankan(async () => {
@@ -2150,7 +2263,10 @@ function laciMkp() {
     if (c.jenis === "dok") {
       const e = x[c.k];
       return `<div class="picker">${kepala}${e ? entriMkp(e, c.k, boleh) : `<div class="row" style="justify-content:space-between"><span class="chip s-revisi">Belum</span></div>`}
-        ${boleh ? `<div class="row small" style="flex-wrap:wrap"><label class="btn sm" ${S.sibuk ? 'aria-disabled="true"' : ""}>${e ? "Ganti dengan file" : "Unggah file"}<input type="file" data-mfile="${c.k}" accept="${TERIMA}" hidden ${dis}></label><button class="btn sm" data-act="mkpTautan" data-komp="${c.k}" ${dis}>${e ? "Ganti dengan tautan" : "Tempel tautan"}</button></div>${formTautanMkp(c.k, false)}` : ""}${e && e.t === "file" && x0.ttdMkp && x0.ttdMkp[c.k] ? ttdMkpHtml(c.k, e, boleh, x0) : ""}${c.k === "rps" ? bagianRps(x0, G) : ""}${c.k === "kontrak" || c.k === "rubrik" ? bagianTemplatNilai(c.k, G) : ""}</div>`;
+        ${boleh ? (c.k === "rps" || c.k === "kontrak"
+          ? `<div class="row small" style="flex-wrap:wrap"><label class="btn sm" ${S.sibuk ? 'aria-disabled="true"' : ""}>${e ? "Ganti dengan Word baru" : "Unggah Word (.docx)"}<input type="file" data-mfile="${c.k}" accept="${c.k === "rps" || c.k === "kontrak" ? ".docx" : TERIMA}" hidden ${dis}></label></div>
+             <span class="hint">Hanya <b>templat Word dari aplikasi</b> yang sudah diisi (tombol Unduh templat di bawah). PDF dan tautan tidak diterima karena aplikasi memeriksa isinya dan membubuhkan tanda tangan elektronik (QR) pada Word.</span>`
+          : `<div class="row small" style="flex-wrap:wrap"><label class="btn sm" ${S.sibuk ? 'aria-disabled="true"' : ""}>${e ? "Ganti dengan file" : "Unggah file"}<input type="file" data-mfile="${c.k}" accept="${TERIMA}" hidden ${dis}></label><button class="btn sm" data-act="mkpTautan" data-komp="${c.k}" ${dis}>${e ? "Ganti dengan tautan" : "Tempel tautan"}</button></div>${formTautanMkp(c.k, false)}`) : ""}${e && e.tpl ? sahMkpHtml(c.k, e, G) : e && e.t === "file" && x0.ttdMkp && x0.ttdMkp[c.k] ? ttdMkpHtml(c.k, e, boleh, x0) : ""}${c.k === "rps" ? bagianRps(x0, G) : ""}${c.k === "kontrak" || c.k === "rubrik" ? bagianTemplatNilai(c.k, G) : ""}</div>`;
     }
     if (c.jenis === "metode") {
       const m = x.metode;
@@ -2273,6 +2389,20 @@ Object.assign(AKSI, {
 });
 /* ---------- RPS (v0.42.0): templat terisi, baca RPS Word, pemeriksaan butir 8, saran metode ---------- */
 let janjiRps = null;
+let janjiPdf = null;
+/** v0.55.0: mesin PDF buatan sendiri (pdf.js), dimuat saat pertama dibutuhkan. */
+function muatPdf() {
+  if (window.UPW_PDF) return Promise.resolve();
+  if (!janjiPdf) janjiPdf = new Promise((ok, no) => {
+    const sc = document.createElement("script"); sc.src = "pdf.js?v=" + encodeURIComponent(K.versi);
+    sc.onload = () => ok(); sc.onerror = () => { janjiPdf = null; no(new Error("Modul PDF gagal dimuat. Periksa koneksi, lalu coba lagi.")); };
+    document.head.appendChild(sc);
+  });
+  return janjiPdf;
+}
+const u8DariB64 = b => { const bin = atob(b), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return a; };
+/** Word (.docx) → halaman PDF di penulis yang sama. */
+async function tambahDocxKePdf(tw, buf) { const H = await UPW_PDF.docxKeHtml(buf); return UPW_PDF.dariHtml(tw, H.html, { lebar: H.lebar, tinggi: H.tinggi, margin: H.margin }); }
 function muatRps() {
   if (window.UPW_RPS) return Promise.resolve();
   if (!janjiRps) janjiRps = new Promise((ok, no) => {
@@ -2289,7 +2419,7 @@ function bagianRps(x0, G) {
   const B = G.rpsBaca, e = G.rps, T = S.laci.rpsT;
   let h = `<div class="row small" style="flex-wrap:wrap;margin-top:6px"><button class="btn sm" data-act="rpsTemplat" ${S.sibuk ? "disabled" : ""}>${T ? "Tutup templat" : "Unduh templat RPS (terisi)"}</button>
     ${G.bolehUtama && e && e.t === "file" && !/\.docx$/i.test(e.nama || "") ? `<label class="btn sm" ${S.sibuk ? 'aria-disabled="true"' : ""}>${B ? "Perbarui" : "Unggah"} Word sumber untuk pemeriksaan<input type="file" data-mfile="rpsSumber" accept=".docx" hidden ${S.sibuk ? "disabled" : ""}></label>` : ""}
-    <span class="hint">Unggah RPS resmi bertanda tangan dalam <b>PDF</b>, lalu tambahkan file <b>Word (.docx)</b> sumbernya agar aplikasi membaca CPL, CPMK, metode, dan bobot serta memeriksa kelengkapannya. Bisa juga langsung mengunggah Word.</span></div>`;
+    <span class="hint">Alur: unduh templat RPS (terisi) → lengkapi di Word → unggah Word-nya di atas → aplikasi membaca dan memeriksa isinya → <b>Ajukan pengesahan</b> (KPS memeriksa, Ketua Jurusan mengesahkan) → unduh RPS bertanda tangan elektronik.</span></div>`;
   if (T) h += panelTemplatRps(T);
   if (B && B.data) {
     if (!window.UPW_RPS) { muatRps().catch(() => {}); return h + `<div class="small muted">Memuat hasil baca RPS…</div>`; }
@@ -2795,7 +2925,7 @@ Object.assign(AKSI, {
     jalankan(async () => { S.rpsOtor = await api("rps.otorisasi", d); toast("Data bersama templat tersimpan."); });
   }
 });
-function gantiMkp(j) { if (S.laci && S.laci.jenis === "mkp") { S.laci.x = j; S.laci.tm = null; } S.mkp = null; S.mkpRekap = null; S.tugas = null; S.nilai = null; }
+function gantiMkp(j) { if (S.laci && S.laci.jenis === "mkp") { S.laci.x = j; S.laci.tm = null; } S.sah = null; S.mkp = null; S.mkpRekap = null; S.tugas = null; S.nilai = null; }
 function unggahMkp(komp, isi) {
   const x = S.laci.x;
   if (isi.isi) toast("Mengunggah…");
@@ -2856,7 +2986,8 @@ document.addEventListener("change", e => {
   const f = t.files && t.files[0], komp = t.dataset.mfile; t.value = "";
   if (!f) return;
   if (f.size > 10 * 1024 * 1024) { toast("Ukuran file maksimal 10 MB. Untuk file lebih besar, unggah ke Google Drive lalu pakai tautan."); return; }
-  if (komp === "rps" && /\.docx$/i.test(f.name)) { unggahRpsWord(f); return; }
+  if ((komp === "rps" || komp === "kontrak") && !/\.docx$/i.test(f.name)) { toast("Unggah templat Word aplikasi yang sudah diisi (.docx). PDF tidak diterima untuk RPS dan kontrak kuliah."); return; }
+  if (komp === "rps") { unggahRpsWord(f); return; }
   if (komp === "rpsSumber") { bacaRpsSumber(f); return; }
   if (komp === "nilai") { unggahNilaiSiakad(f); return; }
   const ket = komp === "interaksi" ? String($("mkpKet")?.value || "").trim() : undefined;
@@ -4236,7 +4367,7 @@ const JENIS_AKUN_L = { mahasiswa: "Mahasiswa", dosen: "Dosen", tendik: "Tendik",
 const jenisAkun = x => x.jenisBiodata === "mahasiswa" ? "mahasiswa" : !x.peran ? "lain" : x.peran.includes("dosen") ? "dosen" : x.peran.includes("tendik") ? "tendik" : x.peran.includes("asesor") ? "asesor" : "lain";
 const CHIP_SMHS = { A: "s-disetujui", L: "s-diajukan", C: "s-revisi", N: "s-revisi" };
 const chipSmhs = k => `<span class="chip ${CHIP_SMHS[k] || "s-ditolak"}">${esc(STATUS_MHS[k] || k || "–")}</span>`;
-const PF_AWAL = () => ({ jenis: "", akun: "", angkatan: "", kelas: "", smhs: "", bio: "", urut: "nama", arah: 1 });
+const PF_AWAL = () => ({ jenis: "", akun: "", angkatan: "", kelas: "", smhs: "", bio: "", urut: "nim", arah: 1 }); // v0.53.0: bawaan urut NIM/NIP (permintaan pemilik)
 function saringAkun(l) {
   const f = S.pf = S.pf || PF_AWAL(), q = (S.cari || "").trim().toLowerCase();
   return l.filter(x => (!q || (x.username + " " + x.nama + " " + (x.email || "")).toLowerCase().includes(q))
@@ -5060,6 +5191,132 @@ Object.assign(AKSI, {
   }
 });
 
+/* --- Pengesahan elektronik RPS & kontrak kuliah (v0.54.0) --- */
+const ST_SAH_CHIP = { draf: "s-draf", kps: "s-diajukan", kajur: "s-diajukan", mhs: "s-diajukan", revisi: "s-revisi", sah: "s-disetujui" };
+const KOMP_SAH_L = { rps: "RPS", kontrak: "Kontrak kuliah" };
+const ALUR_SAH_L = { rps: "Dosen pengampu → KPS memeriksa → Ketua Jurusan mengesahkan", kontrak: "Dosen pengampu → perwakilan mahasiswa menyetujui → KPS mengetahui" };
+const chipSah = s => s ? `<span class="chip ${ST_SAH_CHIP[s.st] || "s-draf"}">${esc(s.label)}</span>` : "";
+/** Status pengesahan di laci Portofolio MK. */
+function sahMkpHtml(komp, e, G) {
+  const s = e.sah; if (!s || !G) return "";
+  const x = S.laci.x;
+  return `<div class="small" style="margin-top:6px">${chipSah(s)} ${s.ttd && s.ttd.length ? `<span class="muted">· ${s.ttd.map(t => esc(t.sebagai)).join(", ")}</span>` : ""}
+    <div class="row small" style="gap:6px;margin-top:4px;flex-wrap:wrap"><button class="btn sm ${["draf", "revisi"].includes(s.st) && G.bolehUtama ? "primary" : ""}" data-act="sahBuka" data-s="${x.semester}" data-kode="${esc(x.kode)}" data-kunci="${esc(G.k)}" data-komp="${komp}">${["draf", "revisi"].includes(s.st) && G.bolehUtama ? "Ajukan pengesahan" : "Lihat pengesahan"}</button>
+    ${s.st === "sah" ? `<button class="btn sm" data-act="sahUnduh" data-s="${x.semester}" data-kode="${esc(x.kode)}" data-kunci="${esc(G.k)}" data-komp="${komp}">Unduh PDF bertanda tangan</button>` : ""}</div>
+    <span class="hint">${esc(ALUR_SAH_L[komp])}.</span></div>`;
+}
+function muatSah() { sekali("sah", async () => { S.sah = await api("sah.daftar"); render(); }); }
+function barisSah(x) {
+  return `<div class="item" style="cursor:pointer" data-act="sahBuka" data-s="${x.semester}" data-kode="${esc(x.kode)}" data-kunci="${esc(x.kunci)}" data-komp="${x.komp}"><div class="body">
+    <div class="title">${KOMP_SAH_L[x.komp]} · ${esc(x.kode)} ${esc(x.nama)}</div>
+    <div class="meta"><span>${esc(x.label)}</span><span>${esc(x.labelSemester)}</span>${x.sah && x.sah.ttd.length ? `<span>${x.sah.ttd.map(t => esc(t.sebagai)).join(" ✓ · ")} ✓</span>` : ""}${x.komp === "kontrak" && x.sah && x.sah.jumlahBaca ? `<span>dibaca ${x.sah.jumlahBaca} mahasiswa</span>` : ""}</div></div>
+    ${x.giliran ? '<span class="chip s-diajukan">Menunggu Anda</span>' : chipSah(x.sah)}</div>`;
+}
+function hSah() {
+  if (!S.sah) { muatSah(); return `<div class="memuat">Memuat dokumen…</div>`; }
+  const D = S.sah.dokumen, p = peranAktif(), mhs = p === "mahasiswa";
+  const giliran = D.filter(x => x.giliran), revisi = D.filter(x => x.peranTim === "utama" && x.sah && ["draf", "revisi"].includes(x.sah.st)), lain = D.filter(x => !giliran.includes(x) && !revisi.includes(x));
+  const blok = (judul, l, kosong) => `<section class="panel"><h2>${judul} (${l.length})</h2><div class="list">${l.map(barisSah).join("") || `<div class="empty">${kosong}</div>`}</div></section>`;
+  return `<div class="head"><div><h1>RPS &amp; Kontrak Kuliah</h1><p>${mhs ? "Kontrak kuliah kelas Anda. Baca isinya; bila Anda dipilih sebagai perwakilan kelas, setujui atau kembalikan dengan catatan."
+      : "Pengesahan elektronik: " + esc(ALUR_SAH_L.rps) + ". Kontrak kuliah: " + esc(ALUR_SAH_L.kontrak) + ". Dokumen yang sah diunduh sebagai Word bertanda tangan elektronik (QR) dan bisa diverifikasi lewat kodenya."}</p></div></div>
+    ${blok("Menunggu keputusan Anda", giliran, "Tidak ada dokumen yang menunggu Anda.")}
+    ${revisi.length ? blok("Perlu Anda ajukan atau perbaiki", revisi, "") : ""}
+    ${blok(mhs ? "Kontrak kuliah kelas Anda" : "Dokumen lain", lain, mhs ? "Belum ada kontrak kuliah yang diajukan dosen." : "Belum ada dokumen.")}`;
+}
+async function bacaBerkasSah(d) {
+  const j = await api("mkp.sahBerkas", { semester: d.s || d.semester, kode: d.kode, kunci: d.kunci, komp: d.komp });
+  const bin = atob(j.isi), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return { j, buf: arr.buffer };
+}
+function laciSahLihat() {
+  const L = S.laci, x = L.x, dis = S.sibuk ? "disabled" : "";
+  if (!x) return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Pengesahan"><div class="memuat">Memuat dokumen…</div></div></div>`;
+  const s = x.sah || {}, mhsPilih = x.pilihanMhs || [];
+  return `<div class="overlay" data-act="tutupLuar"><div class="drawer" role="dialog" aria-modal="true" aria-label="Pengesahan dokumen" style="width:min(980px,100%)">
+   <div class="dh"><h2>${KOMP_SAH_L[x.komp]} · ${esc(x.kode)} ${esc(x.nama)}</h2><button class="iconbtn" data-act="tutup" aria-label="Tutup">✕</button></div>
+   <div class="row" style="gap:8px;flex-wrap:wrap">${chipSah(s)}<span class="small muted">${esc(x.label)} · ${esc(x.labelSemester)} · ${esc(x.nmBerkas)} (diunggah ${esc(namaPendek(x.oleh))}, ${esc(tglJam(x.w))})</span>${s.kode ? `<span class="small mono">${esc(s.kode)}</span>` : ""}</div>
+   <p class="small muted" style="margin:4px 0">${esc(ALUR_SAH_L[x.komp])}.${x.komp === "kontrak" && s.mhsNama ? " Perwakilan mahasiswa: <b>" + esc(s.mhsNama) + "</b>." : ""}</p>
+   ${s.ttd && s.ttd.length ? `<div class="small">${s.ttd.map(t => `✓ ${esc(t.sebagai)}: <b>${esc(t.nama)}</b> · ${esc(tglJam(t.w))}`).join("<br>")}</div>` : ""}
+   ${(s.riw || []).filter(r => r.c).length ? `<div class="callout small">${(s.riw || []).filter(r => r.c).map(r => `<b>${esc(namaPendek(r.oleh))}</b> (${esc(tglJam(r.w))}): ${esc(r.c)}`).join("<br>")}</div>` : ""}
+   <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm ${s.st === "sah" ? "primary" : ""}" data-act="sahUnduh" data-s="${x.semester}" data-kode="${esc(x.kode)}" data-kunci="${esc(x.kunci)}" data-komp="${x.komp}" ${dis}>${s.st === "sah" ? "Unduh PDF bertanda tangan" : "Unduh Word"}</button>
+    ${s.st !== "sah" ? `<button class="btn sm" data-act="sahPratinjauPdf" ${dis}>Pratinjau PDF</button>` : ""}
+    ${x.peserta && !x.sudahBaca ? `<button class="btn sm" data-act="sahBaca" ${dis}>Tandai sudah saya baca</button>` : x.peserta ? '<span class="small muted">Sudah Anda baca.</span>' : ""}</div>
+   ${x.bolehAjukan ? `<div class="picker" style="border-color:var(--brand)"><b>Ajukan pengesahan</b>
+     ${x.komp === "kontrak" ? `<div class="field"><label for="sahMhs">Perwakilan mahasiswa (ketua kelas)${wajib}</label><select id="sahMhs"><option value="">Pilih…</option>${mhsPilih.map(m => `<option value="${m.id}" ${s.mhsId === m.id ? "selected" : ""}>${esc(m.nama)} · ${esc(m.nim)}</option>`).join("")}</select>
+       ${mhsPilih.length ? "" : `<span class="hint">Belum ada peserta kelas. Admin Prodi/KPS mengatur peserta kelas di Data Prodi.</span>`}</div>` : ""}
+     <div class="field"><label for="sahCatAju">Catatan (opsional)</label><input id="sahCatAju" type="text" maxlength="300" placeholder="${s.st === "revisi" ? "Contoh: bobot UTS sudah diperbaiki" : ""}"></div>
+     <div class="row">${tombol("sahAjukan", s.st === "revisi" ? "Ajukan ulang" : "Ajukan", "primary sm")}</div><span class="hint">Bila isinya perlu diubah, unggah Word baru di Mata Kuliah Saya; persetujuan sebelumnya otomatis gugur.</span></div>` : ""}
+   ${x.giliran ? `<div class="picker" style="border-color:var(--brand)"><b>${s.st === "mhs" ? "Persetujuan perwakilan mahasiswa" : s.st === "kajur" ? "Pengesahan Ketua Jurusan" : "Pemeriksaan KPS"}</b>
+     <span class="small muted">Baca dokumen di bawah. Menyetujui berarti Anda menandatangani dokumen ini secara elektronik (nama, waktu, dan kode verifikasi tercatat).</span>
+     <div class="field"><label for="sahCat">Catatan (wajib bila dikembalikan)</label><textarea id="sahCat" rows="2"></textarea></div>
+     <div class="row" style="flex-wrap:wrap">${tombol("sahPutus", "Setujui dan tanda tangani", "ok sm", 'data-k="setuju"')}${tombol("sahPutus", "Kembalikan untuk revisi", "warn sm", 'data-k="revisi"')}</div></div>` : ""}
+   ${galatHtml()}
+   <h3 class="instr-h">Isi dokumen</h3>${L.periksa || ""}<div class="docx-pratinjau small">${L.html || '<div class="memuat">Membaca Word…</div>'}</div></div></div>`;
+}
+async function qrPng(teks) {
+  const m = UPW_QR.buat(teks), n = m.length, sk = 8, t = 4, w = (n + 2 * t) * sk, c = document.createElement("canvas"); c.width = c.height = w;
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, w, w); g.fillStyle = "#000";
+  m.forEach((r, y) => r.forEach((v, x) => { if (v) g.fillRect((x + t) * sk, (y + t) * sk, sk, sk); }));
+  const b = await new Promise(ok => c.toBlob(ok, "image/png")); return new Uint8Array(await b.arrayBuffer());
+}
+Object.assign(AKSI, {
+  async sahBuka(d) {
+    const kunci = { semester: d.s, kode: d.kode, kunci: d.kunci, komp: d.komp };
+    S.view = "sah"; S.laci = { jenis: "sahLihat", q: kunci }; S.galat = ""; render();
+    try {
+      if (!S.sah) S.sah = await api("sah.daftar");
+      const x = S.sah.dokumen.find(y => y.semester === d.s && y.kode === d.kode && y.komp === d.komp && (y.kunci === d.kunci || d.komp === "rps"));
+      if (!x) throw new Error("Dokumen tidak ditemukan atau tidak bisa Anda buka.");
+      if (!S.laci || S.laci.jenis !== "sahLihat") return;
+      S.laci.x = x; render();
+      await muatRps();
+      const { buf } = await bacaBerkasSah(x);
+      S.laci.html = await UPW_RPS.pratinjauDocx(buf);
+      if (x.komp === "rps" && !["mahasiswa"].includes(peranAktif())) {
+        try { const D = await UPW_RPS.baca(buf), h = UPW_RPS.periksa(D, null).filter(r => r.t === "wajib");
+          S.laci.periksa = h.length ? `<div class="callout small"><b>Pemeriksaan otomatis:</b> ${h.length} hal perlu diperbaiki: ${h.slice(0, 5).map(r => esc(r.teks)).join("; ")}${h.length > 5 ? "; …" : ""}</div>` : `<div class="auto small">Pemeriksaan otomatis kelengkapan RPS: tidak ada yang wajib diperbaiki.</div>`; } catch (_) {}
+      }
+      if (S.laci && S.laci.x === x) render();
+    } catch (e) { if (S.laci && S.laci.jenis === "sahLihat") { S.laci = null; } render(); toast(e.message); }
+  },
+  sahAjukan() {
+    const x = S.laci.x, mhsId = $("sahMhs")?.value || "", catatan = $("sahCatAju")?.value || "";
+    if (x.komp === "kontrak" && !mhsId) { toast("Pilih perwakilan mahasiswa."); return; }
+    jalankan(async () => { S.sah = await api("mkp.sahAjukan", { semester: x.semester, kode: x.kode, kunci: x.kunci, komp: x.komp, mhsId, catatan }); S.tugas = null; S.mkp = null; S.laci = null; toast("Diajukan."); });
+  },
+  sahPutus(d) {
+    const x = S.laci.x, catatan = ($("sahCat")?.value || "").trim();
+    if (d.k === "revisi" && catatan.length < 5) { toast("Tulis catatan revisi untuk dosen."); return; }
+    if (d.k === "setuju" && !confirm("Setujui dan tandatangani dokumen ini secara elektronik?")) return;
+    jalankan(async () => { S.sah = await api("mkp.sahPutus", { semester: x.semester, kode: x.kode, kunci: x.kunci, komp: x.komp, keputusan: d.k, catatan }); S.tugas = null; S.laci = null; toast(d.k === "setuju" ? "Disetujui dan ditandatangani." : "Dikembalikan ke dosen."); });
+  },
+  sahBaca() {
+    const x = S.laci.x;
+    jalankan(async () => { S.sah = await api("mkp.sahBaca", { semester: x.semester, kode: x.kode, kunci: x.kunci }); S.tugas = null; S.laci.x = S.sah.dokumen.find(y => y.semester === x.semester && y.kode === x.kode && y.kunci === x.kunci && y.komp === "kontrak") || x; });
+  },
+  async sahPratinjauPdf() {
+    const x = S.laci.x, w = penampil();
+    try {
+      await muatRps(); await muatPdf();
+      const { buf } = await bacaBerkasSah(x), tw = new UPW_PDF.PdfTulis(); await tambahDocxKePdf(tw, buf);
+      const url = URL.createObjectURL(new Blob([tw.hasil(x.nama)], { type: "application/pdf" }));
+      if (w) w.tampil(url, `Pratinjau ${KOMP_SAH_L[x.komp]} ${x.kode}.pdf`, "application/pdf"); setTimeout(() => URL.revokeObjectURL(url), 120000);
+    } catch (e) { if (w) w.close(); toast(e.message); }
+  },
+  async sahUnduh(d) {
+    try {
+      await muatRps();
+      const { j, buf } = await bacaBerkasSah(d), s = j.sah || {};
+      if (s.st !== "sah") { simpanBerkas(new Blob([buf], { type: j.mime }), j.nama); return; }
+      const url = tautanCek(s.kode), tanda = {};
+      s.ttd.forEach(t => { tanda[t.k] = { nama: t.nama, nomor: (t.k === "mhs" ? "NIM " : "NIP ") + t.nomor, sebagai: t.sebagai, waktu: tglJam(t.w) }; });
+      const blob = await UPW_RPS.capSah(buf, { qr: await qrPng(url), kode: s.kode, url, judul: j.judul, tanda });
+      await muatPdf(); const tw = new UPW_PDF.PdfTulis(); await tambahDocxKePdf(tw, await blob.arrayBuffer());   // v0.55.0: dokumen jadi = PDF (mesin sendiri)
+      simpanBerkas(new Blob([tw.hasil(j.judul)], { type: "application/pdf" }), j.nama.replace(/\.docx$/i, "") + " - bertanda tangan elektronik.pdf");
+    } catch (e) { toast(e.message); }
+  }
+});
+
 /* --- Tabel iLKPS (v0.7.0) --- */
 const tautanKeg = id => location.origin + location.pathname + "?keg=" + encodeURIComponent(id);
 const tautanCek = kode => location.origin + location.pathname + "?cek=" + encodeURIComponent(kode);
@@ -5321,12 +5578,29 @@ function gantiJenis(j) {
 }
 function kirimForm(kirim) {
   jalankan(async () => {
-    const j = await api("kegiatan.simpan", { peran: peranAktif(), kirim, data: dataForm(S.form) });
+    const tunda = (S.form.lampBaru || []).slice();
+    let j = await api("kegiatan.simpan", { peran: peranAktif(), kirim, data: dataForm(S.form) });
+    for (const x of tunda) { try { j = await api("kegiatan.lampiranUnggah", { id: j.kegiatan.id, j: x.j, nama: x.nama, isi: x.isi }); } catch (e) { toast("Lampiran " + x.nama + " gagal: " + e.message); } }
     S.form = null; segarkan();
     S.laci = { jenis: "kegDetail", id: j.kegiatan.id, k: j.kegiatan };
     toast(kirim ? (j.kegiatan.st === "menunggu_kps" ? "Terkirim ke KPS." : "Kegiatan diajukan.") : j.kegiatan.st === "tanpa" ? "Tersimpan. Sekarang unggah buktinya." : "Draf tersimpan.");
   });
 }
+document.addEventListener("change", e => {
+  const t = e.target;
+  // v0.53.0: lampiran pengajuan (formulir: ditunda sampai disimpan; detail: langsung diunggah)
+  if (t.id === "kfLamp" || t.id === "laFile") {
+    const fl = t.files && t.files[0]; t.value = ""; if (!fl) return;
+    if (fl.size > 10 * 1024 * 1024) { toast("Ukuran file maksimal 10 MB. Pakai tautan Google Drive untuk berkas besar."); return; }
+    const jn = (t.id === "kfLamp" ? $("kfLampJ") : $("laJ"))?.value || "Lainnya";
+    bacaBase64(fl).then(isi => {
+      if (t.id === "kfLamp") { if (!S.form) return; (S.form.lampBaru = S.form.lampBaru || []).push({ j: jn, nama: fl.name, isi, ukuran: fl.size }); render(); return; }
+      const id = S.laci.k.id;
+      jalankan(async () => { const j = await api("kegiatan.lampiranUnggah", { id, j: jn, nama: fl.name, isi }); S.laci.k = j.kegiatan; segarkan(); toast("Lampiran terunggah."); });
+    }, err => toast(err.message));
+    return;
+  }
+});
 document.addEventListener("change", e => {
   const t = e.target, f = S.form; if (!f || !S.laci || S.laci.jenis !== "keg") return;
   if (t.dataset.kf && t.tagName === "SELECT") {
@@ -5528,12 +5802,14 @@ function kertasUndangan(r, gbr) {
     ${terbit ? `<div class="ttd-area">${gbr ? `<img class="ttd-img" src="${gbr}" alt="Tanda tangan ${esc(kps.nama)}">` : ""}</div>` : `<div class="draf-ttd">DRAF: belum diterbitkan KPS</div>`}
     <div class="ttd-nama"><b><u>${esc(kps.nama)}</u></b><br>NIP. ${esc(nipTampil(kps.nip))}</div>
     ${terbit ? `<div class="sah-baris"><div class="qr">${window.UPW_QR ? UPW_QR.svg(url) : ""}</div><div class="sah">Diterbitkan secara elektronik melalui Repositori UPW pada ${esc(tglSurat(tg))}.<br>Kode verifikasi: <b>${esc(r.kode)}</b><br>Pindai QR atau buka: ${esc(url)}</div></div>` : ""}</div>`;
-  const waktu = jamRapat(r) || "[jam]", tempat = [r.tempat, r.tautan ? "Daring: " + r.tautan : ""].filter(Boolean).join("; ") || "[tempat]";
+  // v0.53.0: tautan rapat daring menjadi tautan yang bisa diklik (juga di PDF hasil cetak browser)
+  const waktu = jamRapat(r) || "[jam]", tautanH = r.tautan ? `Daring: <a href="${esc(r.tautan)}" target="_blank" rel="noopener noreferrer" style="color:#0A5188;word-break:break-all">${esc(r.tautan)}</a>` : "";
+  const tempat = [r.tempat ? esc(r.tempat) : "", tautanH].filter(Boolean).join("; ") || "[tempat]";
   return `<div class="kertas">${kopHtml()}${tanda}<p style="text-align:right">${esc(L.set.tempat || "Nusa Dua")}, ${esc(tglSurat(tg))}</p>
     ${tabelBaris([["Nomor", esc(r.nomor || "–")], ["Lampiran", "1 (satu) berkas"], ["Hal", "<b>Undangan " + esc(r.judul) + "</b>"]])}
     <p style="margin-top:12px">Kepada Yth.<br>Bapak/Ibu/Saudara/i sebagaimana daftar terlampir<br>di Tempat</p>
     <p style="margin-top:12px">Dengan hormat,</p><p style="text-align:justify">Dengan ini kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri <b>${esc(r.judul)}</b> yang akan dilaksanakan pada:</p>
-    ${tabelBaris([["Hari/Tanggal", r.tgl ? esc(tglPanjang(r.tgl)) : kosong("tanggal")], ["Waktu", esc(waktu)], ["Tempat", esc(tempat)]])}
+    ${tabelBaris([["Hari/Tanggal", r.tgl ? esc(tglPanjang(r.tgl)) : kosong("tanggal")], ["Waktu", esc(waktu)], ["Tempat", tempat]])}
     <p style="margin-bottom:4px">dengan agenda:</p><ol style="margin:0 0 10px 22px;padding:0">${(r.agenda || []).map(a => `<li>${esc(a.t)}</li>`).join("")}</ol>
     ${r.pengantar ? `<p style="text-align:justify">${esc(r.pengantar)}</p>` : ""}
     <p style="text-align:justify">Mengingat pentingnya acara tersebut, kami mohon kehadiran Bapak/Ibu/Saudara/i tepat waktu. Atas perhatian dan kerja samanya kami ucapkan terima kasih.</p>${ttd}</div>
@@ -5865,7 +6141,17 @@ function htmlSaran(jenis, teks, kecuali, batas) {
     const h = UPW_SARAN.jenis(t, boleh, 3).filter(x => !(kecuali || []).includes(x.k));
     return h.length ? `<div class="saran-baris"><span class="muted">Saran jenis dari judul:</span>${h.map(x => `<button type="button" class="chip-saran" data-act="saranPilih" data-j="kegjenis" data-k="${x.k}" title="Cocok: ${esc(x.alasan.join(", "))}">${esc(x.l)}</button>`).join("")}</div>` : "";
   }
-  let h = UPW_SARAN.butir(t, 6);
+  // v0.53.0: konteks (jenis rapat, butir agenda) menaikkan butir yang cocok; saran sisa yang jauh lebih lemah dari saran terbaik tidak ditampilkan.
+  const L = S.laci, konteks = [], jr = k => { const j = S.rapatRef && S.rapatRef.jenis.find(y => y.k === k); return j ? j.butir : []; };
+  let tq = t;
+  if (/^agenda:/.test(jenis) && L && L.jenis === "rapatForm") konteks.push(...jr(L.f.jenis));
+  if (/^kep:/.test(jenis) && L && L.jenis === "risalahForm") {
+    const ag = (L.r.agenda || [])[Number(jenis.slice(4).split(".")[0])] || {};
+    konteks.push(...(ag.butir || []), ...jr(L.r.jenis));
+    if (t.split(/\s+/).length < 4 && ag.t) tq = t + " " + ag.t;   // keputusan pendek: ikut memakai teks agendanya
+  }
+  const semuaH = UPW_SARAN.butir(tq, 10, { konteks }), atas = semuaH.length ? semuaH[0].skor : 0;
+  let h = semuaH.filter(x => x.skor >= 0.45 * atas);
   if (jenis === "bank" && S.bankMatriks) h = h.filter(x => S.bankMatriks.some(m => m.n === x.n));
   h = h.filter(x => !(kecuali || []).includes(x.n)).slice(0, batas || 4);
   if (!h.length) return jenis === "cari" ? `<p class="small muted">Belum ada butir yang cocok. Coba kata lain, misalnya "kepuasan alumni", "RPS", "rapat industri".</p>` : "";

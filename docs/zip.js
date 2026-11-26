@@ -88,14 +88,16 @@ async function bukaZip(buf, jenis = "Excel (.xlsx)") {
     hasil[nama] = { metode, besar, awal: lok + 30 + d.getUint16(lok + 26, true) + d.getUint16(lok + 28, true) };
     p += 46 + nl + el + cl;
   }
-  return async nama => {
+  const biner = async nama => {   // v0.54.0: isi mentah (untuk menyalin berkas Word apa adanya)
     const f = hasil[nama]; if (!f) return null;
     const data = u.subarray(f.awal, f.awal + f.besar);
-    if (f.metode === 0) return dek.decode(data);
+    if (f.metode === 0) return data.slice();
     if (f.metode !== 8) throw new Error(`Format kompresi ${jenis} tidak didukung.`);
-    const aliran = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
-    return await new Response(aliran).text();
+    return new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer());
   };
+  const ambil = async nama => { const b = await biner(nama); return b === null ? null : dek.decode(b); };
+  ambil.daftar = Object.keys(hasil); ambil.biner = biner;
+  return ambil;
 }
 const kolomKe = ref => { let n = 0; for (const c of ref.replace(/\d+/g, "")) n = n * 26 + c.charCodeAt(0) - 64; return n - 1; };
 async function bacaXlsx(buf) {

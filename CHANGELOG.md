@@ -3,6 +3,14 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.55.0 — 26 Nov 2026 — Produksi
+- Produksi diperbarui dari v0.52.0 ke v0.55.0 (tampilan docs/ dan server Apps Script Produksi deployment @38), sekaligus membawa v0.53.0, v0.54.0, v0.54.1: lampiran untuk KPS,
+  pencarian jenis lebih luas, saran butir berkonteks, tautan undangan, urut NIM, gulir tetap; pengesahan elektronik RPS/kontrak + peran Ketua Jurusan; penanda TTE; mesin PDF sendiri.
+- Struktur data berubah (VERSI_SKEMA 35: kolom Kegiatan.lampiranAju). Migrasi dan cadangan otomatis dipicu langsung setelah rilis (±22 dtk, permintaan tanpa login).
+  Rollback ke v0.52.0: tampilan (tag v0.52.0) dan deployment @37; data tetap terbaca (lampiran pengajuan dan status pengesahan diabaikan; akun berperan hanya kajur tidak bisa dipakai).
+- Setelah tayang: Super Admin membuat akun Ketua Jurusan (impor dengan peran kajur); dosen memakai templat RPS/kontrak baru (berpenanda TTE kuning).
+- Penyetuju: pemilik, di chat 26 Nov 2026: "Setuju tayang v0.55.0".
+
 ## v0.55.0 — 26 Nov 2026 — Uji Coba
 Ringkas: Mesin PDF buatan sendiri: surat tugas + semua lampiran menjadi satu PDF; RPS dan kontrak kuliah yang sah menjadi PDF bertanda tangan elektronik; Pratinjau PDF.
 Permintaan pemilik 26 Nov 2026: lampiran PDF/Word langsung menjadi satu PDF tanpa pustaka tambahan; RPS/kontrak yang sah berupa PDF; pilihan pemilik "Bagaimana jika kita coba yang B?"
