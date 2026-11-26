@@ -279,14 +279,21 @@ function aksiKegiatanRef(d, token) {
   };
 }
 
+/** v0.60.0: urutan daftar = tanggal terbaru dulu; data SINTA yang belum bertanggal memakai tahun SINTA (seperti di SINTA); draf lain tanpa tanggal di atas. */
+function kunciUrutKeg(k) {
+  if (k.tgl) return String(k.tgl);
+  var s = jsonDari(k.sinta, null);
+  return s && s.tahun ? s.tahun + "-00" : "9";
+}
 function aksiKegiatanDaftar(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_KEGIATAN);
   var semuaJ = d.lingkup === "semua";
   if (semuaJ && !boleLihatSemua(p)) throw galat("Anda tidak memiliki izin untuk tindakan ini.");
   var idx = indeksOrang();
-  var l = semuaKegiatan().filter(function (k) { return semuaJ ? !(k.st === "draf_aju" || (k.st === "tanpa" && k.status === "draf")) || k.olehId === p.id : terlibat(k, p, idx); });
-  l.sort(function (a, b) { return (b.tgl || "9").localeCompare(a.tgl || "9") || String(b.dibuat).localeCompare(String(a.dibuat)); });
+  // v0.60.0: draf hasil tarikan SINTA adalah data prodi → tetap tampil di "Semua kegiatan" (draf pribadi lain tetap tersembunyi)
+  var l = semuaKegiatan().filter(function (k) { return semuaJ ? !(k.st === "draf_aju" || (k.st === "tanpa" && k.status === "draf" && !k.sinta)) || k.olehId === p.id : terlibat(k, p, idx); });
+  l.sort(function (a, b) { return kunciUrutKeg(b).localeCompare(kunciUrutKeg(a)) || String(b.dibuat).localeCompare(String(a.dibuat)); });
   var set = pengaturanSurat();
   return { kegiatan: l.map(function (k) { return kegiatanKeKlien(k, p, idx, false, set); }) };
 }

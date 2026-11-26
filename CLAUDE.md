@@ -428,6 +428,11 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   memuatnya — kolom kegiatan baru WAJIB ditambah di kedua fungsi itu, kalau tidak simpanKegiatan menghapusnya). Hanya DTPS TA berjalan yang ditarik. Browser bawaan Claude memblokir
   localhost dari situs publik: uji lokal penuh tidak bisa, uji jembatan (parse di tab SINTA → kirim di tab lokal). server-uji.mjs kini menjawab CORS. .drawer>*{flex-shrink:0}.
 
+- v0.60.0 (27 Nov 2026, Uji Coba): publikasi & sitasi dari SINTA. sinta-tarik.js: bacaPubSinta (view garuda|googlescholar|scopus|wos; Garuda = nama penulis lengkap + "Accred : Sinta N" + DOI,
+  Scholar = "N cited", Scopus = "Qn as <tipe>") dan bacaStatSinta (tabel .stat-table di halaman utama profil → Pengaturan sintaStat). gas/Sinta.js kirimPubSinta: kunci "publikasi|judul",
+  gabung lintas indeks/profil, sitasi Scholar diperbarui tiap tarikan juga bila disetujui (tarik_<field> = info.w kode → max dalam satu tarikan), isian dosen tidak ditimpa. Kegiatan:
+  "Semua kegiatan" memuat draf SINTA; kunciUrutKeg (tgl atau tahun SINTA). Uji: uji-v60-bagian.mjs.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

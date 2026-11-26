@@ -3,6 +3,20 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.60.0 — 27 Nov 2026 — Uji Coba
+Ringkas: publikasi dan sitasi dosen ikut ditarik dari SINTA (Garuda, Google Scholar, Scopus, WoS) beserta ringkasan artikel/sitasi/h-index; draf SINTA tampil di Semua kegiatan Admin dan daftar Kegiatan urut tahun terbaru.
+Permintaan pemilik 27 Nov 2026 (catatan setelah penarikan pertama): draf SINTA tidak tampil di Kegiatan bagi Admin; urutan bawaan tahun terbaru di atas seperti SINTA; "Bagaimana dengan
+publikasi dan sitasi?" → usulan disetujui: "Ya, sesuai usulan".
+- Kegiatan (gas/Kegiatan.js): "Semua kegiatan" (Admin/Super Admin/KPS) kini memuat draf hasil SINTA (draf pribadi lain tetap tersembunyi). Urutan: kunciUrutKeg = tanggal, atau tahun SINTA
+  bila tanggal belum diisi; daftar menampilkan "Tahun N (SINTA)".
+- gas/Sinta.js: kirimPubSinta — publikasi digabung per judul dinormalkan (lintas indeks dan lintas profil dosen); kategori dari akreditasi Garuda (Sinta 1–6 → nasional terakreditasi)
+  atau Scopus/WoS (jurnal → internasional bereputasi, prosiding → seminar internasional), kosong bila tidak pasti; Nama jurnal, DOI, Luaran dari = Penelitian. Sitasi Google Scholar
+  diperbarui setiap tarikan, termasuk untuk publikasi yang sudah disetujui (dicatat di riwayat); isian yang sudah diisi dosen tidak ditimpa. Dosen penulis lain dikenali dari nama
+  lengkap (Garuda) yang sama dengan nama profil SINTA-nya. simpanStatSinta → Pengaturan "sintaStat" (artikel, sitasi, h-index per Scopus/Scholar/WoS). Tanpa perubahan struktur data.
+- docs/uji/sinta-tarik.js: bacaPubSinta (view garuda/googlescholar/scopus/wos), bacaStatSinta (halaman utama profil); diuji pada profil SINTA sungguhan.
+- Tampilan: kolom Publikasi dan Profil SINTA di Data Prodi › SINTA (statSintaHtml), blok publikasi di detail kegiatan.
+- Uji: alat/uji/uji-v60-bagian.mjs; uji tampilan lokal (Admin: Semua kegiatan, urutan, detail publikasi gabungan).
+
 ## v0.59.0 — 26 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.59.0 (tampilan docs/ dan server Apps Script Produksi deployment @42): Penelitian & PkM dari SINTA (Data Prodi), penanda buku "Tarik ke Repositori UPW",
   penggabungan tanpa ganda, penandaan dosen otomatis; perbaikan laci yang terhimpit.

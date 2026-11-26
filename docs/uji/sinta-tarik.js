@@ -2,7 +2,8 @@
  * v0.59.0: penarik data SINTA. Dijalankan DI TAB SINTA lewat penanda buku "Tarik ke Repositori UPW" (dibuat di aplikasi: Data Prodi › SINTA),
  * karena SINTA menolak akses dari server/situs lain. Penanda buku mengisi window.UPW_SINTA = {api, lingkungan} lalu memuat berkas ini.
  * Langkah: kode sekali pakai (#upw=… di alamat tab, atau diketik) → sinta.daftar (DTPS ber-ID SINTA) → baca profil tiap dosen
- * (?view=researches = penelitian, ?view=services = PkM; 10 terbaru tanpa login) → sinta.kirim per kelompok → ringkasan.
+ * (?view=researches = penelitian, ?view=services = PkM; v0.60.0: halaman utama = ringkasan sitasi/h-index, ?view=garuda|googlescholar|scopus|wos
+ * = publikasi; 10 terbaru per daftar tanpa login) → sinta.kirim per kelompok → ringkasan.
  * Pembaca HTML berbasis pola teks (bacaDaftarSinta) agar bisa diuji di Node (alat/uji/uji-v59-bagian.mjs).
  */
 (function () {
@@ -29,7 +30,51 @@
     }).filter(x => x.judul && x.tahun);
     return { nama, item };
   }
+  /** v0.60.0: HTML profil SINTA view garuda | googlescholar | scopus | wos → {nama, item[] publikasi} */
+  function bacaPubSinta(html, sumber, dari) {
+    const nama = dekode((html.match(/<h3>\s*<a[^>]*>([\s\S]*?)<\/a>/) || [])[1]);
+    const bagian = String(html).split(/<div class="ar-list-item\b[^"]*">/).slice(1);
+    const item = bagian.map(h => {
+      h = h.split(/<div class="ar-list-item\b/)[0].split(/View more/)[0];
+      const t = h.match(/class="ar-title">\s*<a([^>]*)>([\s\S]*?)<\/a>/) || [];
+      const judul = dekode(t[2]), url = dekode((String(t[1] || "").match(/href="([^"]*)"/) || [])[1]);
+      const pubs = []; h.replace(/class="ar-pub"[^>]*>([\s\S]*?)<\/a>/g, (m, x) => { pubs.push(dekode(x)); return m; });
+      const jurnal = pubs.filter(x => !/^WOS\./i.test(x)).pop() || "";
+      const tahun = Number((h.match(/class="ar-year"[^>]*>[\s\S]*?(\d{4})/) || [])[1]) || 0;
+      const cited = dekode((h.match(/class="ar-cited"[^>]*>([\s\S]*?)<\/a>/) || [])[1]);
+      const sit = cited.match(/^(\d+)\s*cited/i), doi = (cited.match(/DOI\s*:\s*(\S+)/i) || [])[1] || "";
+      const label = []; h.replace(/class="ar-quartile[^"]*"[^>]*>([\s\S]*?)<\/a>/g, (m, x) => { label.push(dekode(x)); return m; });
+      const akred = ((label.find(x => /Accred/i.test(x)) || "").match(/Sinta\s*\d/i) || [""])[0];
+      const kuartil = ((label.find(x => /^Q\d/i.test(x)) || "").match(/^Q\d/i) || [""])[0].toUpperCase();
+      // jenis terbitan: "Q2 as Book Series" / "as Conference Proceedings" (Scopus), "WOS.ISSHP Edition" (WoS prosiding)
+      const tipe = ((label.find(x => /\bas\s+/i.test(x)) || "").match(/\bas\s+(.+)$/i) || [])[1] || (pubs.find(x => /^WOS\./i.test(x)) || "");
+      // penulis: "Authors : a, b" (Scholar), "Authors : a; b;" (WoS), "Creator : x" (Scopus), atau tautan nama "a; b" (Garuda)
+      let pen = (h.match(/>\s*Authors\s*:\s*([^<]*)</) || h.match(/>\s*Creator\s*:\s*([^<]*)</) || [])[1];
+      if (!pen) { const g = [...h.matchAll(/<a href="#!">([^<]*;[^<]*)<\/a>/g)].map(m => m[1]).find(x => !/Author Order/i.test(x)); pen = g || ""; }
+      const penulis = dekode(pen).split(sumber === "googlescholar" ? /\s*,\s*/ : /\s*;\s*/).map(x => x.trim()).filter(Boolean);
+      return { jenis: "publikasi", sumber, judul, url, jurnal, tahun, sitasi: sit ? Number(sit[1]) : null, doi, akred, kuartil, tipe, penulis, dari: String(dari) };
+    }).filter(x => x.judul && x.tahun);
+    return { nama, item };
+  }
+  /** v0.60.0: ringkasan profil (tabel Article/Citation/H-Index per Scopus, GScholar, WOS) */
+  function bacaStatSinta(html) {
+    const nama = dekode((html.match(/<h3>\s*<a[^>]*>([\s\S]*?)<\/a>/) || [])[1]);
+    const tb = (String(html).match(/<table[^>]*stat-table[\s\S]*?<\/table>/) || [])[0];
+    if (!tb) return { nama, stat: null };
+    const kol = [...tb.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map(m => dekode(m[1]).toLowerCase()).slice(1);
+    const kunciKol = kol.map(k => /scopus/.test(k) ? "scopus" : /scholar/.test(k) ? "gs" : /wos/.test(k) ? "wos" : "");
+    const BAR = { article: "artikel", citation: "sitasi", "cited document": "dok", "h-index": "h", "i10-index": "i10", "g-index": "g" };
+    const stat = {};
+    [...tb.matchAll(/<tr>([\s\S]*?)<\/tr>/g)].forEach(m => {
+      const sel = [...m[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(x => dekode(x[1]));
+      const b = BAR[(sel[0] || "").toLowerCase()]; if (!b) return;
+      sel.slice(1).forEach((v, i) => { const k = kunciKol[i]; if (!k) return; stat[k] = stat[k] || {}; stat[k][b] = Number(v.replace(/\D/g, "")) || 0; });
+    });
+    return { nama, stat: Object.keys(stat).length ? stat : null };
+  }
   G.UPW_SINTA_BACA = bacaDaftarSinta;
+  G.UPW_SINTA_PUB = bacaPubSinta;
+  G.UPW_SINTA_STAT = bacaStatSinta;
   if (typeof document === "undefined" || !G.UPW_SINTA || !G.UPW_SINTA.api) return;   // dimuat untuk uji saja
 
   /* ---------- dijalankan di tab SINTA ---------- */
@@ -54,33 +99,46 @@
       log("Mengambil daftar dosen dari aplikasi…");
       const L = (await api("sinta.daftar", { kode })).dosen;
       log(L.length + " dosen DTPS ber-ID SINTA.");
-      const semua = [], nama = {}, gagal = [];
+      const semua = [], nama = {}, gagal = [], statistik = {};
+      const ambil = async v => { const r = await fetch(`/authors/profile/${encodeURIComponent(v)}`, { credentials: "include" }); if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); };
       for (const d of L) {
-        for (const [view, jenis] of [["researches", "penelitian"], ["services", "pkm"]]) {
+        try {   // ringkasan profil: nama resmi + artikel/sitasi/h-index
+          const st = bacaStatSinta(await ambil(d.sinta));
+          if (st.nama) nama[d.sinta] = st.nama;
+          if (st.stat) statistik[d.sinta] = st.stat;
+        } catch (e) { gagal.push(`${d.nama} (ringkasan): ${e.message}`); }
+        await jeda(700);
+        for (const [view, jenis] of [["researches", "penelitian"], ["services", "pkm"], ["garuda", "publikasi"], ["googlescholar", "publikasi"], ["scopus", "publikasi"], ["wos", "publikasi"]]) {
           try {
             const r = await fetch(`/authors/profile/${encodeURIComponent(d.sinta)}?view=${view}`, { credentials: "include" });
             if (!r.ok) throw new Error("HTTP " + r.status);
-            const h = bacaDaftarSinta(await r.text(), jenis, d.sinta);
-            if (h.nama) nama[d.sinta] = h.nama;
+            const h = jenis === "publikasi" ? bacaPubSinta(await r.text(), view, d.sinta) : bacaDaftarSinta(await r.text(), jenis, d.sinta);
+            if (h.nama && !nama[d.sinta]) nama[d.sinta] = h.nama;
             semua.push(...h.item);
-            log(`${d.nama}: ${h.item.length} ${jenis === "pkm" ? "PkM" : "penelitian"}`);
-          } catch (e) { gagal.push(`${d.nama} (${jenis}): ${e.message}`); log(`${d.nama} (${jenis}): gagal – ${e.message}`, "#b00"); }
+            const lbl = { researches: "penelitian", services: "PkM", garuda: "publikasi Garuda", googlescholar: "publikasi Google Scholar", scopus: "publikasi Scopus", wos: "publikasi WoS" }[view];
+            if (h.item.length || jenis !== "publikasi") log(`${d.nama}: ${h.item.length} ${lbl}`);
+          } catch (e) { gagal.push(`${d.nama} (${view}): ${e.message}`); log(`${d.nama} (${view}): gagal – ${e.message}`, "#b00"); }
           await jeda(700);   // sopan terhadap server SINTA
         }
       }
       // ketua yang juga dosen UPW (dikenali dari nama di profil SINTA-nya sendiri)
       const keSinta = {}; Object.keys(nama).forEach(s => { keSinta[nama[s].toUpperCase()] = s; });
-      semua.forEach(x => { x.ketuaSinta = keSinta[x.ketua.toUpperCase()] || ""; });
+      const normNama = t => String(t || "").toUpperCase().replace(/[^A-Z ]/g, " ").replace(/\s+/g, " ").trim();
+      const keSintaN = {}; Object.keys(nama).forEach(s => { keSintaN[normNama(nama[s])] = s; });
+      semua.forEach(x => {
+        if (x.jenis === "publikasi") { x.anggota = (x.penulis || []).map(n => keSintaN[normNama(n)]).filter(Boolean).map(s => ({ sinta: s, nama: nama[s] })); return; }   // penulis bernama lengkap (Garuda) = dosen UPW lain
+        x.ketuaSinta = keSinta[x.ketua.toUpperCase()] || "";
+      });
       if (!semua.length && gagal.length) throw new Error("Tidak ada data yang terbaca. Tampilan SINTA mungkin berubah; hubungi pengelola aplikasi.");
       log(`Mengirim ${semua.length} entri ke aplikasi (yang sama tidak dibuat ganda)…`);
-      const tot = { baru: 0, sudah: 0, tertaut: 0, ditandai: 0, diabaikan: 0, dilewati: 0 };
+      const tot = { baru: 0, sudah: 0, tertaut: 0, ditandai: 0, diabaikan: 0, dilewati: 0, sitasi: 0 };
       for (let i = 0; i < semua.length || i === 0; i += 40) {
         const akhir = i + 40 >= semua.length;
-        const j = await api("sinta.kirim", { kode, item: semua.slice(i, i + 40), selesai: akhir, ringkas: akhir ? { dosen: L.length, item: semua.length, gagal, baru: tot.baru } : undefined });
+        const j = await api("sinta.kirim", { kode, item: semua.slice(i, i + 40), statistik: i === 0 ? statistik : undefined, selesai: akhir, ringkas: akhir ? { dosen: L.length, item: semua.length, gagal, baru: tot.baru } : undefined });
         Object.keys(tot).forEach(k => { tot[k] += j[k] || 0; });
         if (akhir) break;
       }
-      log(`Selesai. Baru: ${tot.baru} · sudah tercatat: ${tot.sudah} · ditautkan ke data dosen: ${tot.tertaut} · dosen ditandai: ${tot.ditandai}${tot.diabaikan ? " · dilewati (pernah dihapus): " + tot.diabaikan : ""}.`, "#0a6b2b");
+      log(`Selesai. Baru: ${tot.baru} · sudah tercatat: ${tot.sudah} · ditautkan ke data dosen: ${tot.tertaut} · dosen ditandai: ${tot.ditandai}${tot.sitasi ? " · sitasi diperbarui: " + tot.sitasi : ""}${tot.diabaikan ? " · dilewati (pernah dihapus): " + tot.diabaikan : ""}.`, "#0a6b2b");
       log("Kembali ke aplikasi lalu tekan Muat ulang di Data Prodi › SINTA. Data baru berstatus draf sampai dosen melengkapi bukti dan diverifikasi.");
     } catch (e) { log("Gagal: " + e.message, "#b00"); }
   })();

@@ -36,7 +36,103 @@ function kodeSintaSah(kode) {
   if (!v) throw galat("Kode penarikan sudah kedaluwarsa (30 menit). Tekan Tarik Data SINTA lagi di aplikasi.");
   return JSON.parse(v);
 }
-function sintaKeKlien(k) { return k ? { ketua: k.ketua, skema: k.skema, sumber: k.sumber, dana: k.dana, tahun: k.tahun, anggota: k.anggota || [], pada: k.pada, terakhir: k.terakhir } : null; }
+function sintaKeKlien(k) {
+  if (!k) return null;
+  if (k.pub) return { pub: 1, tahun: k.tahun, jurnal: k.jurnal || "", doi: k.doi || "", akred: k.akred || "", kuartil: k.kuartil || "", tipe: k.tipe || "", sitasi: k.sitasi === undefined ? null : k.sitasi,
+    sitasiScopus: k.sitasiScopus === undefined ? null : k.sitasiScopus, asal: k.asal || [], penulis: k.penulis || [], url: k.url || "", pada: k.pada, terakhir: k.terakhir };
+  return { ketua: k.ketua, skema: k.skema, sumber: k.sumber, dana: k.dana, tahun: k.tahun, anggota: k.anggota || [], pada: k.pada, terakhir: k.terakhir };
+}
+/* ---------- v0.60.0: publikasi & sitasi (Garuda, Google Scholar, Scopus, WoS di profil SINTA) ---------- */
+var ASAL_PUB = { garuda: "Garuda", googlescholar: "Google Scholar", scopus: "Scopus", wos: "Web of Science" };
+var ISIAN_SITASI = "Jumlah sitasi (Google Scholar)";
+function kunciPubSinta(judul) { return "publikasi|" + normalJudul(judul); }
+/** Kategori publikasi (isian jenis "publikasi") dari indeks SINTA; kosong bila tidak bisa dipastikan (dosen memilih sendiri). */
+function kategoriPubSinta(m) {
+  var def = jenisDef("publikasi"), f = def ? def.fx.filter(function (x) { return x.l === "Kategori publikasi"; })[0] : null;
+  if (!f) return "";
+  var pilih = function (awal) { return f.o.filter(function (o) { return o.indexOf(awal) === 0; })[0] || ""; };
+  var asal = m.asal || [];
+  if (asal.indexOf("scopus") >= 0 || asal.indexOf("wos") >= 0)   // prosiding terindeks (Scopus "Conference Proceeding", WoS ISSHP/ISTP/CPCI) = seminar internasional
+    return /conference|proceeding|ISSHP|ISTP|CPCI/i.test(teks(m.tipe)) ? pilih("Seminar internasional") : pilih("Jurnal internasional bereputasi");
+  if (/sinta\s*[1-6]/i.test(teks(m.akred))) return pilih("Jurnal nasional terakreditasi");
+  return "";
+}
+function angkaSitasi(v) { if (v === null || v === undefined || v === "") return null; var n = Math.round(Number(v)); return isFinite(n) && n >= 0 && n < 1e7 ? n : null; }
+/** Satu entri publikasi dari tab SINTA → buat / gabungkan (judul sama dari indeks lain atau profil dosen lain = satu kegiatan). */
+function kirimPubSinta(x, C, h) {
+  var judul = potong(x.judul, 300).trim(), tahun = Number(x.tahun) || 0, asal = ASAL_PUB[x.sumber] ? x.sumber : "";
+  if (!asal || !judul || !(tahun >= 1990 && tahun <= 2100)) { h.dilewati++; return; }
+  var kunci = kunciPubSinta(judul);
+  if (C.abaikan.indexOf(kunci) >= 0) { h.diabaikan++; return; }
+  var tag = C.tag(x);
+  if (!tag.length) { h.dilewati++; return; }
+  var sit = angkaSitasi(x.sitasi), k = C.perKunci[kunci];
+  if (!k) {
+    var c = (C.perJudul["publikasi|" + normalJudul(judul)] || []).filter(function (y) { return !jsonDari(y.sinta, null) && (!y.tgl || Math.abs(Number(y.tgl.slice(0, 4)) - tahun) <= 1); })[0];
+    if (c) { k = c; h.tertaut++; } else h.baru++;
+  } else h.sudah++;
+  var lama = k ? jsonDari(k.sinta, null) || {} : {}, m = {};
+  Object.keys(lama).forEach(function (a) { m[a] = lama[a]; });
+  m.k = kunci; m.pub = 1; m.tahun = m.tahun || tahun; m.pada = lama.pada || C.kini; m.terakhir = C.kini;
+  m.asal = (m.asal || []).slice(); if (m.asal.indexOf(asal) < 0) m.asal.push(asal);
+  ["jurnal", "doi", "url"].forEach(function (a) { var v = potong(x[a], 300).trim(); if (v && !m[a]) m[a] = v; });
+  if (teks(x.akred).trim()) m.akred = potong(x.akred, 40).trim();
+  if (teks(x.kuartil).trim()) m.kuartil = potong(x.kuartil, 40).trim();
+  if (teks(x.tipe).trim() && (asal === "scopus" || asal === "wos")) m.tipe = potong(x.tipe, 60).trim();
+  if (!m.penulis || !m.penulis.length) m.penulis = (Array.isArray(x.penulis) ? x.penulis : []).slice(0, 40).map(function (a) { return potong(a, 120); });
+  if (sit !== null) {
+    // judul yang sama di profil beberapa dosen pada tarikan yang sama → ambil angka terbesar; tarikan baru → angka terbaru
+    var fs = asal === "googlescholar" ? "sitasi" : asal === "scopus" ? "sitasiScopus" : "", tk = "tarik_" + fs;
+    if (fs) { m[fs] = lama[tk] === C.info.w && lama[fs] !== undefined && lama[fs] !== null ? Math.max(lama[fs], sit) : sit; m[tk] = C.info.w; }
+  }
+  if (k) {
+    var bisaUbah = k.status === "draf" || k.status === "revisi", nb = 0, cat = [];
+    if (bisaUbah) tag.forEach(function (u) { if (k.pegawai.indexOf(u) < 0 && k.olehId !== u) { k.pegawai.push(u); nb++; } });
+    h.ditandai += nb;
+    if (nb) cat.push(nb + " dosen ditandai dari SINTA");
+    if (!lama.k) cat.push("ditautkan ke SINTA");
+    // sitasi diperbarui setiap tarikan, juga untuk data yang sudah disetujui (hanya angka sitasi)
+    if (m.sitasi !== undefined && m.sitasi !== null && String(m.sitasi) !== teks(k.isian[ISIAN_SITASI])) {
+      cat.push("sitasi Google Scholar diperbarui dari SINTA: " + (teks(k.isian[ISIAN_SITASI]) || "–") + " → " + m.sitasi);
+      k.isian[ISIAN_SITASI] = String(m.sitasi); h.sitasi = (h.sitasi || 0) + 1;
+    }
+    if (bisaUbah) {   // isian kosong dilengkapi dari SINTA; isian yang sudah diisi dosen tidak ditimpa
+      var kat = kategoriPubSinta(m);
+      if (kat && !teks(k.isian["Kategori publikasi"])) k.isian["Kategori publikasi"] = kat;
+      if (m.jurnal && !teks(k.isian["Nama jurnal / seminar"])) k.isian["Nama jurnal / seminar"] = m.jurnal;
+      if ((m.doi || m.url) && !teks(k.isian["DOI / tautan"])) k.isian["DOI / tautan"] = m.doi ? "https://doi.org/" + m.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, "") : m.url;
+    }
+    k.sinta = JSON.stringify(m);
+    if (cat.length) k.riwayat.push({ w: C.kini, o: C.info.u, a: "sinta", c: cat.join("; ") });
+    simpanKegiatan(k);
+    return;
+  }
+  var isian = { "Luaran dari": "Penelitian" }, kat0 = kategoriPubSinta(m);
+  if (kat0) isian["Kategori publikasi"] = kat0;
+  if (m.jurnal) isian["Nama jurnal / seminar"] = m.jurnal;
+  if (m.doi || m.url) isian["DOI / tautan"] = m.doi ? "https://doi.org/" + m.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, "") : m.url;
+  if (m.sitasi !== undefined && m.sitasi !== null) isian[ISIAN_SITASI] = String(m.sitasi);
+  var olehId = tag[0];
+  var baru = { id: "k" + acak(10), jenis: "publikasi", jenisLain: "", judul: judul, tgl: "", sampai: "", tingkat: "", olehId: olehId, kelompok: "dosen",
+    pegawai: tag.filter(function (u) { return u !== olehId; }), kelas: [], mhs: [], excl: [], pendampingId: "", isian: isian, gcet: [], perluST: false,
+    tempat: "", aktivitas: "", ket: potong("Dari SINTA (" + ASAL_PUB[asal] + ") " + tahun + (m.jurnal ? ": " + m.jurnal : ""), 300), bentuk: "", kegDosen: "",
+    st: "tanpa", status: "draf", riwayat: [{ w: C.kini, o: C.info.u, a: "sinta", c: "dibuat dari SINTA (" + ASAL_PUB[asal] + ")" }], kodeSurat: "", tglSurat: "", kpsId: "", lampiran: null,
+    dibuat: new Date(), bukti: {}, verifId: "", tglVerif: "", lampiranAju: [], induk: "", sinta: JSON.stringify(m) };
+  simpanKegiatan(baru);
+  C.perKunci[kunci] = ambilKegiatan(baru.id);
+}
+/** Ringkasan profil SINTA per dosen (artikel, sitasi, h-index per indeks) → Pengaturan "sintaStat". */
+function simpanStatSinta(st, kini) {
+  if (!st || typeof st !== "object") return;
+  var L = jsonDari(pengaturan("sintaStat", ""), {}) || {}, n = 0, ang = function (v) { var x = Math.round(Number(v)); return isFinite(x) && x >= 0 && x < 1e8 ? x : 0; };
+  Object.keys(st).slice(0, 200).forEach(function (id) {
+    if (!/^\d{3,12}$/.test(id) || !st[id]) return;
+    var r = { w: kini };
+    ["scopus", "gs", "wos"].forEach(function (s) { var v = st[id][s]; if (v && typeof v === "object") r[s] = { artikel: ang(v.artikel), sitasi: ang(v.sitasi), dok: ang(v.dok), h: ang(v.h), i10: ang(v.i10), g: ang(v.g) }; });
+    L[id] = r; n++;
+  });
+  if (n) simpanPengaturan("sintaStat", L, "Ringkasan profil SINTA per dosen (artikel, sitasi, h-index)");
+}
 
 /* ---------- aksi Admin ---------- */
 
@@ -44,8 +140,9 @@ function aksiSintaData(d, token) {
   var p = penggunaDariToken(token);
   wajibPeran(p, PERAN_DP_LIHAT);
   var L = dosenSinta(), jml = {};
-  semuaKegiatan().forEach(function (k) { var s = jsonDari(k.sinta, null); if (!s) return; [k.olehId].concat(k.pegawai).forEach(function (u) { jml[u] = jml[u] || { penelitian: 0, pkm: 0, disetujui: 0 }; jml[u][k.jenis] = (jml[u][k.jenis] || 0) + 1; if (k.status === "disetujui") jml[u].disetujui++; }); });
-  return { dosen: L.map(function (x) { return Object.assign(x, { dtps: x.status === STATUS_DTPS, jumlah: jml[x.id] || { penelitian: 0, pkm: 0, disetujui: 0 } }); }),
+  semuaKegiatan().forEach(function (k) { var s = jsonDari(k.sinta, null); if (!s) return; [k.olehId].concat(k.pegawai).forEach(function (u) { jml[u] = jml[u] || { penelitian: 0, pkm: 0, publikasi: 0, disetujui: 0 }; jml[u][k.jenis] = (jml[u][k.jenis] || 0) + 1; if (k.status === "disetujui") jml[u].disetujui++; }); });
+  var st = jsonDari(pengaturan("sintaStat", ""), {}) || {};
+  return { dosen: L.map(function (x) { return Object.assign(x, { dtps: x.status === STATUS_DTPS, jumlah: jml[x.id] || { penelitian: 0, pkm: 0, publikasi: 0, disetujui: 0 }, stat: x.sinta && st[x.sinta] || null }); }),
     terakhir: jsonDari(pengaturan("sintaTerakhir", ""), null), bolehTarik: punyaPeran(p, PERAN_SINTA), url: SINTA_URL };
 }
 function aksiSintaIdSimpan(d, token) {
@@ -101,10 +198,15 @@ function aksiSintaKirim(d) {
     var semuaK = semuaKegiatan(), perKunci = {}, perJudul = {};
     semuaK.forEach(function (k) {
       var s = jsonDari(k.sinta, null); if (s && s.k) perKunci[s.k] = k;
-      if (k.jenis === "penelitian" || k.jenis === "pkm") (perJudul[k.jenis + "|" + normalJudul(k.judul)] = perJudul[k.jenis + "|" + normalJudul(k.judul)] || []).push(k);
+      if (k.jenis === "penelitian" || k.jenis === "pkm" || k.jenis === "publikasi") (perJudul[k.jenis + "|" + normalJudul(k.judul)] = perJudul[k.jenis + "|" + normalJudul(k.judul)] || []).push(k);
     });
-    var h = { baru: 0, sudah: 0, tertaut: 0, ditandai: 0, diabaikan: 0, dilewati: 0 };
+    var h = { baru: 0, sudah: 0, tertaut: 0, ditandai: 0, diabaikan: 0, dilewati: 0, sitasi: 0 };
+    var tagDari = function (x) { var tag = [], tambahTag = function (s) { var u = keUser[teks(s)]; if (u && tag.indexOf(u) < 0) tag.push(u); };
+      tambahTag(x.dari); tambahTag(x.ketuaSinta); (Array.isArray(x.anggota) ? x.anggota : []).forEach(function (a) { tambahTag(a && a.sinta); }); return tag; };
+    var C = { abaikan: abaikan, perKunci: perKunci, perJudul: perJudul, kini: kini, info: info, tag: tagDari };
+    simpanStatSinta(d.statistik, kini);
     item.forEach(function (x) {
+      if (x && x.jenis === "publikasi") { kirimPubSinta(x, C, h); return; }
       var jenis = x.jenis === "pkm" ? "pkm" : x.jenis === "penelitian" ? "penelitian" : "", judul = potong(x.judul, 300).trim(), tahun = Number(x.tahun) || 0;
       if (!jenis || !judul || !(tahun >= 1990 && tahun <= 2100) || /tolak|reject/i.test(teks(x.status))) { h.dilewati++; return; }
       var kunci = kunciSinta(jenis, tahun, judul);
