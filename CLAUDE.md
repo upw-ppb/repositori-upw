@@ -422,6 +422,12 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   wajib otorisasi ulang di editor). Tampilan: UPW_PDF.teksPdf (pdf.js), docs/uji/kalender.js (UPW_KALENDER.baca/bacaLibur; muatKal), panelKalender (Beranda), laciKal/laciKalUbah/
   laciKalLihat (S.kal, S.laci.baris/tebak). Data uji OCR: alat/uji/kalender-ocr-*.txt (jalankan.sh kini menyalin *.txt). PDF kalender asli pemilik ada di ~/Downloads (JANGAN ke repo).
 
+- v0.59.0 (26 Nov 2026, Uji Coba): SINTA. SINTA menolak server (403) & tanpa CORS → penarikan HANYA dari tab SINTA: penanda buku (bookmarkletSinta) memuat docs/uji/sinta-tarik.js
+  (UPW_SINTA_BACA = pembaca HTML berbasis regex, diuji di Node) → sinta.daftar/sinta.kirim {kode} (kode dari sinta.mulai, CacheService 30 mnt). gas/Sinta.js: kunciSinta, idSintaDari
+  (biodata "sinta" yang sudah ada), pemilikKegiatan (dosen tertandai boleh ubah/hapus data SINTA), abaikanSinta, tugasSinta. Kegiatan.sinta (VERSI_SKEMA 39; kegiatanDari/barisKegiatan
+  memuatnya — kolom kegiatan baru WAJIB ditambah di kedua fungsi itu, kalau tidak simpanKegiatan menghapusnya). Hanya DTPS TA berjalan yang ditarik. Browser bawaan Claude memblokir
+  localhost dari situs publik: uji lokal penuh tidak bisa, uji jembatan (parse di tab SINTA → kirim di tab lokal). server-uji.mjs kini menjawab CORS. .drawer>*{flex-shrink:0}.
+
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
   DED_BUTIR (64), GCET (10 pasal), STATUS_MHS (A,C,N,L,D,K,M,W). Dipakai ulang di aplikasi sebenarnya.

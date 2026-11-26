@@ -3,6 +3,24 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.59.0 — 26 Nov 2026 — Uji Coba
+Ringkas: penelitian dan PkM dosen ditarik dari SINTA (tombol Tarik Data SINTA + penanda buku di tab SINTA), satu judul dicatat sekali dan semua dosen tercantum ditandai; dosen melengkapi bukti lalu diverifikasi.
+Permintaan pemilik 26 Nov 2026: "Ya, cara itu" (tombol Tarik Data SINTA untuk Admin/Super Admin; tidak ganda; dosen yang sama ditandai otomatis; satu unggahan bukti; tarikan berkala
+menambah data di luar 10 terakhir), dengan keputusan: hasil tarikan "Diajukan – menunggu bukti" (tidak dihitung iLKPS sebelum diverifikasi), judul berketua dosen prodi lain tetap
+dihitung, dosen boleh mengubah klasifikasi yang tidak ada di SINTA.
+- Dasar teknis (diuji langsung): SINTA menolak akses server/robot (HTTP 403) dan tidak mengizinkan situs lain membaca halamannya (tanpa CORS), tetapi skrip di tab SINTA bisa
+  membaca profil lain dan mengirim ke Apps Script (diuji: kiriman dari tab SINTA ke server Uji Coba berhasil; pemuatan skrip dari github.io berhasil). Tanpa login: 10 entri terbaru per daftar.
+- gas/Sinta.js: sinta.data/idSimpan (Data Prodi), sinta.mulai (kode sekali pakai 30 menit, CacheService), sinta.daftar/sinta.kirim (dipanggil skrip di tab SINTA dengan kode).
+  Kunci judul = jenis|tahun|judul dinormalkan; dosen ditandai lewat ID SINTA (pemilik profil, anggota yang tertaut ke profil SINTA, ketua yang dikenali dari nama profil); judul yang sudah
+  dicatat dosen (tahun ±1) ditautkan; draf yang dihapus dicatat di "sintaAbaikan". Kegiatan.sinta (kolom baru, VERSI_SKEMA 39). ID SINTA memakai isian biodata yang sudah ada
+  ("SINTA ID", Profil ilmiah; alamat profil juga terbaca).
+- Kegiatan dari SINTA: draf tanpa surat tugas, isian Sumber dana (Institusi Internal → Perguruan Tinggi; Kerjasama Luar Negeri → Luar negeri; Kerjasama lembaga lain → Dalam negeri),
+  Jumlah dana, Tahap PkM Pelaksanaan; semua dosen tertandai boleh mengubah/menghapus; anggota tidak memverifikasi datanya sendiri; Beranda dosen: pengingat melengkapi.
+- docs/uji/sinta-tarik.js: dimuat penanda buku "Tarik ke Repositori UPW" di tab SINTA; membaca ?view=researches dan ?view=services setiap DTPS ber-ID SINTA (jeda 0,7 dtk), mengirim
+  per 40 entri. Tampilan: tab Data Prodi "Penelitian & PkM (SINTA)" (isiSinta, bookmarkletSinta), blokSintaKeg di detail kegiatan.
+- Perbaikan: isi laci tidak lagi terhimpit (tabel detail kegiatan sempat setinggi 2 px) — gaya.css .drawer>*{flex-shrink:0}.
+- Uji: alat/uji/uji-v59-bagian.mjs; uji tampilan lokal memakai data nyata dua profil SINTA (14 entri → 10 judul, 4 dikenali sudah ada).
+
 ## v0.58.0 — 26 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.58.0 (tampilan docs/ dan server Apps Script Produksi deployment @41): Kalender Akademik di Beranda, unggah PDF dengan baca tanggal otomatis
   (OCR Google Drive; layanan lanjutan Drive v3, tanpa izin baru), jadwal survei dan hari libur mengikuti kalender resmi.

@@ -78,6 +78,7 @@ function bisaUnggah(k, p, idx) {
 function bisaVerifikasi(k, p) {
   if (k.status !== "diajukan" && k.status !== "diajukan_ulang") return false;
   if (k.olehId === p.id) return false;
+  if (k.sinta && k.pegawai.indexOf(p.id) >= 0) return false;   // v0.59.0: anggota data SINTA tidak memverifikasi datanya sendiri
   return k.pendampingId ? k.pendampingId === p.id : punyaPeran(p, PERAN_VERIFIKATOR);
 }
 function bisaAjukanData(k, p, idx, stat) {
@@ -315,6 +316,7 @@ function aksiTugasSaya(d, token) {
   hasil.undangan = tr.undangan; hasil.tlSaya = tt.tlSaya; hasil.tlVerif = tt.tlVerif;
   var mu = tugasMutu(p); Object.keys(mu).forEach(function (k) { hasil[k] = mu[k]; }); // v0.52.0: hasil survei dibahas/dipublikasikan
   var ts = tugasSah(p); Object.keys(ts).forEach(function (k) { hasil[k] = ts[k]; }); // v0.54.0: pengesahan RPS / kontrak
+  var tsi = tugasSinta(p); Object.keys(tsi).forEach(function (k) { hasil[k] = tsi[k]; }); // v0.59.0: data SINTA perlu dilengkapi
   var tp = tugasPraktisi(p); Object.keys(tp).forEach(function (k) { hasil[k] = tp[k]; }); // v0.57.0: SK praktisi semester berjalan
   if (!punyaPeran(p, PERAN_KEGIATAN)) return hasil;
   var idx = indeksOrang(), set = pengaturanSurat(), kini = hariIni();

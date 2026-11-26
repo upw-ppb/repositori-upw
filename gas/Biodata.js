@@ -77,7 +77,7 @@ var BIO_PEG = [
     { k: "mkLain", l: "Mata kuliah yang diampu di prodi lain", t: "text", untuk: "dosen", baru: 1, hint: "Kosongkan bila tidak ada. Contoh: Bahasa Inggris Pariwisata (Prodi Perhotelan)" }] },
   { g: "Profil ilmiah", untuk: "dosen", f: [
     { k: "scholar", l: "Google Scholar", t: "text", untuk: "dosen", hint: "Alamat profil Google Scholar Anda" },
-    { k: "sinta", l: "SINTA ID", t: "text", untuk: "dosen", hint: "Angka ID di sinta.kemdiktisaintek.go.id" },
+    { k: "sinta", l: "SINTA ID", t: "text", untuk: "dosen", hint: "Angka ID di sinta.kemdiktisaintek.go.id, contoh: 6810293. Dipakai untuk menarik data penelitian dan PkM Anda dari SINTA." },
     { k: "scopus", l: "Scopus ID", t: "text", untuk: "dosen" },
     { k: "orcid", l: "ORCID", t: "text", untuk: "dosen", hint: "Contoh: 0000-0002-1825-0097" }] },
   { g: "Kontak", f: [

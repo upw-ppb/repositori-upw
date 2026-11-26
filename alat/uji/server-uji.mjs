@@ -67,12 +67,14 @@ console.log("data contoh kegiatan siap");
 globalThis.permintaan = [];
 const TIPE = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".webmanifest": "application/manifest+json" };
 http.createServer((req, res) => {
+  // v0.59.0: seperti Apps Script, /api boleh dipanggil dari situs lain (skrip penarik di tab SINTA). Uji lokal dari https perlu izin jaringan privat Chrome.
+  if (req.method === "OPTIONS" && req.url === "/api") { res.writeHead(204, { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST", "Access-Control-Allow-Headers": "content-type", "Access-Control-Allow-Private-Network": "true" }); res.end(); return; }
   if (req.method === "POST" && req.url === "/api") {
     let b = ""; req.on("data", c => b += c); req.on("end", () => {
       const m = JSON.parse(b); permintaan.push({ aksi: m.aksi, data: m.data });
       fs.appendFileSync(path.join(WEB, "..", "permintaan.log"), JSON.stringify({ aksi: m.aksi, data: m.data }) + "\n");
       const out = g.ctx.doPost({ postData: { contents: b } }).isi;
-      res.writeHead(200, { "Content-Type": "application/json" }); res.end(out);
+      res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }); res.end(out);
     }); return;
   }
   const f = path.join(WEB, decodeURIComponent(req.url.split("?")[0]).replace(/\/$/, "/index.html"));

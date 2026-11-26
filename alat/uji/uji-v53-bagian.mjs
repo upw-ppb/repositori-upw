@@ -6,7 +6,7 @@ export async function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tD
   console.log("69. Lampiran pengajuan, jenis benchmarking, saran butir");
   const dsn = ID("199001152015041001");
   const pdf = n => Buffer.concat([Buffer.from("%PDF-1.4\n"), Buffer.alloc(n || 40, 66)]).toString("base64");
-  cek("kolom lampiranAju di akhir tabel Kegiatan; SKEMA_VERSI ≥ 35", g.sheets.Kegiatan[0].slice(-2)[0] === "lampiranAju" && Number(g.props.SKEMA_VERSI) >= 35);
+  cek("kolom lampiranAju di akhir tabel Kegiatan; SKEMA_VERSI ≥ 35", g.sheets.Kegiatan[0][35] === "lampiranAju" && Number(g.props.SKEMA_VERSI) >= 35);
   const ref = ok("kegiatan.ref", { peran: "dosen" }, tDsn);
   cek("jenis Benchmarking / studi banding kini bisa dipilih dosen; IAB/PPEPP tetap Admin", ref.jenis.find(j => j.k === "benchmark").boleh === true && ref.jenis.find(j => j.k === "iab").boleh === false);
   const data = { jenis: "benchmark", judul: "Benchmarking kurikulum ke Prodi Pariwisata kampus lain", tgl: "2026-12-10", tingkat: "Nasional", perluST: true,
