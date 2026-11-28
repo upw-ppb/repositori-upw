@@ -1,0 +1,19 @@
+# Aturan keamanan untuk Cloudflare Pages (v0.60.3). GitHub Pages mengabaikan berkas ini.
+# Content Security Policy utama ada di <meta> index.html; di sini ditambah yang hanya bisa lewat header server.
+/*
+  Content-Security-Policy: frame-ancestors 'self'
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000
+
+# service worker dan konfigurasi selalu diperiksa ulang agar versi baru cepat sampai ke pengguna
+/sw.js
+  Cache-Control: no-cache
+/uji/sw.js
+  Cache-Control: no-cache
+/konfig.js
+  Cache-Control: no-cache
+/uji/konfig.js
+  Cache-Control: no-cache
