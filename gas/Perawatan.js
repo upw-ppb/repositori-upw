@@ -9,8 +9,25 @@
  *  2. Log yang lebih tua dari ARSIP_LOG_HARI dipindah ke spreadsheet terpisah "Repositori UPW — Arsip Log" (satu lembar per tahun),
  *     paling banyak MAKS_ARSIP_PER_JALAN baris per hari agar permintaan tidak lama. Arsip tetap tersimpan, tidak dihapus.
  *  3. Kolom kosong di kanan dan baris kosong di bawah setiap lembar dibuang (disisakan SISA_BARIS baris kosong).
+ *  4. v0.61.0: cadangan mingguan otomatis — salinan spreadsheet data ke folder Drive "Cadangan" (nama "Cadangan / Mingguan otomatis / <waktu>"),
+ *     CADANGAN_SIMPAN salinan terakhir disimpan; yang lebih lama dipindah ke Sampah Drive (masih bisa dipulihkan 30 hari). Cadangan lain
+ *     (sebelum rilis, manual) tidak pernah disentuh. Berkas bukti di Drive tidak disalin (tidak pernah diubah/dihapus aplikasi kecuali oleh pemiliknya).
  * Super Admin bisa menjalankannya kapan saja dari Riwayat Versi (aksi admin.rawat) dan melihat perkiraan jumlah sel.
  */
+var CADANGAN_HARI = 7, CADANGAN_SIMPAN = 8, AWALAN_CADANGAN_MINGGUAN = "Cadangan / Mingguan otomatis / ";
+function perluCadanganMingguan() { var t = prop("CADANGAN_MINGGUAN_TERAKHIR"); return !t || (new Date(hariIni()) - new Date(t)) / 86400000 >= CADANGAN_HARI; }
+/** Salin spreadsheet data; simpan CADANGAN_SIMPAN salinan mingguan terbaru, sisanya ke Sampah. */
+function cadanganMingguan() {
+  var waktu = Utilities.formatDate(new Date(), "Asia/Makassar", "yyyy-MM-dd HH.mm"), tujuan = folderCadangan();
+  var nama = AWALAN_CADANGAN_MINGGUAN + waktu;
+  DriveApp.getFileById(prop("SPREADSHEET_ID")).makeCopy(nama, tujuan);
+  var L = [], it = tujuan.getFiles();
+  while (it.hasNext()) { var f = it.next(); if (!f.isTrashed() && f.getName().indexOf(AWALAN_CADANGAN_MINGGUAN) === 0) L.push(f); }
+  L.sort(function (a, b) { return b.getName().localeCompare(a.getName()); });   // nama berisi waktu → terbaru dulu
+  var buang = L.slice(CADANGAN_SIMPAN);
+  buang.forEach(function (f) { f.setTrashed(true); });
+  return { nama: nama, simpan: L.length - buang.length, dibuang: buang.length };
+}
 var ARSIP_LOG_HARI = 365, SISA_BARIS = 50, MAKS_ARSIP_PER_JALAN = 20000, BATAS_SEL_SHEETS = 10000000, RAWAT_HARI_UKURAN = 7;
 function perluRapikanUkuran() { var t = prop("RAWAT_UKURAN_TERAKHIR"); return !t || (new Date(hariIni()) - new Date(t)) / 86400000 >= RAWAT_HARI_UKURAN; }
 
@@ -30,6 +47,10 @@ function rawatHarian(paksa) {
     if (!paksa && !perluRawat()) return null;
     var h = { sesi: bersihkanKedaluwarsa("Sesi"), kode: bersihkanKedaluwarsa("Kode"), log: arsipkanLog(), ukuran: { kolom: 0, baris: 0 }, sel: null }, o = { RAWAT_TERAKHIR: hariIni() };
     if (paksa || perluRapikanUkuran()) { h.ukuran = rapikanUkuran(); h.sel = hitungSel(); o.RAWAT_UKURAN_TERAKHIR = hariIni(); o.RAWAT_SEL = JSON.stringify(h.sel); }
+    if (perluCadanganMingguan()) {   // v0.61.0: kegagalan cadangan tidak menggagalkan perawatan; dicoba lagi pada perawatan berikutnya
+      try { h.cadangan = cadanganMingguan(); o.CADANGAN_MINGGUAN_TERAKHIR = hariIni(); o.CADANGAN_MINGGUAN_HASIL = JSON.stringify({ w: new Date().toISOString(), nama: h.cadangan.nama, simpan: h.cadangan.simpan, dibuang: h.cadangan.dibuang }); }
+      catch (e) { console.error("Cadangan mingguan gagal", e && e.stack || e); h.cadanganGalat = String(e && e.message || e).slice(0, 300); o.CADANGAN_MINGGUAN_HASIL = JSON.stringify({ w: new Date().toISOString(), galat: h.cadanganGalat }); }
+    }
     h.waktu = new Date().toISOString(); o.RAWAT_HASIL = JSON.stringify(h).slice(0, 8000);
     konfig().setProperties(o); setelPropUlang();
     return h;
@@ -118,8 +139,9 @@ function aksiAdminRawat(d, token) {
   wajibPeran(p, ["superadmin"]);
   var h = d && d.jalankan ? rawatHarian(true) : null;
   if (h) catat(p.id, "admin.rawat", { sesi: h.sesi, kode: h.kode, log: h.log, sel: h.sel && h.sel.total });
-  var lalu = null, sel = null; try { lalu = JSON.parse(prop("RAWAT_HASIL") || "null"); sel = JSON.parse(prop("RAWAT_SEL") || "null"); } catch (e) {}
+  var lalu = null, sel = null, cad = null; try { lalu = JSON.parse(prop("RAWAT_HASIL") || "null"); sel = JSON.parse(prop("RAWAT_SEL") || "null"); cad = JSON.parse(prop("CADANGAN_MINGGUAN_HASIL") || "null"); } catch (e) {}
   if (!sel) sel = hitungSel();   // belum pernah dihitung: hitung sekarang (beberapa detik)
   return { hasil: h, terakhir: prop("RAWAT_TERAKHIR") || "", terakhirUkuran: prop("RAWAT_UKURAN_TERAKHIR") || "", lalu: lalu, sel: sel,
-    arsipLog: prop("ARSIP_LOG_ID") ? "https://docs.google.com/spreadsheets/d/" + prop("ARSIP_LOG_ID") : "" };
+    arsipLog: prop("ARSIP_LOG_ID") ? "https://docs.google.com/spreadsheets/d/" + prop("ARSIP_LOG_ID") : "",
+    cadangan: { terakhir: prop("CADANGAN_MINGGUAN_TERAKHIR") || "", hasil: cad, simpan: CADANGAN_SIMPAN, hari: CADANGAN_HARI } };
 }

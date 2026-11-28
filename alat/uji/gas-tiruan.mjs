@@ -70,7 +70,7 @@ export function buatGas(folderGas, opsi = {}) {
     getFiles: () => { const l = f.file.slice(); return { hasNext: () => l.length > 0, next: () => l.shift() }; },
     createFile: (n, isi) => { const x = typeof n === "object" ? berkas(n.getName(), n.getBytes(), n.getContentType()) : berkas(n, isi); f.file.push(x); x.folder = f; return x; } }; files[f.id] = f; return f; };
   const berkas = (nama, isi = "", mime = "") => { const b = { id: id("b"), nama, isi, mime, terbuang: false, getId: () => b.id, getName: () => b.nama, getSize: () => Array.isArray(isi) ? isi.length : String(isi).length,
-    setTrashed: v => { b.terbuang = !!v; }, getMimeType: () => b.mime, getBlob: () => ({ getBytes: () => Array.isArray(isi) ? isi.slice() : Array.from(Buffer.from(String(isi))), getContentType: () => b.mime, getName: () => b.nama }),
+    setTrashed: v => { b.terbuang = !!v; }, isTrashed: () => b.terbuang, getMimeType: () => b.mime, getBlob: () => ({ getBytes: () => Array.isArray(isi) ? isi.slice() : Array.from(Buffer.from(String(isi))), getContentType: () => b.mime, getName: () => b.nama }),
     getLastUpdated: () => new Date(), getUrl: () => "https://contoh/" + b.id,
     getAs: m => { if (b.mime !== "application/vnd.google-apps.document" || m !== "application/pdf") throw new Error("Mengonversikan tidak didukung."); return { getBytes: () => Array.isArray(isi) ? isi.slice() : Array.from(Buffer.from(String(isi))) }; },
     moveTo: f => { f.file.push(b); }, makeCopy: (n, f) => { const c = berkas(n, JSON.stringify(sheets)); f.file.push(c); return c; } }; files[b.id] = b; return b; };

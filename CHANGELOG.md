@@ -3,6 +3,16 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.61.0 — 28 Nov 2026 — Uji Coba
+Ringkas: cadangan data otomatis mingguan — server menyalin spreadsheet data ke folder Drive Cadangan setiap 7 hari dan menyimpan 8 salinan terakhir.
+Permintaan pemilik 28 Nov 2026 (kekhawatiran kehilangan data): usulan cadangan terjadwal disetujui: "Ya, buatkan".
+- gas/Perawatan.js: cadanganMingguan() dijalankan perawatan harian (permintaan "saya"/"masuk" pertama hari itu) bila CADANGAN_MINGGUAN_TERAKHIR ≥ 7 hari: makeCopy spreadsheet
+  ke folder Cadangan dengan nama "Cadangan / Mingguan otomatis / <waktu WITA>"; salinan mingguan ke-9 dst. (tertua) dipindah ke Sampah Drive (setTrashed, bisa dipulihkan 30 hari).
+  Cadangan sebelum rilis/manual tidak disentuh. Gagal → dicatat (CADANGAN_MINGGUAN_HASIL), perawatan tetap selesai, dicoba lagi berikutnya. Tanpa izin Google baru, tanpa perubahan
+  struktur data. Berkas bukti Drive tidak disalin (aplikasi tidak menghapusnya).
+- admin.rawat → cadangan {terakhir, hasil, simpan, hari}; tampilan: infoCadanganMingguan di panel Kesehatan data (Riwayat Versi, Super Admin).
+- Uji: alat/uji/uji-v61-bagian.mjs (tiruan Drive kini punya isTrashed).
+
 ## v0.60.2 — 28 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.60.2 (tampilan docs/ dan server Apps Script Produksi deployment @45): perbaikan keamanan — ganti kata sandi mengeluarkan perangkat lain, batas
   permintaan kode email, tautan SINTA hanya https, Content Security Policy di halaman.

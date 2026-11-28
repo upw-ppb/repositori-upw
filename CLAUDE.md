@@ -437,6 +437,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
 - v0.60.2 (28 Nov 2026, Uji Coba): keamanan. Content Security Policy di docs/uji/index.html (script-src 'self'; connect-src Apps Script saja) → JANGAN pakai onclick=/onload= sebaris,
   skrip/CDN luar, atau fetch ke situs lain tanpa menambah CSP (uji v602 memeriksa). hapusSemuaSesi(userId, kecualiToken) dipakai ganti.sandi; bolehKirimKode(kunci, batas) untuk kode email.
   Tautan dari SINTA hanya https. Keputusan pemilik: sandi awal = NIM/NIP tetap; aktivasi tanpa email DIMATIKAN pemilik di Produksi (email kode sudah terkirim).
+- 28 Nov 2026: tampilan juga tayang di Cloudflare Pages https://repositori-upw.pages.dev/ (uji: /uji/; cabang main, output docs, pratinjau dimatikan; header keamanan docs/_headers).
+  GitHub Pages dimatikan + repositori privat dijadwalkan 30 Nov 2026 14.00 WITA (tugas terjadwal "upw-matikan-github-pages").
+- v0.61.0 (28 Nov 2026, Uji Coba): cadanganMingguan() di rawatHarian (CADANGAN_HARI 7, CADANGAN_SIMPAN 8, awalan "Cadangan / Mingguan otomatis / ", lama → setTrashed). Uji: uji-v61-bagian.mjs.
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,
