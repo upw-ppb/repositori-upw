@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.61.0 — 28 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.61.0 (tampilan docs/ dan server Apps Script Produksi deployment @46): cadangan data otomatis mingguan (8 salinan terakhir) di folder Drive Cadangan.
+- Tidak ada perubahan struktur data. Rollback ke v0.60.2 cukup tampilan (tag v0.60.2) dan deployment @45; salinan cadangan yang sudah dibuat tetap tersimpan.
+- Cadangan mingguan pertama dibuat oleh perawatan harian berikutnya (atau tombol "Jalankan perawatan sekarang" Super Admin).
+- Penyetuju: pemilik, di chat 28 Nov 2026: "Setuju tayang v0.61.0".
+
 ## v0.61.0 — 28 Nov 2026 — Uji Coba
 Ringkas: cadangan data otomatis mingguan — server menyalin spreadsheet data ke folder Drive Cadangan setiap 7 hari dan menyimpan 8 salinan terakhir.
 Permintaan pemilik 28 Nov 2026 (kekhawatiran kehilangan data): usulan cadangan terjadwal disetujui: "Ya, buatkan".
