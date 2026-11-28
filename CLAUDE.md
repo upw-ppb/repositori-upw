@@ -434,6 +434,9 @@ Rincian lengkap: bagian "Prosedur rilis dan pengembalian versi" di dokumen ranca
   "Semua kegiatan" memuat draf SINTA; kunciUrutKeg (tgl atau tahun SINTA). Uji: uji-v60-bagian.mjs.
 - v0.60.1 (27 Nov 2026, Uji Coba): tebakLuaranSinta (POLA_JURNAL_PKM / miripJudul dengan PkM dosen) → isian "Luaran dari" (PkM = Tabel 19); sinta.luaran {v, alasan}; hanya draf
   yang isiannya masih otomatis yang dirapikan. Uji: uji-v601-bagian.mjs.
+- v0.60.2 (28 Nov 2026, Uji Coba): keamanan. Content Security Policy di docs/uji/index.html (script-src 'self'; connect-src Apps Script saja) → JANGAN pakai onclick=/onload= sebaris,
+  skrip/CDN luar, atau fetch ke situs lain tanpa menambah CSP (uji v602 memeriksa). hapusSemuaSesi(userId, kecualiToken) dipakai ganti.sandi; bolehKirimKode(kunci, batas) untuk kode email.
+  Tautan dari SINTA hanya https. Keputusan pemilik: sandi awal = NIM/NIP tetap; aktivasi tanpa email DIMATIKAN pemilik di Produksi (email kode sudah terkirim).
 
 ## Penilaian & instrumen (dari DED/Matriks versi Word, Downloads)
 - prototipe/data-akreditasi.js: MATRIKS (84 butir Lampiran 1, total bobot 100.000 — terverifikasi), KRITERIA,

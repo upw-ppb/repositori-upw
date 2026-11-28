@@ -93,6 +93,9 @@ function kirimPubSinta(x, C, h) {
   m.k = kunci; m.pub = 1; m.tahun = m.tahun || tahun; m.pada = lama.pada || C.kini; m.terakhir = C.kini;
   m.asal = (m.asal || []).slice(); if (m.asal.indexOf(asal) < 0) m.asal.push(asal);
   ["jurnal", "doi", "url"].forEach(function (a) { var v = potong(x[a], 300).trim(); if (v && !m[a]) m[a] = v; });
+  // v0.60.2: tautan hanya https:// (sama dengan tautan lain di aplikasi); DOI hanya karakter DOI yang lazim
+  if (m.url) m.url = /^https:\/\//i.test(m.url) ? m.url.replace(/[\s<>"'`]/g, function (c) { return "%" + ("0" + c.charCodeAt(0).toString(16).toUpperCase()).slice(-2); }) : "";
+  if (m.doi && !/^10\.\d{3,9}\/[^\s<>"']+$/.test(m.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, ""))) m.doi = "";
   if (teks(x.akred).trim()) m.akred = potong(x.akred, 40).trim();
   if (teks(x.kuartil).trim()) m.kuartil = potong(x.kuartil, 40).trim();
   if (teks(x.tipe).trim() && (asal === "scopus" || asal === "wos")) m.tipe = potong(x.tipe, 60).trim();

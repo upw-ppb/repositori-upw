@@ -107,6 +107,7 @@ function aksiAktivasiKirimKode(d, token) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw galat("Format email tidak valid.");
   var dipakai = cari("Pengguna", function (x) { return String(x.email).toLowerCase() === email && x.id !== p.id; });
   if (dipakai) throw galat("Email ini sudah dipakai akun lain.");
+  if (!bolehKirimKode("aktivasi:" + p.id, 5)) throw galat("Terlalu banyak permintaan kode. Tunggu satu jam, lalu coba lagi.");
   var kode = buatKode(p.id, "aktivasi", email);
   kirimEmailKode(email, p.nama, kode, "aktivasi");
   catat(p.id, "aktivasi.kirimKode", { email: email });
@@ -130,6 +131,7 @@ function aksiLupaKirimKode(d) {
   var email = String(d.email || "").trim().toLowerCase();
   var p = email && cari("Pengguna", function (x) { return String(x.email).toLowerCase() === email && x.status === "aktif"; });
   var hasil = { pesan: "Bila email terdaftar, kode reset sudah dikirim. Periksa juga folder spam." };
+  if (p && !bolehKirimKode("lupa:" + p.id)) return hasil;   // v0.60.2: maks. BATAS_KIRIM_KODE per jam; jawaban tetap sama agar tidak membocorkan apa pun
   if (p) {
     var kode = buatKode(p.id, "reset", email);
     kirimEmailKode(email, p.nama, kode, "reset");
@@ -161,6 +163,7 @@ function aksiGantiSandi(d, token) {
   periksaSandiBaru(d.sandiBaru, p);
   var garam = acak(24);
   kunciTulis(function () { ubah("Pengguna", p, { hash: hashSandi(d.sandiBaru, garam), garam: garam, wajibGanti: false, diubahPada: new Date() }); });
+  hapusSemuaSesi(p.id, token);   // v0.60.2: perangkat lain otomatis keluar; perangkat ini tetap masuk
   catat(p.id, "ganti.sandi", {});
   return { pengguna: profilPublik(p) };
 }
@@ -281,7 +284,9 @@ function aksiAktivasiTanpaEmail(d, token) {
 function aksiEmailKirimKode(d, token) {
   var p = penggunaDariToken(token);
   if (p.status !== "aktif" || p.emailTerverifikasi !== "tertunda") throw galat("Email akun ini tidak perlu diverifikasi.");
-  var email = emailBaru(d, p), kode = buatKode(p.id, "email", email);
+  var email = emailBaru(d, p);
+  if (!bolehKirimKode("email:" + p.id, 5)) throw galat("Terlalu banyak permintaan kode. Tunggu satu jam, lalu coba lagi.");
+  var kode = buatKode(p.id, "email", email);
   kirimEmailKode(email, p.nama, kode, "aktivasi");
   catat(p.id, "email.kirimKode", { email: email });
   var hasil = { terkirimKe: email };

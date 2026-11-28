@@ -3,6 +3,19 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.60.2 — 28 Nov 2026 — Uji Coba
+Ringkas: perbaikan keamanan — ganti kata sandi mengeluarkan perangkat lain, permintaan kode email dibatasi, tautan SINTA hanya https, dan halaman dilindungi Content Security Policy.
+Hasil pemeriksaan keamanan 27–28 Nov 2026 (repositori, riwayat Git, 218 aksi server, login/sesi/sandi, tampilan, berbagi Drive). Keputusan pemilik: "Ya, kerjakan sesuai catatan saya":
+(1) sandi awal = NIM/NIP dibiarkan seperti sekarang — aktivasi tanpa email sudah dimatikan pemilik di Produksi, sehingga aktivasi wajib lewat kode ke email yang benar-benar ada; (2)–(6) dikerjakan.
+- Ganti kata sandi (aksiGantiSandi): semua sesi lain pengguna itu dihapus, sesi perangkat yang dipakai tetap (hapusSemuaSesi(userId, kecualiToken)).
+- Batas kirim kode (bolehKirimKode, CacheService 1 jam): lupa.kirimKode maks. 3 per akun (jawaban tetap sama, tidak membocorkan apakah email terdaftar); aktivasi.kirimKode dan
+  email.kirimKode maks. 5 per akun.
+- SINTA: tautan publikasi hanya https:// (karakter spasi/petik/< > disandikan), DOI harus berpola 10.xxxx/…; tampilan hanya membuat tautan https.
+- Content Security Policy di index.html: skrip hanya dari aplikasi sendiri, data hanya ke Apps Script (script.google.com, script.googleusercontent.com), gambar/berkas data: dan blob:,
+  object-src none; onclick sebaris pada tombol penanda buku SINTA diganti penangan di aplikasi.js. Diuji: 52 halaman/tab dijelajahi tanpa pelanggaran; skrip & kiriman ke situs luar terblokir.
+- Berkas uji: alamat Gmail buatan diganti alamat contoh.id; uji pengingat bukti kini mengikuti tanggal hari ini (sebelumnya gagal setelah batas tanggal data uji lewat).
+- Uji: alat/uji/uji-v602-bagian.mjs.
+
 ## v0.60.1 — 27 Nov 2026 — Produksi
 - Produksi diperbarui ke v0.60.1 (tampilan docs/ dan server Apps Script Produksi deployment @44): "Luaran dari" publikasi SINTA ditebak otomatis (jurnal pengabdian / judul mirip PkM → PkM, Tabel 19).
 - Tidak ada perubahan struktur data. Rollback ke v0.60.0 cukup tampilan (tag v0.60.0) dan deployment @43.

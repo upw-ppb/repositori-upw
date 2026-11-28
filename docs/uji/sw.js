@@ -1,6 +1,6 @@
 /* Service worker: tampilan diambil dari jaringan lebih dulu (agar pembaruan langsung terasa),
    lalu cadangan dari cache bila sedang offline. Permintaan ke server Apps Script tidak di-cache. */
-const CACHE = "upw-uji-v0.60.1";
+const CACHE = "upw-uji-v0.60.2";
 const INTI = ["./", "index.html", "gaya.css", "konfig.js", "aplikasi.js", "qr.js", "zip.js", "docx.js", "panduan.js", "instrumen.js", "saran.js", "logo.png", "logo-kop.jpg", "ikon-192.png", "ikon-512.png", "ikon-apple-180.png", "wilayah.json"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(INTI)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => {

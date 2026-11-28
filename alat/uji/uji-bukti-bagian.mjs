@@ -37,7 +37,9 @@ export function jalankan({ g, cek, ok, salah, ID, tKps, tDsn, tAdm, tM, tM2, tD2
   cek("pengaju melengkapi data akreditasi setelah terbit", k.tingkat === "Internasional" && k.isian.Capaian === "Juara 1" && k.bisaUbahAkreditasi);
   cek("peserta bukan pengaju tidak bisa ubah data akreditasi", /tidak bisa diubah/.test(salah("kegiatan.akreditasi", { id: lombaId, data: { tingkat: "Nasional" } }, tM3)));
   let t = ok("tugas.saya", {}, tM3);
-  cek("pengingat peserta: bukti 3/5, batas, belum terlambat", t.tugas.some(x => x.jenis === "bukti" && x.id === lombaId && x.ada === 3 && x.perlu === 5 && !x.terlambat), t.tugas);
+  // terlambat dihitung dari tanggal hari ini (WITA) terhadap batas; data uji bertanggal tetap, jadi harapan mengikuti tanggal berjalan
+  const hariIniWita = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+  cek("pengingat peserta: bukti 3/5, batas, status terlambat sesuai tanggal hari ini", t.tugas.some(x => x.jenis === "bukti" && x.id === lombaId && x.ada === 3 && x.perlu === 5 && x.batas && x.terlambat === (hariIniWita > x.batas)), t.tugas);
   ok("bukti.unggah", { id: lombaId, slot: "hadir", ket: "Lomba daring, tidak ada daftar hadir" }, tM3);
   j = ok("bukti.unggah", { id: lombaId, slot: "piagam", nama: "piagam.jpg", isi: Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1]).toString("base64") }, tM);
   cek("bukti wajib lengkap → otomatis diajukan untuk verifikasi data", j.otomatis && j.kegiatan.status === "diajukan" && j.kegiatan.riwayat.some(r => r.aksi === "ajukan_data"), j.kegiatan.status);

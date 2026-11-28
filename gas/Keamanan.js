@@ -93,9 +93,19 @@ function hapusSesi(token) {
   });
 }
 
-function hapusSemuaSesi(userId) {
+/** Hapus semua sesi pengguna; bila `kecualiToken` diberikan, sesi perangkat itu tetap (v0.60.2: ganti kata sandi). */
+/** v0.60.2: batasi pengiriman kode lewat email (mencegah banjir email dan habisnya kuota harian). */
+var BATAS_KIRIM_KODE = 3;
+function bolehKirimKode(kunci, batas) {
+  var c = CacheService.getScriptCache(), k = "kirimkode:" + kunci, n = Number(c.get(k) || 0);
+  if (n >= (batas || BATAS_KIRIM_KODE)) return false;
+  c.put(k, String(n + 1), 3600);
+  return true;
+}
+function hapusSemuaSesi(userId, kecualiToken) {
+  var kecuali = kecualiToken ? hashToken(kecualiToken) : "";
   kunciTulis(function () {
-    var l = semua("Sesi").filter(function (x) { return x.userId === userId; }).reverse();
+    var l = semua("Sesi").filter(function (x) { return x.userId === userId && x.tokenHash !== kecuali; }).reverse();
     l.forEach(function (s) { CacheService.getScriptCache().remove("sesi:" + s.tokenHash); hapusBaris("Sesi", s); });
   });
 }
