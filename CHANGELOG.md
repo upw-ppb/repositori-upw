@@ -3,6 +3,12 @@
 Format: versi, tanggal, lingkungan, isi, penyetuju. Produksi hanya berubah setelah pemilik menulis "setuju tayang".
 Rilis Uji Coba tidak memerlukan persetujuan tayang (aturan tetap no. 1–2 di CLAUDE.md).
 
+## v0.60.2 — 28 Nov 2026 — Produksi
+- Produksi diperbarui ke v0.60.2 (tampilan docs/ dan server Apps Script Produksi deployment @45): perbaikan keamanan — ganti kata sandi mengeluarkan perangkat lain, batas
+  permintaan kode email, tautan SINTA hanya https, Content Security Policy di halaman.
+- Tidak ada perubahan struktur data. Rollback ke v0.60.1 cukup tampilan (tag v0.60.1) dan deployment @44.
+- Penyetuju: pemilik, di chat 28 Nov 2026: "Setuju tayang v0.60.2".
+
 ## v0.60.2 — 28 Nov 2026 — Uji Coba
 Ringkas: perbaikan keamanan — ganti kata sandi mengeluarkan perangkat lain, permintaan kode email dibatasi, tautan SINTA hanya https, dan halaman dilindungi Content Security Policy.
 Hasil pemeriksaan keamanan 27–28 Nov 2026 (repositori, riwayat Git, 218 aksi server, login/sesi/sandi, tampilan, berbagi Drive). Keputusan pemilik: "Ya, kerjakan sesuai catatan saya":

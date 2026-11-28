@@ -1,7 +1,7 @@
 # Daftar periksa Produksi — Repositori Akreditasi UPW
 
 **TAYANG 13 Nov 2026: v0.16.0** di https://upw-ppb.github.io/repositori-upw/ (persetujuan pemilik: "Setuju tayang v0.16.0").
-**Diperbarui 27 Nov 2026: v0.60.1** (deployment @44; persetujuan: "Setuju tayang v0.60.1").
+**Diperbarui 28 Nov 2026: v0.60.2** (deployment @45; persetujuan: "Setuju tayang v0.60.2").
 Email kampus (DKIM) belum beres → pakai aktivasi tanpa email sementara (v0.16.0). Bagian A tetap berlaku untuk DKIM.
 
 Langkah pemilik setelah tayang: masuk sebagai `superadmin` (sandi sementara dari log) → ganti sandi → Pengguna › Aktivasi akun →
